@@ -55,3 +55,9 @@ Vercel deployment dpl_AUKDCBEMeQWL9ncTxyv7oi5cidUA reached READY at https://enco
 The hosted preflight passed closed signup, restricted role, RLS on application tables, private bucket and verified client TLS. Optional DATABASE_SSL_CA supports the official provider trust root without disabling certificate or hostname verification. This is a personal demo on Hobby, with no paid-plan upgrade. Detailed live checks and publication evidence follow in docs/testing/results.md and docs/work-log.md.
 
 Deployment source/report committed and pushed as 9d5a0ccf69a714a19221941e269a5e04fc9a7de7; local and remote main matched. All 147 local automated tests and 16 live checks passed. GitHub Actions run 42407530523 passed all clean-runner checks, including migrations, typecheck, lint, unit/integration/browser tests, normal and Supabase-mode builds and documentation verification.
+
+## Sidebar and invitation-management milestone
+
+Implemented scrollable desktop navigation with reachable account controls, mobile account/sign-out controls, administrator invitation list/actions, HR member-only scope, safe versioned resend/revoke, fresh-token replacement, queue cancellation, provisioning race protection and explicit email queue status. Added the seventh additive migration linking outbox mail to invitation history. Worker/serverless paths now share validated SMTP transport and attendance processing can proceed without SMTP. All 171 local automated tests passed; hosted rollout is underway.
+
+No email service is configured, as confirmed by Talha. The UI explicitly reports that invitations remain queued. No provider account, paid plan or real-recipient test email was created or sent.

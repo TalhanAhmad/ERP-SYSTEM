@@ -83,3 +83,30 @@ it("executes a bounded serverless job pass with durable email processing", async
   expect(result.slice).toBeGreaterThanOrEqual(0);
   expect(result.attendanceUpdated).toBeGreaterThanOrEqual(0);
 });
+it("never claims canceled mail even after a lease expires", async () => {
+  const record = await mail();
+  await db.outbox.update({
+    where: { id: record.id },
+    data: { canceledAt: new Date(), leaseUntil: new Date(0) },
+  });
+  let sent = 0;
+  expect(
+    (
+      await processOutbox(async () => {
+        sent++;
+      }, 1)
+    ).claimed,
+  ).toBe(0);
+  expect(sent).toBe(0);
+});
+it("keeps queued mail untouched and attendance processing available without SMTP", async () => {
+  const record = await mail();
+  const { scheduledPass } = await import("@/server/jobs/scheduled");
+  const result = await scheduledPass(undefined, {});
+  expect(result.mailStatus).toBe("NOT_CONFIGURED");
+  expect(result.mailClaimed).toBe(0);
+  expect(result.attendanceUpdated).toBeGreaterThanOrEqual(0);
+  expect(
+    (await db.outbox.findUniqueOrThrow({ where: { id: record.id } })).attempts,
+  ).toBe(0);
+});

@@ -7,12 +7,14 @@ export function MutationForm({
   transform,
   label = "Save",
   method = "POST",
+  successMessage = "Saved successfully.",
 }: {
   endpoint: string;
   children?: React.ReactNode;
   transform?: (data: FormData) => unknown;
   label?: string;
   method?: "POST" | "PATCH";
+  successMessage?: string;
 }) {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -77,7 +79,7 @@ export function MutationForm({
       )}
       {success && (
         <div className="success" role="status">
-          Saved successfully.
+          {successMessage}
         </div>
       )}
       <div className="form-actions">

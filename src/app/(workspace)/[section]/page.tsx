@@ -20,7 +20,10 @@ import {
   InvitationForm,
   MemberForm,
   ReadButton,
+  InvitationAction,
 } from "@/components/work-forms";
+import { listInvitations } from "@/modules/identity/service";
+import { emailStatus } from "@/lib/email-config";
 export default async function Section({
   params,
 }: {
@@ -264,18 +267,22 @@ export default async function Section({
         </section>
       </>
     );
-  if (section === "people")
+  if (section === "people") {
+    const canInvite = ["SUPER_ADMIN", "HR_ADMIN"].includes(actor.role);
+    const invitations = canInvite ? await listInvitations(actor) : [];
     return (
       <>
         <Heading
           title="People"
           subtitle="The people in your workspace, within your current access."
         />
-        {["SUPER_ADMIN", "HR_ADMIN"].includes(actor.role) && (
+        {canInvite && (
           <section className="panel">
             <details>
               <summary>Invite a person</summary>
-              <InvitationForm />
+              <InvitationForm
+                canInvitePrivileged={actor.role === "SUPER_ADMIN"}
+              />
             </details>
           </section>
         )}
@@ -308,8 +315,97 @@ export default async function Section({
             </table>
           </div>
         </section>
+        {canInvite && (
+          <section className="panel" aria-labelledby="invitations-heading">
+            <h2 id="invitations-heading">Invitations</h2>
+            {emailStatus() !== "READY" && (
+              <p className="error" role="status">
+                Email delivery is not configured. Invitations will remain queued
+                until an email service is connected.
+              </p>
+            )}
+            <p className="note">
+              Resending replaces the previous link and queues a new email.
+              Revoking prevents account creation. An email already being sent
+              may still arrive, but its canceled link will not work.
+            </p>
+            {invitations.length === 0 ? (
+              <Empty text="No invitations yet." />
+            ) : (
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Person</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Email</th>
+                      <th>Expires (Karachi)</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invitations.map((item) => (
+                      <tr key={item.id}>
+                        <td>
+                          <strong>{item.displayName}</strong>
+                          <div>{item.email}</div>
+                          <div className="muted">@{item.username}</div>
+                        </td>
+                        <td>{item.role.replaceAll("_", " ").toLowerCase()}</td>
+                        <td>
+                          <Status value={item.status} />
+                          {item.processing && (
+                            <p className="note">Account creation in progress</p>
+                          )}
+                        </td>
+                        <td>
+                          {
+                            {
+                              QUEUED: "Queued",
+                              SMTP_ACCEPTED: "Accepted by email server",
+                              CANCELED: "Canceled",
+                              RETRYING: "Retrying",
+                              FAILED: "Failed",
+                            }[item.delivery]
+                          }
+                        </td>
+                        <td>
+                          {new Intl.DateTimeFormat("en-GB", {
+                            timeZone: "Asia/Karachi",
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          }).format(item.expiresAt)}
+                        </td>
+                        <td>
+                          {!["ACCEPTED", "REVOKED"].includes(item.status) && (
+                            <div className="stack">
+                              {!item.processing && (
+                                <InvitationAction
+                                  id={item.id}
+                                  version={item.version}
+                                  action="resend"
+                                />
+                              )}
+                              <InvitationAction
+                                id={item.id}
+                                version={item.version}
+                                action="revoke"
+                              />
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
       </>
     );
+  }
   if (section === "notifications") {
     const items = await db.notification.findMany({
       where: { recipientId: actor.id },

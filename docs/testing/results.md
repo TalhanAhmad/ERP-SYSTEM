@@ -11,10 +11,10 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm db:migrate:deploy on dev/test | PASS | Six migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
-| pnpm test:unit | PASS — 93 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
-| pnpm test:integration | PASS — 52 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
+| pnpm test:unit | PASS — 100 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
+| pnpm test:integration | PASS — 65 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 2 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest run: 4.8 seconds on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 6 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest run: 4.8 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
@@ -104,3 +104,13 @@ Additional live asset check passed: none of the configured database credentials,
 A supplied screenshot showed generic credential rejection. The stored live-owner credentials were independently verified again: POST /api/session/sign-in returned 200, GET /api/v1/me returned 200 with SUPER_ADMIN, and a fresh Chromium login rendered the authenticated dashboard. The screenshot does not reveal the entered password, so its exact cause is not established. No account password reset or application change was necessary; hosted credentials are separate from the local account and excluded from this report.
 
 Supplementary limitation from that diagnostic: the Sign out button was outside the default Chromium viewport and its click timed out after the successful dashboard assertion. API sign-out passed. Track sidebar control reachability as a separate UI follow-up; this diagnostic does not claim browser sign-out passed.
+
+## Sidebar and invitation-management milestone — 8 November 2026
+
+Local verification: typecheck/lint, 100 unit tests, 65 integration tests and 6 Chromium browser tests passed (171 total), Prisma validation and normal production build passed, and production dependency audit reported no known vulnerabilities. Seven additive migrations are applied locally and to encova_test. Live migration/deployment and acceptance checks are underway at this checkpoint.
+
+New checks cover administrator/HR/member permissions, private invitation DTOs, token rotation and replay rejection for both auth paths, expiry, retry idempotency, stale/concurrent management requests, revocation during provider provisioning and HTTP origin/session/version validation. Loopback SMTP tests complete a real SMTP conversation and exercise recipient rejection/retry without external mail. Missing SMTP leaves queued mail untouched while attendance processing continues. Chromium verifies the actual People controls and invitation links, plus administrator navigation/sign-out at 1280x720, 1280x480 and 360x800.
+
+The first invitation browser run encountered Next.js's extra route-announcer alert; scoped its locator to the form and matched the existing lowercase status labels. All six browser checks then passed. The earlier supplementary sidebar limitation is fixed locally; live acceptance is pending rollout. Read-only schema comparison retains the pre-existing reviewed SQL-only constraints, which are intentionally absent from Prisma's model; no constraint-removal script was executed.
+
+Talha confirmed no email service exists. Local SMTP acceptance is not proof of internet delivery or inbox receipt. Live invitation delivery, verified sender setup and scheduler operation remain unclaimed.

@@ -61,6 +61,7 @@ export async function acceptSupabaseInvitation(
       });
       invariant(
         item.provisioningAttemptId === attemptId &&
+          item.tokenHash === hash &&
           !item.acceptedAt &&
           !item.revokedAt &&
           item.expiresAt > new Date(),
@@ -83,12 +84,17 @@ export async function acceptSupabaseInvitation(
         where: { id: item.id },
         data: {
           acceptedAt: new Date(),
+          version: { increment: 1 },
           provisioningStatus: "COMPLETE",
           provisioningLeaseUntil: null,
         },
       });
       await audit(tx, person.id, "INVITATION_ACCEPTED", item.id, {
         provider: "supabase",
+      });
+      await tx.outbox.updateMany({
+        where: { invitationId: item.id, deliveredAt: null, canceledAt: null },
+        data: { canceledAt: new Date() },
       });
       return { id: person.id };
     });

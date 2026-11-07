@@ -13,3 +13,11 @@ Production target is Supabase + Vercel; see deployment.md. Supabase session/prov
 ## Release gates still open
 
 Real SMTP journey, privileged MFA, shared operational job-run monitoring, full API/security/browser acceptance, least-privilege database credentials, deployment, backup restore into a separate database, rollback compatibility and incident drills. Do not claim recovery from a successful backup command alone. The local embedded distribution does not include pg_dump/pg_restore; install PostgreSQL client tools or use the approved database provider before the restore drill.
+
+## Invitation controls and email state
+
+People lists invitation status and email queue state for super admins; HR sees/manages MEMBER invitations only. Resend invalidates the prior link and grants a new 72-hour expiry. Revoke prevents acceptance, including an in-progress provider attempt. Used/revoked invitations cannot be resent. Concurrent management actions require the displayed version and a fresh deliberate action; retries with the same idempotency key do not rotate again.
+
+Outbox now stores invitationId and canceledAt. Resend, revoke and acceptance cancel outstanding old mail. Workers skip canceled rows; a message already in flight can arrive, but its invalidated link cannot create an account. deliveredAt means SMTP server acceptance, not verified inbox receipt. Failed SMTP attempts remain queued for bounded retries. Do not expose outbox text, token hashes or provider IDs through browser lists/logs.
+
+Without complete SMTP configuration the scheduled pass reports mailStatus=NOT_CONFIGURED or INVALID, claims no email and still reconciles attendance. SMTP service and recurring scheduler are not yet configured for the personal demo. Configure a verified sender and credentials privately before testing internet delivery; do not enqueue real employee invites before that acceptance check.

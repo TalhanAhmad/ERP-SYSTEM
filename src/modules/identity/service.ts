@@ -8,7 +8,7 @@ import { env } from "@/server/env";
 import { acceptSupabaseInvitation } from "./supabase-provisioning";
 import { invariant } from "@/server/errors";
 import type { Actor } from "@/server/context";
-import { audit, type Tx } from "@/server/transaction";
+import { audit, expected, type Tx } from "@/server/transaction";
 import { invitationSchema, acceptSchema } from "./schemas";
 export { invitationSchema, acceptSchema } from "./schemas";
 export async function invite(
@@ -42,6 +42,7 @@ export async function invite(
   });
   await tx.outbox.create({
     data: {
+      invitationId: item.id,
       eventKey: `invite:${item.id}`,
       recipient: input.email,
       subject: "Your Encova Workspace invitation",
@@ -53,6 +54,141 @@ export async function invite(
     role: input.role,
   });
   return { id: item.id, email: item.email, expiresAt: item.expiresAt };
+}
+function manageInvitation(actor: Actor, role: string) {
+  invariant(
+    actor.role === "SUPER_ADMIN" ||
+      (actor.role === "HR_ADMIN" && role === "MEMBER"),
+    "FORBIDDEN",
+    "You cannot manage this invitation.",
+    403,
+  );
+}
+// Explicit DTO: token hashes, bearer links and provider provisioning IDs stay server-only.
+export async function listInvitations(actor: Actor) {
+  invariant(
+    ["SUPER_ADMIN", "HR_ADMIN"].includes(actor.role),
+    "FORBIDDEN",
+    "Administrator access required.",
+    403,
+  );
+  const items = await db.invitation.findMany({
+    where: actor.role === "HR_ADMIN" ? { role: "MEMBER" } : {},
+    orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+    take: 100,
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      displayName: true,
+      role: true,
+      employmentType: true,
+      version: true,
+      expiresAt: true,
+      acceptedAt: true,
+      revokedAt: true,
+      createdAt: true,
+      provisioningStatus: true,
+      emails: {
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: 1,
+        select: {
+          deliveredAt: true,
+          canceledAt: true,
+          attempts: true,
+          lastError: true,
+        },
+      },
+    },
+  });
+  return items.map(({ emails, provisioningStatus, ...item }) => ({
+    ...item,
+    status: item.acceptedAt
+      ? "ACCEPTED"
+      : item.revokedAt
+        ? "REVOKED"
+        : item.expiresAt <= new Date()
+          ? "EXPIRED"
+          : "PENDING",
+    processing: provisioningStatus === "PROVISIONING",
+    delivery: emails[0]?.canceledAt
+      ? "CANCELED"
+      : emails[0]?.deliveredAt
+        ? "SMTP_ACCEPTED"
+        : emails[0]?.lastError
+          ? emails[0].attempts >= 5
+            ? "FAILED"
+            : "RETRYING"
+          : "QUEUED",
+  }));
+}
+export async function manageInvitationAction(
+  tx: Tx,
+  actor: Actor,
+  id: string,
+  input: { expectedVersion: number; action: "resend" | "revoke" },
+) {
+  await tx.$queryRaw`SELECT id FROM "Invitation" WHERE id=${id}::uuid FOR UPDATE`;
+  const item = await tx.invitation.findUnique({ where: { id } });
+  invariant(item, "NOT_FOUND", "Invitation not found.", 404);
+  manageInvitation(actor, item.role);
+  expected(item.version, input.expectedVersion);
+  invariant(
+    !item.acceptedAt && !item.revokedAt,
+    "INVITATION_CLOSED",
+    "This invitation has already been accepted or revoked.",
+    409,
+  );
+  if (input.action === "resend")
+    invariant(
+      item.provisioningStatus === "PENDING",
+      "PROVISIONING_BUSY",
+      "This invitation is being processed. Revoke it or retry after processing finishes.",
+      409,
+    );
+  // Canceled queued mail is never claimed by a worker. Already in-flight mail
+  // may arrive, but the revoked/rotated token cannot authorize acceptance.
+  await tx.outbox.updateMany({
+    where: { invitationId: id, deliveredAt: null, canceledAt: null },
+    data: { canceledAt: new Date() },
+  });
+  if (input.action === "revoke") {
+    const updated = await tx.invitation.update({
+      where: { id },
+      data: { revokedAt: new Date(), version: { increment: 1 } },
+    });
+    await audit(tx, actor.id, "INVITATION_REVOKED", id);
+    return { id, version: updated.version, status: "REVOKED" };
+  }
+  const token = randomBytes(32).toString("hex");
+  const updated = await tx.invitation.update({
+    where: { id },
+    data: {
+      tokenHash: createHash("sha256").update(token).digest("hex"),
+      expiresAt: new Date(Date.now() + 72 * 3600000),
+      version: { increment: 1 },
+      provisioningAttemptId: null,
+      provisioningLeaseUntil: null,
+    },
+  });
+  await tx.outbox.create({
+    data: {
+      invitationId: id,
+      eventKey: `invite:${id}:resend:${updated.version}`,
+      recipient: item.email,
+      subject: "Your new Encova Workspace invitation",
+      text: `Accept your invitation within 72 hours: ${env.APP_URL}/invite/${token}`,
+    },
+  });
+  await audit(tx, actor.id, "INVITATION_RESENT", id, {
+    version: updated.version,
+  });
+  return {
+    id,
+    version: updated.version,
+    expiresAt: updated.expiresAt,
+    status: "PENDING",
+  };
 }
 export async function acceptInvitation(input: z.infer<typeof acceptSchema>) {
   if (env.AUTH_PROVIDER === "supabase") return acceptSupabaseInvitation(input);
@@ -106,7 +242,11 @@ export async function acceptInvitation(input: z.infer<typeof acceptSchema>) {
       });
       await tx.invitation.update({
         where: { id: item.id },
-        data: { acceptedAt: new Date() },
+        data: { acceptedAt: new Date(), version: { increment: 1 } },
+      });
+      await tx.outbox.updateMany({
+        where: { invitationId: item.id, deliveredAt: null, canceledAt: null },
+        data: { canceledAt: new Date() },
       });
       await audit(tx, person.id, "INVITATION_ACCEPTED", item.id);
       return { id: person.id };

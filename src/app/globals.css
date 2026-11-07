@@ -123,6 +123,12 @@ label + label {
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.sidebar > :not(.nav) {
+  flex-shrink: 0;
 }
 .brand {
   font-size: 24px;
@@ -159,6 +165,8 @@ label + label {
 .nav {
   display: grid;
   gap: 6px;
+  min-height: 0;
+  overflow-y: auto;
 }
 .nav a {
   padding: 12px;
@@ -195,6 +203,10 @@ label + label {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+.user > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .user small {
   display: block;
@@ -551,14 +563,20 @@ details summary {
   }
   .sidebar .brand,
   .workspace-label,
-  .nav-label,
-  .sidebar-footer {
+  .nav-label {
     display: none;
   }
   .nav {
     display: flex;
     overflow: auto;
     gap: 5px;
+  }
+  .sidebar-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding: 12px 0 0;
   }
   .nav a {
     padding: 9px;

@@ -8,7 +8,7 @@ Last updated: 2026-11-08 (Asia/Karachi)
 - Current learning status: Awaiting learning check
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
-- Implementation status: initial company-day/work modules deployed for personal testing; full specification and company production acceptance remain incomplete
+- Implementation status: personal-testing demo deployed; sidebar and invitation management milestone implemented and locally verified, with live rollout underway. Full specification and company production acceptance remain incomplete.
 - Publication: verified demo deployment code and report committed/pushed as 9d5a0cc; local/remote SHA equality verified. GitHub Actions run 42407530523 passed all checks; local 147 automated tests and 16 live acceptance checks also passed.
 
 ## Implemented evidence
@@ -21,7 +21,7 @@ See [the backlog](planning/backlog.md). No internship workflow, advanced spreads
 
 ## Blockers and dependencies
 
-Actual company policies, production host, real SMTP delivery and backup-client tooling/restore demonstration remain unresolved for pilot. Git author identity has been supplied and configured locally. GitHub CLI browser authentication completed as TalhanAhmad with credentials stored in the system keyring; repository ADMIN access and HTTPS push succeeded. Node/pnpm/PostgreSQL were recovered for development; Docker remains unavailable.
+Actual company policies, real SMTP delivery and backup-client tooling/restore demonstration remain unresolved for pilot. Git author identity has been supplied and configured locally. GitHub CLI browser authentication completed as TalhanAhmad with credentials stored in the system keyring; repository ADMIN access and HTTPS push succeeded. Node/pnpm/PostgreSQL were recovered for development; Docker remains unavailable.
 
 ## Production stack decision
 
@@ -31,4 +31,4 @@ Official CLI browser authentication resolved the connected-tool gap. Created a s
 
 ## Exact next action
 
-The verified deployment changes/report are published. Continue company launch prerequisites and the product backlog when authorized. SMTP delivery, recurring jobs, binary file workflows, privileged MFA and backup restore remain company launch gates. Invitation resend/revoke remains the next product feature after deployment verification.
+Deploy and verify the sidebar/invitation-management milestone, then publish its updated evidence. Local results: 100 unit, 65 integration and 6 browser tests passed. Talha confirmed no SMTP service exists, so real delivery remains blocked on provider setup. Recurring jobs, binary file workflows, privileged MFA, restore and broader product requirements remain open.

@@ -4,10 +4,12 @@ import { workDate } from "@/lib/dates";
 import { reconcileAttendance } from "./attendance";
 import { processOutbox } from "./outbox";
 import { emailSender } from "./email";
+import { emailStatus } from "@/lib/email-config";
 // Bounded passes resume through durable email leases and deterministic date slices.
 // Configure a recurring scheduler; Vercel does not run a permanent Node worker.
 export async function scheduledPass(
-  send: Parameters<typeof processOutbox>[0] = emailSender(),
+  send?: Parameters<typeof processOutbox>[0],
+  emailInput: Record<string, unknown> = process.env,
 ) {
   const now = new Date();
   const day = workDate(now);
@@ -21,7 +23,10 @@ export async function scheduledPass(
     skip: slice * 20,
     take: 20,
   });
-  const mail = await processOutbox(send, 1);
+  const mailStatus = send ? "INJECTED" : emailStatus(emailInput);
+  const sender =
+    send ?? (mailStatus === "READY" ? emailSender(emailInput) : undefined);
+  const mail = sender ? await processOutbox(sender, 1) : { claimed: 0 };
   let updated = 0;
   for (const date of [workDate(new Date(now.getTime() - 86400000)), day])
     updated += (
@@ -31,5 +36,10 @@ export async function scheduledPass(
     ).updated;
   await db.rateLimit.deleteMany({ where: { expiresAt: { lt: now } } });
   await db.idempotency.deleteMany({ where: { expiresAt: { lt: now } } });
-  return { mailClaimed: mail.claimed, attendanceUpdated: updated, slice };
+  return {
+    mailClaimed: mail.claimed,
+    mailStatus,
+    attendanceUpdated: updated,
+    slice,
+  };
 }

@@ -14,9 +14,17 @@ export function ProjectForm() {
     </MutationForm>
   );
 }
-export function InvitationForm() {
+export function InvitationForm({
+  canInvitePrivileged = false,
+}: {
+  canInvitePrivileged?: boolean;
+}) {
   return (
-    <MutationForm endpoint="/api/v1/invitations" label="Send invitation">
+    <MutationForm
+      endpoint="/api/v1/invitations"
+      label="Queue invitation"
+      successMessage="Invitation queued for email delivery."
+    >
       <div className="form-grid">
         <label>
           Display name
@@ -34,9 +42,13 @@ export function InvitationForm() {
           Role
           <select name="role">
             <option>MEMBER</option>
-            <option>TEAM_LEAD</option>
-            <option>HR_ADMIN</option>
-            <option>SUPER_ADMIN</option>
+            {canInvitePrivileged && (
+              <>
+                <option>TEAM_LEAD</option>
+                <option>HR_ADMIN</option>
+                <option>SUPER_ADMIN</option>
+              </>
+            )}
           </select>
         </label>
         <label>
@@ -48,6 +60,28 @@ export function InvitationForm() {
         </label>
       </div>
     </MutationForm>
+  );
+}
+export function InvitationAction({
+  id,
+  version,
+  action,
+}: {
+  id: string;
+  version: number;
+  action: "resend" | "revoke";
+}) {
+  return (
+    <MutationForm
+      endpoint={`/api/v1/invitations/${id}/${action}`}
+      label={action === "resend" ? "Resend invitation" : "Revoke invitation"}
+      transform={() => ({ expectedVersion: version })}
+      successMessage={
+        action === "resend"
+          ? "New invitation queued. The previous link is invalid."
+          : "Invitation revoked. Its link no longer works."
+      }
+    />
   );
 }
 type Option = { id: string; displayName: string; username: string };

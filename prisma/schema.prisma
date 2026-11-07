@@ -214,8 +214,12 @@ model Outbox {
  nextAttemptAt DateTime @default(now()) @db.Timestamptz
  leaseUntil DateTime? @db.Timestamptz
  deliveredAt DateTime? @db.Timestamptz
+ canceledAt DateTime? @db.Timestamptz
+ invitationId String? @db.Uuid
+ invitation Invitation? @relation(fields: [invitationId], references: [id], onDelete: Restrict)
  lastError String?
  createdAt DateTime @default(now()) @db.Timestamptz
+ @@index([invitationId,createdAt])
 }
 model AuthRateLimit {
  id String @id
@@ -225,6 +229,8 @@ model AuthRateLimit {
  @@map("auth_rate_limit")
 }
 model Invitation {
+ version Int @default(1)
+ emails Outbox[]
  provisioningStatus String @default("PENDING")
  provisioningAttemptId String? @db.Uuid
  provisioningLeaseUntil DateTime? @db.Timestamptz

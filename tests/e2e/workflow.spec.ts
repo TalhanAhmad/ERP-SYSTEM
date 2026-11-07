@@ -1,17 +1,5 @@
-import { test, expect, type Page } from "@playwright/test";
-async function login(page: Page, email: string) {
-  await page.goto("/login", { waitUntil: "domcontentloaded" });
-  // Better Auth limits repeated logins from one IP. Separate browser accounts still
-  // share loopback, so retry the public form until its short rate-limit window clears.
-  await expect(async () => {
-    await page.getByLabel("Work email").fill(email);
-    await page
-      .getByLabel("Password", { exact: true })
-      .fill("Synthetic-browser-test-only-9#");
-    await page.getByRole("button", { name: "Sign in to workspace" }).click();
-    await expect(page).toHaveURL(/dashboard/, { timeout: 1500 });
-  }).toPass({ timeout: 25000, intervals: [1000, 3000, 5000] });
-}
+import { test, expect } from "@playwright/test";
+import { login } from "./helpers";
 
 test("complete browser work lifecycle with three separate role sessions", async ({
   browser,
@@ -149,3 +137,28 @@ test("360-pixel login and workspace keep primary controls reachable", async ({
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(360);
 });
+for (const viewport of [
+  { width: 1280, height: 720 },
+  { width: 1280, height: 480 },
+  { width: 360, height: 800 },
+]) {
+  test(`administrator can navigate and sign out at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await login(page, "e2e.admin@example.test");
+    const navigation = page.getByRole("navigation", {
+      name: "Main navigation",
+    });
+    await navigation
+      .getByRole("link", { name: "Audit log", exact: true })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Audit log", exact: true }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Sign out", exact: true }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/login$/);
+  });
+}

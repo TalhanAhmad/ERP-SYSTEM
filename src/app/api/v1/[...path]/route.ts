@@ -25,6 +25,8 @@ import {
   acceptSchema,
   invite,
   acceptInvitation,
+  listInvitations,
+  manageInvitationAction,
 } from "@/modules/identity/service";
 import {
   attendanceList,
@@ -68,6 +70,8 @@ export async function GET(request: Request, { params }: Params) {
           role: actor.role,
         },
       });
+    if (path === "invitations")
+      return NextResponse.json({ data: await listInvitations(actor) });
     if (path === "attendance" || path === "attendance/me")
       return NextResponse.json({
         data: await attendanceList(
@@ -203,6 +207,16 @@ export async function POST(request: Request, { params }: Params) {
       request.headers.get("idempotency-key"),
       input,
       async (tx) => {
+        if (path[0] === "invitations" && path.length === 3) {
+          const body = z
+            .object({ expectedVersion: z.number().int().positive() })
+            .strict()
+            .parse(input);
+          return manageInvitationAction(tx, actor, uuid.parse(path[1]), {
+            ...body,
+            action: z.enum(["resend", "revoke"]).parse(path[2]),
+          });
+        }
         if (path[0] === "users" && path.length === 3) {
           const id = uuid.parse(path[1]);
           if (path[2] === "role")

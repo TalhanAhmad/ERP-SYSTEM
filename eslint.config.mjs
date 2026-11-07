@@ -5,6 +5,10 @@ export default defineConfig([
   ...nextVitals,
   ...nextTs,
   globalIgnores([
+    ".local/**",
+    ".vercel/**",
+    "playwright-report/**",
+    "test-results/**",
     ".next/**",
     "src/generated/**",
     "next-env.d.ts",

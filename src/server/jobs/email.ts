@@ -1,41 +1,29 @@
 import "server-only";
 import nodemailer from "nodemailer";
-import { z } from "zod";
-export function emailSender() {
-  const settings = z
-    .object({
-      SMTP_HOST: z.string().min(1),
-      SMTP_PORT: z.coerce.number().int().positive(),
-      SMTP_FROM: z.email(),
-    })
-    .parse(process.env);
-  const transport = nodemailer.createTransport({
-    host: settings.SMTP_HOST,
-    port: settings.SMTP_PORT,
-    secure: settings.SMTP_PORT === 465,
-    connectionTimeout: 5000,
-    greetingTimeout: 5000,
-    socketTimeout: 10000,
-    ...(process.env.SMTP_USER
-      ? {
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASSWORD,
-          },
-        }
-      : {}),
-  });
-  return (job: {
+import { smtpConfiguration } from "@/lib/email-config";
+export function emailSender(input: Record<string, unknown> = process.env) {
+  const { options, from } = smtpConfiguration(input);
+  const transport = nodemailer.createTransport(options);
+  return async (job: {
     id: string;
     recipient: string;
     subject: string;
     text: string;
-  }) =>
-    transport.sendMail({
-      from: settings.SMTP_FROM,
+  }) => {
+    const result = await transport.sendMail({
+      from,
       to: job.recipient,
       subject: job.subject,
       text: job.text,
-      messageId: `<${job.id}@encova-workspace.local>`,
+      messageId: `<${job.id}@${from.split("@")[1]}>`,
     });
+    if (
+      !result.accepted.some(
+        (recipient) =>
+          String(recipient).toLowerCase() === job.recipient.toLowerCase(),
+      )
+    )
+      throw new Error("SMTP did not accept the recipient.");
+    return result;
+  };
 }
