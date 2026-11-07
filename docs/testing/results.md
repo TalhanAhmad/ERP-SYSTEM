@@ -102,3 +102,5 @@ Additional live asset check passed: none of the configured database credentials,
 ## Live login recheck after user report — 8 November 2026
 
 A supplied screenshot showed generic credential rejection. The stored live-owner credentials were independently verified again: POST /api/session/sign-in returned 200, GET /api/v1/me returned 200 with SUPER_ADMIN, and a fresh Chromium login rendered the authenticated dashboard. The screenshot does not reveal the entered password, so its exact cause is not established. No account password reset or application change was necessary; hosted credentials are separate from the local account and excluded from this report.
+
+Supplementary limitation from that diagnostic: the Sign out button was outside the default Chromium viewport and its click timed out after the successful dashboard assertion. API sign-out passed. Track sidebar control reachability as a separate UI follow-up; this diagnostic does not claim browser sign-out passed.
