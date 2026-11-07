@@ -11,3 +11,6 @@ test-results/
 .local/
 src/generated/
 *.tsbuildinfo
+.vercel/
+supabase/.temp/
+supabase/.branches/

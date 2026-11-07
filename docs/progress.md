@@ -1,6 +1,6 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-07 (Asia/Karachi)
+Last updated: 2026-11-08 (Asia/Karachi)
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded
@@ -8,7 +8,7 @@ Last updated: 2026-11-07 (Asia/Karachi)
 - Current learning status: Awaiting learning check
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
-- Implementation status: initial company-day/work modules plus Supabase/Vercel production foundation; full specification and live cutover incomplete
+- Implementation status: initial company-day/work modules deployed for personal testing; full specification and company production acceptance remain incomplete
 - Publication: Supabase/Vercel foundation committed and pushed as 31e55e4; remote/local SHA equality verified. GitHub Actions run 42403511665 passed, including the Supabase-mode build.
 
 ## Implemented evidence
@@ -27,8 +27,8 @@ Actual company policies, production host, real SMTP delivery and backup-client t
 
 Talha finalized Next.js + TypeScript + Tailwind, Next Route Handlers/shared services, Supabase PostgreSQL/Auth/Storage, Prisma and Vercel. See [ADR-002](decisions/ADR-002-supabase-vercel.md) and [deployment guide](operations/deployment.md). Better Auth remains local compatibility only; hosted deployments must select Supabase. The existing local admin is preserved.
 
-New hosted projects were requested. Talha reported enabling both connections; subsequent account checks still return installed=false and no Supabase/Vercel project APIs are available. No hosted project, paid plan, production migration or deployment is claimed.
+Official CLI browser authentication resolved the connected-tool gap. Created a separate Encova Solutions organization and Encova Workspace Demo Supabase project in Mumbai, and encova-workspace on Vercel Hobby. All six hosted migrations and database/Auth/private-storage preflight passed. The deployment is READY at https://encova-workspace.vercel.app; live API/browser and attendance acceptance checks passed. This is a personal testing demo with no billing upgrade.
 
 ## Exact next action
 
-Verify authenticated Supabase/Vercel project access, create the new projects in the intended accounts/region/plan, then configure the runtime/migration connections, Auth settings, private storage and scheduler. Run the deployment preflight and live acceptance checks before cutover. Repository preparation/tests and the current code publication are recorded in the work log. Invitation resend/revoke remains the next product feature after this deployment foundation is settled.
+Publish the verified deployment changes and updated Word report. SMTP delivery, recurring jobs, binary file workflows, privileged MFA and backup restore remain company launch gates. Invitation resend/revoke remains the next product feature after deployment verification.

@@ -1,6 +1,6 @@
 # Verification results
 
-Date: 7 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnpm 12.18.0, real PostgreSQL 17.9 on loopback. All test accounts and work data are synthetic. Development, test and restore databases are distinct.
+Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnpm 12.18.0, real PostgreSQL 17.9 on loopback. All test accounts and work data are synthetic. Development, test and restore databases are distinct.
 
 ## Latest outcomes
 
@@ -11,7 +11,7 @@ Date: 7 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm db:migrate:deploy on dev/test | PASS | Six migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
-| pnpm test:unit | PASS — 88 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
+| pnpm test:unit | PASS — 93 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
 | pnpm test:integration | PASS — 52 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
 | pnpm test:e2e | PASS — 2 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest run: 4.8 seconds on port 3100; local app on 3000 remained available. |
@@ -22,7 +22,7 @@ Date: 7 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 
 ## Supabase/Vercel foundation verification
 
-Latest local results: 88 unit, 52 integration and 2 browser tests passed (142 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
+Latest local results: 93 unit, 52 integration and 2 browser tests passed (147 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
 
 Supabase SDK + real PostgreSQL contract tests verify safe session DTOs/HTTP-only cookies, server identity verification, client role metadata rejection, immediate domain deactivation denial, legacy endpoint closure, same-origin protection, generic reset results, internal-only redirects, sign-out cookie clearing and scheduler authentication. Provider HTTP is simulated in these tests; no live Supabase result is claimed. Separate PostgreSQL tests cover provisioning failure/retry/revocation/concurrency, RLS/grants and the bounded job pass.
 
@@ -30,7 +30,7 @@ Both a normal build and a Supabase-selected Vercel-mode build passed. The latter
 
 A browser rerun initially failed because integration tests reset the shared test database and the fixture-preparation step was omitted. Recreating the synthetic accounts before rerunning resolved it. The CI workflow already prepares accounts between these phases and now also compiles the Supabase configuration explicitly.
 
-No real Supabase/Vercel project, hosted auth session, provider SMTP delivery, storage upload/download, live scheduler, MFA rollout, hosted database/pool check, production migration or backup restore is verified. The deployment preflight needs authenticated project access and real configuration. User confirmation of connected apps could not be corroborated: the catalog still reports both providers not installed and no project APIs are exposed.
+The real Supabase/Vercel demo deployment, migrations, hosted identity sessions, restricted pooled database access and preflight have now been verified through authenticated official CLIs and live browser/API checks. Provider SMTP delivery, binary storage upload/download, recurring scheduler, privileged MFA rollout and backup restore remain unverified. Earlier connected-tool access failures were resolved through official CLI browser login.
 
 ## Remote verification
 
@@ -62,6 +62,35 @@ GitHub Actions run 42384281499 completed successfully for commit 396a146d897a1fa
 - Browser coverage is the work lifecycle and mobile shell; it is not the complete specification's attendance/leave/internship/pilot journey or a comprehensive accessibility audit.
 - Email send callbacks, outbox leases and retries are tested; actual SMTP transport delivery is not demonstrated.
 - Attendance finalization/reconciliation code exists; privileged manual retry auditing, job-run monitoring, reminder scheduling and broad recovery tests remain open.
-- No real company records, deployed host, production migration, privileged MFA rollout, performance baseline, backup restore or incident drill were tested.
+- No real company records, privileged MFA rollout, performance baseline, backup restore or incident drill were tested. Hosted migrations and the personal-demo host are verified below.
 - Organization, internship, advanced tables/import/export and remaining lifecycle requirements are listed in the backlog. They are not counted as passed.
 - GitHub CI passed on the clean Ubuntu runner for published commit 396a146; evidence: https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42384281499. This verifies the implemented application, not the unfinished pilot gates.
+
+## Live demo acceptance — 8 November 2026
+
+Canonical URL: https://encova-workspace.vercel.app. Deployment dpl_AUKDCBEMeQWL9ncTxyv7oi5cidUA reached READY with the Next.js frontend and Node backend on Vercel, Supabase Auth, restricted pooled PostgreSQL and prepared private Storage. Vercel Hobby is authorized for personal testing; no billing upgrade was made.
+
+Hosted preflight passed: closed signup, restricted non-superuser/non-bypass runtime role, application RLS, private bucket and certificate-authorized client TLS. All six migrations applied through the controlled session pooler. Local checks passed: typecheck, lint, 93 unit, 52 integration, 2 browser tests and production build. The extra five unit checks cover custom-CA SSL option preservation and bounded pools. Browser fixtures were explicitly scoped to encova_test after the preparation guard correctly rejected the dev target.
+
+Live checks use only synthetic test records and the authenticated account owner's bootstrap login. No invitation email was sent. Results:
+
+| Live check | Outcome |
+| --- | --- |
+| Public login page | PASS |
+| Anonymous API access rejected | PASS |
+| Unauthenticated job invocation rejected | PASS |
+| Cross-origin sign-in rejected | PASS |
+| Real Supabase owner sign-in and SUPER_ADMIN domain permissions | PASS |
+| Separate real Supabase MEMBER sign-in | PASS |
+| MEMBER project creation and audit access denied | PASS |
+| Hosted project persistence and idempotent retry | PASS |
+| Self-approval rejected on live backend | PASS |
+| Live task assignment, start, submission and independent approval | PASS |
+| Live attendance schedule, check-in and check-out persistence | PASS |
+| Live browser login and authenticated dashboard | PASS |
+| Live browser renders persisted approved task | PASS |
+| Live 360px dashboard layout | PASS |
+| Live sign-out clears application access | PASS |
+| Synthetic member deactivated; existing hosted session denied immediately | PASS |
+
+The synthetic member was deactivated through the live admin API after verification; its existing session was immediately denied. Synthetic project, approved task, attendance and immutable audit evidence remain clearly labeled in the demo. No real employee records were imported. SMTP invitation delivery, password-reset delivery, binary upload/download, automatic job scheduling and company production readiness are not claimed.

@@ -16,6 +16,7 @@ export const runtimeSchema = z
   .object({
     DATABASE_URL: postgres,
     DIRECT_URL: postgres.optional(),
+    DATABASE_SSL_CA: z.string().min(1).optional(),
     APP_URL: z.url().optional(),
     AUTH_PROVIDER: z.enum(["better-auth", "supabase"]).default("better-auth"),
     BETTER_AUTH_URL: z.url().optional(),

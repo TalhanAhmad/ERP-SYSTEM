@@ -1,11 +1,11 @@
 # Encova Workspace — initial implementation report
 
-Date: 7 November 2026 (Asia/Karachi)
+Date: 8 November 2026 (Asia/Karachi)
 Repository: https://github.com/TalhanAhmad/ERP-SYSTEM
 
 ## Delivery status
 
-The specification has been analyzed and a real Next.js/PostgreSQL implementation has been created from an empty directory. This is an initial implementation, not completion of the full 60-milestone specification. No production deployment, real-data migration, pilot acceptance or learning completion is claimed.
+The specification has been analyzed and a real Next.js/PostgreSQL implementation has been created from an empty directory. This is an initial implementation, not completion of the full 60-milestone specification. A personal testing demo is deployed on Vercel with Supabase. Company production acceptance, real-data migration, pilot acceptance and learning completion remain outstanding.
 
 Talha authorized building across milestones and committing/pushing to the supplied repository. The document's daily advancement restriction is superseded by that direct authorization. The commit author email is the value supplied by Talha; the repository-local author name is Talha Ahmad.
 
@@ -28,11 +28,11 @@ Talha selected Supabase PostgreSQL/Auth/Storage and Vercel. The application reta
 
 The existing local administrator and Better Auth records are preserved for local compatibility; Vercel deployments reject that auth provider. Supabase identities are linked explicitly using a separate UUID field. Actual production accounts/passwords are not migrated automatically. Browser forms use shared server account endpoints, so the UI does not need a rewrite at cutover.
 
-The selected Storage bucket is private and its setup is prepared, but binary upload/download records, screens and live authorization tests remain outstanding. No cloud project or deployment has been created: although the user confirmed enabling connections, the account catalog still shows both providers not installed and no provider project APIs are available. Account/project access, real SMTP, MFA, recurring scheduling, live-provider browser tests and restore remain launch gates. Detailed instructions are in docs/operations/deployment.md.
+The hosted encova-private Storage bucket exists and is private; binary upload/download records, screens and authorization workflows remain outstanding. Official CLI browser authentication resolved the connected-tool access gap. Created a separate Encova Solutions Supabase organization, Encova Workspace Demo database in Mumbai and encova-workspace on Vercel Hobby for the authorized personal demo. Applied all six real database migrations, restricted runtime access, RLS, closed signup and exact Auth callbacks. Deployed the Next.js frontend and backend together at https://encova-workspace.vercel.app. SMTP delivery, privileged MFA, recurring scheduling and backup restore remain company launch gates. See docs/operations/deployment.md.
 
 ## Verification and limits
 
-Latest local verification: 88 unit, 52 integration and 2 browser tests passed, plus strict typing, lint, normal/Supabase-mode builds, fresh migrations and dependency checks. Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
+Latest local verification: 93 unit, 52 integration and 2 browser tests passed, plus strict typing, lint, normal/Supabase-mode builds, fresh migrations and dependency checks. Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
 
 Passing tests cover only implemented behavior. The full specification remains open, notably organization/profile management, internship workflows, advanced tables/import/export, lifecycle management actions, complete settings and dashboard contracts, MFA, reminders/job-run monitoring, real SMTP delivery and backup restore. See docs/planning/backlog.md for the actionable list.
 
@@ -47,3 +47,9 @@ The initial authentication failure is resolved. GitHub CLI browser authorization
 Remote verification passed at https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42384281499 for commit 396a146d897a1fa9ba2eb7a4131f63d1ee7641c2. The clean Ubuntu runner completed installation, client generation, migrations, type checking, lint, unit/integration tests, production build, browser tests and documentation verification. Publication does not indicate that the remaining specification or production acceptance is complete.
 
 The Supabase/Vercel foundation was subsequently committed and pushed as 31e55e4. Remote/local SHA equality was verified and all GitHub Actions checks passed in run 42403511665, including the explicitly selected Supabase production build. Evidence: https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42403511665. This does not verify a hosted Supabase project or a Vercel deployment.
+
+## Live demo deployment — 8 November 2026
+
+Vercel deployment dpl_AUKDCBEMeQWL9ncTxyv7oi5cidUA reached READY at https://encova-workspace.vercel.app. Node 24 functions run in Mumbai alongside the Supabase ap-south-1 project. The app uses real Supabase Auth and a pooled PostgreSQL runtime login; owner migration credentials are absent from Vercel. The first super admin belongs to the authenticated account owner. Credentials are shared privately and excluded from this report.
+
+The hosted preflight passed closed signup, restricted role, RLS on application tables, private bucket and verified client TLS. Optional DATABASE_SSL_CA supports the official provider trust root without disabling certificate or hostname verification. This is a personal demo on Hobby, with no paid-plan upgrade. Detailed live checks and publication evidence follow in docs/testing/results.md and docs/work-log.md.
