@@ -18,7 +18,7 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | Foundation commit 31e55e4 pushed; local and remote SHA equality verified. |
+| Git commit/push | PASS | Demo deployment commit 9d5a0cc pushed; local and remote SHA equality verified. |
 
 ## Supabase/Vercel foundation verification
 
@@ -34,7 +34,9 @@ The real Supabase/Vercel demo deployment, migrations, hosted identity sessions, 
 
 ## Remote verification
 
-Latest: Supabase/Vercel foundation commit 31e55e48da139c7012e6c64d583eb6922a591b4d passed GitHub Actions run 42403511665: https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42403511665. All configured checks passed on the clean Ubuntu runner, including the new Supabase-mode production build. This remains a build/contract verification, not live-provider acceptance.
+Deployment source/report commit 9d5a0ccf69a714a19221941e269a5e04fc9a7de7 was pushed and remote/local SHA equality verified. CI run https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42407530523 passed all configured checks, including browser E2E and the Supabase-mode build. All local 147 automated tests and the 16 live checks passed.
+
+Earlier foundation evidence: Supabase/Vercel foundation commit 31e55e48da139c7012e6c64d583eb6922a591b4d passed GitHub Actions run 42403511665: https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42403511665. All configured checks passed on the clean Ubuntu runner, including the new Supabase-mode production build. This remains a build/contract verification, not live-provider acceptance.
 
 Historical initial-publication evidence follows.
 
@@ -94,3 +96,5 @@ Live checks use only synthetic test records and the authenticated account owner'
 | Synthetic member deactivated; existing hosted session denied immediately | PASS |
 
 The synthetic member was deactivated through the live admin API after verification; its existing session was immediately denied. Synthetic project, approved task, attendance and immutable audit evidence remain clearly labeled in the demo. No real employee records were imported. SMTP invitation delivery, password-reset delivery, binary upload/download, automatic job scheduling and company production readiness are not claimed.
+
+Additional live asset check passed: none of the configured database credentials, server key, cron secret or generated admin password appeared in public login HTML or its 10 JavaScript assets. This is a targeted credential-exposure check, not a comprehensive security audit.
