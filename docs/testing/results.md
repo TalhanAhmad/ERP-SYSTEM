@@ -18,7 +18,7 @@ Date: 7 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | GitHub CLI authentication completed; push succeeded. Local and remote main matched commit 396a146. |
+| Git commit/push | PASS | Foundation commit 31e55e4 pushed; local and remote SHA equality verified. |
 
 ## Supabase/Vercel foundation verification
 
@@ -33,6 +33,10 @@ A browser rerun initially failed because integration tests reset the shared test
 No real Supabase/Vercel project, hosted auth session, provider SMTP delivery, storage upload/download, live scheduler, MFA rollout, hosted database/pool check, production migration or backup restore is verified. The deployment preflight needs authenticated project access and real configuration. User confirmation of connected apps could not be corroborated: the catalog still reports both providers not installed and no project APIs are exposed.
 
 ## Remote verification
+
+Latest: Supabase/Vercel foundation commit 31e55e48da139c7012e6c64d583eb6922a591b4d passed GitHub Actions run 42403511665: https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42403511665. All configured checks passed on the clean Ubuntu runner, including the new Supabase-mode production build. This remains a build/contract verification, not live-provider acceptance.
+
+Historical initial-publication evidence follows.
 
 GitHub Actions run 42384281499 completed successfully for commit 396a146d897a1fa9ba2eb7a4131f63d1ee7641c2. Every configured step passed, including browser E2E and documentation verification. No application code changed during authentication/publication; this report update is documentation only.
 

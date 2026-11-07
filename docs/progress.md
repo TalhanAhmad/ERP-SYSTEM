@@ -9,7 +9,7 @@ Last updated: 2026-11-07 (Asia/Karachi)
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
 - Implementation status: initial company-day/work modules plus Supabase/Vercel production foundation; full specification and live cutover incomplete
-- Publication: GitHub authentication resolved; main published and remote/local commit 396a146 verified equal. Remote GitHub Actions verification passed for that commit.
+- Publication: Supabase/Vercel foundation committed and pushed as 31e55e4; remote/local SHA equality verified. GitHub Actions run 42403511665 passed, including the Supabase-mode build.
 
 ## Implemented evidence
 
