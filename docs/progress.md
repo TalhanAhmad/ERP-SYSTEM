@@ -9,7 +9,7 @@ Last updated: 2026-11-07 (Asia/Karachi)
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
 - Implementation status: initial company-day and work-management modules implemented; full specification incomplete
-- Publication: local implementation commit a7dccbd created; push attempted but blocked by missing GitHub authentication
+- Publication: GitHub authentication resolved; main published and remote/local commit 396a146 verified equal. Remote GitHub Actions verification passed for that commit.
 
 ## Implemented evidence
 
@@ -21,8 +21,8 @@ See [the backlog](planning/backlog.md). No internship workflow, advanced spreads
 
 ## Blockers and dependencies
 
-Actual company policies, production host, real SMTP delivery and backup-client tooling/restore demonstration remain unresolved for pilot. Git author identity has been supplied and configured locally. GitHub HTTPS credentials are missing; the GitHub integration was discovered and offered but is not confirmed connected. Node/pnpm/PostgreSQL were recovered for development; Docker remains unavailable.
+Actual company policies, production host, real SMTP delivery and backup-client tooling/restore demonstration remain unresolved for pilot. Git author identity has been supplied and configured locally. GitHub CLI browser authentication completed as TalhanAhmad with credentials stored in the system keyring; repository ADMIN access and HTTPS push succeeded. Node/pnpm/PostgreSQL were recovered for development; Docker remains unavailable.
 
 ## Exact next action
 
-Step 1: complete the active GitHub CLI browser sign-in, then verify repository access, push main and compare remote/local HEAD. Official GitHub CLI is installed under ignored .local/tools/gh/; authentication is awaiting the user's browser action. Local browser verification and Word export have passed. Subsequent feature work starts with the incomplete identity/organization and work-lifecycle requirements in the backlog. Learning completion awaits Talha's explanation; cross-milestone build approval is already granted.
+Step 1 is complete: GitHub authentication, publication, remote/local equality and clean-runner CI have been verified. Step 2: complete invitation management (resend/revoke endpoints and controls, expiry/revocation protection and tests). Official GitHub CLI remains under ignored .local/tools/gh/. Local browser verification and Word export have passed. Subsequent feature work starts with the incomplete identity/organization and work-lifecycle requirements in the backlog. Learning completion awaits Talha's explanation; cross-milestone build approval is already granted.

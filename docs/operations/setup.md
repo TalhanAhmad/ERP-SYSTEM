@@ -55,6 +55,6 @@ The authoritative installed versions are in the lockfile. Package build-script a
 
 ## GitHub publication setup
 
-An official macOS ARM64 GitHub CLI 2.103.3 binary is installed locally at `.local/tools/gh/gh` (ignored by Git); its release SHA-256 was verified. It is not included in a clean clone. GitHub CLI browser sign-in was initiated for step-by-step publication; success is not assumed until `gh auth status` and repository access verification pass. Never paste access tokens or account passwords into the progress log.
+An official macOS ARM64 GitHub CLI 2.103.3 binary is installed locally at `.local/tools/gh/gh` (ignored by Git); its release SHA-256 was verified. It is not included in a clean clone. GitHub CLI browser sign-in subsequently completed as TalhanAhmad, using the system keyring. Repository ADMIN access, HTTPS push and remote/local commit equality were verified. Use `.local/tools/gh/gh auth status --hostname github.com` to check the current session; never assume authentication on a clean machine. Never paste access tokens or account passwords into the progress log.
 
 Official command references: https://cli.github.com/manual/gh_auth_login and https://cli.github.com/manual/gh_auth_setup-git.

@@ -34,4 +34,6 @@ The live index is docs/progress.md. docs/work-log.md records actions, defects an
 
 ## Publication
 
-Implementation commit: a7dccbd (first commit), created successfully on local main. HTTPS push was attempted and failed because no GitHub username/credential is configured for noninteractive Git. The GitHub integration is available but not installed/connected; authentication requires user action. No remote branch update or CI run is claimed. A follow-up documentation commit records this outcome; inspect git log for the final local HEAD.
+The initial authentication failure is resolved. GitHub CLI browser authorization completed as TalhanAhmad; credentials are stored in the system keyring. Repository ADMIN access was verified. `git push -u origin main` succeeded, and local/remote main were confirmed equal at 396a146d897a1fa9ba2eb7a4131f63d1ee7641c2. The implementation commit remains a7dccbd, followed by documentation commits.
+
+Remote verification passed at https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42384281499 for commit 396a146d897a1fa9ba2eb7a4131f63d1ee7641c2. The clean Ubuntu runner completed installation, client generation, migrations, type checking, lint, unit/integration tests, production build, browser tests and documentation verification. Publication does not indicate that the remaining specification or production acceptance is complete.

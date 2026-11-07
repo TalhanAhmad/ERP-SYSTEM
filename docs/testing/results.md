@@ -18,7 +18,11 @@ Date: 7 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | LOCAL COMMIT PASS; PUSH BLOCKED | a7dccbd created. git push -u origin main failed: missing GitHub HTTPS credentials. No remote update or CI pass claimed. |
+| Git commit/push | PASS | GitHub CLI authentication completed; push succeeded. Local and remote main matched commit 396a146. |
+
+## Remote verification
+
+GitHub Actions run 42384281499 completed successfully for commit 396a146d897a1fa9ba2eb7a4131f63d1ee7641c2. Every configured step passed, including browser E2E and documentation verification. No application code changed during authentication/publication; this report update is documentation only.
 
 ## Defects found and corrected
 
@@ -44,4 +48,4 @@ Date: 7 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 - Attendance finalization/reconciliation code exists; privileged manual retry auditing, job-run monitoring, reminder scheduling and broad recovery tests remain open.
 - No real company records, deployed host, production migration, privileged MFA rollout, performance baseline, backup restore or incident drill were tested.
 - Organization, internship, advanced tables/import/export and remaining lifecycle requirements are listed in the backlog. They are not counted as passed.
-- GitHub CI is configured but its remote run is not yet observed.
+- GitHub CI passed on the clean Ubuntu runner for published commit 396a146; evidence: https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42384281499. This verifies the implemented application, not the unfinished pilot gates.
