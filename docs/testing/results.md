@@ -18,7 +18,7 @@ Date: 7 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | Pending final publication | Remote read access succeeded; write access not yet established. |
+| Git commit/push | LOCAL COMMIT PASS; PUSH BLOCKED | a7dccbd created. git push -u origin main failed: missing GitHub HTTPS credentials. No remote update or CI pass claimed. |
 
 ## Defects found and corrected
 

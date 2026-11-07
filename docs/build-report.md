@@ -34,4 +34,4 @@ The live index is docs/progress.md. docs/work-log.md records actions, defects an
 
 ## Publication
 
-Commit and push status will be updated after the final local checks and Git verification. Remote CI is a separate check and is not assumed to pass merely because its workflow exists.
+Implementation commit: a7dccbd (first commit), created successfully on local main. HTTPS push was attempted and failed because no GitHub username/credential is configured for noninteractive Git. The GitHub integration is available but not installed/connected; authentication requires user action. No remote branch update or CI run is claimed. A follow-up documentation commit records this outcome; inspect git log for the final local HEAD.
