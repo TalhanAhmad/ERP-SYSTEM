@@ -1,0 +1,593 @@
+Encova Workspace Build Specification
+Prepared for Talha Ahmad Awan and Codex • 7 November 2026 • Version 1.0
+1 Purpose and implementation contract
+Build a complete internal platform for Encova Solutions with working frontend, backend, and PostgreSQL persistence. Super admins manage people, work, attendance, and settings. Staff receive a personal dashboard with assignments, feedback, attendance, and reports. This is a proposed specification, not evidence of implemented features or passing tests.
+The first release must support an end-to-end company day: an invited person logs in, checks in, receives an assignment, reports progress, submits work, receives a review, and checks out. Authorized managers see exceptions and approve requests. Every interactive control must either work against the backend or be explicitly excluded; do not deliver decorative dashboards backed only by mock data.
+Working assumptions
+Topic
+Default for implementation
+Organization
+One Encova company; no multi-company SaaS or billing
+Project location
+New repository if the supplied repository is empty; inspect existing code before deciding to reuse or migrate
+People
+Design and test initially for 100 active people; actual headcount is unconfirmed
+Work setting
+Supports office and remote staff through browser check-in; no biometric or location verification
+Sheets
+Structured editable tables and CSV import/export; no Google Sheets synchronization or formula engine
+Timezone
+Asia/Karachi; event timestamps stored in UTC
+Attendance
+One scheduled day shift per person per date; overnight shifts and split shifts deferred
+Delivery mode
+Four-hour learning/build sessions; one planned day at a time with approval to advance
+
+Defaults are decisions for a testable first release, not confirmed company policies. Record changes in docs/decisions. Demo schedule and leave rules must be reviewed before real employee data is used.
+Scope and exclusions
+Included: invitations, profiles, departments and teams, roles, projects, task assignment by username, submissions and review, daily reports, attendance, corrections, leave approval, internship plans, dashboards, notifications, structured tables, audit records, automated checks, deployment instructions, and restore practice.
+Excluded: payroll, salaries, accounting, client billing, recruitment, chat, native mobile apps, biometric devices, screenshots or surveillance, arbitrary spreadsheets, AI employee scoring, public registration, and multi-tenant administration. Link to work artifacts such as PRs and Drive files; binary file uploads are deferred.
+Contents
+Sections 2–5 define architecture, access, and workflows. Sections 6–8 specify attendance, internships, and frontend behavior. Sections 9–12 define database and API contracts. Sections 13–16 cover repository structure, security, jobs, and delivery. Sections 17–20 provide acceptance checks, daily milestones, documentation templates, and Codex operating instructions.
+
+2 Architecture and technical choices
+Use a modular monolith: one Next.js application, one PostgreSQL database, and a small scheduled job runner using the same services. Separate modules by business responsibility. Do not introduce microservices, a second backend framework, or Redis without a measured need.
+Layer
+Default
+Web application
+Next.js App Router and React; Node runtime
+Language
+TypeScript strict mode; pnpm with committed lockfile
+Database
+PostgreSQL; Prisma for schema and normal queries; reviewed SQL migrations for unsupported constraints
+Authentication
+Better Auth with database sessions and email/password; closed registration
+Validation
+Zod request schemas and explicit response DTOs
+UI
+Tailwind CSS, accessible reusable controls, TanStack Table for grid views
+Client data
+TanStack Query for interactive grids; Server Components for initial page reads
+Tests
+Vitest, real PostgreSQL integration tests, Playwright
+Email
+SMTP adapter; local mail catcher in development; company-controlled delivery for production
+Background work
+Database outbox and job-run records; scheduled Node worker command
+
+Pin mutually compatible supported stable versions during Day 1 and record them in docs/operations/setup.md. This document intentionally does not claim a specific latest release. Verify installed-version API details against official documentation.
+Request boundaries
+Server Components call authorized query services directly. Client interactions call Route Handlers under /api/v1. Both paths resolve the same verified user context and call shared services. Next.js recommends server-side reads directly from their data source rather than through the app's own HTTP handlers [1].
+Route Handlers parse input, enforce session and mutation-origin requirements, call a service, and map errors. Services own permissions, transitions, and transactions. Query modules own database access and safe field selection. Database and service files are server-only; never expose credentials or raw auth records to browser components.
+Mermaid diagram source
+flowchart TD  B[Browser] --> P[Server Components]  B --> R[Route Handlers]  P --> S[Authorized services]  R --> S  A[Session verification] --> S  J[Scheduled worker] --> S  S --> D[(PostgreSQL through Prisma)]  D --> O[Outbox processing]  O --> E[Email delivery]
+The worker is a separate process, not a separate business backend. Durable jobs and email retries must not depend on a web request staying alive. In-app notifications are stored in PostgreSQL and refreshed on focus and modest polling; real-time sockets are not required for release one.
+
+3 Roles and authorization
+Separate employment type from permissions. A person may be an INTERN or EMPLOYEE while holding a MEMBER, TEAM_LEAD, HR_ADMIN, or SUPER_ADMIN role. Store one primary role initially. A team lead may also mentor an intern without receiving HR-wide access.
+Capability
+Super admin
+HR admin
+Lead or mentor
+Member
+Roles and security settings
+All
+No
+No
+No
+Invite and deactivate ordinary staff
+All
+Members only
+No
+No
+Directory and private HR profile
+All
+All
+Safe team profile
+Own profile
+Projects and work
+All
+No by role alone
+Managed projects
+Assigned projects/tasks
+Attendance and leave
+All
+All
+No by role alone
+Own records
+Daily work reports
+All
+Submission counts only
+Current reports of managed team
+Own
+Internship records
+All
+Administration
+Assigned mentees
+Own plan and feedback
+Audit and company settings
+All
+HR events only
+No
+No
+
+SUPER_ADMIN and TEAM_LEAD can create projects. The creator becomes project manager. Project managers manage membership and assignments within their projects. Project ownership does not grant access to private employee records. HR admins participate in project work only when explicitly added as members. MEMBER access is scoped by membership, ownership, and assignment, not just the role name.
+Enforcement rules
+All query paths, count endpoints, exports, autocomplete results, and mutations enforce the same scopes. Generic resource lookups return 404 when the user cannot see the record. Visible but forbidden actions return 403. Never depend on hidden buttons or layouts to enforce access.
+Only super admins grant or change privileged roles. HR may invite MEMBER accounts and change ordinary employment details. No one approves their own leave, attendance correction, task submission, or internship review; route such requests to another authorized person. If no independent approver exists, leave the item pending and show the configuration issue. A single-super-admin setup cannot self-approve personal requests.
+Keep at least one active super admin using a transaction and a singleton security-settings lock. Deactivation immediately denies new application access; revoke auth sessions as well. Disable cached role claims as the authoritative source. Read current active status and permissions server-side.
+Audit policy
+Record successful role changes, invitations, deactivation, assignments, reviews, attendance corrections, leave decisions, settings changes, imports, and exports. Include actor, action, object ID, time, request ID, and safe before/after values. Do not record secrets, full private report bodies, or reset tokens. Application audit records are append-only but are not claimed to be tamper-proof against database administrators.
+
+4 People onboarding and company configuration
+Account lifecycle
+A super admin creates an invitation with email, unique username, employment type, department, team, and intended role. HR can do this only for MEMBER roles. Normalize email and username before checking uniqueness. Usernames use lowercase letters, numbers, dots, underscores, or hyphens, 3–30 characters. They are labels; all relationships use permanent UUID user IDs.
+Generate a cryptographically random single-use invitation token, store only its hash, and expire it after 72 hours. Resending revokes the previous token. On acceptance, verify the token and normalized email, create the auth identity using the library's supported server API, and activate the linked profile. Make this retry-safe. If auth provisioning and domain writes cannot share a transaction, retain a pending state and reconcile; do not grant access until both succeed.
+Public self-registration is disabled. The invitation acceptance path is the only user-facing account creation path. Use library-managed hashing, verification, reset, and session APIs. Better Auth provides email/password and session-management facilities; configure and test them for the pinned version [2,3]. Do not implement password hashing or homemade cookies.
+Bootstrap the first super admin with an explicit local administration command, never the first visitor. Production passwords are never hardcoded or printed. Password reset returns a generic response to prevent email enumeration. Verify email ownership before activation. Invitation and reset emails use the outbox; development routes them to a mail catcher.
+Profiles and organization
+A profile contains display name, username, work email, employment type, department, primary team, manager, joining date, optional internship end date, work mode, and active status. Private contact details are optional and accessible only to self, HR, and super admins. Exclude national identity numbers, bank details, and salaries from this release.
+Departments contain teams. A team has one lead and multiple members; each person has one primary team initially. Team membership and lead changes require audit records. Avoid cycles in manager relationships. Account deactivation preserves all historical records, cancels future reminders, and displays remaining assigned work for reassignment; it must not delete submissions or attendance.
+Settings
+Store company display name, timezone, workweek, holidays, daily report cutoff, and notification preferences. Schedule policies are effective-dated and snapshotted into attendance days. Suggested demo values only: Monday–Friday, 09:00–17:00, 15-minute grace, 17:00 report cutoff. The admin must confirm actual values before pilot launch. Changing a policy never silently recalculates historical approved records.
+
+5 Projects assignments reviews and daily reports
+Assignment workflow
+A project manager searches a scoped directory by @username. Show name, username, team, and active state to avoid selecting the wrong person. Save assignee_id rather than the text username. Each task has one accountable assignee, one reviewer, title, instructions, priority, deadline, and project. The assignee and reviewer must be active project members; super admins may review with an explicit audited override. Reviewer and assignee cannot be the same person.
+Task states: ASSIGNED, IN_PROGRESS, BLOCKED, IN_REVIEW, CHANGES_REQUESTED, APPROVED, CANCELED. Only the assignee moves between IN_PROGRESS and BLOCKED, starts an assigned task, or submits work. Submission creates an immutable numbered submission record with a summary and validated HTTPS artifact links. Submission moves the task to IN_REVIEW atomically.
+The designated reviewer or super admin may APPROVE or REQUEST_CHANGES with feedback; no self-review. Requesting changes moves the task to CHANGES_REQUESTED. A new submission increments the revision number and preserves prior feedback. Approved tasks are read-only until a manager explicitly reopens them with a reason. Managers can cancel unfinished tasks with a reason. Reassigning an in-review task is blocked until its review is resolved or explicitly returned for changes.
+Mermaid diagram source
+stateDiagram-v2  ASSIGNED --> IN_PROGRESS: Assignee starts  IN_PROGRESS --> BLOCKED: Assignee reports blocker  BLOCKED --> IN_PROGRESS: Blocker resolved  IN_PROGRESS --> IN_REVIEW: Submit revision  CHANGES_REQUESTED --> IN_REVIEW: Resubmit revision  IN_REVIEW --> CHANGES_REQUESTED: Reviewer returns  IN_REVIEW --> APPROVED: Reviewer approves  APPROVED --> IN_PROGRESS: Manager reopens
+Cancellation and manager actions are additional guarded transitions documented above. A task is completed for dashboard metrics only in APPROVED, not merely submitted.
+Project boundaries
+Projects have a manager, status, member list, and archive timestamp. Archive requires no open tasks, or an explicit action canceling them with a reason. Archived projects are readable but immutable. Block removing a member while they own an open task or pending review. Historic access is based on current project membership unless an admin grants access. Remove membership to revoke project visibility.
+Daily reports
+One report per active person and company work date. Fields: completed work, remaining work, blockers, and optional task links. Reports start DRAFT, become SUBMITTED, and can become ACKNOWLEDGED by the current team lead or super admin. Submitted content is immutable; a lead can return it for revision, retaining an audit snapshot. Leads cannot acknowledge their own report. Team changes affect current access; do not retain former-manager access by default.
+Missing reports are calculated only after the configured cutoff for scheduled workdays, excluding approved full-day leave and holidays. HR sees whether a report was submitted, not its private work narrative. Late submissions remain allowed and are marked late. Attendance does not determine work quality.
+
+6 Attendance leave and corrections
+Attendance data flow
+Keep immutable check events separate from editable attendance summaries. The server timestamps check-in/out; do not trust the browser clock. A person can check in once and check out once for a scheduled date in release one. A unique request key prevents duplicate clicks from duplicating events. One daily summary per person and work date references its schedule assignment and policy snapshot.
+Statuses: NOT_DUE, IN_PROGRESS, PRESENT, ABSENT, ON_LEAVE, HOLIDAY, OFF_DAY, NEEDS_REVIEW. Late and early departure are separate flags. The summary records first_in, last_out, gross_minutes, approved adjustment, and final status. Gross time is not payroll time: breaks are not tracked and no paid-hours claim is made.
+Before the shift begins, show NOT_DUE. Check-in produces IN_PROGRESS. Valid check-out produces PRESENT with gross elapsed minutes. After shift end plus a configurable closing buffer, a scheduled day with no events becomes ABSENT unless on approved leave; an unclosed check-in becomes NEEDS_REVIEW, never a fabricated check-out. Off-day or holiday check-ins are rejected in release one with an explanation. Overnight shifts are rejected at schedule setup rather than miscalculated.
+Correction workflow
+The employee submits proposed in/out times, work date, and reason. HR or another super admin approves or rejects. Check-out must follow check-in and both must fit the applicable day-shift policy. Approval changes the effective summary, preserves raw events, and records old/new values plus reviewer. It can convert an absence or missing check-out to PRESENT. The summary version prevents a stale request from overwriting newer facts. Recalculation respects approved corrections.
+Leave workflow
+Support full-day leave requests initially: type PERSONAL, SICK, or OTHER; inclusive start/end dates; optional private note. Do not calculate entitlement, pay deductions, or legal allowances. Requests transition PENDING to APPROVED, REJECTED, or CANCELED. Staff can cancel pending requests. Canceling approved leave requires an authorized independent approver and an audit entry.
+Expand the range into scheduled dates using the effective work calendar; reject requests with no working dates. Prevent overlapping pending or approved requests for the same person/date. Approval is blocked if there are existing check events for affected dates; HR must resolve the conflict explicitly. Check-in is blocked on approved leave. Approval and check-in acquire the same per-person/date lock so they cannot both win concurrently.
+Scheduling and dates
+Store instants in UTC timestamptz; store work dates as DATE and calculate them in Asia/Karachi. Assign policies by effective date range, with no overlaps per person. Each generated day stores scheduled start/end instants and grace values. For multi-date transactions, acquire locks in ascending user/date order. Exceptions, job retries, and late corrections must produce the same final summary without duplicate records.
+
+7 Internships notifications and spreadsheet views
+Internship management
+An internship has intern_id, mentor_id, department, start/end dates, status, and learning objective. Mentor must be an active lead or super admin and cannot be the intern. Allow one active internship per intern. HR and super admins manage enrollment and mentor assignment; assigned mentors manage learning plans and feedback.
+Learning milestones have title, description, due date, linked work tasks, and status PLANNED, ACTIVE, SUBMITTED, COMPLETED. Interns submit evidence through linked task submissions. A mentor completes a milestone only after its required tasks are approved. Weekly feedback uses strengths, improvements, next actions, and an optional explained rating. Feedback is visible to the intern, assigned mentor, HR, and super admin. Do not generate automated employee rankings or use attendance as a proxy for skill.
+Notifications
+Persist in-app notifications for task assignment/reassignment, submission, review outcome, leave and correction decisions, mentorship assignment, and report reminders. Notifications contain a safe title and authorized route, not sensitive HR content. Mark read only for the recipient. Revalidate permission when opening the target; a stale notification must not grant access.
+Mandatory account emails: invitation, verification, and password reset. Other email notifications are optional preferences. Write domain changes, audit events, notifications, and outbox rows atomically where they share the database. Store a unique event/recipient key to suppress duplicate notifications. Email delivery is at-least-once; document the possibility of a duplicate after an ambiguous provider timeout.
+Spreadsheet-style views
+Provide People, Tasks, Attendance, and Report Status tables backed by the same business records and services used by detail pages. Include sortable headers, typed filters, column visibility, pagination, saved personal views, keyboard navigation, and clear unsaved/pending states. Persist only allowed columns and validated filters in saved views.
+People edits are limited to authorized profile fields. Task cells expose only actions the current user can perform. Attendance values cannot be overwritten directly: the cell opens the correction workflow. No raw spreadsheet route may bypass approval or validation rules.
+Bulk task changes: maximum 100 records per request, preview first, validate each item and expected version, apply all-or-nothing in one transaction. For mixed authorization or conflicts, reject the batch with item-level errors. CSV import initially supports new tasks within one managed project only. No attendance or user-account imports in release one. Cap imports at 500 rows, validate headers and usernames, preview errors, then commit atomically with an idempotency key.
+CSV exports obey current row and field permissions, omit private fields by default, and neutralize spreadsheet formula prefixes such as =, +, -, and @ in text cells. Exporting does not grant edit access. Actual Google Sheets synchronization remains a separate future integration.
+
+8 Frontend screens and design system
+Use a restrained black-and-white interface with one accessible accent color. Avoid decorative glass effects behind dense data. Desktop uses a persistent sidebar; mobile uses a drawer and stacked cards. Prioritize 360-pixel mobile screens for attendance, personal work, and reports. Use readable labels, visible focus, proper form errors, and text alongside status colors.
+Route
+Required content
+/login and /forgot-password
+Accessible sign-in and reset request; generic failure messages
+/invite/[token] and /reset-password
+Token validation, account setup/reset, expiry and retry states
+/dashboard
+Role-scoped summary, action queue, deadlines, blockers
+/my-work and /tasks/[id]
+Assigned tasks, instructions, history, submissions, review feedback
+/projects and /projects/[id]
+Project overview, members, table/board tasks, review queue
+/people and /people/[id]
+Scoped directory, profile, team, status; private tabs permission-gated
+/teams and /departments
+Organization lists and authorized management forms
+/attendance and /attendance/me
+HR daily grid; personal check-in/out and history
+/leave and /corrections
+Own requests or scoped approval queue
+/reports and /reports/[id]
+Daily report editor, history, manager review
+/internships and /internships/[id]
+Mentor, learning milestones, linked tasks, weekly feedback
+/notifications
+Recipient inbox and read state
+/settings and /audit
+Authorized company settings and filterable audit records
+/profile
+Own permitted profile fields and account-security actions
+
+Dashboard contracts
+Super admin: active people, present/absent/needs-review counts, overdue open tasks, pending reviews, pending HR requests, missing reports, and operational failures. HR: attendance, leave, corrections, onboarding, internship administration. Leads: their teams' reports, managed project work, review queue, and mentee progress. Members: own assignments, blockers, today's attendance, pending requests, and report status.
+Overdue work means a non-canceled, non-approved task past due_at. Review queue counts only current submissions requiring the viewer's review. Attendance statistics cover scheduled eligible people for the selected date; do not count off-days as absent. Every summary count must use the same scope as its drill-down list.
+Component and state requirements
+Create reusable AppShell, Sidebar, PageHeader, DataTable, FilterBar, Pagination, StatusBadge, UserPicker, DateField, ConfirmDialog, EmptyState, ErrorState, and FormField components. Feature-specific components include CheckInCard, TaskDrawer, SubmissionForm, ReviewPanel, DailyReportForm, CorrectionDialog, and InternshipTimeline.
+Every screen needs loading, empty, error, success, and permission-denied behavior. Keep form input on validation failure. Disable duplicate submissions while pending. A 409 conflict preserves local input and offers reload; never silently overwrite. Destructive or consequential actions show the exact affected object and ask for a reason where specified. Use server-confirmed updates for attendance and approvals; do not present them as successful before commit.
+
+9 Database conventions and identity schema
+This is the logical data contract. Codex must implement a validated Prisma schema and executable migrations, not copy the table descriptions as a substitute. Standard domain IDs are UUIDs. Mutable records include created_at, updated_at, and version integer starting at 1 unless explicitly stated otherwise. Immutable event tables have created_at only. Optional fields are nullable. Authentication tables use the chosen adapter's supported IDs and are linked from domain users.
+Entity
+Required fields and constraints
+auth user/session/account/verification
+Library-owned schema generated for the installed Better Auth version; do not expose through domain DTOs
+users
+id; auth_user_id unique nullable until invitation completion; username_normalized unique; email_normalized unique; display_name; role; employment_type; status INVITED/ACTIVE/INACTIVE
+employee_profiles
+user_id unique FK; department_id nullable; team_id nullable; manager_id nullable; joining_date; work_mode; private_contact nullable
+departments
+id; name; normalized_name unique; archived_at nullable
+teams
+id; department_id FK; lead_id FK; name; archived_at; unique department/name
+invitations
+id; email; username; intended_role; invited_by FK; token_hash unique; expires_at; accepted_at nullable; revoked_at nullable; provisioning_status
+company_settings
+singleton ID; company_name; timezone; workweek JSON; report_cutoff_local; policy_confirmed_at nullable
+schedule_policies
+id; name; local_start; local_end; weekdays; grace_minutes; closing_buffer_minutes; effective policy payload; archived_at
+schedule_assignments
+id; user_id FK; policy_id FK; start_date; end_date nullable; prohibit overlapping ranges for user
+holidays
+id; date unique; name
+
+The auth identity is not the application authorization record. All application access requires a linked ACTIVE domain user. Keep account provisioning status separate from profile edits. Usernames may change through an audited admin action, but links remain stable because they use UUIDs.
+Company settings use a versioned update and security lock. Schedule policy content becomes immutable after use; create a new policy version for changed rules. Assignments apply prospectively. Do not hard-delete referenced users, departments, policies, or teams. Use archive/inactive flags and preserve historical foreign keys.
+Suggested database constraints
+Use unique normalized identifiers, foreign keys, CHECK constraints for valid date order and nonnegative durations, and database enum or validated text constraints for state values. Cross-record permission rules belong in services. PostgreSQL CHECK constraints are not a general mechanism for checking other rows; use transactions, locks, and suitable uniqueness/exclusion constraints [4].
+Reject manager cycles at write time. The last-super-admin invariant is checked under a lock on company_settings. Protect schedule overlaps with an exclusion constraint where supported, or serialize writes under a locked user row and test concurrent insertion. Never implement overlap protection as an unlocked read-then-insert.
+
+10 Work attendance and internship schema
+Entity
+Required fields and relationships
+projects
+id; name; description; manager_id FK; status; archived_at
+project_members
+project_id and user_id composite PK; joined_at
+tasks
+id; project_id FK; assignee_id FK; reviewer_id FK; created_by FK; title; description; priority; status; due_at nullable; deleted_at nullable
+task_submissions
+id; task_id FK; revision; submitted_by FK; summary; artifact_links JSON; unique task/revision; immutable
+task_reviews
+id; submission_id unique FK; reviewer_id FK; decision; feedback; immutable
+task_comments
+id; task_id FK; author_id FK; body; deleted_at nullable
+daily_reports
+id; user_id FK; work_date; completed_text; remaining_text; blockers_text; task_links JSON; status; submitted_at; acknowledged_by nullable; unique user/date
+attendance_days
+id; user_id FK; work_date; schedule_snapshot JSON; status; first_in/last_out nullable; gross_minutes nullable; late/early flags; correction_id nullable; unique user/date
+attendance_events
+id; attendance_day_id FK; user_id FK; kind IN/OUT; occurred_at; request_key; unique user/request_key; immutable
+attendance_corrections
+id; attendance_day_id FK; requested_by FK; proposed_in/out; reason; expected_day_version; status; reviewer_id nullable; reviewed_at nullable
+leave_requests
+id; user_id FK; start_date/end_date; type; private_note nullable; status; reviewer_id nullable; reviewed_at nullable
+leave_dates
+id; request_id FK; user_id FK; work_date; reservation_active; active user/date unique
+internships
+id; intern_id FK; mentor_id FK; start_date/end_date; objective; status; one active internship per intern
+learning_milestones
+id; internship_id FK; title; description; due_date; status
+milestone_tasks
+milestone_id and task_id composite PK
+internship_feedback
+id; internship_id FK; author_id FK; week_start; strengths; improvements; next_actions; rating nullable; unique internship/week
+
+Attendance events permit at most one IN and one OUT per attendance day for release one. User ID must match the parent day, using a composite FK or an equivalent enforced write path plus integrity tests. Corrections do not append fictitious raw events. Leave reservations remain active for PENDING and APPROVED requests and are released on rejection/cancellation in the same transaction.
+Tasks must belong to their project; active assignees and reviewers must be eligible members. Lock the project when assignments or membership change. A submission's author must be the task's current assignee. A review's actor must match current reviewer authority and differ from the submitter. Links between learning milestones and tasks are validated by mentor access and intern assignment.
+Reports may link only tasks visible to their author at submission. Render links through permission checks when read later; a retained link is not an access grant. Preserve edited report versions through safe audit snapshots accessible only to the same report scope.
+
+11 Supporting schema and transactional rules
+Entity
+Fields and purpose
+notifications
+id; recipient_id FK; event_key; type; safe_title; target_type/id; read_at; unique recipient/event_key
+outbox_events
+id; event_key unique; type; payload JSON; status; attempts; next_attempt_at; lease_until; last_error_code
+audit_logs
+id; actor_id nullable for system; action; entity_type/id; safe_changes JSON; request_id; created_at
+saved_views
+id; user_id FK; resource; name; columns JSON; filters JSON; sort JSON
+idempotency_keys
+id; actor_id FK; operation; key; request_hash; response_summary; expires_at; unique actor/operation/key
+job_runs
+id; job_name; run_key; status; lease_until; started_at; finished_at; error_summary; unique job/run_key
+import_batches
+id; actor_id FK; project_id FK; request_key unique; input_hash; status; row_count; error_summary
+
+Atomic writes
+Task submission: lock task, check expectedVersion and allowed transition, create immutable submission, move task state, add audit and notification/outbox entries, commit. Review: lock task and current submission, ensure it is still the latest unreviewed revision, write one review, transition task, and notify atomically. Duplicate reviews cannot create contradictory decisions.
+Attendance: create the day's unique record if absent, lock it, check effective schedule and approved leave, validate event order, append raw event, update summary, and commit. Leave approval locks all relevant attendance-day rows in ascending date order, creating them if necessary, then checks events and updates leave plus summaries. Correction decisions use the same day lock and expected version.
+Bulk writes lock affected resources in deterministic ID order. Never make SMTP or HTTP calls inside database transactions. On serialization failures or deadlocks, retry a small bounded number of times; if exhausted, return a retryable conflict without partial success.
+Versions and duplicate requests
+PATCH and decision endpoints accept expectedVersion. A conditional update that changes zero rows returns 409 STALE_VERSION. Creation, attendance, submissions, imports, and decisions require an Idempotency-Key. Reuse with the same actor/operation/body returns the original result; reuse with different input returns 409. Reserve the key and execute the domain operation atomically so concurrent duplicates cannot both commit. Retain keys for at least 24 hours in the first release and document cleanup.
+Indexes and data retention
+Start with indexes for task assignee/status/due_at, task project/status, report user/date, attendance user/date, notification recipient/read_at/created_at, audit entity/time, and outbox status/next_attempt_at. The unique constraints already create indexes; avoid duplicating them. Measure with representative seed data and query plans.
+Do not automatically purge attendance, feedback, audit, or reports until Encova approves a retention policy. Delete expired invitation/reset artifacts through library-supported cleanup. Exports are streamed rather than retained indefinitely. Use backups and a controlled data-removal process for real data; archival flags are not a substitute for an approved retention policy.
+
+12 API contract and common responses
+Application endpoints use /api/v1. Authentication uses the library's /api/auth handler. All application requests require an ACTIVE linked user except documented invite acceptance. IDs below are UUIDs. Responses return explicit DTOs and no auth/session records.
+Route group
+Methods and actions
+/me
+GET profile/context; PATCH own permitted profile fields
+/users and /users/:id
+GET scoped list/detail; PATCH authorized employment fields
+/users/:id/role and /users/:id/deactivate
+POST super-admin role change; POST permitted deactivation
+/invitations
+POST create; POST /:id/resend or /:id/revoke; POST /accept with token
+/departments and /teams
+GET POST lists/create; PATCH /:id; team membership through /teams/:id/members
+/projects
+GET POST; GET PATCH /:id; POST /:id/archive or /:id/restore
+/projects/:id/members
+GET POST; DELETE /:userId with assignment checks
+/tasks
+GET scoped filters; POST create; GET PATCH /:id
+/tasks/:id/status and /tasks/:id/reassign
+POST guarded transition; POST manager reassignment
+/tasks/:id/submissions
+GET POST; POST /submissions/:id/review through top-level submissions route
+/tasks/:id/comments
+GET POST; PATCH DELETE /comments/:id through top-level comments route
+/reports
+GET POST draft; GET PATCH /:id; POST /:id/submit, acknowledge, or return
+/attendance
+GET scoped daily list; GET /me; POST /check-in and /check-out
+/corrections and /leave
+GET POST; GET /:id; POST /:id/approve, reject, or cancel where allowed
+/schedules and /holidays
+GET POST; PATCH /:id; POST /schedule-assignments
+/internships
+GET POST; GET PATCH /:id; nested /milestones and /feedback GET POST
+/milestones/:id
+PATCH; POST /submit or /complete; POST DELETE task links
+/dashboard and /notifications
+GET; POST /notifications/:id/read; POST /notifications/read-all
+/views and /audit
+GET POST views; PATCH DELETE /views/:id; GET scoped audit
+/settings
+GET PATCH super-admin settings
+/tasks/bulk and /imports/tasks
+POST bulk; POST /preview and /commit for imports
+/exports/:resource
+GET scoped CSV for people/tasks/attendance/report-status
+
+Nested action names represent separate endpoints. Static routes such as bulk must not be confused with ID routes. Each action implements the permissions and transitions in sections 3–7. Add an OpenAPI description during implementation with exact input/output schemas; a route existing without policy coverage is incomplete.
+Lists: page starts at 1; pageSize defaults 20 and caps at 100; sort fields are allowlisted; tie-break by ID; search caps at 100 characters. Apply authorization before filtering, counting, and pagination. Response: {data: [], meta: {page, pageSize, total}}. Write success is 200 or 201; error: {error: {code, message, fields?, requestId}}. Use 400 malformed syntax, 401 no session, 403 forbidden, 404 absent/inaccessible, 409 conflict, 422 invalid fields, 429 rate-limited, 500 unexpected failure.
+
+13 API payload examples and validation
+Creating an assignment
+POST /api/v1/tasks with Idempotency-Key and a verified session. Example values below describe the shape; replace illustrative identifiers with actual UUIDs in executable fixtures.
+{  "projectId": "<project UUID>",  "assigneeId": "<person UUID>",  "reviewerId": "<different person UUID>",  "title": "Build the client list API",  "description": "Return paginated clients with validation tests.",  "priority": "HIGH",  "dueAt": "2026-11-12T12:00:00Z"}
+Server checks role, project membership, active assignee/reviewer, distinct reviewer, unarchived project, valid deadline, and unknown fields. It creates the task, audit event, and assignment notification in a transaction. Client receives only task DTO fields. The browser resolves @username through GET /users with q and projectId filters; it never sends a username as a foreign key.
+Submitting work and recording review
+{  "expectedVersion": 3,  "summary": "Implemented pagination and invalid-input handling.",  "artifactLinks": ["https://example.com/review/123"]}
+POST /tasks/:id/submissions accepts the above. POST /submissions/:id/review accepts expectedVersion of the task, decision APPROVE or REQUEST_CHANGES, and feedback. Require nonempty feedback for requested changes; preserve every submission and decision.
+Attendance and leave
+POST /attendance/check-in and check-out take an empty JSON object plus Idempotency-Key. Identity, work date, and timestamps come from the server. Reject client-supplied userId or occurredAt. POST /leave takes startDate, endDate, type, and optional privateNote. POST /corrections takes attendanceDayId, expectedDayVersion, proposedIn, proposedOut, and reason. Approve/reject actions require the request's expectedVersion; approval checks the day version as well.
+Validation defaults
+Names 1–120 trimmed characters; task title 1–200; descriptions and report sections at most 5000; comments 1–2000; review/correction reasons 1–2000; HTTPS artifact URLs at most 2048 characters each and at most 10 per submission. Treat links as user content; do not fetch arbitrary URLs server-side. Reject unknown mutation fields, invalid dates, invalid enums, and arbitrary sort expressions. Handle empty optional fields consistently as null or omission, documented per endpoint.
+Limit JSON bodies to 256 KB and CSV uploads to 2 MB as initial application limits. Return understandable errors rather than truncating silently. Use parameterized SQL for all raw operations. Log diagnostic details privately with requestId; never return stack traces or connection strings.
+
+14 Application folder structure
+Create folders as their features are implemented; do not generate dozens of empty abstraction layers. This structure is a target organization, not permission to overwrite an existing repository. Parenthesized route groups do not change URLs. Braces below mean separate named files.
+encova-workspace/  AGENTS.md  README.md  package.json  pnpm-lock.yaml  .env.example  .gitignore  next.config.ts  tsconfig.json  eslint.config.mjs  vitest.config.ts  playwright.config.ts  compose.yaml  .github/workflows/ci.yml  prisma/    schema.prisma    migrations/    seed.ts  scripts/    bootstrap-admin.ts    worker.ts    reconcile-attendance.ts    verify-environment.ts  src/    app/      (auth)/login/page.tsx      (auth)/forgot-password/page.tsx      (auth)/reset-password/page.tsx      (auth)/invite/[token]/page.tsx      (workspace)/layout.tsx      (workspace)/dashboard/page.tsx      (workspace)/my-work/page.tsx      (workspace)/people/[id]/page.tsx      (workspace)/projects/[id]/page.tsx      (workspace)/tasks/[id]/page.tsx      (workspace)/attendance/me/page.tsx      (workspace)/reports/[id]/page.tsx      (workspace)/internships/[id]/page.tsx      (workspace)/{teams,departments,leave,corrections}/page.tsx      (workspace)/{notifications,settings,audit,profile}/page.tsx      api/auth/[...all]/route.ts      api/v1/[feature routes matching the API contract]      error.tsx      not-found.tsx      globals.css
+Add list pages alongside detail pages: people, projects, tasks where needed, attendance, reports, and internships. Feature API paths must be actual route directories, not a literal feature-routes placeholder. Define loading/error boundaries where useful. Keep generated auth adapter tables and migration conventions compatible with the installed Prisma version rather than assuming commands from a different major release.
+
+15 Feature module and documentation structure
+  src/    modules/      identity/   people/       organization/      projects/   tasks/        reports/      attendance/ leave/        internships/      notifications/ audit/     views/      imports/    dashboard/    settings/    components/      ui/         layout/       shared/    server/      auth.ts     db.ts         env.ts      context.ts  errors.ts     logger.ts      csrf.ts     rate-limit.ts idempotency.ts      jobs/       email/        transactions/    lib/      dates.ts    constants.ts    types/      api.ts  tests/    unit/       integration/    e2e/    fixtures/   helpers/  docs/    README.md    progress.md    product/{scope,roles,workflows}.md    architecture/{overview,decisions}.md    architecture/diagrams/*.mmd    database/{schema,migrations,seed-data}.md    api/{conventions,endpoints,openapi}.md    frontend/{screens,components}.md    backend/{services,jobs}.md    testing/{strategy,acceptance,results}.md    operations/{setup,deployment,backup-restore,runbook}.md    planning/{milestones,backlog}.md    planning/days/day-001.md through day-060.md    decisions/ADR-001-project-foundation.md
+Inside a feature module use schemas.ts for Zod, dto.ts for safe responses, policy.ts for access rules, queries.ts for data access, service.ts for transactions, components/ for feature UI, and hooks/ only for client hooks. Avoid a global miscellaneous service file. Export only necessary public interfaces.
+Documentation ownership
+The scope file defines the agreed product. The schema and API files must describe implemented behavior and label future work. progress.md is the single status index; daily files contain evidence. ADRs record a decision, alternatives, reason, date, and consequences. testing/results.md records commands, date, environment, outcome, and unresolved failures. Never store secret values or private employee records in docs.
+The supplied documentation pack contains proposed requirements and blank progress templates, not a working application. Codex must reconcile it with the repository, preserve existing instructions, and populate setup, migrations, actual API schemas, and test results as work proceeds. Do not mark planned files as already implemented.
+
+16 Security background jobs and deployment
+Security baseline
+Require server-side authorization on every entry path and explicit response field selection. Use library-managed secure HttpOnly sessions and documented CSRF defenses. Custom cookie-authenticated mutation endpoints enforce same-origin requests and CSRF protection. Do not use GET for writes. Disable public registration and test invitation bypass attempts.
+Use rate limits for login/reset/invitation endpoints and sensible per-user mutation limits. Limits must work across deployed instances; use platform-supported shared limits or a database-backed implementation, not an unbounded in-process Map. Protect privileged accounts with supported MFA before real-data rollout. No impersonation feature is included.
+Keep secrets out of browser bundles, repository files, logs, and documentation. Validate server environment at startup. Use least-privilege application DB credentials and controlled migration credentials. Test row-level access through direct API calls, not just page navigation. Session revocation plus ACTIVE checks protect deactivated accounts.
+Worker requirements
+Jobs: process email outbox, finalize eligible attendance days, remind missing reports, and clean expired idempotency/invitation artifacts. Jobs are retryable with unique run keys and leases; competing workers must not process the same lease simultaneously. A crashed worker's lease expires. Do not mark an email delivered before the provider accepts it. Expose exhausted retries to super admins without exposing secret payloads.
+Attendance reconciliation recomputes from schedule snapshots, raw events, approved leave, and approved corrections; it must preserve approved overrides. Run periodic reconciliation and allow an audited admin retry. No scheduler running means missing automation, not a false healthy status.
+Local and production environments
+Use separate development, test, and pilot databases. compose.yaml provides local PostgreSQL and a development mail catcher. .env.example lists placeholders for DATABASE_URL, auth secret and base URL, SMTP host/port/user/password/from address, and worker configuration. Exact variable names are finalized for the chosen adapters on Day 1.
+Expected scripts: dev, build, start, lint, typecheck, test:unit, test:integration, test:e2e, db:migrate:dev, db:migrate:deploy, db:seed, worker, and bootstrap:admin. Implement these commands using the installed tool versions, not invented CLI syntax. Protect seed/reset commands from production targets.
+Release: CI checks, reviewed migration, backup, compatible migration application, application and worker deployment, then smoke tests. Deploy only to an approved host with Node support and persistent PostgreSQL; static export cannot provide this backend. Document rollback compatibility. Test backup restore into a separate DB; a successful backup command alone does not prove recovery. Retain a release checklist and incident runbook before pilot use.
+
+17 Verification and release acceptance
+Unit tests cover schemas, state transitions, date calculations, permission decisions, and CSV sanitization. Integration tests use real PostgreSQL to verify transactions, uniqueness, locks, and rollback. E2E tests use separate role sessions and real backend responses. Synthetic users and fake company data are mandatory during development.
+Risk
+Required check
+Unauthorized access
+Member cannot read another person's attendance, private profile, report, or unassigned project through URL, API, counts, export, or autocomplete
+Privilege escalation
+HR cannot grant lead/admin roles; user cannot edit own role; last active super admin cannot be removed
+Invitation misuse
+Expired revoked reused and mismatched-email tokens fail; unlinked identity has no access
+Assignment integrity
+Username rename preserves assignments; inactive or nonmember assignee rejected
+Review correctness
+Self-review fails; duplicate decisions are idempotent; old submission cannot receive a new decision
+Concurrency
+Same expectedVersion produces one successful edit; conflict preserves existing data
+Attendance
+Duplicate check-in creates one event; checkout-before-checkin fails; open day becomes NEEDS_REVIEW
+Attendance dates
+Holiday/off-day handling and Asia/Karachi midnight boundaries behave correctly
+Leave race
+Concurrent leave approval and check-in cannot both commit incompatible results
+Corrections
+Raw events preserved; stale correction rejected; self-approval denied
+Job recovery
+Worker crash/retry does not duplicate in-app notifications or attendance summaries
+Tables and imports
+Bulk partial failures roll back; import retry safe; exported formula text neutralized
+UI accessibility
+Keyboard navigation, visible focus, labeled forms, readable statuses, 360-pixel layouts
+Operations
+Clean setup, migrations, worker execution, private smoke test, and backup restore demonstrated
+
+Pilot acceptance journey
+Invite a developer and intern; accept both; assign team and schedule. Create a project, add both people, and assign separate tasks with an independent reviewer. Each sees only permitted work. Record attendance, submit daily reports, submit work, request changes, resubmit, and approve. Request leave and an attendance correction; independent approvers act and history remains visible. Complete an intern milestone through approved tasks. Verify admin summaries and filtered exports against actual records.
+Then deactivate one account, verify session access fails, inspect audit history, retry a failed email job, and restore the pilot backup into another database. Record evidence for every gate. The system is not production-ready merely because the UI renders or the build passes.
+Completion rule
+A feature is done only when frontend, service, database migration, permissions, error states, meaningful tests, and documentation agree. A learning day is complete only when its implementation checks pass and Talha can explain the important concept. Blocked work remains blocked; elapsed dates do not prove progress.
+
+18 Daily milestones for days 1 to 30
+Planning allowance: 60 sessions of about four hours, approximately 240 hours. This is an initial work breakdown, not a delivery guarantee. At five sessions per week it spans roughly 12 weeks. Review estimates after the first six sessions. Split oversized days into continuation sessions; do not skip checks to meet a date. Current progress starts at zero unless repository evidence proves otherwise.
+Day
+Work and daily acceptance
+01
+Inspect repo and assumptions; choose compatible versions; record reuse/new-repo decision and setup
+02
+Initialize app strict typing lint and scripts; local app and typecheck work
+03
+Create docs and progress workflow; all days pending and resumption instructions clear
+04
+Configure PostgreSQL and migrations; clean test database can be recreated
+05
+Integrate auth library and closed registration; anonymous/domain-unlinked access rejected
+06
+Bootstrap super admin and session lifecycle; current-user endpoint and logout verified
+07
+Implement domain roles and policy helpers; role matrix unit tests pass
+08
+Build invitation tokens and provisioning; expired and reused token tests pass
+09
+Add mail adapter and outbox foundation; invitation reaches development mail catcher
+10
+Build acceptance/reset screens; real account setup and reset flow verified
+11
+Build people profiles and directory; private fields excluded by role
+12
+Add departments teams and manager rules; membership changes audited
+13
+Add deactivation and role change; revoked access and last-admin guard verified
+14
+Build reusable layout and table controls; keyboard/mobile shell checked
+15
+Complete role-specific navigation; unauthorized routes and DTOs tested
+16
+Build project schema and services; CRUD and manager scope tests pass
+17
+Build project list/detail/membership UI; membership removal rules enforced
+18
+Build task creation and user picker; assignment uses ID and validates reviewer
+19
+Build personal work list and task detail; scope and filter counts match
+20
+Implement task state transitions and blockers; illegal transitions rejected
+21
+Implement immutable submissions; revisions and idempotent submit verified
+22
+Implement review decisions; self-review and concurrent duplicate review rejected
+23
+Build review queue and feedback UI; return/resubmit/approve journey passes
+24
+Add comments archive/reopen and audit; lifecycle rules verified
+25
+Build report schema and drafts; one report per user/date enforced
+26
+Build report submit/return/acknowledge; access and immutable submissions tested
+27
+Build report screens and missing-report query; cutoff and leave exceptions covered
+28
+Build schedule policies and effective assignments; overlaps rejected
+29
+Build holidays and schedule settings UI; policy snapshots and date rules checked
+30
+Build attendance events and idempotent check-in; duplicate and off-day cases pass
+
+
+19 Daily milestones for days 31 to 60
+Day
+Work and daily acceptance
+31
+Implement check-out and daily summary; event order and duration tests pass
+32
+Implement attendance finalizer; absence/open-checkin and retries verified
+33
+Build personal attendance card/history; mobile check-in/out workflow works
+34
+Build HR attendance grid; scoped counts and drill-down agree
+35
+Implement correction requests and decisions; raw history and version guard verified
+36
+Build correction UI; independent approval and error recovery demonstrated
+37
+Implement leave and reserved dates; overlapping pending/approved leave rejected
+38
+Implement leave decisions and attendance interaction; approval/check-in race tested
+39
+Build leave calendar and request UI; full workflow and private-note access checked
+40
+Run integrated attendance/leave scenarios; date boundaries and retries pass
+41
+Build internship enrollment and mentor policies; one active enrollment enforced
+42
+Build learning milestones/task links; only eligible work can be linked
+43
+Build weekly feedback and intern UI; mentee/mentor/HR visibility tested
+44
+Implement milestone completion; unapproved required task blocks completion
+45
+Add persistent in-app notifications; recipient ownership and read state verified
+46
+Complete worker leases/retries/reminders; recovery and deduplication tested
+47
+Add editable task/people tables; updates call validated domain services
+48
+Add personal saved views and filters; invalid columns/filters rejected
+49
+Implement bulk task update; authorization/version failures roll back batch
+50
+Implement task CSV preview/commit and exports; limits and formula sanitization pass
+51
+Build super-admin dashboard and action queues; numbers match scoped source records
+52
+Build HR lead and personal dashboards; role-specific evidence verified
+53
+Build settings/audit screens and admin operational errors; filters and access checked
+54
+Run security tests and configure privileged MFA; direct API bypass tests pass
+55
+Run complete browser journeys and mobile/accessibility review; defects recorded/fixed
+56
+Profile realistic data and improve measured slow queries; record before/after results
+57
+Configure CI and production build checks; clean checkout reproduces results
+58
+Prepare approved pilot deployment and worker; migration/backup/smoke steps documented
+59
+Perform backup restore and operational failure drill; recovery evidence recorded
+60
+Conduct pilot acceptance and final documentation review; open issues and launch decision explicit
+
+Daily pacing
+Use approximately 30 minutes to read the day's requirements, 140 minutes to build, 45 minutes to verify, 15 minutes to explain the key concept, and 10 minutes to record progress. Take breaks within the building block. A four-hour allowance is a cap for planning, not a reason to call unfinished work complete.
+Finish one day's scope before requesting approval to advance. If a check fails, continue that day next session. Approval for the next day does not approve extra unrelated features, production deployment, or migration of existing real data.
+
+20 Codex operating instructions and handoff
+Starting instruction
+Codex: read this specification and the supplied docs folder, then inspect the repository and its instructions. Build Encova Workspace with a real frontend, backend, and database, following the daily milestones. Preserve existing work. If a completed Encova Hub repository is supplied, document what is reusable and request approval before a major restructure or data migration. If the repository is empty, create the new structure described here.
+Create or reconcile the docs folder first. Start the first unfinished day; never assume elapsed calendar time means completion. Work only on that day's scope, explain important changes in simple English, and run relevant checks. Implement requested work while making time for Talha to explain the core backend concept.
+Session and progress rules
+At session start, read docs/progress.md and the current day file, then verify against code and test evidence. At each meaningful checkpoint and before ending, update completed work, files changed, commands actually run, outcomes, blockers, remaining tasks, and exact next action. Never fabricate test results, commit hashes, or learning completion.
+Use Pending, In progress, Blocked, Awaiting learning check, and Completed. There may be only one active planned day. Mark learning complete only after Talha explains or demonstrates it. Ask before moving to the next day. Keep one planned day per Asia/Karachi calendar day unless Talha explicitly approves an exception. A new date never auto-completes an unfinished day.
+When asked “Where are we?”, answer from documentation: completed days out of 60, current day and status, remaining days including unfinished work, blockers, next task, and whether advancement is approved. A status question does not authorize starting new tasks. A “continue” instruction resumes the active day; if that day is complete, request approval before advancing unless approval is already recorded.
+Progress template
+Total planned days: 60Completed days: 0Current day: 001Current status: PendingRemaining days: 60Last session date: Not startedNext-day approval: Not requestedImplementation evidence: None yetBlockers: None recordedNext action: Inspect repository and confirm working assumptions
+Daily files contain Goal; Task checklist; Completed work; Files changed; Checks and results; Learning check; Blockers; Remaining work; Next action; Advancement approval. Update totals from actual daily statuses. Record plan changes without deleting historical evidence. Do not push, deploy, relocate existing folders, or migrate real data without explicit authorization.
+Sources and limits
+[1] Next.js Backend for Frontend: https://nextjs.org/docs/app/guides/backend-for-frontend
+[2] Better Auth Email and Password: https://better-auth.com/docs/authentication/email-password
+[3] Better Auth Session Management: https://better-auth.com/docs/concepts/session-management
+[4] PostgreSQL Constraints: https://www.postgresql.org/docs/17/ddl-constraints.html
+Sources support framework principles; product rules and defaults in this document are proposed Encova decisions. Repository implementation, actual provider configuration, and deployment access remain to be established. The specification and templates do not claim that the platform has been built or approved for real company use.

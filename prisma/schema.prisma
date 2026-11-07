@@ -1,0 +1,386 @@
+generator client {
+ provider = "prisma-client"
+ output = "../src/generated/prisma"
+}
+datasource db {
+ provider = "postgresql"
+}
+model User {
+ id String @id
+ name String
+ email String @unique
+ emailVerified Boolean @default(false)
+ image String?
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ sessions Session[]
+ accounts Account[]
+ person Person?
+ @@map("user")
+}
+model Session {
+ id String @id
+ expiresAt DateTime @db.Timestamptz
+ token String @unique
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ ipAddress String?
+ userAgent String?
+ userId String
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ @@index([userId])
+ @@map("session")
+}
+model Account {
+ id String @id
+ accountId String
+ providerId String
+ userId String
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ accessToken String?
+ refreshToken String?
+ idToken String?
+ accessTokenExpiresAt DateTime? @db.Timestamptz
+ refreshTokenExpiresAt DateTime? @db.Timestamptz
+ scope String?
+ password String?
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ @@index([userId])
+ @@map("account")
+}
+model Verification {
+ id String @id
+ identifier String
+ value String
+ expiresAt DateTime @db.Timestamptz
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ @@index([identifier])
+ @@map("verification")
+}
+enum Role {
+ SUPER_ADMIN
+ HR_ADMIN
+ TEAM_LEAD
+ MEMBER
+}
+enum PersonStatus {
+ INVITED
+ ACTIVE
+ INACTIVE
+}
+enum TaskStatus {
+ ASSIGNED
+ IN_PROGRESS
+ BLOCKED
+ IN_REVIEW
+ CHANGES_REQUESTED
+ APPROVED
+ CANCELED
+}
+model Person {
+ id String @id @default(uuid()) @db.Uuid
+ authUserId String? @unique
+ authUser User? @relation(fields:[authUserId],references:[id])
+ email String @unique
+ username String @unique
+ displayName String
+ role Role @default(MEMBER)
+ status PersonStatus @default(INVITED)
+ employmentType String @default("EMPLOYEE")
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ projects Project[]
+ memberships ProjectMember[]
+ assignments Task[] @relation("Assignee")
+ reviews Task[] @relation("Reviewer")
+ submissions Submission[]
+ decisions Review[]
+ notifications Notification[]
+ @@index([status,role])
+}
+model Project {
+ id String @id @default(uuid()) @db.Uuid
+ name String
+ description String
+ managerId String @db.Uuid
+ manager Person @relation(fields:[managerId],references:[id])
+ archivedAt DateTime? @db.Timestamptz
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ members ProjectMember[]
+ tasks Task[]
+}
+model ProjectMember {
+ projectId String @db.Uuid
+ userId String @db.Uuid
+ project Project @relation(fields:[projectId],references:[id])
+ user Person @relation(fields:[userId],references:[id])
+ joinedAt DateTime @default(now()) @db.Timestamptz
+ @@id([projectId,userId])
+}
+model Task {
+ id String @id @default(uuid()) @db.Uuid
+ projectId String @db.Uuid
+ project Project @relation(fields:[projectId],references:[id])
+ assigneeId String @db.Uuid
+ assignee Person @relation("Assignee",fields:[assigneeId],references:[id])
+ reviewerId String @db.Uuid
+ reviewer Person @relation("Reviewer",fields:[reviewerId],references:[id])
+ title String
+ description String
+ priority String @default("NORMAL")
+ status TaskStatus @default(ASSIGNED)
+ dueAt DateTime? @db.Timestamptz
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ submissions Submission[]
+ @@index([assigneeId,status,dueAt])
+ @@index([projectId,status])
+}
+model Submission {
+ id String @id @default(uuid()) @db.Uuid
+ taskId String @db.Uuid
+ task Task @relation(fields:[taskId],references:[id])
+ revision Int
+ submittedBy String @db.Uuid
+ author Person @relation(fields:[submittedBy],references:[id])
+ summary String
+ artifactLinks Json
+ createdAt DateTime @default(now()) @db.Timestamptz
+ review Review?
+ @@unique([taskId,revision])
+}
+model Review {
+ id String @id @default(uuid()) @db.Uuid
+ submissionId String @unique @db.Uuid
+ submission Submission @relation(fields:[submissionId],references:[id])
+ reviewerId String @db.Uuid
+ reviewer Person @relation(fields:[reviewerId],references:[id])
+ decision String
+ feedback String
+ createdAt DateTime @default(now()) @db.Timestamptz
+}
+model Notification {
+ id String @id @default(uuid()) @db.Uuid
+ recipientId String @db.Uuid
+ recipient Person @relation(fields:[recipientId],references:[id])
+ eventKey String
+ title String
+ target String
+ readAt DateTime? @db.Timestamptz
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@unique([recipientId,eventKey])
+ @@index([recipientId,readAt,createdAt])
+}
+model Audit {
+ id String @id @default(uuid()) @db.Uuid
+ actorId String? @db.Uuid
+ action String
+ entityId String
+ changes Json
+ requestId String
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@index([entityId,createdAt])
+}
+model Idempotency {
+ id String @id @default(uuid()) @db.Uuid
+ actorId String @db.Uuid
+ operation String
+ key String
+ hash String
+ result Json
+ createdAt DateTime @default(now()) @db.Timestamptz
+ expiresAt DateTime @db.Timestamptz
+ @@unique([actorId,operation,key])
+}
+model RateLimit {
+ id String @id
+ count Int @default(1)
+ expiresAt DateTime @db.Timestamptz
+}
+model Outbox {
+ id String @id @default(uuid()) @db.Uuid
+ eventKey String @unique
+ recipient String
+ subject String
+ text String
+ attempts Int @default(0)
+ nextAttemptAt DateTime @default(now()) @db.Timestamptz
+ leaseUntil DateTime? @db.Timestamptz
+ deliveredAt DateTime? @db.Timestamptz
+ lastError String?
+ createdAt DateTime @default(now()) @db.Timestamptz
+}
+model AuthRateLimit {
+ id String @id
+ key String @unique
+ count Int
+ lastRequest BigInt
+ @@map("auth_rate_limit")
+}
+model Invitation {
+ id String @id @default(uuid()) @db.Uuid
+ email String
+ username String
+ displayName String
+ role Role
+ employmentType String
+ tokenHash String @unique
+ invitedBy String @db.Uuid
+ expiresAt DateTime @db.Timestamptz
+ acceptedAt DateTime? @db.Timestamptz
+ revokedAt DateTime? @db.Timestamptz
+ createdAt DateTime @default(now()) @db.Timestamptz
+}
+model SchedulePolicy {
+ id String @id @default(uuid()) @db.Uuid
+ name String
+ localStart String
+ localEnd String
+ weekdays Json
+ graceMinutes Int
+ closingBufferMinutes Int
+ createdAt DateTime @default(now()) @db.Timestamptz
+}
+model ScheduleAssignment {
+ id String @id @default(uuid()) @db.Uuid
+ userId String @db.Uuid
+ policyId String @db.Uuid
+ startDate DateTime @db.Date
+ endDate DateTime? @db.Date
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@index([userId,startDate])
+}
+model Holiday {
+ id String @id @default(uuid()) @db.Uuid
+ date DateTime @unique @db.Date
+ name String
+ createdAt DateTime @default(now()) @db.Timestamptz
+}
+model AttendanceDay {
+ id String @id @default(uuid()) @db.Uuid
+ userId String @db.Uuid
+ workDate DateTime @db.Date
+ snapshot Json
+ status String
+ firstIn DateTime? @db.Timestamptz
+ lastOut DateTime? @db.Timestamptz
+ grossMinutes Int?
+ late Boolean @default(false)
+ early Boolean @default(false)
+ corrected Boolean @default(false)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ events AttendanceEvent[]
+ @@unique([userId,workDate])
+}
+model AttendanceEvent {
+ id String @id @default(uuid()) @db.Uuid
+ dayId String @db.Uuid
+ day AttendanceDay @relation(fields:[dayId],references:[id])
+ userId String @db.Uuid
+ kind String
+ occurredAt DateTime @db.Timestamptz
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@unique([dayId,kind])
+}
+model AttendanceCorrection {
+ id String @id @default(uuid()) @db.Uuid
+ dayId String @db.Uuid
+ requestedBy String @db.Uuid
+ proposedIn DateTime @db.Timestamptz
+ proposedOut DateTime @db.Timestamptz
+ reason String
+ expectedDayVersion Int
+ status String @default("PENDING")
+ reviewerId String? @db.Uuid
+ reviewedAt DateTime? @db.Timestamptz
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+}
+model LeaveRequest {
+ id String @id @default(uuid()) @db.Uuid
+ userId String @db.Uuid
+ startDate DateTime @db.Date
+ endDate DateTime @db.Date
+ type String
+ privateNote String?
+ status String @default("PENDING")
+ reviewerId String? @db.Uuid
+ reviewedAt DateTime? @db.Timestamptz
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ dates LeaveDate[]
+}
+model LeaveDate {
+ id String @id @default(uuid()) @db.Uuid
+ requestId String @db.Uuid
+ request LeaveRequest @relation(fields:[requestId],references:[id])
+ userId String @db.Uuid
+ workDate DateTime @db.Date
+ active Boolean @default(true)
+ @@index([userId,workDate])
+}
+model DailyReport {
+ id String @id @default(uuid()) @db.Uuid
+ userId String @db.Uuid
+ workDate DateTime @db.Date
+ completedText String
+ remainingText String
+ blockersText String
+ status String @default("DRAFT")
+ submittedAt DateTime? @db.Timestamptz
+ acknowledgedBy String? @db.Uuid
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ @@unique([userId,workDate])
+}
+model Department {
+ id String @id @default(uuid()) @db.Uuid
+ name String
+ normalizedName String @unique
+ archivedAt DateTime? @db.Timestamptz
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+}
+model Team {
+ id String @id @default(uuid()) @db.Uuid
+ departmentId String @db.Uuid
+ leadId String @db.Uuid
+ name String
+ archivedAt DateTime? @db.Timestamptz
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ @@unique([departmentId,name])
+}
+model EmployeeProfile {
+ userId String @id @db.Uuid
+ departmentId String? @db.Uuid
+ teamId String? @db.Uuid
+ managerId String? @db.Uuid
+ joiningDate DateTime? @db.Date
+ workMode String @default("OFFICE")
+ privateContact String?
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+}
+model ReportRevision {
+ id String @id @default(uuid()) @db.Uuid
+ reportId String @db.Uuid
+ version Int
+ content Json
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@unique([reportId,version])
+}

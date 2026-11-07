@@ -1,0 +1,75 @@
+{
+  "name": "encova-workspace",
+  "version": "0.1.0",
+  "description": "Encova internal workspace",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "db:generate": "prisma generate",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "bootstrap:admin": "tsx --conditions=react-server scripts/bootstrap-admin.ts",
+    "verify:docs": "python3 scripts/verify-docs.py",
+    "db:local": "tsx scripts/local-db.ts",
+    "worker": "tsx --conditions=react-server scripts/worker.ts",
+    "test:e2e:prepare": "tsx --conditions=react-server tests/e2e/prepare.ts",
+    "reconcile:attendance": "tsx --conditions=react-server scripts/reconcile-attendance.ts",
+    "report:export": "python3 scripts/export-report.py",
+    "db:seed": "pnpm test:e2e:prepare"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.18.0",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.18.0",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "@tanstack/react-query": "5.106.1",
+    "@tanstack/react-table": "9.3.1",
+    "better-auth": "1.7.18",
+    "lucide-react": "1.70.0",
+    "next": "16.4.5",
+    "nodemailer": "10.3.1",
+    "pg": "8.23.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "server-only": "0.0.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "@types/node": "26.6.6",
+    "@types/nodemailer": "8.0.2",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "dotenv": "18.0.9",
+    "embedded-postgres": "17.9.0-beta.16",
+    "eslint": "9.39.1",
+    "eslint-config-next": "16.4.5",
+    "prettier": "3.9.10",
+    "prisma": "7.10.1",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.1.0"
+  }
+}
