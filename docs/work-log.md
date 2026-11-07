@@ -50,3 +50,9 @@ Date: 2026-11-07, Asia/Karachi. Append meaningful checkpoints; do not rewrite fa
 | 044 | Attempt requested push | git push -u origin main failed: could not read Username for https://github.com with terminal prompts disabled. No remote update claimed. |
 | 045 | Discover publication fallback | GitHub integration found as available but not installed/connected; offered it so the user can authenticate. Connection is not assumed. |
 | 046 | Record publication blocker | Updated report, live progress and test evidence to show successful local commit and blocked push. No auto-review or permission rejection occurred; this is an authentication failure. |
+| 047 | Start local preview | Started the development server on loopback port 3000; /login returned HTTP 200. |
+| 048 | Create requested local super admin | Confirmed encova_dev had no super admin, then ran the transactional bootstrap using the user's supplied email and a generated password. Credentials were provided privately in chat and were not stored in source or documentation. |
+| 049 | Verify administrator login | Signed in through the real auth HTTP endpoint and fetched /api/v1/me with the resulting session; confirmed SUPER_ADMIN. Only local development data changed. |
+| 050 | Begin step-by-step blocker resolution | User requested solving outstanding work step by step. Started with GitHub authentication/publication; no additional feature scope was started. |
+| 051 | Install isolated GitHub CLI | Downloaded official GitHub CLI 2.103.3 for macOS ARM64, verified its published SHA-256 digest, and installed it under ignored .local/tools/gh/. |
+| 052 | Start browser authentication | Confirmed no existing GitHub CLI login and started GitHub's device authorization flow. User must complete sign-in in their browser; no passwords, access tokens or device codes are recorded in project documents. |

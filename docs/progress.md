@@ -25,4 +25,4 @@ Actual company policies, production host, real SMTP delivery and backup-client t
 
 ## Exact next action
 
-Authenticate GitHub, then push main and verify the remote branch against local HEAD. Local browser verification and Word export have passed. Subsequent feature work starts with the incomplete identity/organization and work-lifecycle requirements in the backlog. Learning completion awaits Talha's explanation; cross-milestone build approval is already granted.
+Step 1: complete the active GitHub CLI browser sign-in, then verify repository access, push main and compare remote/local HEAD. Official GitHub CLI is installed under ignored .local/tools/gh/; authentication is awaiting the user's browser action. Local browser verification and Word export have passed. Subsequent feature work starts with the incomplete identity/organization and work-lifecycle requirements in the backlog. Learning completion awaits Talha's explanation; cross-milestone build approval is already granted.

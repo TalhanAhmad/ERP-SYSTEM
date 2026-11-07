@@ -52,3 +52,9 @@ Set TEST_DATABASE_URL if using a different port/password. Its database name must
 - https://www.prisma.io/docs/orm/reference/system-requirements
 
 The authoritative installed versions are in the lockfile. Package build-script approval is allowlisted in pnpm-workspace.yaml. Package-supplied agent skills were not adopted.
+
+## GitHub publication setup
+
+An official macOS ARM64 GitHub CLI 2.103.3 binary is installed locally at `.local/tools/gh/gh` (ignored by Git); its release SHA-256 was verified. It is not included in a clean clone. GitHub CLI browser sign-in was initiated for step-by-step publication; success is not assumed until `gh auth status` and repository access verification pass. Never paste access tokens or account passwords into the progress log.
+
+Official command references: https://cli.github.com/manual/gh_auth_login and https://cli.github.com/manual/gh_auth_setup-git.
