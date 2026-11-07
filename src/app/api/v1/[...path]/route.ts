@@ -381,3 +381,5 @@ export async function PATCH(request: Request, { params }: Params) {
     return failure(error, requestId);
   }
 }
+
+export const runtime = "nodejs";

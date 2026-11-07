@@ -4,6 +4,8 @@ Encova Workspace: a Next.js / PostgreSQL internal work platform.
 
 **Initial implementation; the full specification and production acceptance are not complete.**
 
+Production target: **Next.js + TypeScript + Tailwind + Supabase PostgreSQL/Auth/Storage + Prisma + Vercel**. See [deployment and cutover](docs/operations/deployment.md) and [the architecture decision](docs/decisions/ADR-002-supabase-vercel.md). Supabase production support is staged; the working local login still uses Better Auth until the hosted cutover is verified.
+
 Working modules include invitation-based accounts, projects, task assignments/submissions/reviews, attendance, leave/corrections, daily reports, notifications and audit records. All displayed work records come from PostgreSQL.
 
 Start with [setup](docs/operations/setup.md), then follow [progress](docs/progress.md), the [step log](docs/work-log.md), [verification results](docs/testing/results.md) and [remaining release work](docs/planning/backlog.md).

@@ -2,6 +2,9 @@ import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { db } from "../src/server/db";
+import { env } from "../src/server/env";
+if (env.AUTH_PROVIDER !== "better-auth")
+  throw new Error("Use bootstrap:supabase-admin for Supabase Auth.");
 const email = process.env.ADMIN_EMAIL?.trim().toLowerCase(),
   password = process.env.ADMIN_PASSWORD,
   username = process.env.ADMIN_USERNAME?.trim().toLowerCase();

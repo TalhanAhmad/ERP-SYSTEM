@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { env } from "@/server/env";
+import { supabaseServer } from "@/server/supabase/client";
 import { ResetForm } from "@/components/reset-form";
 export default async function Reset({
   searchParams,
@@ -6,10 +8,15 @@ export default async function Reset({
   searchParams: Promise<{ token?: string }>;
 }) {
   const { token } = await searchParams;
+  const hasSupabaseSession =
+    env.AUTH_PROVIDER === "supabase" &&
+    !!(await (await supabaseServer()).auth.getUser()).data.user;
   return (
     <main className="auth-form">
       <h1>Choose a new password.</h1>
-      {token ? (
+      {hasSupabaseSession ? (
+        <ResetForm mode="update" />
+      ) : token && env.AUTH_PROVIDER === "better-auth" ? (
         <ResetForm token={token} />
       ) : (
         <p className="error">

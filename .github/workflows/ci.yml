@@ -45,4 +45,15 @@ jobs:
       - run: pnpm build
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
+      - name: Verify Supabase-mode production build (configuration fixtures only)
+        run: pnpm build:vercel
+        env:
+          AUTH_PROVIDER: supabase
+          APP_URL: https://workspace.example.test
+          SUPABASE_URL: https://supabase.example.test
+          SUPABASE_PUBLISHABLE_KEY: synthetic-publishable-key
+          SUPABASE_SECRET_KEY: synthetic-server-only-key
+          DATABASE_URL: postgresql://app:synthetic@region.pooler.supabase.com:6543/postgres
+          CRON_SECRET: synthetic-cron-secret-at-least-32-characters
+          VERCEL_ENV: production
       - run: pnpm verify:docs

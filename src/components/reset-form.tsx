@@ -1,15 +1,21 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { createAuthClient } from "better-auth/react";
-const auth = createAuthClient();
-export function ResetForm({ token }: { token?: string }) {
+import { accountAction } from "@/lib/auth/client";
+export function ResetForm({
+  token,
+  mode = "request",
+}: {
+  token?: string;
+  mode?: "request" | "update";
+}) {
+  const updating = !!token || mode === "update";
   const [done, setDone] = useState(false),
     [pending, setPending] = useState(false),
     [error, setError] = useState("");
   return done ? (
     <div className="success">
-      {token
+      {updating
         ? "Your password was reset."
         : "If an eligible account exists, password-reset instructions will be emailed."}{" "}
       <Link href="/login">Return to sign in</Link>
@@ -22,19 +28,14 @@ export function ResetForm({ token }: { token?: string }) {
         setPending(true);
         setError("");
         try {
-          if (token) {
-            const result = await auth.resetPassword({
-              token,
-              newPassword: String(form.get("password")),
+          if (updating) {
+            await accountAction("password-update", {
+              password: String(form.get("password")),
+              ...(token ? { token } : {}),
             });
-            if (result.error)
-              throw new Error(
-                "This reset link is invalid or expired. Request a new one.",
-              );
           } else
-            await auth.requestPasswordReset({
+            await accountAction("password-reset", {
               email: String(form.get("email")).toLowerCase().trim(),
-              redirectTo: `${window.location.origin}/reset-password`,
             });
           setDone(true);
         } catch (err) {
@@ -48,7 +49,7 @@ export function ResetForm({ token }: { token?: string }) {
         }
       }}
     >
-      {token ? (
+      {updating ? (
         <label>
           New password
           <input
@@ -74,7 +75,7 @@ export function ResetForm({ token }: { token?: string }) {
       <button className="primary" disabled={pending}>
         {pending
           ? "Please wait…"
-          : token
+          : updating
             ? "Set new password"
             : "Request reset instructions"}
       </button>

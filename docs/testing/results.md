@@ -8,17 +8,29 @@ Date: 7 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | --- | --- | --- |
 | pnpm install / peers check | PASS | Exact lockfile resolved; no peer dependency issues. |
 | pnpm exec prisma validate | PASS | Initial schema validated; subsequent migrations and generated client succeeded. |
-| pnpm db:migrate:deploy on dev/test | PASS | Five migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
+| pnpm db:migrate:deploy on dev/test | PASS | Six migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
-| pnpm test:unit | PASS — 72 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
-| pnpm test:integration | PASS — 32 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
+| pnpm test:unit | PASS — 88 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
+| pnpm test:integration | PASS — 52 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 2 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest run: 18.5 seconds. |
+| pnpm test:e2e | PASS — 2 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest run: 4.8 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
 | Git commit/push | PASS | GitHub CLI authentication completed; push succeeded. Local and remote main matched commit 396a146. |
+
+## Supabase/Vercel foundation verification
+
+Latest local results: 88 unit, 52 integration and 2 browser tests passed (142 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
+
+Supabase SDK + real PostgreSQL contract tests verify safe session DTOs/HTTP-only cookies, server identity verification, client role metadata rejection, immediate domain deactivation denial, legacy endpoint closure, same-origin protection, generic reset results, internal-only redirects, sign-out cookie clearing and scheduler authentication. Provider HTTP is simulated in these tests; no live Supabase result is claimed. Separate PostgreSQL tests cover provisioning failure/retry/revocation/concurrency, RLS/grants and the bounded job pass.
+
+Both a normal build and a Supabase-selected Vercel-mode build passed. The latter used configuration fixtures/reserved example URLs and did not contact a real hosted project. The same production artifact passed the existing local compatibility browser journey after synthetic account preparation. Production dependency audit again reported no known vulnerabilities and no peer dependency conflicts.
+
+A browser rerun initially failed because integration tests reset the shared test database and the fixture-preparation step was omitted. Recreating the synthetic accounts before rerunning resolved it. The CI workflow already prepares accounts between these phases and now also compiles the Supabase configuration explicitly.
+
+No real Supabase/Vercel project, hosted auth session, provider SMTP delivery, storage upload/download, live scheduler, MFA rollout, hosted database/pool check, production migration or backup restore is verified. The deployment preflight needs authenticated project access and real configuration. User confirmation of connected apps could not be corroborated: the catalog still reports both providers not installed and no project APIs are exposed.
 
 ## Remote verification
 

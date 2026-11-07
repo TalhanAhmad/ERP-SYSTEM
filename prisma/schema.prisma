@@ -81,6 +81,7 @@ enum TaskStatus {
 }
 model Person {
  id String @id @default(uuid()) @db.Uuid
+ supabaseUserId String? @unique @db.Uuid
  authUserId String? @unique
  authUser User? @relation(fields:[authUserId],references:[id])
  email String @unique
@@ -224,6 +225,9 @@ model AuthRateLimit {
  @@map("auth_rate_limit")
 }
 model Invitation {
+ provisioningStatus String @default("PENDING")
+ provisioningAttemptId String? @db.Uuid
+ provisioningLeaseUntil DateTime? @db.Timestamptz
  id String @id @default(uuid()) @db.Uuid
  email String
  username String

@@ -22,9 +22,17 @@ Talha authorized building across milestones and committing/pushing to the suppli
 - Role/deactivation service endpoints, session revocation and a serialized last-super-admin guard.
 - Email outbox leasing/retry, attendance reconciliation commands, synthetic fixtures and CI configuration.
 
+## Supabase/Vercel foundation update
+
+Talha selected Supabase PostgreSQL/Auth/Storage and Vercel. The application retains its Next.js/Prisma service architecture. Added provider-aware server authentication, HTTP-only Supabase SSR session refresh, controlled identity-provisioning leases/retries, a separate Supabase admin bootstrap, pooled runtime/direct migration connections, strict hosted-environment guards, Tailwind's build pipeline, private-access SQL and a bounded authenticated job endpoint.
+
+The existing local administrator and Better Auth records are preserved for local compatibility; Vercel deployments reject that auth provider. Supabase identities are linked explicitly using a separate UUID field. Actual production accounts/passwords are not migrated automatically. Browser forms use shared server account endpoints, so the UI does not need a rewrite at cutover.
+
+The selected Storage bucket is private and its setup is prepared, but binary upload/download records, screens and live authorization tests remain outstanding. No cloud project or deployment has been created: although the user confirmed enabling connections, the account catalog still shows both providers not installed and no provider project APIs are available. Account/project access, real SMTP, MFA, recurring scheduling, live-provider browser tests and restore remain launch gates. Detailed instructions are in docs/operations/deployment.md.
+
 ## Verification and limits
 
-Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
+Latest local verification: 88 unit, 52 integration and 2 browser tests passed, plus strict typing, lint, normal/Supabase-mode builds, fresh migrations and dependency checks. Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
 
 Passing tests cover only implemented behavior. The full specification remains open, notably organization/profile management, internship workflows, advanced tables/import/export, lifecycle management actions, complete settings and dashboard contracts, MFA, reminders/job-run monitoring, real SMTP delivery and backup restore. See docs/planning/backlog.md for the actionable list.
 

@@ -2,8 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createAuthClient } from "better-auth/react";
-const client = createAuthClient();
+import { accountAction } from "@/lib/auth/client";
 export function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -16,18 +15,18 @@ export function LoginForm() {
         setError("");
         try {
           const form = new FormData(event.currentTarget);
-          const result = await client.signIn.email({
+          await accountAction("sign-in", {
             email: String(form.get("email")).toLowerCase().trim(),
             password: String(form.get("password")),
           });
-          if (result.error)
-            setError(
-              "Unable to sign in. Check your credentials and account status.",
-            );
-          else router.push("/dashboard");
+          router.push("/dashboard");
           router.refresh();
-        } catch {
-          setError("Unable to connect. Try again.");
+        } catch (error) {
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Unable to connect. Try again.",
+          );
         } finally {
           setPending(false);
         }
@@ -76,7 +75,7 @@ export function Logout() {
   return (
     <button
       onClick={async () => {
-        await client.signOut();
+        await accountAction("sign-out", {});
         router.push("/login");
         router.refresh();
       }}

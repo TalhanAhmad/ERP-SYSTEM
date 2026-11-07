@@ -2,6 +2,14 @@
 
 This list is deliberately explicit: the full supplied specification is not complete. Existing services and screens are an initial implementation, not pilot acceptance.
 
+## Supabase/Vercel cutover priority
+
+- Verify account/project access and provision new Supabase and Vercel projects; no live resources are claimed yet.
+- Configure pooled runtime and controlled migration URLs, disabled public signup, company SMTP, production admin linkage, private bucket and recurring jobs.
+- Complete live Auth/reset/session-revocation/MFA acceptance, upload/download workflow and file access tests, actual function/pool measurements and backup restore.
+- Remove the temporary local Better Auth compatibility only after the Supabase local/staging/production flows are verified; keep domain IDs/history.
+- Supabase SDK contract tests use simulated provider HTTP; do not substitute them for live-provider acceptance.
+
 ## Identity and people
 
 - Invitation resend/revoke UI and API, expiration/revocation adversarial tests, reset delivery/browser journey, privileged MFA and recovery.

@@ -70,3 +70,16 @@ it("recovers an expired lease and ignores an active lease", async () => {
   });
   expect((await processOutbox(async () => {}, 1)).claimed).toBe(1);
 });
+
+it("executes a bounded serverless job pass with durable email processing", async () => {
+  await mail();
+  let sent = 0;
+  const { scheduledPass } = await import("@/server/jobs/scheduled");
+  const result = await scheduledPass(async () => {
+    sent++;
+  });
+  expect(sent).toBe(1);
+  expect(result.mailClaimed).toBe(1);
+  expect(result.slice).toBeGreaterThanOrEqual(0);
+  expect(result.attendanceUpdated).toBeGreaterThanOrEqual(0);
+});

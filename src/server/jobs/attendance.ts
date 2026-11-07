@@ -2,9 +2,16 @@ import "server-only";
 import { db } from "../db";
 import { calculate, type Snapshot } from "@/modules/attendance/schemas";
 import { getDay, dateValue } from "@/modules/attendance/service";
-export async function reconcileAttendance(date: string, now = new Date()) {
+export async function reconcileAttendance(
+  date: string,
+  now = new Date(),
+  batch?: { skip?: number; take?: number; userIds?: string[] },
+) {
   const assignments = await db.scheduleAssignment.findMany({
+    ...(batch ? { skip: batch.skip, take: batch.take } : {}),
+    orderBy: [{ userId: "asc" }, { id: "asc" }],
     where: {
+      ...(batch?.userIds ? { userId: { in: batch.userIds } } : {}),
       startDate: { lte: dateValue(date) },
       OR: [{ endDate: null }, { endDate: { gte: dateValue(date) } }],
     },

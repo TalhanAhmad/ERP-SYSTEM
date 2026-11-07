@@ -19,7 +19,8 @@ const { assign, changeStatus, submit, review, listTasks } =
 const { acceptInvitation, invite } = await import("@/modules/identity/service");
 const { betterAuth } = await import("better-auth");
 const { prismaAdapter } = await import("better-auth/adapters/prisma");
-const { auth } = await import("@/server/auth");
+const { getLegacyAuth } = await import("@/server/auth");
+const auth = getLegacyAuth();
 const { GET, POST } = await import("@/app/api/v1/[...path]/route");
 const independentDb = new PrismaClient({
   adapter: new PrismaPg({ connectionString: testUrl }),

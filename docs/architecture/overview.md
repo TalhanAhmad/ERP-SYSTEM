@@ -1,7 +1,9 @@
-# Architecture target
+# Architecture
 
-Browser → Next.js Server Components or /api/v1 Route Handlers → verified context → feature services → Prisma/PostgreSQL. Scheduled Node worker shares the services and processes durable database jobs and email outbox.
+Production target: Next.js + TypeScript + Tailwind on Vercel; Next Route Handlers and shared authorized services form the backend. Supabase provides PostgreSQL, Auth and private Storage. Prisma remains the domain database layer. No Express/NestJS server is required.
 
-Server Components read through authorized services directly. Route Handlers validate strict inputs, origin/CSRF, session, limits and idempotency before mutation. DTOs allowlist response fields. No secrets or raw auth records reach clients.
+Browser → Next Server Components or Route Handlers → verified identity + ACTIVE domain Person → authorized services → Prisma → Supabase PostgreSQL through a bounded transaction-pooler connection. Controlled migrations use a separate direct/session connection. Supabase SSR cookies are verified through the SDK; client metadata is never an authorization source.
 
-This describes the target, not an assertion that these layers already exist.
+A bounded authenticated serverless job endpoint processes PostgreSQL-backed leases/date locks; an approved recurring scheduler must invoke it. A permanent local worker is not assumed on Vercel. Storage setup is private; attachment workflow implementation and tests are outstanding.
+
+See ADR-002 in docs/decisions and the deployment guide in docs/operations. Supabase production authentication is staged behind AUTH_PROVIDER=supabase. Legacy Better Auth remains local compatibility until the hosted cutover is verified; hosted environment guards reject it. Neither provider project nor deployment has been verified through account access in this session.

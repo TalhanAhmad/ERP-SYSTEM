@@ -8,7 +8,7 @@ Last updated: 2026-11-07 (Asia/Karachi)
 - Current learning status: Awaiting learning check
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
-- Implementation status: initial company-day and work-management modules implemented; full specification incomplete
+- Implementation status: initial company-day/work modules plus Supabase/Vercel production foundation; full specification and live cutover incomplete
 - Publication: GitHub authentication resolved; main published and remote/local commit 396a146 verified equal. Remote GitHub Actions verification passed for that commit.
 
 ## Implemented evidence
@@ -23,6 +23,12 @@ See [the backlog](planning/backlog.md). No internship workflow, advanced spreads
 
 Actual company policies, production host, real SMTP delivery and backup-client tooling/restore demonstration remain unresolved for pilot. Git author identity has been supplied and configured locally. GitHub CLI browser authentication completed as TalhanAhmad with credentials stored in the system keyring; repository ADMIN access and HTTPS push succeeded. Node/pnpm/PostgreSQL were recovered for development; Docker remains unavailable.
 
+## Production stack decision
+
+Talha finalized Next.js + TypeScript + Tailwind, Next Route Handlers/shared services, Supabase PostgreSQL/Auth/Storage, Prisma and Vercel. See [ADR-002](decisions/ADR-002-supabase-vercel.md) and [deployment guide](operations/deployment.md). Better Auth remains local compatibility only; hosted deployments must select Supabase. The existing local admin is preserved.
+
+New hosted projects were requested. Talha reported enabling both connections; subsequent account checks still return installed=false and no Supabase/Vercel project APIs are available. No hosted project, paid plan, production migration or deployment is claimed.
+
 ## Exact next action
 
-Step 1 is complete: GitHub authentication, publication, remote/local equality and clean-runner CI have been verified. Step 2: complete invitation management (resend/revoke endpoints and controls, expiry/revocation protection and tests). Official GitHub CLI remains under ignored .local/tools/gh/. Local browser verification and Word export have passed. Subsequent feature work starts with the incomplete identity/organization and work-lifecycle requirements in the backlog. Learning completion awaits Talha's explanation; cross-milestone build approval is already granted.
+Verify authenticated Supabase/Vercel project access, create the new projects in the intended accounts/region/plan, then configure the runtime/migration connections, Auth settings, private storage and scheduler. Run the deployment preflight and live acceptance checks before cutover. Repository preparation/tests and the current code publication are recorded in the work log. Invitation resend/revoke remains the next product feature after this deployment foundation is settled.

@@ -1,0 +1,49 @@
+# Supabase + Vercel deployment and cutover
+
+Status: repository preparation implemented; no live projects or deployment are verified. Talha requested new Supabase/Vercel projects and reported enabling both connections, but the available account catalog still reports installed=false and neither provider's project tools are exposed. Do not claim project creation, account access or a running deployment from that confirmation alone.
+
+## 1. Provision isolated hosted resources
+
+Create the Encova Supabase production project in the intended organization/region and a Vercel Next.js project for this GitHub repository. Confirm the account plan, budget, database region, function region and scheduler capability before choosing paid features. Separate Preview/Test and Production resources and environment secrets; previews must not write production employee records.
+
+A new project normally requires account/organization access and the project's own credentials. Never paste secret keys, database passwords, service keys or cron credentials into chat or progress files. Set them through connected provider tools or the host's secret settings once authenticated project tools are available.
+
+## 2. Migrate through a controlled connection
+
+Configure DIRECT_URL only in the controlled migration environment, using the Supabase direct connection or session pooler on port 5432. DATABASE_URL for Vercel uses the restricted runtime user's transaction pooler on port 6543. URL-encode passwords. Copy connection details from the specific project's Connect dialog, not an example hostname.
+
+Run pnpm db:generate and pnpm db:migrate:deploy with controlled credentials. The command refuses a hosted migration without DIRECT_URL and refuses the transaction pooler as the migration target. Apply supabase/setup.sql as the migration owner, set the encova_app password privately, then use that restricted login for the runtime DSN. Apply this setup again after migrations introducing new tables, and verify RLS/grants.
+
+Never use prisma db push or reset against the production project. Existing migration history is retained, including immutable-history and concurrency constraints. Do not edit migration history to switch providers. Prisma does not manage Supabase's auth or storage schemas.
+
+## 3. Configure Supabase Auth
+
+Disable public sign-up and unwanted providers. Set the Site URL and an exact approved reset callback URL such as https://your-host/auth/confirm. Configure company SMTP and password policy. The backend reset request uses PKCE redirects; email templates may alternatively target /auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password. Never permit arbitrary external callback destinations.
+
+Configure privileged MFA and recovery before real staff data. The current provider adapter verifies identity and active domain membership but does not complete the full privileged MFA rollout or provider-wide revocation workflow. Domain deactivation denies application access immediately even while a provider access token has time remaining; hosted session-ban/revocation behavior still requires explicit acceptance work.
+
+## 4. Set Vercel server environment
+
+Required: AUTH_PROVIDER=supabase, APP_URL (exact HTTPS browser origin), DATABASE_URL (restricted pooled runtime DSN), SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY, CRON_SECRET. SMTP_HOST, SMTP_PORT, SMTP_FROM and optional SMTP_USER/SMTP_PASSWORD are needed for the app invitation outbox. Optional DATABASE_POOL_MAX defaults to 2. SUPABASE_STORAGE_BUCKET defaults to encova-private.
+
+Do not set Supabase server secrets under NEXT_PUBLIC_ names. This implementation uses server endpoints and HTTP-only SSR cookies; no browser SDK key is required. DIRECT_URL is for migration CI/operations, not necessary for runtime functions. Configure APP_URL separately for Preview and Production and allow only intended callback URLs in the corresponding Supabase project. The deployment guard refuses legacy auth on hosted environments.
+
+Vercel uses vercel.json and pnpm build:vercel, which generates Prisma Client before building Next.js. Migrations are a controlled release step, not a side effect of every preview build. Node 24 is already selected in package.json. Do not select static export or an Edge runtime for Prisma routes.
+
+## 5. Provision the first production administrator
+
+Keep the local Better Auth account local. In the Supabase environment, use pnpm bootstrap:supabase-admin with ADMIN_EMAIL, ADMIN_USERNAME, ADMIN_NAME, a newly chosen ADMIN_PASSWORD (12+ chars) and ADMIN_EMAIL_OWNERSHIP_VERIFIED=yes supplied privately. The operator must independently verify email ownership. The command can explicitly link an existing active super admin while preserving its domain UUID; it never automatically links arbitrary existing provider identities by email.
+
+No bulk migration of real employee identities/passwords is authorized or performed by this change. If production legacy users exist, create and review an identity cutover/reset plan before changing AUTH_PROVIDER. Supabase and Better Auth sessions/password records are not interchangeable. During an incomplete cutover, unlinked identities remain denied.
+
+## 6. Schedule and monitor jobs
+
+Configure a recurring authenticated invocation of /api/internal/jobs using the selected Vercel scheduling service or another approved scheduler. A one-minute cadence rotates the 20-person attendance slice and processes one queued email per pass. Confirm actual throughput and tune batching/duration before onboarding many users. Requests require Authorization: Bearer <CRON_SECRET>. Vercel Cron Jobs send this automatically when configured; newer Schedules may require the target's header configuration. The secret is never a URL query parameter.
+
+The route is bounded to a 60-second Node function and uses durable email leases/date locks. vercel.json does not enable a schedule before the account plan is confirmed. An endpoint existing is not evidence that a scheduler is running. Monitor exhausted attempts, stuck leases, scheduler delivery and attendance completion; job-run dashboards/reminders remain backlog items.
+
+## 7. Verify before pilot
+
+Run pnpm verify:deployment with the actual hosted runtime configuration. It verifies disabled public signup, a restricted database role, enabled RLS, a private bucket and a TLS database connection. It fails without the configured project; it is not a substitute for browser or restore checks.
+
+Then demonstrate live invite/login/logout/reset, active/unlinked/inactive users, attendance/leave races, task assignment/review and permissions with synthetic users. Complete actual file upload/download authorization, size/type/access and deactivation checks after the attachment feature is implemented. Record provider SMTP acceptance, recurring job invocations, privileged MFA, connection-pool behavior, backup restore into a separate database and rollback compatibility. Production readiness remains unclaimed until these pass.

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { AppError, invariant } from "./errors";
 import { db } from "./db";
+import { env } from "./env";
 export async function jsonBody(request: Request) {
   invariant(
     request.headers.get("content-type")?.split(";")[0] === "application/json",
@@ -31,7 +32,7 @@ export async function jsonBody(request: Request) {
 }
 export function mutationOrigin(request: Request) {
   const origin = request.headers.get("origin");
-  const expected = new URL(process.env.BETTER_AUTH_URL!).origin;
+  const expected = new URL(env.APP_URL).origin;
   invariant(
     origin === expected,
     "INVALID_ORIGIN",

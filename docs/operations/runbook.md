@@ -1,6 +1,6 @@
 # Initial operational runbook
 
-No deployment has been performed. Local startup and synthetic verification are documented in setup.md. This is not pilot sign-off.
+Production target is Supabase + Vercel; see deployment.md. Supabase session/provisioning adapters, restricted database setup and the serverless job endpoint are prepared. No deployment has been performed. Local startup and synthetic verification are documented in setup.md. This is not pilot sign-off.
 
 - Authentication problems: verify the auth URL matches browser origin; verify the domain Person is ACTIVE and linked; do not activate an arbitrary auth identity manually.
 - Invitation/reset not delivered: run the worker, check SMTP availability, inspect Outbox attempts/nextAttemptAt/leaseUntil/deliveredAt. Never copy tokens or email bodies into logs or issue reports. Exhaustion occurs after five attempts; investigate before an audited retry feature is implemented.

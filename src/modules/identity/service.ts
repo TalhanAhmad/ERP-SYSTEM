@@ -4,6 +4,8 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { z } from "zod";
 import { db } from "@/server/db";
+import { env } from "@/server/env";
+import { acceptSupabaseInvitation } from "./supabase-provisioning";
 import { invariant } from "@/server/errors";
 import type { Actor } from "@/server/context";
 import { audit, type Tx } from "@/server/transaction";
@@ -43,7 +45,7 @@ export async function invite(
       eventKey: `invite:${item.id}`,
       recipient: input.email,
       subject: "Your Encova Workspace invitation",
-      text: `Accept your invitation within 72 hours: ${process.env.BETTER_AUTH_URL}/invite/${token}`,
+      text: `Accept your invitation within 72 hours: ${env.APP_URL}/invite/${token}`,
     },
   });
   await audit(tx, actor.id, "INVITATION_CREATED", item.id, {
@@ -53,6 +55,7 @@ export async function invite(
   return { id: item.id, email: item.email, expiresAt: item.expiresAt };
 }
 export async function acceptInvitation(input: z.infer<typeof acceptSchema>) {
+  if (env.AUTH_PROVIDER === "supabase") return acceptSupabaseInvitation(input);
   const hash = createHash("sha256").update(input.token).digest("hex");
   return db.$transaction(
     async (tx) => {

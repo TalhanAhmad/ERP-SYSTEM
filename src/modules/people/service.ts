@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { env } from "@/server/env";
 import type { Actor } from "@/server/context";
 import { audit, expected, type Tx } from "@/server/transaction";
 import { invariant } from "@/server/errors";
@@ -48,7 +49,7 @@ export async function changeRole(
     where: { id },
     data: { role: input.role, version: { increment: 1 } },
   });
-  if (target.authUserId)
+  if (target.authUserId && env.AUTH_PROVIDER === "better-auth")
     await tx.session.deleteMany({ where: { userId: target.authUserId } });
   await audit(tx, actor.id, "ROLE_CHANGED", id, {
     from: target.role,
@@ -97,7 +98,7 @@ export async function deactivate(
     where: { id },
     data: { status: "INACTIVE", version: { increment: 1 } },
   });
-  if (target.authUserId)
+  if (target.authUserId && env.AUTH_PROVIDER === "better-auth")
     await tx.session.deleteMany({ where: { userId: target.authUserId } });
   const assigned = await tx.task.count({
     where: { assigneeId: id, status: { notIn: ["APPROVED", "CANCELED"] } },
