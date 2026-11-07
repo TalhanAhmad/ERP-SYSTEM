@@ -1,6 +1,6 @@
 # Supabase + Vercel deployment and cutover
 
-Status (8 November 2026): personal testing demo deployed at https://encova-workspace.vercel.app. Official CLI browser authentication succeeded after connected project tools remained unavailable. Encova Solutions is a separate Supabase organization; Encova Workspace Demo runs in ap-south-1 (Mumbai). The Vercel encova-workspace project uses Hobby, Node 24 and bom1 functions. Six hosted migrations and the real runtime preflight passed. Company production acceptance remains outstanding; no billing upgrade or real employee data migration was performed.
+Status (8 November 2026): personal testing demo deployed at https://encova-workspace.vercel.app. Official CLI browser authentication succeeded after connected project tools remained unavailable. Encova Solutions is a separate Supabase organization; Encova Workspace Demo runs in ap-south-1 (Mumbai). The Vercel encova-workspace project uses Hobby, Node 24 and bom1 functions. Seven hosted migrations and the real runtime preflight passed. Company production acceptance remains outstanding; no billing upgrade or real employee data migration was performed.
 
 ## 1. Provision isolated hosted resources
 
@@ -54,4 +54,4 @@ Canonical URL: https://encova-workspace.vercel.app. Vercel hosts both the fronte
 
 Application SMTP and a recurring job schedule are not configured. Therefore invitation emails and automatic attendance reconciliation are not claimed as operational. Binary file upload/download workflows are not implemented, despite the bucket being prepared. Complete these, privileged MFA, provider reset delivery, independent backup restore and company policy acceptance before staff production use.
 
-The operator-only credentials and one-time admin password are kept under ignored .local/deploy with restricted file permissions; none belong in Git or public report exports. The runtime uses encova_app through port 6543; migrations use controlled session pooling on 5432. The preflight verifies the actual PostgreSQL client's encrypted, certificate-authorized socket, because Supavisor's internal backend connection has different TLS state.
+The operator-only credentials and one-time admin password are kept under ignored .local/deploy with restricted file permissions; none belong in Git or public report exports. The runtime uses encova_app through port 6543; migrations use controlled session pooling on 5432. The seventh additive migration provides invitation versions and outbox cancellation/link metadata without changing existing bearer tokens during migration. The preflight verifies the actual PostgreSQL client's encrypted, certificate-authorized socket, because Supavisor's internal backend connection has different TLS state.

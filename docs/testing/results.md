@@ -8,21 +8,21 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | --- | --- | --- |
 | pnpm install / peers check | PASS | Exact lockfile resolved; no peer dependency issues. |
 | pnpm exec prisma validate | PASS | Initial schema validated; subsequent migrations and generated client succeeded. |
-| pnpm db:migrate:deploy on dev/test | PASS | Six migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
+| pnpm db:migrate:deploy on dev/test | PASS | Seven migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
 | pnpm test:unit | PASS — 100 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
 | pnpm test:integration | PASS — 65 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 6 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest run: 4.8 seconds on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 6 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 7.1 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | Demo deployment commit 9d5a0cc pushed; local and remote SHA equality verified. |
+| Git commit/push | PASS | Sidebar/invitation source milestone 8769b9b pushed; local and remote SHA equality verified. |
 
 ## Supabase/Vercel foundation verification
 
-Latest local results: 93 unit, 52 integration and 2 browser tests passed (147 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
+Current milestone local results: 100 unit, 65 integration and 6 browser tests passed (171 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
 
 Supabase SDK + real PostgreSQL contract tests verify safe session DTOs/HTTP-only cookies, server identity verification, client role metadata rejection, immediate domain deactivation denial, legacy endpoint closure, same-origin protection, generic reset results, internal-only redirects, sign-out cookie clearing and scheduler authentication. Provider HTTP is simulated in these tests; no live Supabase result is claimed. Separate PostgreSQL tests cover provisioning failure/retry/revocation/concurrency, RLS/grants and the bounded job pass.
 
@@ -107,10 +107,46 @@ Supplementary limitation from that diagnostic: the Sign out button was outside t
 
 ## Sidebar and invitation-management milestone — 8 November 2026
 
-Local verification: typecheck/lint, 100 unit tests, 65 integration tests and 6 Chromium browser tests passed (171 total), Prisma validation and normal production build passed, and production dependency audit reported no known vulnerabilities. Seven additive migrations are applied locally and to encova_test. Live migration/deployment and acceptance checks are underway at this checkpoint.
+Local verification: typecheck/lint, 100 unit tests, 65 integration tests and 6 Chromium browser tests passed (171 total), Prisma validation and normal production build passed, and production dependency audit reported no known vulnerabilities. Seven additive migrations are applied locally and to encova_test. Seven migrations are also applied to Supabase, and the runtime preflight passed. Vercel deployment dpl_EakZQrEvDeTwUFQpQnfjA8dzotoK is READY. Source commit 8769b9beb0113d608865879cb06a35047479b16a passed all clean-runner checks in https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42411734232.
 
 New checks cover administrator/HR/member permissions, private invitation DTOs, token rotation and replay rejection for both auth paths, expiry, retry idempotency, stale/concurrent management requests, revocation during provider provisioning and HTTP origin/session/version validation. Loopback SMTP tests complete a real SMTP conversation and exercise recipient rejection/retry without external mail. Missing SMTP leaves queued mail untouched while attendance processing continues. Chromium verifies the actual People controls and invitation links, plus administrator navigation/sign-out at 1280x720, 1280x480 and 360x800.
 
-The first invitation browser run encountered Next.js's extra route-announcer alert; scoped its locator to the form and matched the existing lowercase status labels. All six browser checks then passed. The earlier supplementary sidebar limitation is fixed locally; live acceptance is pending rollout. Read-only schema comparison retains the pre-existing reviewed SQL-only constraints, which are intentionally absent from Prisma's model; no constraint-removal script was executed.
+The first invitation browser run encountered Next.js's extra route-announcer alert; scoped its locator to the form and matched the existing lowercase status labels. All six browser checks then passed. The earlier supplementary sidebar limitation is fixed in the deployed source; live viewport acceptance is being recorded below. Read-only schema comparison retains the pre-existing reviewed SQL-only constraints, which are intentionally absent from Prisma's model; no constraint-removal script was executed.
 
 Talha confirmed no email service exists. Local SMTP acceptance is not proof of internet delivery or inbox receipt. Live invitation delivery, verified sender setup and scheduler operation remain unclaimed.
+
+## Live milestone acceptance
+
+All 27 checks below passed against https://encova-workspace.vercel.app after deployment dpl_EakZQrEvDeTwUFQpQnfjA8dzotoK. The invitation acceptance fixture read synthetic queue tokens privately to exercise the provider/application path; no internet email delivery is implied. The generated MEMBER account was deactivated afterward and its existing session was denied. Clearly labeled synthetic invitation/project/task/attendance records and immutable audit history are retained.
+
+| Live check | Outcome |
+| --- | --- |
+| Hosted invitation resend is idempotent and stale management is rejected | PASS |
+| Hosted rotated invitation token is rejected before provisioning | PASS |
+| Hosted resend cancels the previous queued email | PASS |
+| Hosted revoked invitation cannot create an account | PASS |
+| Hosted replacement invitation provisions a real Supabase identity and ACTIVE MEMBER | PASS |
+| Hosted accepted invitation cannot be reused | PASS |
+| Hosted invitation DTO excludes tokens, email bodies and provisioning IDs | PASS |
+| Hosted authenticated job pass runs without SMTP and does not claim email delivery | PASS |
+| Public login page | PASS |
+| Anonymous API access rejected | PASS |
+| Unauthenticated job invocation rejected | PASS |
+| Cross-origin sign-in rejected | PASS |
+| Real Supabase owner sign-in and SUPER_ADMIN domain permissions | PASS |
+| Separate real Supabase MEMBER sign-in | PASS |
+| MEMBER project creation and audit access denied | PASS |
+| Hosted project persistence and idempotent retry | PASS |
+| Self-approval rejected on live backend | PASS |
+| Live task assignment, start, submission and independent approval | PASS |
+| Live attendance schedule, check-in and check-out persistence | PASS |
+| Live browser login and authenticated dashboard | PASS |
+| Live browser renders persisted approved task | PASS |
+| Live 360px dashboard layout | PASS |
+| Live sign-out clears application access | PASS |
+| Synthetic member deactivated; existing hosted session denied immediately | PASS |
+| Live administrator navigation, invitation queue notice and sign-out at 1280x720 | PASS |
+| Live administrator navigation, invitation queue notice and sign-out at 1280x480 | PASS |
+| Live administrator navigation, invitation queue notice and sign-out at 360x800 | PASS |
+
+Live administrator account controls were additionally inspected in a short-desktop screenshot. The original sidebar Sign out reachability limitation is resolved on the deployed app at all three tested viewport sizes. This covers implemented behavior, not the full ERP specification, production performance, provider inbox/reset delivery or a backup restore. No recurring schedule is enabled; the job check was an authenticated manual invocation.

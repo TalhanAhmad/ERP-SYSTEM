@@ -17,7 +17,7 @@ Verified platform: macOS ARM64; Node 24.22.2; pnpm 12.18.0. Runtime dependencies
 9. Configure schedules through `/schedules` before attendance use. Do not assume example weekday/shift rules are company policy.
 10. Run `pnpm worker` periodically to process the mail outbox and reconcile attendance. It is a single-pass command, not an installed scheduler.
 
-Mailpit web UI: http://localhost:8025. The SMTP configuration is required for real invitation/reset delivery. Email transport delivery has not yet been demonstrated with a real SMTP server in this session.
+Mailpit web UI: http://localhost:8025. The SMTP configuration is required for real invitation/reset delivery. A real SMTP protocol conversation is now tested against an isolated loopback fixture. External provider/inbox delivery remains unverified; Talha has no email service yet.
 
 ## Local PostgreSQL without Docker
 

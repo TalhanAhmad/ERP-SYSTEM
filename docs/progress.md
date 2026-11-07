@@ -8,8 +8,8 @@ Last updated: 2026-11-08 (Asia/Karachi)
 - Current learning status: Awaiting learning check
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
-- Implementation status: personal-testing demo deployed; sidebar and invitation management milestone implemented and locally verified, with live rollout underway. Full specification and company production acceptance remain incomplete.
-- Publication: verified demo deployment code and report committed/pushed as 9d5a0cc; local/remote SHA equality verified. GitHub Actions run 42407530523 passed all checks; local 147 automated tests and 16 live acceptance checks also passed.
+- Implementation status: personal-testing demo deployed with sidebar accessibility fixes and versioned invitation resend/revoke. Full specification and company production acceptance remain incomplete.
+- Publication: sidebar/invitation source milestone committed/pushed as 8769b9b; local/remote SHA equality verified. GitHub Actions run 42411734232 passed all checks. Local verification: 100 unit, 65 integration and 6 browser tests (171 total).
 
 ## Implemented evidence
 
@@ -27,8 +27,8 @@ Actual company policies, real SMTP delivery and backup-client tooling/restore de
 
 Talha finalized Next.js + TypeScript + Tailwind, Next Route Handlers/shared services, Supabase PostgreSQL/Auth/Storage, Prisma and Vercel. See [ADR-002](decisions/ADR-002-supabase-vercel.md) and [deployment guide](operations/deployment.md). Better Auth remains local compatibility only; hosted deployments must select Supabase. The existing local admin is preserved.
 
-Official CLI browser authentication resolved the connected-tool gap. Created a separate Encova Solutions organization and Encova Workspace Demo Supabase project in Mumbai, and encova-workspace on Vercel Hobby. All six hosted migrations and database/Auth/private-storage preflight passed. The deployment is READY at https://encova-workspace.vercel.app; live API/browser and attendance acceptance checks passed. This is a personal testing demo with no billing upgrade.
+Official CLI browser authentication resolved the connected-tool gap. Created a separate Encova Solutions organization and Encova Workspace Demo Supabase project in Mumbai, and encova-workspace on Vercel Hobby. All seven hosted migrations and database/Auth/private-storage preflight passed. The deployment is READY at https://encova-workspace.vercel.app; live API/browser and attendance acceptance checks passed. This is a personal testing demo with no billing upgrade.
 
 ## Exact next action
 
-Deploy and verify the sidebar/invitation-management milestone, then publish its updated evidence. Local results: 100 unit, 65 integration and 6 browser tests passed. Talha confirmed no SMTP service exists, so real delivery remains blocked on provider setup. Recurring jobs, binary file workflows, privileged MFA, restore and broader product requirements remain open.
+The sidebar/invitation milestone is deployed and its source CI passed. All 27 live milestone checks passed, including invitation replacement acceptance, revocation, task/attendance persistence and sidebar sign-out at all three viewports. The final report records these results. Next, connect a verified email service and validate real delivery when credentials are available; other product and operations work can continue independently. Talha confirmed no SMTP service exists, so real delivery remains blocked on provider setup. Recurring jobs, binary file workflows, privileged MFA, restore and broader product requirements remain open.

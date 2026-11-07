@@ -4,15 +4,15 @@ This list is deliberately explicit: the full supplied specification is not compl
 
 ## Supabase/Vercel cutover priority
 
-- Verify account/project access and provision new Supabase and Vercel projects; no live resources are claimed yet.
-- Configure pooled runtime and controlled migration URLs, disabled public signup, company SMTP, production admin linkage, private bucket and recurring jobs.
+- The personal demo is already deployed to isolated Supabase/Vercel projects. Complete company production acceptance separately; do not treat the demo as acceptance of the full specification.
+- Configure a verified email sender/company SMTP and recurring jobs. Pooled runtime/controlled migrations, closed signup, initial hosted admin linkage and private bucket are implemented and verified.
 - Complete live Auth/reset/session-revocation/MFA acceptance, upload/download workflow and file access tests, actual function/pool measurements and backup restore.
 - Remove the temporary local Better Auth compatibility only after the Supabase local/staging/production flows are verified; keep domain IDs/history.
-- Supabase SDK contract tests use simulated provider HTTP; do not substitute them for live-provider acceptance.
+- Keep both provider contract tests and live Supabase acceptance. Current live sessions/work/attendance are verified with synthetic records; inbox/reset delivery, provider-wide revocation and MFA acceptance remain.
 
 ## Identity and people
 
-- Invitation resend/revoke UI and API, expiration/revocation adversarial tests, reset delivery/browser journey, privileged MFA and recovery.
+- Invitation resend/revoke UI/API and expiration/revocation/concurrency tests are implemented. Real email/reset delivery, privileged MFA and recovery remain; Talha confirmed no email service exists.
 - People detail/edit/profile screens, department/team administration, manager-cycle protection, team membership history and HR-safe directory/autocomplete scopes.
 - Role/deactivation services exist; management UI and concurrent security-change coverage remain.
 
@@ -33,8 +33,8 @@ This list is deliberately explicit: the full supplied specification is not compl
 
 - Internship enrollment, mentor assignment, milestones, eligible task links, weekly feedback and their screens/tests are not implemented.
 - Company settings, scoped HR audit view, operational failure dashboard, notification preferences and mark-all-read.
-- Real SMTP delivery, deployment host approval, least-privilege production database roles, security headers/CSP review and privileged MFA rollout.
+- Real SMTP delivery, company hosting approval, security headers/CSP review and privileged MFA rollout. Restricted hosted runtime roles are already configured.
 - Representative 100-user performance measurement, broad accessibility audit, full pilot browser journey, backup restore drill, incident/rollback exercise.
-- CI configuration is committed for remote execution; a green GitHub Actions run must be separately observed after push.
+- Maintain clean-runner CI verification for each source milestone and record its exact run/commit in the test results.
 
 Learning milestones remain unconfirmed until Talha demonstrates the relevant concepts. Permission to build across milestones does not fabricate learning completion.

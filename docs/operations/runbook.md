@@ -21,3 +21,5 @@ People lists invitation status and email queue state for super admins; HR sees/m
 Outbox now stores invitationId and canceledAt. Resend, revoke and acceptance cancel outstanding old mail. Workers skip canceled rows; a message already in flight can arrive, but its invalidated link cannot create an account. deliveredAt means SMTP server acceptance, not verified inbox receipt. Failed SMTP attempts remain queued for bounded retries. Do not expose outbox text, token hashes or provider IDs through browser lists/logs.
 
 Without complete SMTP configuration the scheduled pass reports mailStatus=NOT_CONFIGURED or INVALID, claims no email and still reconciles attendance. SMTP service and recurring scheduler are not yet configured for the personal demo. Configure a verified sender and credentials privately before testing internet delivery; do not enqueue real employee invites before that acceptance check.
+
+Remote SMTP uses certificate verification and implicit TLS/required STARTTLS; transport behavior follows the [official Nodemailer SMTP guidance](https://nodemailer.com/smtp). Loopback fixtures remain local-only, and hosted settings reject localhost relays.
