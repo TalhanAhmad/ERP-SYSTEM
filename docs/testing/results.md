@@ -98,3 +98,7 @@ Live checks use only synthetic test records and the authenticated account owner'
 The synthetic member was deactivated through the live admin API after verification; its existing session was immediately denied. Synthetic project, approved task, attendance and immutable audit evidence remain clearly labeled in the demo. No real employee records were imported. SMTP invitation delivery, password-reset delivery, binary upload/download, automatic job scheduling and company production readiness are not claimed.
 
 Additional live asset check passed: none of the configured database credentials, server key, cron secret or generated admin password appeared in public login HTML or its 10 JavaScript assets. This is a targeted credential-exposure check, not a comprehensive security audit.
+
+## Live login recheck after user report — 8 November 2026
+
+A supplied screenshot showed generic credential rejection. The stored live-owner credentials were independently verified again: POST /api/session/sign-in returned 200, GET /api/v1/me returned 200 with SUPER_ADMIN, and a fresh Chromium login rendered the authenticated dashboard. The screenshot does not reveal the entered password, so its exact cause is not established. No account password reset or application change was necessary; hosted credentials are separate from the local account and excluded from this report.
