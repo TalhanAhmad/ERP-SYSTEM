@@ -1,6 +1,6 @@
 # Private task-submission attachments
 
-Implemented in the attachment milestone; real-provider acceptance is recorded in the test results after deployment. This extends the original link-only scope under the accepted Supabase Storage architecture.
+Implemented and deployed in source 7f0de97; 20 real-provider attachment checks and 26 other live regression checks passed, along with 202 local automated tests and source CI. See [test evidence](../testing/results.md). This extends the original link-only scope under the accepted Supabase Storage architecture.
 
 ## Workflow and access
 
@@ -24,6 +24,6 @@ The application caps bytes below the [Vercel Function request/response limit](ht
 
 Apply the eighth additive migration through the controlled migration connection. It creates the Attachment table, grants the existing restricted server role, enables RLS, revokes browser/Data API access and adds immutable-history/matching-submission constraints. supabase/setup.sql remains safe to reapply for the existing policy pattern.
 
-Local compatibility mode does not silently store uploads on the application filesystem. It reports unavailable unless explicit Supabase Storage configuration is supplied. Browser/SDK contract tests use an isolated loopback in-memory HTTP fixture, never a production storage fallback; live acceptance uses the actual project.
+Local compatibility mode does not silently store uploads on the application filesystem. It reports unavailable unless explicit Supabase Storage configuration is supplied for a separate development project. Do not reuse hosted production/demo secrets for previews or unrelated local data. Browser/SDK contract tests use an isolated loopback in-memory HTTP fixture, never a production storage fallback; live acceptance uses the actual project.
 
 Use only synthetic files/accounts during acceptance. Check type/signature and exact size boundaries, read/write scope, revision preservation, retry/concurrency, failed deletion, integrity mismatch and account/membership revocation. Real SMTP, recurring scheduling, privileged MFA, backup restore, retention and broader release work remain separate requirements.

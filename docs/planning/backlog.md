@@ -6,7 +6,7 @@ This list is deliberately explicit: the full supplied specification is not compl
 
 - The personal demo is already deployed to isolated Supabase/Vercel projects. Complete company production acceptance separately; do not treat the demo as acceptance of the full specification.
 - Configure a verified email sender/company SMTP and recurring jobs. Pooled runtime/controlled migrations, closed signup, initial hosted admin linkage and private bucket are implemented and verified.
-- Complete live Auth/reset/session-revocation/MFA acceptance, upload/download workflow and file access tests, actual function/pool measurements and backup restore.
+- Complete live Auth/reset/session-revocation/MFA acceptance, actual function/pool measurements and backup restore. Bounded private task-submission upload/download and access tests are now implemented and verified.
 - Remove the temporary local Better Auth compatibility only after the Supabase local/staging/production flows are verified; keep domain IDs/history.
 - Keep both provider contract tests and live Supabase acceptance. Current live sessions/work/attendance are verified with synthetic records; inbox/reset delivery, provider-wide revocation and MFA acceptance remain.
 
@@ -17,6 +17,8 @@ This list is deliberately explicit: the full supplied specification is not compl
 - Role/deactivation services exist; management UI and concurrent security-change coverage remain.
 
 ## Work management
+
+- Initial private attachments are delivered (4 MiB, PDF/PNG/JPEG/UTF-8 text, per-revision history). Larger/resumable files, broad retention/orphan tooling and full file scanning/format validation remain separate extensions.
 
 - Project detail/edit/archive/restore, membership removal, task editing/reassignment, reasoned cancellation/reopen, comments.
 - Precise server pagination/filter/sort/search contracts, task-detail read API, username picker scoped to a selected project, full OpenAPI DTOs.

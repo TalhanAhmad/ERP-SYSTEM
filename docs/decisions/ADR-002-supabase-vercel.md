@@ -1,7 +1,7 @@
 # ADR-002: Supabase and Vercel production stack
 
 Date: 2026-11-07 (Asia/Karachi)
-Status: production architecture accepted from Talha's explicit instruction; hosted provisioning/cutover not yet verified
+Status: accepted; personal-demo hosted provisioning/cutover and bounded private file workflow verified. Company production acceptance remains incomplete.
 
 ## Decision
 
@@ -31,7 +31,7 @@ Supabase HTTP provisioning cannot share a Prisma transaction. A persisted invita
 
 Vercel functions do not run the development worker permanently. /api/internal/jobs is a bounded Node endpoint protected by a random CRON_SECRET bearer value. Email leases and date locks persist in PostgreSQL. The job processes one email and up to 20 active people for today/yesterday per invocation; slices rotate across all active people. Recurring scheduler configuration, actual mail throughput and function duration must be verified against the chosen hosting plan. No recurring schedule is silently enabled in vercel.json.
 
-The setup SQL provisions a private encova-private bucket with a 10MB cap and a small MIME allowlist if the storage schema exists. There is no public bucket and no direct upload policy. Signed upload/download service authorization, attachment records/UI and file acceptance tests are still unimplemented.
+The setup SQL provisions a private encova-private bucket with a 10MB cap and a small MIME allowlist if the storage schema exists. There is no public bucket and no direct upload policy. Authenticated proxy upload/download, attachment records/UI and immutable revision acceptance tests are now implemented for files up to 4 MiB. No browser signed URLs are issued; current account/project access is rechecked per download. See [file operations](../operations/files.md) for limits and deferred larger/retention features.
 
 ## Alternatives and consequences
 

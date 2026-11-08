@@ -1,6 +1,6 @@
 # Supabase + Vercel deployment and cutover
 
-Status (8 November 2026): personal testing demo deployed at https://encova-workspace.vercel.app. Official CLI browser authentication succeeded after connected project tools remained unavailable. Encova Solutions is a separate Supabase organization; Encova Workspace Demo runs in ap-south-1 (Mumbai). The Vercel encova-workspace project uses Hobby, Node 24 and bom1 functions. Seven hosted migrations and the real runtime preflight passed. Company production acceptance remains outstanding; no billing upgrade or real employee data migration was performed.
+Status (8 November 2026): personal testing demo deployed at https://encova-workspace.vercel.app. Official CLI browser authentication succeeded after connected project tools remained unavailable. Encova Solutions is a separate Supabase organization; Encova Workspace Demo runs in ap-south-1 (Mumbai). The Vercel encova-workspace project uses Hobby, Node 24 and bom1 functions. Eight hosted migrations and the real runtime preflight passed. Company production acceptance remains outstanding; no billing upgrade or real employee data migration was performed.
 
 ## 1. Provision isolated hosted resources
 
@@ -46,12 +46,14 @@ The route is bounded to a 60-second Node function and uses durable email leases/
 
 Run pnpm verify:deployment with the actual hosted runtime configuration. It verifies disabled public signup, a restricted database role, enabled RLS, a private bucket and a TLS database connection. It fails without the configured project; it is not a substitute for browser or restore checks.
 
-Then demonstrate live invite/login/logout/reset, active/unlinked/inactive users, attendance/leave races, task assignment/review and permissions with synthetic users. Complete actual file upload/download authorization, size/type/access and deactivation checks after the attachment feature is implemented. Record provider SMTP acceptance, recurring job invocations, privileged MFA, connection-pool behavior, backup restore into a separate database and rollback compatibility. Production readiness remains unclaimed until these pass.
+Then demonstrate live invite/login/logout/reset, active/unlinked/inactive users, attendance/leave races, task assignment/review and permissions with synthetic users. Repeat the implemented file workflow checks for the selected deployment; current synthetic acceptance covers size/type, upload/download scope, history and deactivation (see files.md). Record provider SMTP acceptance, recurring job invocations, privileged MFA, connection-pool behavior, backup restore into a separate database and rollback compatibility. Production readiness remains unclaimed until these pass.
 
 ## Current demo operations
 
 Canonical URL: https://encova-workspace.vercel.app. Vercel hosts both the frontend and Next.js backend routes; Supabase hosts PostgreSQL, Auth and private storage. Preview deployments have no production environment secrets and are not yet a separate functioning test environment. Publish manually with the authenticated Vercel CLI after checks; Git auto-deployment has not been configured.
 
-Application SMTP and a recurring job schedule are not configured. Therefore invitation emails and automatic attendance reconciliation are not claimed as operational. Binary file upload/download workflows are not implemented, despite the bucket being prepared. Complete these, privileged MFA, provider reset delivery, independent backup restore and company policy acceptance before staff production use.
+Application SMTP and a recurring job schedule are not configured. Therefore invitation emails and automatic attendance reconciliation are not claimed as operational. Bounded private file upload/download is implemented and live-verified; see [file operations](files.md) for the 4 MiB cap, permissions and retention/recovery limits. Privileged MFA, provider reset delivery, independent backup restore and company policy acceptance remain before staff production use.
 
 The operator-only credentials and one-time admin password are kept under ignored .local/deploy with restricted file permissions; none belong in Git or public report exports. The runtime uses encova_app through port 6543; migrations use controlled session pooling on 5432. The seventh additive migration provides invitation versions and outbox cancellation/link metadata without changing existing bearer tokens during migration. The preflight verifies the actual PostgreSQL client's encrypted, certificate-authorized socket, because Supavisor's internal backend connection has different TLS state.
+
+The eighth migration creates protected Attachment metadata with RLS/restricted-role grants and immutable revision enforcement. The deployed app proxies binary transfers through its authorized Node handlers; browser clients receive no storage key or signed URL. No storage or authentication credentials were added to preview environment variables.

@@ -8,21 +8,21 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | --- | --- | --- |
 | pnpm install / peers check | PASS | Exact lockfile resolved; no peer dependency issues. |
 | pnpm exec prisma validate | PASS | Initial schema validated; subsequent migrations and generated client succeeded. |
-| pnpm db:migrate:deploy on dev/test | PASS | Seven migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
+| pnpm db:migrate:deploy on dev/test | PASS | Eight migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
-| pnpm test:unit | PASS — 100 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
-| pnpm test:integration | PASS — 65 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
+| pnpm test:unit | PASS — 117 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
+| pnpm test:integration | PASS — 78 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 6 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 7.1 seconds on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 7 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 11.4 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | Sidebar/invitation source milestone 8769b9b pushed; local and remote SHA equality verified. |
+| Git commit/push | PASS | Private attachment source 7f0de97 pushed and verified by successful remote CI; report publication follows. |
 
 ## Supabase/Vercel foundation verification
 
-Current milestone local results: 100 unit, 65 integration and 6 browser tests passed (171 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
+Current milestone local results: 117 unit, 78 integration and 7 browser tests passed (202 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
 
 Supabase SDK + real PostgreSQL contract tests verify safe session DTOs/HTTP-only cookies, server identity verification, client role metadata rejection, immediate domain deactivation denial, legacy endpoint closure, same-origin protection, generic reset results, internal-only redirects, sign-out cookie clearing and scheduler authentication. Provider HTTP is simulated in these tests; no live Supabase result is claimed. Separate PostgreSQL tests cover provisioning failure/retry/revocation/concurrency, RLS/grants and the bounded job pass.
 
@@ -155,4 +155,35 @@ Live administrator account controls were additionally inspected in a short-deskt
 
 117 unit, 78 integration and 7 browser tests passed (202 total), plus strict typecheck/lint and normal production build. New checks cover MIME/signature/UTF-8/name/size validation, safe disposition headers, metadata boundaries, real SDK upload/download/deletion against isolated loopback HTTP, ambiguous-write recovery, mismatch rejection, concurrent claim isolation, provider calls outside DB transactions, scope/deactivation/membership denial, failed-removal recovery, quotas and immutable/matching submission history. Browser coverage adds real file controls, revision downloads, lost-response retry without duplication and removal. Existing invitation/work/sidebar/mobile browser journeys still pass.
 
-The eighth migration applied to encova_test. Hosted migration, real bucket transfer and boundary tests are pending deployment; no live file success is claimed yet. Documented local fixtures are not a production file backend.
+The eighth migration applied to encova_test. The hosted eighth migration and runtime preflight passed; the real bucket transfer and boundary results are recorded below. Documented local fixtures are not a production file backend.
+
+## Private attachments — live acceptance
+
+Deployment dpl_8875MGEvjDMFNBnoNgSdWqMCq7Dr is READY at https://encova-workspace.vercel.app. Source commit 7f0de97b41016059e1c30a96df2c9f6ba2c5e9e2 passed all clean-runner checks: https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42467966752. The private bucket remains private, and the eighth migration protects the new table with RLS and restricted-role grants.
+
+All twenty file checks below passed with the real provider, including a mobile browser and an exact 4 MiB round trip. No real employee data or external emails were used. An additional eight invitation/job checks, fifteen existing core workflow/auth/attendance checks and three live layout/sign-out checks passed on this same deployment (46 total). Both synthetic file-test identities were deactivated and the owner account was preserved.
+
+| Live file check | Result |
+| --- | --- |
+| Live private upload and idempotent replay preserve one file | PASS |
+| Live upload key reuse with changed bytes is rejected | PASS |
+| Draft download denies other project members, outsiders and anonymous callers | PASS |
+| Live file upload denies a non-member | PASS |
+| Live MIME/signature mismatch is rejected | PASS |
+| Live 4 MiB plus one byte upload is rejected | PASS |
+| Exact 4 MiB file uploads/downloads through Vercel and Supabase with matching digest | PASS |
+| Live draft removal prevents further app download | PASS |
+| Removed draft object is absent from the real private bucket | PASS |
+| PDF-header, real PNG and real JPEG fixtures pass allowed-type transfer and draft cleanup | PASS |
+| Designated reviewer downloads submitted bytes with safe filename/cache headers | PASS |
+| Submitted attachment remains inaccessible to a project outsider | PASS |
+| Direct anonymous public-bucket URL cannot serve the private object | PASS |
+| Live task metadata excludes object paths and file digests | PASS |
+| Submitted file cannot be removed after changes are requested | PASS |
+| Live mobile browser uploads, selects and submits a private revision file | PASS |
+| Live approval retains download links for both immutable revisions | PASS |
+| Actual browser download preserves the original filename and bytes | PASS |
+| Deactivation denies an existing session access to the private attachment | PASS |
+| Authorized reviewer retains historical file access after uploader deactivation | PASS |
+
+The exact-boundary draft and MIME fixtures were physically removed after testing. Two small submitted revision files remain as immutable synthetic history. The short/mobile screenshot was inspected, and the local preview was restarted to load the regenerated client; /login returned HTTP 200. Larger/resumable transfer, malware scanning/full format parsing, retention/orphan dashboards, SMTP/reset delivery, recurring scheduling, MFA and restore remain outside this acceptance.
