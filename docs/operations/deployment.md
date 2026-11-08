@@ -1,6 +1,6 @@
 # Supabase + Vercel deployment and cutover
 
-Status (8 November 2026): personal testing demo deployed at https://encova-workspace.vercel.app. Official CLI browser authentication succeeded after connected project tools remained unavailable. Encova Solutions is a separate Supabase organization; Encova Workspace Demo runs in ap-south-1 (Mumbai). The Vercel encova-workspace project uses Hobby, Node 24 and bom1 functions. Nine hosted migrations and the real runtime preflight passed. Company production acceptance remains outstanding; no billing upgrade or real employee data migration was performed.
+Status (8 November 2026): personal testing demo deployed at https://encova-workspace.vercel.app. Official CLI browser authentication succeeded after connected project tools remained unavailable. Encova Solutions is a separate Supabase organization; Encova Workspace Demo runs in ap-south-1 (Mumbai). The Vercel encova-workspace project uses Hobby, Node 24 and bom1 functions. Ten hosted migrations and the real runtime preflight passed. Company production acceptance remains outstanding; no billing upgrade or real employee data migration was performed.
 
 ## 1. Provision isolated hosted resources
 
@@ -59,3 +59,5 @@ The operator-only credentials and one-time admin password are kept under ignored
 The eighth migration creates protected Attachment metadata with RLS/restricted-role grants and immutable revision enforcement. The deployed app proxies binary transfers through its authorized Node handlers; browser clients receive no storage key or signed URL. No storage or authentication credentials were added to preview environment variables.
 
 The ninth migration adds protected JobRun/JobAttempt history and immutable audience/cursor rules. Operations supports super-admin dated queue/run/retry controls and safe queue counts. Schedule registration and protected manual execution are verified; the first natural timed invocation is separately pending.
+
+The tenth migration adds one protected shared announcement slot. The focused HR interface and announcement TTL/cleanup are documented in [HR and announcement operations](announcements-hr.md). Source 5155215 passed CI 42487129069; deployment dpl_FVM6CY46egk1cz1c9pWgG5F3vvUK passed 21 targeted hosted checks.

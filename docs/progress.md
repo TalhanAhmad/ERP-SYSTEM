@@ -9,7 +9,7 @@ Last updated: 2026-11-08 (Asia/Karachi)
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
 - Implementation status: personal-testing demo deployed with monitored attendance jobs, an enabled daily schedule, private revision attachments and invitation management, plus restricted Resend email/reset delivery. Full specification and company production acceptance remain incomplete.
-- Publication: owner-requested demo password policy source 088a714 passed GitHub CI 42482165407 and is committed/pushed and deployed as dpl_4Tp4KQSx349F8kApPNLpNAdPvbRU. Local verification: 121 unit, 95 integration and 8 browser tests (224 total), plus five targeted live credential/mobile/sign-out checks. The prior email deployment passed 71 live checks; its evidence remains recorded separately.
+- Publication: focused HR/announcement source 5155215 passed GitHub CI 42487129069 and is deployed as dpl_FVM6CY46egk1cz1c9pWgG5F3vvUK. Local verification: 121 unit, 104 integration and 10 browser tests (235 total), plus 21 hosted HR/announcement/auth/permission checks. Earlier milestone evidence remains recorded separately.
 
 ## Implemented evidence
 
@@ -43,4 +43,4 @@ Three owner-requested demo accounts now remain ACTIVE: HR Admin, Team Lead and M
 
 ## Current implementation work
 
-Focused HR attendance/leave/notifications and the shared Super Admin announcement are implemented locally. Ten migrations now exist. Final regression and hosted release are underway; exact scope/expiry behavior is in [HR and announcement operations](operations/announcements-hr.md). The persistent demo accounts will be preserved.
+Focused HR attendance/leave/notifications and the shared Super Admin announcement are deployed and verified. All ten hosted migrations and runtime preflight passed. All 235 local and 21 targeted hosted checks passed; exact scope/expiry behavior is in [HR and announcement operations](operations/announcements-hr.md). The persistent demo accounts remain ACTIVE; only the new verification fixture was deactivated.

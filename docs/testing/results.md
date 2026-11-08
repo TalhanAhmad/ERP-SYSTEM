@@ -8,13 +8,13 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | --- | --- | --- |
 | pnpm install / peers check | PASS | Exact lockfile resolved; no peer dependency issues. |
 | pnpm exec prisma validate | PASS | Initial schema validated; subsequent migrations and generated client succeeded. |
-| pnpm db:migrate:deploy on dev/test | PASS | Nine migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
+| pnpm db:migrate:deploy on dev/test | PASS | Ten migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
 | pnpm test:unit | PASS — 121 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
-| pnpm test:integration | PASS — 95 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
+| pnpm test:integration | PASS — 104 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 8 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 14.0 seconds on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 10 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 41.3 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
@@ -22,7 +22,7 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 
 ## Supabase/Vercel foundation verification
 
-Current milestone local results: 121 unit, 95 integration and 8 browser tests passed (224 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
+Current milestone local results: 121 unit, 104 integration and 10 browser tests passed (235 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
 
 Supabase SDK + real PostgreSQL contract tests verify safe session DTOs/HTTP-only cookies, server identity verification, client role metadata rejection, immediate domain deactivation denial, legacy endpoint closure, same-origin protection, generic reset results, internal-only redirects, sign-out cookie clearing and scheduler authentication. Provider HTTP is simulated in these tests; no live Supabase result is claimed. Separate PostgreSQL tests cover provisioning failure/retry/revocation/concurrency, RLS/grants and the bounded job pass.
 
@@ -274,3 +274,11 @@ The first sample-project setup did not finish; resumed using saved identity stat
 121 unit, 104 integration and 10 Chromium tests passed (235 total), plus typing/lint and production build. The tenth migration applied to isolated dev/test databases. New PostgreSQL/HTTP coverage verifies one shared slot, strict content, Super Admin-only mutations, role-consistent reads, 24-hour TTL and renewed edit expiry, stale IDs/versions, competing admins, idempotent edits, expiry deletion and HR route restrictions/named active people. Browser coverage verifies named check-in/out transitions and leave approval with four HR menus; shared announcement polling, editing, early deletion and timer-driven expiry on an open page also pass. The 24-hour scenario uses a controlled five-second synthetic expiry for the waiting portion, not a claim that 24 wall-clock hours elapsed.
 
 Initial lint found two variables that should be const. The announcement browser flow then exposed a nested textarea label containing its initial message text, causing an exact label lookup to fail after publishing. Explicit field IDs/labels corrected the association; the focused flow and full ten-browser suite passed afterward. Added row locking to keep expiry cleanup from racing an active edit. Hosted migration/deployment/live acceptance are pending at this checkpoint.
+
+## Focused HR and shared announcement — hosted acceptance
+
+Source 5155215215a39c0266545cfd346ad3296917130f passed [GitHub CI 42487129069](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42487129069), including fresh migrations, both builds and all 235 tests. The tenth hosted migration and runtime/RLS/private-storage/verified-TLS preflight passed. Vercel deployment dpl_FVM6CY46egk1cz1c9pWgG5F3vvUK is READY at https://encova-workspace.vercel.app.
+
+Twenty-one hosted checks passed: four existing owner/demo role logins; anonymous announcement denial; reduced HR APIs; named active-person overview; four-item mobile navigation; direct hidden-page denial; real synthetic check-in and check-out; named leave approval; private recipient notifications; identical announcement/24-hour TTL for all roles; non-admin mutation denial; live edit with renewed TTL and shared Notifications display; stale-edit rejection; 360px usability; early deletion; open-page automatic expiry/database cleanup; and HR browser sign-out/session denial.
+
+The production 24-hour initial/edit TTL was verified from its timestamps. The automatic-expiry wait used an eight-second expiry only on the uniquely identified owned synthetic announcement, which then disappeared without a page reload and was deleted on the next read. Test messages were removed; no owner-created announcement was overwritten. Only the newly created verification member was deactivated. The three persistent exploration accounts and their credentials remain valid. The mobile screenshot was inspected and local/live login pages both returned 200. This milestone adds targeted hosted acceptance, not a claimed rerun of all earlier 71 live cases.
