@@ -98,6 +98,7 @@ model Person {
  assignments Task[] @relation("Assignee")
  reviews Task[] @relation("Reviewer")
  submissions Submission[]
+ attachments Attachment[]
  decisions Review[]
  notifications Notification[]
  @@index([status,role])
@@ -140,6 +141,7 @@ model Task {
  createdAt DateTime @default(now()) @db.Timestamptz
  updatedAt DateTime @updatedAt @db.Timestamptz
  submissions Submission[]
+ attachments Attachment[]
  @@index([assigneeId,status,dueAt])
  @@index([projectId,status])
 }
@@ -154,7 +156,31 @@ model Submission {
  artifactLinks Json
  createdAt DateTime @default(now()) @db.Timestamptz
  review Review?
+ attachments Attachment[]
  @@unique([taskId,revision])
+}
+model Attachment {
+ id String @id @default(uuid()) @db.Uuid
+ taskId String @db.Uuid
+ task Task @relation(fields:[taskId],references:[id],onDelete:Restrict)
+ uploaderId String @db.Uuid
+ uploader Person @relation(fields:[uploaderId],references:[id],onDelete:Restrict)
+ submissionId String? @db.Uuid
+ submission Submission? @relation(fields:[submissionId],references:[id],onDelete:Restrict)
+ fileName String
+ mimeType String
+ byteSize Int
+ sha256 String
+ storageKey String @unique
+ uploadKey String
+ status String @default("PENDING")
+ attemptId String? @db.Uuid
+ leaseUntil DateTime? @db.Timestamptz
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ @@unique([taskId,uploaderId,uploadKey])
+ @@index([taskId,status])
+ @@index([submissionId])
 }
 model Review {
  id String @id @default(uuid()) @db.Uuid

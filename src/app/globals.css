@@ -651,3 +651,34 @@ details summary {
 .table-wrap {
   max-width: 100%;
 }
+
+.file-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+.file-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  overflow-wrap: anywhere;
+}
+.file-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-wrap: anywhere;
+}
+.file-choice input {
+  width: auto;
+}
+fieldset {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin-top: 16px;
+  padding: 12px;
+}

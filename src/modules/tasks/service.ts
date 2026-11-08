@@ -7,6 +7,7 @@ import { projectFor, visibleProjects } from "@/modules/projects/service";
 import { assigneeTransition, independent, type TaskState } from "./policy";
 import { createTask, submitTask, reviewTask } from "./schemas";
 import type { z } from "zod";
+import { attachmentFields } from "@/modules/attachments/metadata";
 export const visibleTasks = (actor: Actor) => ({
   project: visibleProjects(actor),
 });
@@ -16,7 +17,7 @@ const detail = {
   project: { select: { id: true, name: true } },
   submissions: {
     orderBy: { revision: "desc" as const },
-    include: { review: true },
+    include: { review: true, attachments: { select: attachmentFields } },
   },
 };
 export async function listTasks(actor: Actor) {
@@ -133,6 +134,22 @@ export async function submit(
     409,
   );
   const revision = (task.submissions[0]?.revision ?? 0) + 1;
+  const attachmentIds = input.attachmentIds ?? [];
+  const files = await tx.attachment.findMany({
+    where: {
+      id: { in: attachmentIds },
+      taskId: id,
+      uploaderId: actor.id,
+      status: "READY",
+      submissionId: null,
+    },
+  });
+  invariant(
+    files.length === attachmentIds.length,
+    "INVALID_ATTACHMENTS",
+    "Select only your completed uploads for this task.",
+    409,
+  );
   const submission = await tx.submission.create({
     data: {
       taskId: id,
@@ -142,6 +159,18 @@ export async function submit(
       artifactLinks: input.artifactLinks,
     },
   });
+  if (attachmentIds.length) {
+    const linked = await tx.attachment.updateMany({
+      where: { id: { in: attachmentIds }, status: "READY", submissionId: null },
+      data: { status: "ATTACHED", submissionId: submission.id },
+    });
+    invariant(
+      linked.count === attachmentIds.length,
+      "INVALID_ATTACHMENTS",
+      "Files changed; reload and retry.",
+      409,
+    );
+  }
   await tx.task.update({
     where: { id },
     data: { status: "IN_REVIEW", version: { increment: 1 } },
@@ -149,6 +178,7 @@ export async function submit(
   await audit(tx, actor.id, "TASK_SUBMITTED", id, {
     submissionId: submission.id,
     revision,
+    attachmentIds,
   });
   await notify(
     tx,

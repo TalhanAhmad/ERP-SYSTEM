@@ -41,11 +41,12 @@ export async function supabaseServer(requestHeaders?: Headers) {
     },
   });
 }
-export function supabaseAdmin() {
+export function supabaseAdmin(fetcher?: typeof fetch) {
   const { url } = configured();
   if (!env.SUPABASE_SECRET_KEY)
     throw new Error("Supabase server secret key is missing.");
   return createClient(url, env.SUPABASE_SECRET_KEY, {
+    ...(fetcher ? { global: { fetch: fetcher } } : {}),
     auth: {
       persistSession: false,
       autoRefreshToken: false,

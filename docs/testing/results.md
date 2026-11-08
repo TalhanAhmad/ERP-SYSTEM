@@ -150,3 +150,9 @@ All 27 checks below passed against https://encova-workspace.vercel.app after dep
 | Live administrator navigation, invitation queue notice and sign-out at 360x800 | PASS |
 
 Live administrator account controls were additionally inspected in a short-desktop screenshot. The original sidebar Sign out reachability limitation is resolved on the deployed app at all three tested viewport sizes. This covers implemented behavior, not the full ERP specification, production performance, provider inbox/reset delivery or a backup restore. No recurring schedule is enabled; the job check was an authenticated manual invocation.
+
+## Private attachment milestone — local verification
+
+117 unit, 78 integration and 7 browser tests passed (202 total), plus strict typecheck/lint and normal production build. New checks cover MIME/signature/UTF-8/name/size validation, safe disposition headers, metadata boundaries, real SDK upload/download/deletion against isolated loopback HTTP, ambiguous-write recovery, mismatch rejection, concurrent claim isolation, provider calls outside DB transactions, scope/deactivation/membership denial, failed-removal recovery, quotas and immutable/matching submission history. Browser coverage adds real file controls, revision downloads, lost-response retry without duplication and removal. Existing invitation/work/sidebar/mobile browser journeys still pass.
+
+The eighth migration applied to encova_test. Hosted migration, real bucket transfer and boundary tests are pending deployment; no live file success is claimed yet. Documented local fixtures are not a production file backend.

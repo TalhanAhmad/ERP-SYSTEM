@@ -64,6 +64,17 @@ test("complete browser work lifecycle with three separate role sessions", async 
   await member.getByRole("button", { name: "Start task", exact: true }).click();
   await expect(member.getByLabel("What did you complete?")).toBeVisible();
   await member
+    .getByLabel("Choose a file")
+    .setInputFiles({
+      name: "revision-one.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("First private revision"),
+    });
+  await member
+    .getByRole("button", { name: "Upload file", exact: true })
+    .click();
+  await member.getByRole("checkbox", { name: /revision-one.txt/ }).check();
+  await member
     .getByLabel("What did you complete?")
     .fill("Initial implementation");
   await member
@@ -74,6 +85,15 @@ test("complete browser work lifecycle with three separate role sessions", async 
   ).toBeVisible();
   await login(reviewer, "e2e.reviewer@example.test");
   await reviewer.goto(taskUrl);
+  const fileLink = reviewer.getByRole("link", {
+    name: /Download revision-one.txt/,
+  });
+  const downloadPath = await fileLink.getAttribute("href");
+  const [download] = await Promise.all([
+    reviewer.waitForEvent("download"),
+    fileLink.click(),
+  ]);
+  expect(download.suggestedFilename()).toBe("revision-one.txt");
   await reviewer
     .getByRole("combobox", { name: "Decision" })
     .selectOption("REQUEST_CHANGES");
@@ -85,6 +105,17 @@ test("complete browser work lifecycle with three separate role sessions", async 
     .click();
   await expect(reviewer.getByText("Please add boundary tests.")).toBeVisible();
   await member.reload();
+  await member
+    .getByLabel("Choose a file")
+    .setInputFiles({
+      name: "revision-two.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("Second private revision"),
+    });
+  await member
+    .getByRole("button", { name: "Upload file", exact: true })
+    .click();
+  await member.getByRole("checkbox", { name: /revision-two.txt/ }).check();
   await member
     .getByLabel("What did you complete?")
     .fill("Added boundary tests.");
@@ -107,8 +138,15 @@ test("complete browser work lifecycle with three separate role sessions", async 
   ).toBeVisible();
   await expect(reviewer.getByText("Revision 1", { exact: true })).toBeVisible();
   await expect(reviewer.getByText("Revision 2", { exact: true })).toBeVisible();
+  await expect(
+    reviewer.getByRole("link", { name: /Download revision-one.txt/ }),
+  ).toBeVisible();
+  await expect(
+    reviewer.getByRole("link", { name: /Download revision-two.txt/ }),
+  ).toBeVisible();
   const outside = await browser.newPage();
   await login(outside, "e2e.outsider@example.test");
+  expect((await outside.request.get(downloadPath!)).status()).toBe(404);
   await outside.goto(taskUrl);
   await expect(
     outside.getByRole("heading", { name: "Page not found." }),

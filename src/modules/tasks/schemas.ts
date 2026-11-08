@@ -26,6 +26,11 @@ export const submitTask = z
           .refine((s) => new URL(s).protocol === "https:", "Use HTTPS links."),
       )
       .max(10),
+    attachmentIds: z
+      .array(z.uuid())
+      .max(10)
+      .refine((v) => new Set(v).size === v.length, "Choose each file once.")
+      .optional(),
   })
   .strict();
 export const reviewTask = z

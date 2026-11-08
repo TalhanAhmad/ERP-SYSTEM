@@ -31,4 +31,4 @@ Official CLI browser authentication resolved the connected-tool gap. Created a s
 
 ## Exact next action
 
-The sidebar/invitation milestone is deployed and its source CI passed. All 27 live milestone checks passed, including invitation replacement acceptance, revocation, task/attendance persistence and sidebar sign-out at all three viewports. The final report records these results. Next, connect a verified email service and validate real delivery when credentials are available; other product and operations work can continue independently. Talha confirmed no SMTP service exists, so real delivery remains blocked on provider setup. Recurring jobs, binary file workflows, privileged MFA, restore and broader product requirements remain open.
+Deploy and verify private task-submission attachments. Local results: 117 unit, 78 integration and 7 browser tests passed (202 total). The previous sidebar/invitation milestone remains live and verified. Talha has no email service yet; SMTP delivery, recurring scheduling, privileged MFA, backup restore and broader ERP features remain incomplete.

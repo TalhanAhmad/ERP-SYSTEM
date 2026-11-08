@@ -215,9 +215,11 @@ export function TransitionForm({
 export function SubmissionForm({
   id,
   version,
+  attachments = [],
 }: {
   id: string;
   version: number;
+  attachments?: { id: string; fileName: string; byteSize: number }[];
 }) {
   return (
     <MutationForm
@@ -226,6 +228,7 @@ export function SubmissionForm({
       transform={(f) => ({
         expectedVersion: version,
         summary: f.get("summary"),
+        attachmentIds: f.getAll("attachmentIds"),
         artifactLinks: String(f.get("links"))
           .split("\n")
           .map((s) => s.trim())
@@ -243,6 +246,19 @@ export function SubmissionForm({
           placeholder="https://github.com/company/project/pull/123"
         />
       </label>
+      {attachments.length > 0 && (
+        <fieldset>
+          <legend>Files to include in this revision</legend>
+          {attachments.map((file) => (
+            <label className="file-choice" key={file.id}>
+              <input type="checkbox" name="attachmentIds" value={file.id} />
+              <span>
+                {file.fileName} · {Math.ceil(file.byteSize / 1024)} KB
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      )}
     </MutationForm>
   );
 }

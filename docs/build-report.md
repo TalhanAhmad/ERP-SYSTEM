@@ -63,3 +63,9 @@ Implemented scrollable desktop navigation with reachable account controls, mobil
 No email service is configured, as confirmed by Talha. The UI explicitly reports that invitations remain queued. No provider account, paid plan or real-recipient test email was created or sent.
 
 Live milestone acceptance passed 27 checks: invitation management/token/identity behavior, safe DTOs, missing-SMTP job processing, existing work/attendance permissions and desktop/mobile navigation/sign-out. The synthetic member was deactivated after testing. The sidebar issue is resolved in the live demo. Full ERP and company production acceptance remain incomplete.
+
+## Private attachment milestone
+
+Implemented assignee draft upload/removal, selectable files per immutable submission revision, private authenticated downloads, safe metadata DTOs and the eighth additive migration. Initial supported formats are PDF/PNG/JPEG/UTF-8 text up to 4 MiB; the bucket's higher limit does not override this app cap. Authorization is rechecked after Storage I/O. Supabase writes occur outside database transactions; upload/deletion retries preserve domain state and never overwrite existing file bytes.
+
+Local verification passed 202 automated tests (117 unit, 78 integration, 7 browser), typing/lint and the production build. Tests include real SDK protocol interactions against an isolated fixture; real-provider acceptance is pending hosted rollout. See docs/operations/files.md for limits, access, retry/recovery and explicit release boundaries.

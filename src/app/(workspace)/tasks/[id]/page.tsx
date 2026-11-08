@@ -5,6 +5,10 @@ import { db } from "@/server/db";
 import { context } from "@/server/context";
 import { visibleTasks } from "@/modules/tasks/service";
 import { Status } from "@/components/status";
+import { AttachmentForm } from "@/components/attachment-form";
+import { attachmentFields } from "@/modules/attachments/metadata";
+import { listDraftAttachments } from "@/modules/attachments/service";
+import { storageAvailable } from "@/modules/attachments/storage";
 import {
   TransitionForm,
   SubmissionForm,
@@ -24,7 +28,10 @@ export default async function Task({
       project: true,
       assignee: { select: { displayName: true, username: true } },
       reviewer: { select: { displayName: true, username: true } },
-      submissions: { orderBy: { revision: "desc" }, include: { review: true } },
+      submissions: {
+        orderBy: { revision: "desc" },
+        include: { review: true, attachments: { select: attachmentFields } },
+      },
     },
   });
   if (!task) notFound();
@@ -32,6 +39,11 @@ export default async function Task({
   const reviewer =
     (task.reviewerId === actor.id || actor.role === "SUPER_ADMIN") && !own;
   const current = task.submissions[0];
+  const canUpload =
+    own &&
+    !task.project.archivedAt &&
+    ["IN_PROGRESS", "CHANGES_REQUESTED"].includes(task.status);
+  const drafts = canUpload ? await listDraftAttachments(actor, id) : [];
   return (
     <>
       <Link className="muted" href="/tasks">
@@ -72,6 +84,14 @@ export default async function Task({
                 <article className="revision" key={s.id}>
                   <strong>Revision {s.revision}</strong>
                   <p>{s.summary}</p>
+                  {s.attachments.map((file) => (
+                    <div key={file.id}>
+                      <a href={`/api/v1/attachments/${file.id}`}>
+                        Download {file.fileName} (
+                        {Math.ceil(file.byteSize / 1024)} KB)
+                      </a>
+                    </div>
+                  ))}
                   {(s.artifactLinks as string[]).map((url) => (
                     <div key={url}>
                       <a href={url} target="_blank" rel="noopener noreferrer">
@@ -93,6 +113,13 @@ export default async function Task({
               ))
             )}
           </section>
+          {canUpload && (
+            <AttachmentForm
+              taskId={id}
+              enabled={storageAvailable()}
+              drafts={drafts}
+            />
+          )}
         </div>
         <section className="panel">
           <h2>Next action</h2>
@@ -113,7 +140,13 @@ export default async function Task({
               {own &&
                 ["IN_PROGRESS", "CHANGES_REQUESTED"].includes(task.status) && (
                   <div style={{ marginTop: 25 }}>
-                    <SubmissionForm id={id} version={task.version} />
+                    <SubmissionForm
+                      id={id}
+                      version={task.version}
+                      attachments={drafts.filter(
+                        (file) => file.status === "READY",
+                      )}
+                    />
                   </div>
                 )}
               {reviewer && task.status === "IN_REVIEW" && current && (
