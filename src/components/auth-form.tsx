@@ -1,4 +1,5 @@
 "use client";
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth/password-policy";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -49,7 +50,7 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
-          minLength={12}
+          minLength={MIN_PASSWORD_LENGTH}
         />
       </label>
       {error && (
@@ -134,7 +135,7 @@ export function AcceptForm({ token }: { token: string }) {
           name="password"
           type="password"
           autoComplete="new-password"
-          minLength={12}
+          minLength={MIN_PASSWORD_LENGTH}
           maxLength={128}
           required
         />

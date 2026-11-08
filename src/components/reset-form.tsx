@@ -1,4 +1,5 @@
 "use client";
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth/password-policy";
 import { useState } from "react";
 import Link from "next/link";
 import { accountAction } from "@/lib/auth/client";
@@ -57,7 +58,7 @@ export function ResetForm({
             type="password"
             autoComplete="new-password"
             required
-            minLength={12}
+            minLength={MIN_PASSWORD_LENGTH}
             maxLength={128}
           />
         </label>

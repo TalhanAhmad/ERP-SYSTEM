@@ -32,7 +32,7 @@ Vercel uses vercel.json and pnpm build:vercel, which generates Prisma Client bef
 
 ## 5. Provision the first production administrator
 
-Keep the local Better Auth account local. In the Supabase environment, use pnpm bootstrap:supabase-admin with ADMIN_EMAIL, ADMIN_USERNAME, ADMIN_NAME, a newly chosen ADMIN_PASSWORD (12+ chars) and ADMIN_EMAIL_OWNERSHIP_VERIFIED=yes supplied privately. The operator must independently verify email ownership. The command can explicitly link an existing active super admin while preserving its domain UUID; it never automatically links arbitrary existing provider identities by email.
+Keep the local Better Auth account local. In the Supabase environment, use pnpm bootstrap:supabase-admin with ADMIN_EMAIL, ADMIN_USERNAME, ADMIN_NAME, a newly chosen ADMIN_PASSWORD (8+ chars for the personal demo) and ADMIN_EMAIL_OWNERSHIP_VERIFIED=yes supplied privately. The operator must independently verify email ownership. The command can explicitly link an existing active super admin while preserving its domain UUID; it never automatically links arbitrary existing provider identities by email.
 
 No bulk migration of real employee identities/passwords is authorized or performed by this change. If production legacy users exist, create and review an identity cutover/reset plan before changing AUTH_PROVIDER. Supabase and Better Auth sessions/password records are not interchangeable. During an incomplete cutover, unlinked identities remain denied.
 

@@ -1,3 +1,4 @@
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth/password-policy";
 import "server-only";
 import { randomBytes, createHash } from "node:crypto";
 import { betterAuth } from "better-auth";
@@ -214,7 +215,10 @@ export async function acceptInvitation(input: z.infer<typeof acceptSchema>) {
           provider: "postgresql",
         }),
         secret: process.env.BETTER_AUTH_SECRET,
-        emailAndPassword: { enabled: true, minPasswordLength: 12 },
+        emailAndPassword: {
+          enabled: true,
+          minPasswordLength: MIN_PASSWORD_LENGTH,
+        },
         advanced: { database: { generateId: () => crypto.randomUUID() } },
       });
       const identity = await provisioning.api.signUpEmail({

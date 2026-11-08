@@ -1,3 +1,4 @@
+import { MIN_PASSWORD_LENGTH } from "../src/lib/auth/password-policy";
 import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -11,12 +12,12 @@ const email = process.env.ADMIN_EMAIL?.trim().toLowerCase(),
 if (
   !email ||
   !password ||
-  password.length < 12 ||
+  password.length < MIN_PASSWORD_LENGTH ||
   !username ||
   !/^[-a-z0-9._]{3,30}$/.test(username)
 )
   throw new Error(
-    "Set ADMIN_EMAIL, ADMIN_PASSWORD (12+ chars), ADMIN_USERNAME (3–30 valid chars). Passwords are never printed.",
+    `Set ADMIN_EMAIL, ADMIN_PASSWORD (${MIN_PASSWORD_LENGTH}+ chars), ADMIN_USERNAME (3–30 valid chars). Passwords are never printed.`,
   );
 await db.$transaction(
   async (tx) => {
@@ -34,7 +35,10 @@ await db.$transaction(
         provider: "postgresql",
       }),
       secret: process.env.BETTER_AUTH_SECRET,
-      emailAndPassword: { enabled: true, minPasswordLength: 12 },
+      emailAndPassword: {
+        enabled: true,
+        minPasswordLength: MIN_PASSWORD_LENGTH,
+      },
       advanced: { database: { generateId: () => crypto.randomUUID() } },
     });
     const result = await provisioning.api.signUpEmail({

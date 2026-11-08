@@ -12,7 +12,7 @@ Verified platform: macOS ARM64; Node 24.22.2; pnpm 12.18.0. Runtime dependencies
 4. Start PostgreSQL and Mailpit with `docker compose up -d`, or use the local helper below. Compose's example password is local-only; production credentials must be independently provisioned.
 5. Set DATABASE_URL for the development database and APP_URL for the actual browser origin (the old BETTER_AUTH_URL remains a local fallback). Match scheme/host/port exactly.
 6. Run `pnpm db:migrate:deploy`.
-7. Supply ADMIN_EMAIL, ADMIN_USERNAME, ADMIN_NAME and ADMIN_PASSWORD privately in your shell environment, then run `pnpm bootstrap:admin`. The password must contain at least 12 characters and is never printed. The operator must verify the first admin's email ownership. The command refuses a second bootstrap once an active super admin exists. It creates auth and domain records atomically.
+7. Supply ADMIN_EMAIL, ADMIN_USERNAME, ADMIN_NAME and ADMIN_PASSWORD privately in your shell environment, then run `pnpm bootstrap:admin`. The password must contain at least 8 characters for the current personal demo and is never printed. The operator must verify the first admin's email ownership. The command refuses a second bootstrap once an active super admin exists. It creates auth and domain records atomically.
 8. Run `pnpm dev`. Sign in at http://localhost:3000/login.
 9. Configure schedules through `/schedules` before attendance use. Do not assume example weekday/shift rules are company policy.
 10. Run `pnpm worker` periodically to process the mail outbox and reconcile attendance. It is a single-pass command, not an installed scheduler.

@@ -52,9 +52,7 @@ test("administrator resends/revokes invitations and only a replacement link crea
     async function accept(email: string, token: string) {
       await guest.goto(base + `/invite/${token}`);
       await guest.getByLabel("Invited email").fill(email);
-      await guest
-        .getByLabel("Choose a password")
-        .fill("Synthetic-browser-invitation-9#");
+      await guest.getByLabel("Choose a password").fill("Demo9x2!");
       await guest
         .getByRole("button", { name: "Accept invitation", exact: true })
         .click();
@@ -77,6 +75,13 @@ test("administrator resends/revokes invitations and only a replacement link crea
     );
     await accept(item.email, replacement);
     await expect(guest.getByText("Account created.")).toBeVisible();
+    await guest.goto(base + "/login");
+    await guest.getByLabel("Work email").fill(item.email);
+    await guest.getByLabel("Password", { exact: true }).fill("Demo9x2!");
+    await guest.getByRole("button", { name: "Sign in to workspace" }).click();
+    await guest.waitForURL("**/dashboard");
+    await guest.getByRole("button", { name: "Sign out", exact: true }).click();
+    await guest.waitForURL("**/login");
     await page.reload();
     await expect(item.row.getByText("accepted", { exact: true })).toBeVisible();
     await expect(

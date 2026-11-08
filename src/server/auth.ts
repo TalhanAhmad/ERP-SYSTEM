@@ -1,3 +1,4 @@
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth/password-policy";
 import "server-only";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -11,7 +12,7 @@ function createLegacyAuth() {
     emailAndPassword: {
       enabled: true,
       disableSignUp: true,
-      minPasswordLength: 12,
+      minPasswordLength: MIN_PASSWORD_LENGTH,
       requireEmailVerification: true,
       sendResetPassword: async ({ user, url }) => {
         await db.outbox.create({

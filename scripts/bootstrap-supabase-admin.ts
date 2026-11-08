@@ -1,3 +1,4 @@
+import { MIN_PASSWORD_LENGTH } from "../src/lib/auth/password-policy";
 import "dotenv/config";
 import { supabaseAdmin } from "../src/server/supabase/client";
 import { db } from "../src/server/db";
@@ -9,7 +10,7 @@ const input = z
   .object({
     ADMIN_EMAIL: z.email().transform((v) => v.trim().toLowerCase()),
     ADMIN_USERNAME: z.string().regex(/^[a-z0-9._-]{3,30}$/),
-    ADMIN_PASSWORD: z.string().min(12).max(128),
+    ADMIN_PASSWORD: z.string().min(MIN_PASSWORD_LENGTH).max(128),
     ADMIN_NAME: z.string().min(1),
     ADMIN_EMAIL_OWNERSHIP_VERIFIED: z.literal("yes"),
   })

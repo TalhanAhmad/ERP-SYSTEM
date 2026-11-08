@@ -1,3 +1,4 @@
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth/password-policy";
 import { z } from "zod";
 export const invitationSchema = z
   .object({
@@ -16,6 +17,6 @@ export const acceptSchema = z
   .object({
     token: z.string().regex(/^[a-f0-9]{64}$/),
     email: z.email().transform((v) => v.toLowerCase().trim()),
-    password: z.string().min(12).max(128),
+    password: z.string().min(MIN_PASSWORD_LENGTH).max(128),
   })
   .strict();

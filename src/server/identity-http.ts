@@ -1,3 +1,4 @@
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth/password-policy";
 import "server-only";
 import { NextResponse } from "next/server";
 import { parseCookieHeader, type CookieOptions } from "@supabase/ssr";
@@ -139,7 +140,7 @@ export async function authAction(action: AuthAction, request: Request) {
     } else {
       const body = z
         .object({
-          password: z.string().min(12).max(128),
+          password: z.string().min(MIN_PASSWORD_LENGTH).max(128),
           token: z.string().optional(),
         })
         .strict()

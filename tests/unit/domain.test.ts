@@ -5,7 +5,7 @@ import {
   states,
 } from "@/modules/tasks/policy";
 import { createTask, submitTask, reviewTask } from "@/modules/tasks/schemas";
-import { invitationSchema } from "@/modules/identity/schemas";
+import { invitationSchema, acceptSchema } from "@/modules/identity/schemas";
 import { workDate, csvCell } from "@/lib/dates";
 const projectId = crypto.randomUUID(),
   assigneeId = crypto.randomUUID(),
@@ -29,6 +29,22 @@ describe("Task state machine", () => {
   });
 });
 describe("Strict schemas", () => {
+  it.each([
+    [7, false],
+    [8, true],
+    [9, true],
+  ])(
+    "validates a %i-character demo invitation password",
+    (length, accepted) => {
+      expect(
+        acceptSchema.safeParse({
+          token: "f".repeat(64),
+          email: "fixture@example.test",
+          password: "x".repeat(length as number),
+        }).success,
+      ).toBe(accepted);
+    },
+  );
   const valid = { projectId, assigneeId, reviewerId, title: "Reviewable work" };
   it("rejects extra role fields", () =>
     expect(
