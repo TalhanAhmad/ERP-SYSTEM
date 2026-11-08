@@ -36,3 +36,7 @@ Monitored attendance jobs and Operations are deployed. Vercel confirms the daily
 ## Current demo password policy
 
 At the owner's explicit request, the personal-demo provider and matching application forms/services now accept passwords of at least 8 characters. The live owner password was changed privately and API/browser sign-in, old-password rejection, mobile access and sign-out passed. Company policy should be reviewed before staff rollout; the owner intends to change the demo password at project completion. No password is recorded in this report.
+
+## Live role exploration accounts
+
+Three owner-requested demo accounts now remain ACTIVE: HR Admin, Team Lead and Member, alongside the existing Super Admin. Twelve targeted live checks passed. Team Lead/Member share a synthetic project with assigned and reviewable work; HR has demo schedules and a pending leave request. Login emails, scope and cleanup rules are in [demo account operations](operations/demo-accounts.md). Credentials are handed directly to the owner and excluded from this report. Application source/deployment did not change for this data-only setup.

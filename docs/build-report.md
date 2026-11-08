@@ -89,3 +89,7 @@ Talha selected Resend and confirmed no domain is owned yet. Official CLI authori
 ## Owner-requested personal-demo password policy
 
 The owner requested a shorter administrator password after the provider rejected it under the former minimum. The current demo policy is aligned to 8 characters across Supabase, browser forms, server validation, local compatibility and bootstrap tools. The actual password is stored only in private deployment files, never in this report or source. Boundary and browser acceptance checks cover the shorter policy; source 088a714 is deployed as dpl_4Tp4KQSx349F8kApPNLpNAdPvbRU. All 224 local tests and five targeted live checks passed; the new owner password works and the old password is rejected. Restore the intended company policy before staff rollout and change the demo credential at project completion as requested by the owner.
+
+## Persistent role demo accounts
+
+Created the three requested live exploration logins through existing invitation/provisioning paths: HR Admin, Team Lead and Member. They remain active, with a Team Lead-managed synthetic project, two Member tasks including one reviewable submission, demo schedules and a pending leave request. All twelve targeted API/permission/browser checks passed. Existing source and deployment were retained; no role permissions were weakened. See docs/operations/demo-accounts.md. Passwords are excluded from source/report.

@@ -262,3 +262,9 @@ Vercel deployment dpl_4Tp4KQSx349F8kApPNLpNAdPvbRU reached READY at the canonica
 Five targeted live checks passed: new owner API login with SUPER_ADMIN role, old credential rejection, actual browser login/dashboard, 360px layout and browser sign-out/session denial. The previous deployment's 71 live email/work/file/attendance/Operations checks remain historical evidence, not an assertion of a second complete live regression for this password-only release.
 
 [GitHub Actions run 42482165407](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42482165407) passed all configured checks for source 088a714, including both builds and all 224 tests. The local preview was restarted to load the same shared minimum without changing local account passwords.
+
+## Persistent owner exploration accounts
+
+Data-only setup on the existing deployment passed twelve targeted live checks: three role-correct API logins; Team Lead project and membership; assigned/reviewable work; HR schedules and pending leave; super-admin/privileged-invitation denial; project membership visibility; three actual mobile browser role journeys with sign-out/session denial; and ACTIVE retention of all three requested accounts. These accounts stay available to the owner, unlike retired automated fixtures. No source changes or new full-regression claim accompanies this account setup; the prior 224 automated tests remain the source verification evidence.
+
+The first sample-project setup did not finish; resumed using saved identity state and stable request keys, then completed and verified the expected project/work records. The final Team Lead mobile review screenshot was inspected. No passwords, provider tokens or invitation links appear in committed tracking files.
