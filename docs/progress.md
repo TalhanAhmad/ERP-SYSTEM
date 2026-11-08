@@ -9,7 +9,7 @@ Last updated: 2026-11-08 (Asia/Karachi)
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
 - Implementation status: personal-testing demo deployed with monitored attendance jobs, an enabled daily schedule, private revision attachments and invitation management, plus restricted Resend email/reset delivery. Full specification and company production acceptance remain incomplete.
-- Publication: email source milestone committed/pushed as 4d76a19; GitHub Actions run 42481163707 passed all checks. Local verification: 118 unit, 95 integration and 8 browser tests (221 total); 71 live checks passed on deployment dpl_H4vyzvankZvxXRABivHg8Z9nk3vc.
+- Publication: owner-requested demo password policy source 088a714 passed GitHub CI 42482165407 and is committed/pushed and deployed as dpl_4Tp4KQSx349F8kApPNLpNAdPvbRU. Local verification: 121 unit, 95 integration and 8 browser tests (224 total), plus five targeted live credential/mobile/sign-out checks. The prior email deployment passed 71 live checks; its evidence remains recorded separately.
 
 ## Implemented evidence
 
@@ -32,3 +32,7 @@ Official CLI browser authentication resolved the connected-tool gap. Created a s
 ## Exact next action
 
 Monitored attendance jobs and Operations are deployed. Vercel confirms the daily 00:15 UTC schedule is registered/enabled (around 05:15 Karachi, Hobby hourly precision); its first natural invocation has not yet been observed. Manual protected execution and recovery passed. Resend SMTP is now authenticated and self-test inbox delivery verified; its restricted sender reaches only the owner until a domain is verified. The updated Vercel release is READY; a reset requested through the live form arrived in the owner Gmail INBOX. Controlled synthetic callback/password-change checks passed without changing the owner password. Next remaining work includes a verified sender domain, an unattended mail retry worker, report reminders/cleanup/alerts, privileged MFA, restore and remaining ERP modules. Full company production acceptance remains incomplete.
+
+## Current demo password policy
+
+At the owner's explicit request, the personal-demo provider and matching application forms/services now accept passwords of at least 8 characters. The live owner password was changed privately and API/browser sign-in, old-password rejection, mobile access and sign-out passed. Company policy should be reviewed before staff rollout; the owner intends to change the demo password at project completion. No password is recorded in this report.

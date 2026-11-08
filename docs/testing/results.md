@@ -11,10 +11,10 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm db:migrate:deploy on dev/test | PASS | Nine migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
-| pnpm test:unit | PASS — 118 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
+| pnpm test:unit | PASS — 121 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
 | pnpm test:integration | PASS — 95 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 8 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 13.1 seconds on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 8 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 14.0 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
@@ -22,7 +22,7 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 
 ## Supabase/Vercel foundation verification
 
-Current milestone local results: 118 unit, 95 integration and 8 browser tests passed (221 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
+Current milestone local results: 121 unit, 95 integration and 8 browser tests passed (224 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
 
 Supabase SDK + real PostgreSQL contract tests verify safe session DTOs/HTTP-only cookies, server identity verification, client role metadata rejection, immediate domain deactivation denial, legacy endpoint closure, same-origin protection, generic reset results, internal-only redirects, sign-out cookie clearing and scheduler authentication. Provider HTTP is simulated in these tests; no live Supabase result is claimed. Separate PostgreSQL tests cover provisioning failure/retry/revocation/concurrency, RLS/grants and the bounded job pass.
 
@@ -252,3 +252,13 @@ All 59 existing named live checks passed again (8 invitations/jobs, 15 core auth
 The real SMTP self-test also arrived in the owner INBOX. Its separate connection/authentication test sent no message. The recovery mutation used a controlled provider-generated token for an already disabled synthetic member; it did not consume the owner's emailed recovery link or change the owner password. Full invitation/reset inbox acceptance for staff remains dependent on a verified domain.
 
 An obsolete cleanup step initially tried to sign in the member after the file suite had already deactivated it and correctly received 401. Corrected the private test orchestration, verified the identities remained inactive, then completed layout/Operations checks. This was a test-sequence correction, not an application access change. The mobile Operations screenshot was inspected. Local preview was refreshed at http://127.0.0.1:3000; local and live /login returned 200.
+
+## Owner-requested demo password change
+
+Source 088a7147f41f5eedaea2a92462678f9c7dbfc376 aligns the shared personal-demo minimum to 8 across invitation/reset validation, forms, local auth and bootstrap tools. Strict typing/lint, 121 unit, 95 integration and 8 browser tests passed (224 total), plus production build. Boundary tests reject seven characters and accept eight/nine. The browser invitation journey accepts and signs in with an eight-character synthetic password.
+
+Vercel deployment dpl_4Tp4KQSx349F8kApPNLpNAdPvbRU reached READY at the canonical URL. A minimal Supabase config push changed only auth.minimum_password_length from 12 to 8; follow-up diff verified no remaining declared changes and preserved all unrelated provider settings. Updated only the guarded ACTIVE SUPER_ADMIN provider identity and the private deployment credential handoff. No password is committed.
+
+Five targeted live checks passed: new owner API login with SUPER_ADMIN role, old credential rejection, actual browser login/dashboard, 360px layout and browser sign-out/session denial. The previous deployment's 71 live email/work/file/attendance/Operations checks remain historical evidence, not an assertion of a second complete live regression for this password-only release.
+
+[GitHub Actions run 42482165407](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42482165407) passed all configured checks for source 088a714, including both builds and all 224 tests. The local preview was restarted to load the same shared minimum without changing local account passwords.
