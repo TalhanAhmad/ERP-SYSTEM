@@ -1,3 +1,4 @@
+import { hrApiAccess } from "@/lib/hr-access";
 import { NextResponse } from "next/server";
 import { context } from "@/server/context";
 import { failure, mutationOrigin, rateLimit } from "@/server/http";
@@ -12,6 +13,7 @@ type Params = { params: Promise<{ id: string }> };
 export async function GET(request: Request, { params }: Params) {
   try {
     const actor = await context(request.headers);
+    hrApiAccess(actor.role, request.method, "attachments");
     await rateLimit(`download:${actor.id}`, 60);
     const { file, bytes } = await downloadAttachment(actor, (await params).id);
     return new Response(Buffer.from(bytes), {
@@ -32,6 +34,7 @@ export async function DELETE(request: Request, { params }: Params) {
   try {
     mutationOrigin(request);
     const actor = await context(request.headers);
+    hrApiAccess(actor.role, request.method, "attachments");
     await rateLimit(`mutation:${actor.id}`);
     return NextResponse.json({
       data: await removeDraftAttachment(actor, (await params).id),

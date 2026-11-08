@@ -22,6 +22,7 @@ export default async function Task({
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
   const actor = await context();
+  if (actor.role === "HR_ADMIN") notFound();
   const task = await db.task.findFirst({
     where: { id, ...visibleTasks(actor) },
     include: {

@@ -40,3 +40,7 @@ At the owner's explicit request, the personal-demo provider and matching applica
 ## Live role exploration accounts
 
 Three owner-requested demo accounts now remain ACTIVE: HR Admin, Team Lead and Member, alongside the existing Super Admin. Twelve targeted live checks passed. Team Lead/Member share a synthetic project with assigned and reviewable work; HR has demo schedules and a pending leave request. Login emails, scope and cleanup rules are in [demo account operations](operations/demo-accounts.md). Credentials are handed directly to the owner and excluded from this report. Application source/deployment did not change for this data-only setup.
+
+## Current implementation work
+
+Focused HR attendance/leave/notifications and the shared Super Admin announcement are implemented locally. Ten migrations now exist. Final regression and hosted release are underway; exact scope/expiry behavior is in [HR and announcement operations](operations/announcements-hr.md). The persistent demo accounts will be preserved.

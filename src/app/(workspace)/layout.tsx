@@ -8,9 +8,13 @@ import {
   Bell,
   Shield,
   ArrowUpRight,
+  Megaphone,
 } from "lucide-react";
 import { context } from "@/server/context";
 import { AppError } from "@/server/errors";
+import { activeAnnouncement } from "@/modules/announcements/service";
+import { WorkspaceAnnouncement } from "@/components/workspace-announcement";
+import { hrSectionAllowed } from "@/lib/hr-access";
 import { Logout } from "@/components/auth-form";
 export const dynamic = "force-dynamic";
 export default async function Workspace({
@@ -33,6 +37,7 @@ export default async function Workspace({
     ["corrections", "Corrections", CheckSquare],
     ["notifications", "Notifications", Bell],
   ] as const;
+  const announcement = await activeAnnouncement();
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -43,13 +48,17 @@ export default async function Workspace({
         <div className="workspace-label">WORKSPACE</div>
         <div className="nav-label">YOUR WORKSPACE</div>
         <nav className="nav" aria-label="Main navigation">
-          {items.map(([path, label, Icon]) => (
-            <Link key={path} href={`/${path}`}>
-              <Icon size={17} />
-              {label}
-            </Link>
-          ))}
-          {["SUPER_ADMIN", "HR_ADMIN"].includes(person.role) && (
+          {items
+            .filter(([path]) => hrSectionAllowed(person.role, path))
+            .map(([path, label, Icon]) => (
+              <Link key={path} href={`/${path}`}>
+                <Icon size={17} />
+                {person.role === "HR_ADMIN" && path === "leave"
+                  ? "Leave approvals"
+                  : label}
+              </Link>
+            ))}
+          {person.role === "SUPER_ADMIN" && (
             <Link href="/schedules">
               <CheckSquare size={17} />
               Schedules
@@ -57,6 +66,10 @@ export default async function Workspace({
           )}
           {person.role === "SUPER_ADMIN" && (
             <>
+              <Link href="/announcements">
+                <Megaphone size={17} />
+                Announcements
+              </Link>
               <Link href="/operations">
                 <Shield size={17} />
                 Operations
@@ -97,7 +110,17 @@ export default async function Workspace({
             }).format(new Date())}
           </span>
         </header>
-        <main className="content">{children}</main>
+        <main className="content">
+          <WorkspaceAnnouncement
+            key={
+              announcement
+                ? `${announcement.id}:${announcement.version}`
+                : "none"
+            }
+            initial={announcement}
+          />
+          {children}
+        </main>
       </div>
     </div>
   );

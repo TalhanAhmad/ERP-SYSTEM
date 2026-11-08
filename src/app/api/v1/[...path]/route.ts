@@ -1,3 +1,12 @@
+import { hrApiAccess } from "@/lib/hr-access";
+import { hrOverview } from "@/modules/hr/service";
+import {
+  activeAnnouncement,
+  announcementSchema,
+  deleteAnnouncementSchema,
+  saveAnnouncement,
+  deleteAnnouncement,
+} from "@/modules/announcements/service";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { context } from "@/server/context";
@@ -66,6 +75,17 @@ export async function GET(request: Request, { params }: Params) {
   try {
     const actor = await context(request.headers);
     const path = (await params).path.join("/");
+    hrApiAccess(actor.role, "GET", path);
+    if (path === "announcements")
+      return NextResponse.json(
+        { data: await activeAnnouncement() },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
+    if (path === "hr/overview")
+      return NextResponse.json(
+        { data: await hrOverview(actor) },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
     if (path === "operations")
       return NextResponse.json(
         { data: await operationsSnapshot(actor) },
@@ -211,6 +231,7 @@ export async function POST(request: Request, { params }: Params) {
       });
     }
     const actor = await context(request.headers);
+    hrApiAccess(actor.role, request.method, (await params).path.join("/"));
     await rateLimit(`mutation:${actor.id}`);
     const data = await mutate(
       actor,
@@ -218,6 +239,14 @@ export async function POST(request: Request, { params }: Params) {
       request.headers.get("idempotency-key"),
       input,
       async (tx) => {
+        if (route === "announcements")
+          return saveAnnouncement(tx, actor, announcementSchema.parse(input));
+        if (route === "announcements/delete")
+          return deleteAnnouncement(
+            tx,
+            actor,
+            deleteAnnouncementSchema.parse(input),
+          );
         if (route === "operations/attendance-jobs")
           return createAttendanceJob(tx, actor, queueJobSchema.parse(input));
         if (path[0] === "invitations" && path.length === 3) {
@@ -385,6 +414,7 @@ export async function PATCH(request: Request, { params }: Params) {
   try {
     mutationOrigin(request);
     const actor = await context(request.headers);
+    hrApiAccess(actor.role, request.method, (await params).path.join("/"));
     await rateLimit(`mutation:${actor.id}`);
     const path = (await params).path;
     const input = await jsonBody(request);

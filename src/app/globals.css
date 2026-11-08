@@ -700,3 +700,24 @@ progress {
   width: 100%;
   accent-color: var(--accent);
 }
+
+.workspace-announcement {
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  border: 1px solid #b6d0bf;
+  border-left: 4px solid #245c49;
+  border-radius: 12px;
+  background: #eef6ef;
+  color: #183c31;
+  overflow-wrap: anywhere;
+}
+.workspace-announcement h2 {
+  margin: 8px 0;
+  font-size: 21px;
+}
+.workspace-announcement p {
+  margin: 8px 0 12px;
+}
+.workspace-announcement small {
+  color: #536b5d;
+}

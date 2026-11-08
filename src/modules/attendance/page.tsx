@@ -146,22 +146,36 @@ export async function DayPage({ section }: { section: string }) {
   }
   if (section === "leave") {
     const requests = await db.leaveRequest.findMany({
-      where: privileged ? {} : { userId: actor.id },
+      where:
+        actor.role === "HR_ADMIN"
+          ? { userId: { not: actor.id } }
+          : privileged
+            ? {}
+            : { userId: actor.id },
       orderBy: { createdAt: "desc" },
       take: 100,
     });
+    const identities = privileged
+      ? await db.person.findMany({
+          where: { id: { in: requests.map((r) => r.userId) } },
+          select: { id: true, displayName: true, username: true },
+        })
+      : [];
+    const names = new Map(identities.map((p) => [p.id, p]));
     return (
       <>
         {heading(
-          "Leave",
+          actor.role === "HR_ADMIN" ? "Leave approvals" : "Leave",
           "Full-day requests, with independent approval and attendance conflict checks.",
         )}
-        <section className="panel">
-          <details>
-            <summary>Request leave</summary>
-            <LeaveForm />
-          </details>
-        </section>
+        {actor.role !== "HR_ADMIN" && (
+          <section className="panel">
+            <details>
+              <summary>Request leave</summary>
+              <LeaveForm />
+            </details>
+          </section>
+        )}
         {requests.map((r) => (
           <section className="panel" key={r.id}>
             <div className="panel-heading">
@@ -173,7 +187,9 @@ export async function DayPage({ section }: { section: string }) {
             </div>
             <p className="muted">
               {r.type} ·{" "}
-              {r.userId === actor.id ? "Your request" : `Person ${r.userId}`}
+              {r.userId === actor.id
+                ? "Your request"
+                : `${names.get(r.userId)?.displayName ?? "Workspace member"} · @${names.get(r.userId)?.username ?? "unknown"}`}
             </p>
             <p className="preline">{r.privateNote}</p>
             <div className="form-actions">
@@ -203,7 +219,7 @@ export async function DayPage({ section }: { section: string }) {
                     />
                   </>
                 )}
-              {privileged &&
+              {actor.role === "SUPER_ADMIN" &&
                 r.userId !== actor.id &&
                 r.status === "APPROVED" && (
                   <DecisionForm

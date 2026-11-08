@@ -1,4 +1,5 @@
 import "server-only";
+import { cleanupExpiredAnnouncements } from "@/modules/announcements/service";
 import { db } from "../db";
 import { workDate } from "@/lib/dates";
 import { processOutbox } from "./outbox";
@@ -14,6 +15,7 @@ export async function scheduledPass(
   allowEmail = false,
 ) {
   const deadline = Date.now() + 35000;
+  await cleanupExpiredAnnouncements();
   const mailStatus = send ? "INJECTED" : emailStatus(emailInput);
   const sender =
     send ??

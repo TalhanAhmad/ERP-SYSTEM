@@ -11,6 +11,7 @@ const provisioning = betterAuth({
 });
 for (const [username, role] of [
   ["e2e.admin", "SUPER_ADMIN"],
+  ["e2e.hr", "HR_ADMIN"],
   ["e2e.member", "MEMBER"],
   ["e2e.reviewer", "MEMBER"],
   ["e2e.outsider", "MEMBER"],

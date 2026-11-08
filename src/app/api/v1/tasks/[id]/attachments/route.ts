@@ -1,3 +1,4 @@
+import { hrApiAccess } from "@/lib/hr-access";
 import { NextResponse } from "next/server";
 import { context } from "@/server/context";
 import { failure, mutationOrigin, rateLimit } from "@/server/http";
@@ -14,6 +15,7 @@ export async function POST(
   try {
     mutationOrigin(request);
     const actor = await context(request.headers);
+    hrApiAccess(actor.role, request.method, "attachments");
     await rateLimit(`upload:${actor.id}`, 10);
     invariant(
       storageAvailable(),

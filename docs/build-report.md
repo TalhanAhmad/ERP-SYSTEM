@@ -32,7 +32,7 @@ The hosted encova-private Storage bucket is private; task-submission upload/down
 
 ## Verification and limits
 
-Latest local verification: 121 unit, 95 integration and 8 browser tests passed, plus strict typing, lint, normal/Supabase-mode builds, fresh migrations and dependency checks. Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
+Latest local verification: 121 unit, 104 integration and 10 browser tests passed, plus strict typing, lint, normal/Supabase-mode builds, fresh migrations and dependency checks. Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
 
 Passing tests cover only implemented behavior. The full specification remains open, notably organization/profile management, internship workflows, advanced tables/import/export, lifecycle management actions, complete settings and dashboard contracts, MFA, reminders/job-run monitoring, real SMTP delivery and backup restore. See docs/planning/backlog.md for the actionable list.
 
@@ -93,3 +93,7 @@ The owner requested a shorter administrator password after the provider rejected
 ## Persistent role demo accounts
 
 Created the three requested live exploration logins through existing invitation/provisioning paths: HR Admin, Team Lead and Member. They remain active, with a Team Lead-managed synthetic project, two Member tasks including one reviewable submission, demo schedules and a pending leave request. All twelve targeted API/permission/browser checks passed. Existing source and deployment were retained; no role permissions were weakened. See docs/operations/demo-accounts.md. Passwords are excluded from source/report.
+
+## Focused HR and shared announcement milestone
+
+Implemented the owner's simplified HR scope with named attendance/check-in status, leave approvals and recipient notifications. Removed HR's unused navigation and direct page/API access. Super Admin can publish/edit/delete one shared plain-text announcement, visible to every signed-in role. Edits renew the 24-hour TTL; open pages remove expired content automatically. Cleanup occurs on the first authenticated read after expiry or the daily scheduled pass. The tenth additive migration preserves existing business records. Full final regression and hosted release are underway; see docs/operations/announcements-hr.md.

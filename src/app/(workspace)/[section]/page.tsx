@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { HrPage } from "@/modules/hr/page";
+import { hrSectionAllowed } from "@/lib/hr-access";
 import { notFound } from "next/navigation";
 import {
   ArrowUpRight,
@@ -31,12 +33,51 @@ export default async function Section({
 }) {
   const { section } = await params;
   const actor = await context();
+  if (!hrSectionAllowed(actor.role, section)) notFound();
+  if (
+    actor.role === "HR_ADMIN" &&
+    ["dashboard", "attendance"].includes(section)
+  )
+    return <HrPage actor={actor} attendance={section === "attendance"} />;
   if (
     ["attendance", "schedules", "leave", "corrections", "reports"].includes(
       section,
     )
   )
     return <DayPage section={section} />;
+  if (section === "notifications") {
+    const items = await db.notification.findMany({
+      where: { recipientId: actor.id },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+    });
+    return (
+      <>
+        <Heading
+          title="Notifications"
+          subtitle="Updates from the work you’re part of."
+        />
+        <section className="panel">
+          {items.length === 0 ? (
+            <Empty text="You’re all caught up. New assignments and review updates will appear here." />
+          ) : (
+            items.map((item) => (
+              <div className="notification" key={item.id}>
+                <div>
+                  <Link href={item.target}>{item.title} →</Link>
+                  <p className="note">
+                    {item.createdAt.toISOString().slice(0, 10)} ·{" "}
+                    {item.readAt ? "Read" : "Unread"}
+                  </p>
+                </div>
+                {!item.readAt && <ReadButton id={item.id} />}
+              </div>
+            ))
+          )}
+        </section>
+      </>
+    );
+  }
   const projects = await listProjects(actor);
   const tasks = await listTasks(actor);
   const manage = actor.role === "SUPER_ADMIN" || actor.role === "TEAM_LEAD";
@@ -411,39 +452,6 @@ export default async function Section({
             )}
           </section>
         )}
-      </>
-    );
-  }
-  if (section === "notifications") {
-    const items = await db.notification.findMany({
-      where: { recipientId: actor.id },
-      orderBy: { createdAt: "desc" },
-      take: 100,
-    });
-    return (
-      <>
-        <Heading
-          title="Notifications"
-          subtitle="Updates from the work you’re part of."
-        />
-        <section className="panel">
-          {items.length === 0 ? (
-            <Empty text="You’re all caught up. New assignments and review updates will appear here." />
-          ) : (
-            items.map((item) => (
-              <div className="notification" key={item.id}>
-                <div>
-                  <Link href={item.target}>{item.title} →</Link>
-                  <p className="note">
-                    {item.createdAt.toISOString().slice(0, 10)} ·{" "}
-                    {item.readAt ? "Read" : "Unread"}
-                  </p>
-                </div>
-                {!item.readAt && <ReadButton id={item.id} />}
-              </div>
-            ))
-          )}
-        </section>
       </>
     );
   }

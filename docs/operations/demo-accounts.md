@@ -16,7 +16,7 @@ The accounts were provisioned through authorized invitation creation and control
 
 - Team Lead manages Demo Workspace — explore your roles. One Member task is ready to start; a second contains a submitted revision ready for approval or changes requested. The owner is also a project member.
 - Member can start and submit their assigned work, inspect the submitted revision, use their attendance schedule and view the pending demo leave request.
-- HR Admin can inspect the demo schedule assignments and approve/reject the Member's pending leave request. HR does not automatically see the work project without membership.
+- HR Admin now sees the focused attendance overview, named check-in status, leave approvals and Notifications. Schedule administration and People/project/report/correction screens are removed from HR; Super Admin manages setup. The existing Member leave request can be approved or rejected if still pending.
 
 All three have a clearly named synthetic daily schedule starting on the creation date. No attendance check-in/out events were fabricated. These records are intended for exploration and may change when the owner uses the accounts; do not assume the initial task/leave states are permanent fixtures.
 
