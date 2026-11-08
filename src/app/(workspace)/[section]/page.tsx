@@ -1,3 +1,4 @@
+import { AdminPeoplePage } from "@/modules/people/page";
 import Link from "next/link";
 import { HrPage } from "@/modules/hr/page";
 import { hrSectionAllowed } from "@/lib/hr-access";
@@ -19,20 +20,20 @@ import { Status } from "@/components/status";
 import {
   ProjectForm,
   TaskForm,
-  InvitationForm,
   MemberForm,
   ReadButton,
-  InvitationAction,
 } from "@/components/work-forms";
-import { listInvitations } from "@/modules/identity/service";
-import { emailStatus, emailTestMode } from "@/lib/email-config";
 export default async function Section({
   params,
+  searchParams,
 }: {
   params: Promise<{ section: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { section } = await params;
   const actor = await context();
+  if (section === "people" && actor.role === "SUPER_ADMIN")
+    return <AdminPeoplePage actor={actor} searchParams={await searchParams} />;
   if (!hrSectionAllowed(actor.role, section)) notFound();
   if (
     actor.role === "HR_ADMIN" &&
@@ -277,7 +278,8 @@ export default async function Section({
               <p className="note">
                 {p._count.members} members · {p._count.tasks} tasks
               </p>
-              {(actor.role === "SUPER_ADMIN" || p.managerId === actor.id) && (
+              {(actor.role === "SUPER_ADMIN" ||
+                (actor.role === "TEAM_LEAD" && p.managerId === actor.id)) && (
                 <details>
                   <summary>Add a project member</summary>
                   <MemberForm projectId={p.id} people={activePeople} />
@@ -308,25 +310,10 @@ export default async function Section({
         </section>
       </>
     );
-  if (section === "people") {
-    const canInvite = ["SUPER_ADMIN", "HR_ADMIN"].includes(actor.role);
-    const invitations = canInvite ? await listInvitations(actor) : [];
+  if (section === "people")
     return (
       <>
-        <Heading
-          title="People"
-          subtitle="The people in your workspace, within your current access."
-        />
-        {canInvite && (
-          <section className="panel">
-            <details>
-              <summary>Invite a person</summary>
-              <InvitationForm
-                canInvitePrivileged={actor.role === "SUPER_ADMIN"}
-              />
-            </details>
-          </section>
-        )}
+        <Heading title="People" subtitle="People within your project access." />
         <section className="panel">
           <div className="table-wrap">
             <table>
@@ -356,105 +343,8 @@ export default async function Section({
             </table>
           </div>
         </section>
-        {canInvite && (
-          <section className="panel" aria-labelledby="invitations-heading">
-            <h2 id="invitations-heading">Invitations</h2>
-            {emailStatus() !== "READY" && (
-              <p className="error" role="status">
-                Email delivery is not configured. Invitations will remain queued
-                until an email service is connected.
-              </p>
-            )}
-            {emailTestMode() && (
-              <p className="note" role="status">
-                Email is in personal demo mode and can only reach the configured
-                test inbox. Invitations to other people need a verified sending
-                domain.
-              </p>
-            )}
-            <p className="note">
-              Sending or resending attempts email delivery when the service is
-              configured. Resending replaces the previous link. Revoking
-              prevents account creation. An email already being sent may still
-              arrive, but its canceled link will not work.
-            </p>
-            {invitations.length === 0 ? (
-              <Empty text="No invitations yet." />
-            ) : (
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Person</th>
-                      <th>Role</th>
-                      <th>Status</th>
-                      <th>Email</th>
-                      <th>Expires (Karachi)</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {invitations.map((item) => (
-                      <tr key={item.id}>
-                        <td>
-                          <strong>{item.displayName}</strong>
-                          <div>{item.email}</div>
-                          <div className="muted">@{item.username}</div>
-                        </td>
-                        <td>{item.role.replaceAll("_", " ").toLowerCase()}</td>
-                        <td>
-                          <Status value={item.status} />
-                          {item.processing && (
-                            <p className="note">Account creation in progress</p>
-                          )}
-                        </td>
-                        <td>
-                          {
-                            {
-                              QUEUED: "Queued",
-                              SMTP_ACCEPTED: "Accepted by email server",
-                              CANCELED: "Canceled",
-                              RETRYING: "Retrying",
-                              FAILED: "Failed",
-                            }[item.delivery]
-                          }
-                        </td>
-                        <td>
-                          {new Intl.DateTimeFormat("en-GB", {
-                            timeZone: "Asia/Karachi",
-                            dateStyle: "medium",
-                            timeStyle: "short",
-                          }).format(item.expiresAt)}
-                        </td>
-                        <td>
-                          {!["ACCEPTED", "REVOKED"].includes(item.status) && (
-                            <div className="stack">
-                              {!item.processing && (
-                                <InvitationAction
-                                  id={item.id}
-                                  version={item.version}
-                                  action="resend"
-                                />
-                              )}
-                              <InvitationAction
-                                id={item.id}
-                                version={item.version}
-                                action="revoke"
-                              />
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        )}
       </>
     );
-  }
   if (section === "audit" && actor.role === "SUPER_ADMIN") {
     const records = await db.audit.findMany({
       orderBy: { createdAt: "desc" },

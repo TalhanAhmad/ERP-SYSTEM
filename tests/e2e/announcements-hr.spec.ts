@@ -106,12 +106,26 @@ test("HR sees named check-in status, approves leave and has only the focused men
     await expect(member.getByText("Your workday is closed.")).toBeVisible();
     await page.getByRole("button", { name: "Refresh attendance" }).click();
     await expect(row.getByText("Checked out", { exact: true })).toBeVisible();
-    const tomorrow = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Asia/Karachi",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date(Date.now() + 86400000));
+    // Select a scheduled day rather than depending on the wall-clock date or
+    // the fixed synthetic holiday used by the integration suite.
+    let tomorrow = "";
+    for (let offset = 1; offset <= 7; offset++) {
+      const candidate = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Karachi",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date(Date.now() + offset * 86400000));
+      const holiday = await sql.query(
+        'SELECT 1 FROM "Holiday" WHERE date=$1::date',
+        [candidate],
+      );
+      if (!holiday.rowCount) {
+        tomorrow = candidate;
+        break;
+      }
+    }
+    expect(tomorrow).not.toBe("");
     const note = `HR browser leave ${suffix}`;
     await post(memberCtx, "leave", {
       startDate: tomorrow,

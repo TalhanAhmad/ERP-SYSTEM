@@ -721,3 +721,26 @@ progress {
 .workspace-announcement small {
   color: #536b5d;
 }
+
+.people-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.people-filters label {
+  flex: 1 1 180px;
+  margin-bottom: 0;
+}
+.confirmation {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 0;
+}
+.confirmation input[type="checkbox"] {
+  width: auto;
+  min-width: 16px;
+  margin-top: 4px;
+}

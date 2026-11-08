@@ -44,3 +44,7 @@ Three owner-requested demo accounts now remain ACTIVE: HR Admin, Team Lead and M
 ## Current implementation work
 
 Focused HR attendance/leave/notifications and the shared Super Admin announcement are deployed and verified. All ten hosted migrations and runtime preflight passed. All 235 local and 21 targeted hosted checks passed; exact scope/expiry behavior is in [HR and announcement operations](operations/announcements-hr.md). The persistent demo accounts remain ACTIVE; only the new verification fixture was deactivated.
+
+## Account-management work
+
+Super Admin People search/filter/pagination and per-account profile/role/status controls are implemented locally. Final regression and hosted release are underway. HR remains focused on attendance, leave approvals and notifications. See [account management](operations/people-management.md). Department/team management and verified email changes remain separate follow-ups.

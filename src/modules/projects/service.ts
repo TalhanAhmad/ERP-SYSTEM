@@ -20,7 +20,8 @@ export async function projectFor(
   invariant(project, "NOT_FOUND", "Project not found.", 404);
   if (manage)
     invariant(
-      actor.role === "SUPER_ADMIN" || project.managerId === actor.id,
+      actor.role === "SUPER_ADMIN" ||
+        (actor.role === "TEAM_LEAD" && project.managerId === actor.id),
       "FORBIDDEN",
       "Project manager access required.",
       403,

@@ -67,7 +67,18 @@ import {
   reportAction,
   reportSchema,
 } from "@/modules/reports/service";
-import { changeRole, deactivate, roleSchema } from "@/modules/people/service";
+import {
+  changeRole,
+  deactivate,
+  reactivate,
+  editProfile,
+  personDetail,
+  listPeople,
+  profileSchema,
+  peopleQuerySchema,
+  accountStatusSchema,
+  roleSchema,
+} from "@/modules/people/service";
 const uuid = z.uuid();
 type Params = { params: Promise<{ path: string[] }> };
 export async function GET(request: Request, { params }: Params) {
@@ -89,6 +100,23 @@ export async function GET(request: Request, { params }: Params) {
     if (path === "operations")
       return NextResponse.json(
         { data: await operationsSnapshot(actor) },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
+    if (path === "people")
+      return NextResponse.json(
+        {
+          data: await listPeople(
+            actor,
+            peopleQuerySchema.parse(
+              Object.fromEntries(new URL(request.url).searchParams),
+            ),
+          ),
+        },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
+    if (/^users\/[^/]+$/.test(path))
+      return NextResponse.json(
+        { data: await personDetail(actor, uuid.parse(path.split("/")[1])) },
         { headers: { "Cache-Control": "private, no-store" } },
       );
     if (path === "me")
@@ -264,15 +292,9 @@ export async function POST(request: Request, { params }: Params) {
           if (path[2] === "role")
             return changeRole(tx, actor, id, roleSchema.parse(input));
           if (path[2] === "deactivate")
-            return deactivate(
-              tx,
-              actor,
-              id,
-              z
-                .object({ expectedVersion: z.number().int().positive() })
-                .strict()
-                .parse(input),
-            );
+            return deactivate(tx, actor, id, accountStatusSchema.parse(input));
+          if (path[2] === "reactivate")
+            return reactivate(tx, actor, id, accountStatusSchema.parse(input));
         }
         if (route === "schedules")
           return createPolicy(tx, actor, policySchema.parse(input));
@@ -418,6 +440,22 @@ export async function PATCH(request: Request, { params }: Params) {
     await rateLimit(`mutation:${actor.id}`);
     const path = (await params).path;
     const input = await jsonBody(request);
+    if (path[0] === "users" && path.length === 2) {
+      const data = await mutate(
+        actor,
+        `PATCH:${path.join("/")}`,
+        request.headers.get("idempotency-key"),
+        input,
+        (tx) =>
+          editProfile(
+            tx,
+            actor,
+            uuid.parse(path[1]),
+            profileSchema.parse(input),
+          ),
+      );
+      return NextResponse.json({ data });
+    }
     invariant(
       path[0] === "reports" && path.length === 2,
       "NOT_FOUND",

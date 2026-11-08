@@ -13,8 +13,8 @@ This list is deliberately explicit: the full supplied specification is not compl
 ## Identity and people
 
 - Invitation resend/revoke UI/API and expiration/revocation/concurrency tests are implemented. Employee email/reset delivery, privileged MFA and recovery procedures remain; Talha selected Resend but confirmed no domain is owned. The provider test sender reaches only the owner.
-- People detail/edit/profile screens, department/team administration, manager-cycle protection, team membership history and HR-safe directory/autocomplete scopes.
-- Role/deactivation services exist; management UI and concurrent security-change coverage remain.
+- Basic Super Admin account detail/profile editing, role/status UI and directory filtering are in the current milestone. Department/team administration, manager-cycle protection, team membership history, richer employee profiles and verified login-email changes remain. HR intentionally keeps its reduced scope.
+- Complete hosted acceptance of the current account-management milestone; provider-wide session revocation remains a separate release requirement.
 
 ## Work management
 
