@@ -1,6 +1,6 @@
 # Supabase + Vercel deployment and cutover
 
-Status (8 November 2026): personal testing demo deployed at https://encova-workspace.vercel.app. Official CLI browser authentication succeeded after connected project tools remained unavailable. Encova Solutions is a separate Supabase organization; Encova Workspace Demo runs in ap-south-1 (Mumbai). The Vercel encova-workspace project uses Hobby, Node 24 and bom1 functions. Eight hosted migrations and the real runtime preflight passed. Company production acceptance remains outstanding; no billing upgrade or real employee data migration was performed.
+Status (8 November 2026): personal testing demo deployed at https://encova-workspace.vercel.app. Official CLI browser authentication succeeded after connected project tools remained unavailable. Encova Solutions is a separate Supabase organization; Encova Workspace Demo runs in ap-south-1 (Mumbai). The Vercel encova-workspace project uses Hobby, Node 24 and bom1 functions. Nine hosted migrations and the real runtime preflight passed. Company production acceptance remains outstanding; no billing upgrade or real employee data migration was performed.
 
 ## 1. Provision isolated hosted resources
 
@@ -38,9 +38,9 @@ No bulk migration of real employee identities/passwords is authorized or perform
 
 ## 6. Schedule and monitor jobs
 
-Configure a recurring authenticated invocation of /api/internal/jobs using the selected Vercel scheduling service or another approved scheduler. A one-minute cadence rotates the 20-person attendance slice and processes one queued email per pass. Confirm actual throughput and tune batching/duration before onboarding many users. Requests require Authorization: Bearer <CRON_SECRET>. Vercel Cron Jobs send this automatically when configured; newer Schedules may require the target's header configuration. The secret is never a URL query parameter.
+The personal demo now configures a daily authenticated /api/internal/jobs invocation in vercel.json (15 0 * * * UTC). For higher throughput, configure an approved scheduler compatible with the selected plan. Clock slices have been replaced with captured audiences and durable per-person checkpoints. Passes have a 35-second work budget and resume queued/interrupted work; failed work requires an operator retry. The daily endpoint sends no email. Confirm actual hosted throughput before onboarding many users. Requests require Authorization: Bearer <CRON_SECRET>. Vercel Cron Jobs send this automatically when configured; newer Schedules may require the target's header configuration. The secret is never a URL query parameter.
 
-The route is bounded to a 60-second Node function and uses durable email leases/date locks. vercel.json does not enable a schedule before the account plan is confirmed. An endpoint existing is not evidence that a scheduler is running. Monitor exhausted attempts, stuck leases, scheduler delivery and attendance completion; job-run dashboards/reminders remain backlog items.
+The route is bounded to a 60-second Node function and uses durable email leases/date locks. Talha authorized a Hobby personal demo; the configured schedule remains daily, with no billing upgrade. An endpoint existing is not evidence that a scheduler is running. Monitor exhausted attempts, stuck leases, scheduler delivery and attendance completion; job-run dashboards/reminders remain backlog items.
 
 ## 7. Verify before pilot
 
@@ -52,8 +52,10 @@ Then demonstrate live invite/login/logout/reset, active/unlinked/inactive users,
 
 Canonical URL: https://encova-workspace.vercel.app. Vercel hosts both the frontend and Next.js backend routes; Supabase hosts PostgreSQL, Auth and private storage. Preview deployments have no production environment secrets and are not yet a separate functioning test environment. Publish manually with the authenticated Vercel CLI after checks; Git auto-deployment has not been configured.
 
-Application SMTP and a recurring job schedule are not configured. Therefore invitation emails and automatic attendance reconciliation are not claimed as operational. Bounded private file upload/download is implemented and live-verified; see [file operations](files.md) for the 4 MiB cap, permissions and retention/recovery limits. Privileged MFA, provider reset delivery, independent backup restore and company policy acceptance remain before staff production use.
+Application SMTP is not configured. The daily attendance cron is now registered/enabled; its first natural invocation remains pending observation. Invitation email delivery and a mail-worker schedule are not operational. See [monitored jobs](jobs.md) for exact scope and recovery. Bounded private file upload/download is implemented and live-verified; see [file operations](files.md) for the 4 MiB cap, permissions and retention/recovery limits. Privileged MFA, provider reset delivery, independent backup restore and company policy acceptance remain before staff production use.
 
 The operator-only credentials and one-time admin password are kept under ignored .local/deploy with restricted file permissions; none belong in Git or public report exports. The runtime uses encova_app through port 6543; migrations use controlled session pooling on 5432. The seventh additive migration provides invitation versions and outbox cancellation/link metadata without changing existing bearer tokens during migration. The preflight verifies the actual PostgreSQL client's encrypted, certificate-authorized socket, because Supavisor's internal backend connection has different TLS state.
 
 The eighth migration creates protected Attachment metadata with RLS/restricted-role grants and immutable revision enforcement. The deployed app proxies binary transfers through its authorized Node handlers; browser clients receive no storage key or signed URL. No storage or authentication credentials were added to preview environment variables.
+
+The ninth migration adds protected JobRun/JobAttempt history and immutable audience/cursor rules. Operations supports super-admin dated queue/run/retry controls and safe queue counts. Schedule registration and protected manual execution are verified; the first natural timed invocation is separately pending.

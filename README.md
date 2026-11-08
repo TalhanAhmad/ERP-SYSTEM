@@ -6,7 +6,7 @@ Encova Workspace: a Next.js / PostgreSQL internal work platform.
 
 Selected stack: **Next.js + TypeScript + Tailwind + Supabase PostgreSQL/Auth/Storage + Prisma + Vercel**. See [deployment and cutover](docs/operations/deployment.md) and [the architecture decision](docs/decisions/ADR-002-supabase-vercel.md). Personal testing demo: https://encova-workspace.vercel.app. The hosted app uses Supabase Auth and PostgreSQL; local compatibility still uses Better Auth.
 
-Working modules include invitation-based accounts with administrator resend/revoke, projects, task assignments/submissions/reviews, attendance, leave/corrections, daily reports, notifications, private per-revision file attachments and audit records. All displayed work records come from PostgreSQL; attached bytes live in private Supabase Storage. See [file limits and access](docs/operations/files.md).
+Working modules include invitation-based accounts with administrator resend/revoke, projects, task assignments/submissions/reviews, attendance, leave/corrections, daily reports, notifications, private per-revision file attachments, monitored attendance jobs and audit records. All displayed work records come from PostgreSQL; attached bytes live in private Supabase Storage. See [file limits and access](docs/operations/files.md).
 
 Start with [setup](docs/operations/setup.md), then follow [progress](docs/progress.md), the [step log](docs/work-log.md), [verification results](docs/testing/results.md) and [remaining release work](docs/planning/backlog.md).
 
@@ -22,3 +22,5 @@ pnpm dev
 ```
 
 Node 24 LTS and pnpm 12.18.0 are required. Use synthetic data during development. The hosted deployment is for personal testing; no real employee-data migration or company production acceptance has been performed.
+
+Super admins can use Operations for job progress and audited retries. The daily attendance schedule is registered; first natural execution is pending observation. See [job operations](docs/operations/jobs.md).

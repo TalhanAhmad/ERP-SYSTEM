@@ -1,6 +1,6 @@
 # Monitored attendance jobs
 
-This milestone adds durable attendance execution and a super-admin Operations page. Personal-demo scheduling is configured on Vercel Hobby; registration and actual automatic invocation evidence are recorded separately in testing results.
+This milestone adds durable attendance execution and a super-admin Operations page. Personal-demo scheduling is registered/enabled on Vercel Hobby. The first natural invocation remains pending; 13 Operations and 46 other live checks passed. Exact source/deployment/CI evidence is in [test results](../testing/results.md).
 
 ## Scheduling and scope
 

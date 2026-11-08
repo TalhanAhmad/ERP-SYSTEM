@@ -8,21 +8,21 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | --- | --- | --- |
 | pnpm install / peers check | PASS | Exact lockfile resolved; no peer dependency issues. |
 | pnpm exec prisma validate | PASS | Initial schema validated; subsequent migrations and generated client succeeded. |
-| pnpm db:migrate:deploy on dev/test | PASS | Eight migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
+| pnpm db:migrate:deploy on dev/test | PASS | Nine migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
 | pnpm test:unit | PASS — 117 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
-| pnpm test:integration | PASS — 78 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
+| pnpm test:integration | PASS — 89 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 7 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 11.4 seconds on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 8 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 12.2 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | Private attachment source 7f0de97 pushed and verified by successful remote CI; report publication follows. |
+| Git commit/push | PASS | Monitored-job source 877addf pushed and verified by successful remote CI; report publication follows. |
 
 ## Supabase/Vercel foundation verification
 
-Current milestone local results: 117 unit, 78 integration and 7 browser tests passed (202 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
+Current milestone local results: 117 unit, 89 integration and 8 browser tests passed (214 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
 
 Supabase SDK + real PostgreSQL contract tests verify safe session DTOs/HTTP-only cookies, server identity verification, client role metadata rejection, immediate domain deactivation denial, legacy endpoint closure, same-origin protection, generic reset results, internal-only redirects, sign-out cookie clearing and scheduler authentication. Provider HTTP is simulated in these tests; no live Supabase result is claimed. Separate PostgreSQL tests cover provisioning failure/retry/revocation/concurrency, RLS/grants and the bounded job pass.
 
@@ -193,3 +193,29 @@ The exact-boundary draft and MIME fixtures were physically removed after testing
 Typecheck/lint, 117 unit tests and 89 integration tests passed, including a 100-person active assigned audience, partial cursor resume, no-op request replay, atomic failure rollback, safe errors, competing claims, expired-lease abandonment, stale worker/role denial, corrected/raw-history preservation, schedule-date uniqueness and terminal-history protection. Real PostgreSQL is used; no production employee records are test fixtures.
 
 Repeated test runs initially captured previous active job.p fixtures in the dedicated test database. Retiring only this suite's old synthetic people fixed isolation; production audience filters were not narrowed. Reusing an already completed scheduled date was separated from testing terminal history. Initial compiler/lint findings corrected nullable system audit actors, Prisma selection typing and render-time clock work. Operations browser assertions were refined to distinguish job badges from attempt status/reason markup; the remaining seven existing browser tests passed throughout. Final browser/hosted evidence follows after rollout.
+
+## Monitored attendance — final verification
+
+Local results: 117 unit, 89 integration and 8 browser tests passed (214 total), plus typing/lint, production build, Prisma validation and docs checks. Source 877addfff349d5aae5561713310baed860d9712b passed all clean-runner checks at https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42477410444. The ninth hosted migration and runtime role/RLS/private-bucket/verified-TLS preflight passed. Vercel deployment dpl_D9rTpj8cZ1WCzwphKA3EkwUXeq2g is READY at the canonical live URL.
+
+All thirteen new live Operations checks below passed. The existing eight invitation/job, fifteen core auth/work/attendance, twenty file and three layout/sign-out checks also passed on this deployment (59 total). No external mail or real employee records were used; all synthetic identities were deactivated afterward. Recovery tests deliberately staged interrupted/failed attempts through controlled internal helpers only on freshly created synthetic records, then exercised the actual live retry UI/API.
+
+| Live Operations check | Result |
+| --- | --- |
+| Live Operations monitoring rejects anonymous and MEMBER sessions | PASS |
+| Live mobile Operations UI queues and completes a captured one-person job | PASS |
+| Real attendance ledger is reconciled without fabricating raw check events | PASS |
+| Live job execution enforces role and matching Origin | PASS |
+| Live expired claim is visible and resumes with retained ABANDONED history | PASS |
+| Controlled hosted failure records a safe code without private exception text | PASS |
+| Live browser retry completes failed work while preserving the failed attempt | PASS |
+| Live partial progress resumes and repeated HTTP request does not create a second attempt | PASS |
+| Live stale versions and future dates are rejected | PASS |
+| Live operational DTO excludes audiences, retry keys and lease internals | PASS |
+| Hosted database prevents rewriting finished attempt history | PASS |
+| Repeated reconciliation preserves an unchanged attendance snapshot | PASS |
+| Live Operations layout and retry controls remain usable at 360px | PASS |
+
+Vercel project metadata confirms one definition for /api/internal/jobs at 15 0 * * *, enabledAt set, disabledAt null and the current deployment ID. This verifies registration/enabled state, not actual timed delivery. The natural automatic invocation marker is still empty; wait for the first daily window and inspect Operations/provider logs. Manual protected invocations are classified Service/CLI, not Schedule. No billing upgrade was made. Daily endpoint email sending is disabled even if SMTP credentials are later supplied; mail worker setup/acceptance is separate.
+
+Anonymous navigation to /operations redirected to /login. Production dependency audit reported no known vulnerabilities. The local preview was restarted after client regeneration, preserving local database/session data. Full company throughput, automatic first-run observation, alerts, historical gap detection, real mail/MFA and restore remain unverified.

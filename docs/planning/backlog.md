@@ -5,7 +5,7 @@ This list is deliberately explicit: the full supplied specification is not compl
 ## Supabase/Vercel cutover priority
 
 - The personal demo is already deployed to isolated Supabase/Vercel projects. Complete company production acceptance separately; do not treat the demo as acceptance of the full specification.
-- Configure a verified email sender/company SMTP and recurring jobs. Pooled runtime/controlled migrations, closed signup, initial hosted admin linkage and private bucket are implemented and verified.
+- Configure a verified email sender/company SMTP and a mail-worker schedule. The daily attendance schedule is registered/enabled; observe its first natural invocation. Pooled runtime/controlled migrations, closed signup, initial hosted admin linkage and private bucket are implemented and verified.
 - Complete live Auth/reset/session-revocation/MFA acceptance, actual function/pool measurements and backup restore. Bounded private task-submission upload/download and access tests are now implemented and verified.
 - Remove the temporary local Better Auth compatibility only after the Supabase local/staging/production flows are verified; keep domain IDs/history.
 - Keep both provider contract tests and live Supabase acceptance. Current live sessions/work/attendance are verified with synthetic records; inbox/reset delivery, provider-wide revocation and MFA acceptance remain.
@@ -29,7 +29,7 @@ This list is deliberately explicit: the full supplied specification is not compl
 - Holiday administration, schedule-assignment replacement/effective-date editing, comprehensive historical scheduling tests.
 - Full attendance HR date filters/drilldowns, independent correction rejection reasons, administrative reconciliation retry/audit.
 - Reports need task links, configurable cutoff/late flags, missing-report calculation with work-calendar/leave exceptions, report status counts for HR and accessible revision-history UI.
-- Persistent global job-run records, report reminders, invitation cleanup and monitored scheduling are incomplete. Attendance reconciliation and email leases exist, but there is no deployed scheduler.
+- Durable attendance jobs/attempts, Operations monitoring, audited resume/retry and daily Hobby schedule are implemented. First natural scheduled invocation, report reminders, invitation cleanup, broader job types, advanced monitoring/pagination/alerts and historical-gap detection remain. Email leases exist; internet delivery and its worker schedule are not configured.
 
 ## Internships and operations
 
