@@ -12,7 +12,7 @@ Production target is Supabase + Vercel; see deployment.md. Supabase session/prov
 
 ## Release gates still open
 
-Real SMTP journey, privileged MFA, shared operational job-run monitoring, full API/security/browser acceptance, least-privilege database credentials, deployment, backup restore into a separate database, rollback compatibility and incident drills. Do not claim recovery from a successful backup command alone. The local embedded distribution does not include pg_dump/pg_restore; install PostgreSQL client tools or use the approved database provider before the restore drill.
+Verified employee SMTP/inbox journey, privileged MFA, shared operational job-run monitoring, full API/security/browser acceptance, least-privilege database credentials, deployment, backup restore into a separate database, rollback compatibility and incident drills. Do not claim recovery from a successful backup command alone. The local embedded distribution does not include pg_dump/pg_restore; install PostgreSQL client tools or use the approved database provider before the restore drill.
 
 ## Invitation controls and email state
 
@@ -20,6 +20,6 @@ People lists invitation status and email queue state for super admins; HR sees/m
 
 Outbox now stores invitationId and canceledAt. Resend, revoke and acceptance cancel outstanding old mail. Workers skip canceled rows; a message already in flight can arrive, but its invalidated link cannot create an account. deliveredAt means SMTP server acceptance, not verified inbox receipt. Failed SMTP attempts remain queued for bounded retries. Do not expose outbox text, token hashes or provider IDs through browser lists/logs.
 
-Without complete SMTP configuration the scheduled pass reports mailStatus=NOT_CONFIGURED or INVALID, claims no email and still reconciles attendance. SMTP service and recurring scheduler are not yet configured for the personal demo. Configure a verified sender and credentials privately before testing internet delivery; do not enqueue real employee invites before that acceptance check.
+Without complete SMTP configuration the scheduled pass reports mailStatus=NOT_CONFIGURED or INVALID, claims no email and still reconciles attendance. Resend is now configured for owner-only demo email, and the daily attendance schedule is registered. Created/resent invitations get one scoped post-commit send attempt. The daily cron sends no mail; an unattended retry worker and verified domain remain. See [email operations](email.md) before real employee invitations.
 
 Remote SMTP uses certificate verification and implicit TLS/required STARTTLS; transport behavior follows the [official Nodemailer SMTP guidance](https://nodemailer.com/smtp). Loopback fixtures remain local-only, and hosted settings reject localhost relays.

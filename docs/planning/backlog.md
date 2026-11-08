@@ -12,7 +12,7 @@ This list is deliberately explicit: the full supplied specification is not compl
 
 ## Identity and people
 
-- Invitation resend/revoke UI/API and expiration/revocation/concurrency tests are implemented. Real email/reset delivery, privileged MFA and recovery remain; Talha selected Resend but confirmed no domain is owned. The provider test sender reaches only the owner.
+- Invitation resend/revoke UI/API and expiration/revocation/concurrency tests are implemented. Employee email/reset delivery, privileged MFA and recovery procedures remain; Talha selected Resend but confirmed no domain is owned. The provider test sender reaches only the owner.
 - People detail/edit/profile screens, department/team administration, manager-cycle protection, team membership history and HR-safe directory/autocomplete scopes.
 - Role/deactivation services exist; management UI and concurrent security-change coverage remain.
 
@@ -29,13 +29,13 @@ This list is deliberately explicit: the full supplied specification is not compl
 - Holiday administration, schedule-assignment replacement/effective-date editing, comprehensive historical scheduling tests.
 - Full attendance HR date filters/drilldowns, independent correction rejection reasons, administrative reconciliation retry/audit.
 - Reports need task links, configurable cutoff/late flags, missing-report calculation with work-calendar/leave exceptions, report status counts for HR and accessible revision-history UI.
-- Durable attendance jobs/attempts, Operations monitoring, audited resume/retry and daily Hobby schedule are implemented. First natural scheduled invocation, report reminders, invitation cleanup, broader job types, advanced monitoring/pagination/alerts and historical-gap detection remain. Email leases exist; internet delivery and its worker schedule are not configured.
+- Durable attendance jobs/attempts, Operations monitoring, audited resume/retry and daily Hobby schedule are implemented. First natural scheduled invocation, report reminders, invitation cleanup, broader job types, advanced monitoring/pagination/alerts and historical-gap detection remain. Email leases and restricted owner inbox delivery are verified; a verified domain and unattended retry worker remain.
 
 ## Internships and operations
 
 - Internship enrollment, mentor assignment, milestones, eligible task links, weekly feedback and their screens/tests are not implemented.
 - Company settings, scoped HR audit view, operational failure dashboard, notification preferences and mark-all-read.
-- Real SMTP delivery, company hosting approval, security headers/CSP review and privileged MFA rollout. Restricted hosted runtime roles are already configured.
+- Verified company sender/domain, company hosting approval, security headers/CSP review and privileged MFA rollout. Restricted hosted runtime roles are already configured.
 - Representative 100-user performance measurement, broad accessibility audit, full pilot browser journey, backup restore drill, incident/rollback exercise.
 - Maintain clean-runner CI verification for each source milestone and record its exact run/commit in the test results.
 

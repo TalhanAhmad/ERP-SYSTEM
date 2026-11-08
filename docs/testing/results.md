@@ -14,15 +14,15 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm test:unit | PASS — 118 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
 | pnpm test:integration | PASS — 95 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 8 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 12.2 seconds on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 8 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 13.1 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | Monitored-job source 877addf pushed and verified by successful remote CI; report publication follows. |
+| Git commit/push | PASS | Email source 4d76a19 pushed and verified by successful CI 42481163707; current report updated. |
 
 ## Supabase/Vercel foundation verification
 
-Current milestone local results: 117 unit, 89 integration and 8 browser tests passed (214 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
+Current milestone local results: 118 unit, 95 integration and 8 browser tests passed (221 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
 
 Supabase SDK + real PostgreSQL contract tests verify safe session DTOs/HTTP-only cookies, server identity verification, client role metadata rejection, immediate domain deactivation denial, legacy endpoint closure, same-origin protection, generic reset results, internal-only redirects, sign-out cookie clearing and scheduler authentication. Provider HTTP is simulated in these tests; no live Supabase result is claimed. Separate PostgreSQL tests cover provisioning failure/retry/revocation/concurrency, RLS/grants and the bounded job pass.
 
@@ -226,4 +226,29 @@ Anonymous navigation to /operations redirected to /login. Production dependency 
 
 Initial fixture setup failed because Invitation.invitedBy has a real foreign key; corrected the synthetic inviter fixture. The new short-expiry case then exposed a real local database session time-zone mismatch. Explicit UTC startup options fixed timestamp comparisons; all suites passed after the fix, and the actual Supabase pooled connection accepted the option.
 
-Real Resend TLS/authentication and one owner-only self-test passed. Gmail search confirmed the requested test in INBOX. Supabase SMTP-only push/diff passed with other Auth/database/storage settings unchanged. Vercel release and reset inbox verification are pending at this checkpoint. This restricted sender cannot deliver employee invitations; inbox evidence is not a claim of complete password-reset mutation or company acceptance.
+Real Resend TLS/authentication and one owner-only self-test passed. Gmail search confirmed the requested test in INBOX. Supabase SMTP-only push/diff passed with other Auth/database/storage settings unchanged. Vercel release and actual owner reset inbox delivery are now verified below. This restricted sender cannot deliver employee invitations or arbitrary staff reset mail; company acceptance remains incomplete.
+
+## Transactional email milestone — deployed acceptance
+
+Source 4d76a19952f82abea5ad49f3650af14dc6103d50 is pushed to main. [GitHub Actions run 42481163707](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42481163707) passed all steps, including both production builds, fresh migrations, 221 tests and documentation checks. Vercel deployment dpl_H4vyzvankZvxXRABivHg8Z9nk3vc is READY at https://encova-workspace.vercel.app. No schema migration was required for this milestone.
+
+All 59 existing named live checks passed again (8 invitations/jobs, 15 core auth/work/attendance, 20 private-file, 3 layout/sign-out and 13 Operations), alongside these 12 email checks: 71 named live checks total. Synthetic identities were deactivated, real employee data was not used, and the owner's credentials were preserved. The first natural cron attempt is still not observed.
+
+| Live email check | Result |
+| --- | --- |
+| People reports restricted sender without claiming employee delivery | PASS |
+| Operations shows complete SMTP settings and the demo restriction | PASS |
+| Restriction notice is usable at 360px | PASS |
+| Password reset rejects foreign Origin | PASS |
+| Password reset rejects unknown input fields | PASS |
+| Actual forgot-password form calls the hosted backend with a neutral success state | PASS |
+| Missing-account reset response matches owner response | PASS |
+| Existing owner credentials and SUPER_ADMIN access still work | PASS |
+| Login HTML and JavaScript contain no SMTP key | PASS |
+| Actual live Supabase reset email arrived in the owner's Gmail INBOX | PASS |
+| Separately generated synthetic recovery token completes real callback, form and password change; new credentials verified at Supabase | PASS |
+| Synthetic password recovery does not reactivate its disabled domain account | PASS |
+
+The real SMTP self-test also arrived in the owner INBOX. Its separate connection/authentication test sent no message. The recovery mutation used a controlled provider-generated token for an already disabled synthetic member; it did not consume the owner's emailed recovery link or change the owner password. Full invitation/reset inbox acceptance for staff remains dependent on a verified domain.
+
+An obsolete cleanup step initially tried to sign in the member after the file suite had already deactivated it and correctly received 401. Corrected the private test orchestration, verified the identities remained inactive, then completed layout/Operations checks. This was a test-sequence correction, not an application access change. The mobile Operations screenshot was inspected. Local preview was refreshed at http://127.0.0.1:3000; local and live /login returned 200.

@@ -27,3 +27,7 @@ Add a domain you own to Resend and publish the provider-generated DNS records. A
 The daily attendance cron sends no email. Resend an invitation from People to replace its link and attempt fresh delivery. pnpm worker remains an explicit operator action that processes at most one queued email per pass; check the intended environment and queued recipients first. An unattended retry worker, bounce alerts and broader email monitoring remain backlog work.
 
 Provider references: [Resend SMTP](https://resend.com/docs/send-with-smtp), [default sender restrictions](https://resend.com/docs/knowledge-base/403-error-resend-dev-domain), [verified domains](https://resend.com/docs/dashboard/domains/introduction), [Supabase custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp).
+
+## Verified demo evidence
+
+The real SMTP self-test and the password reset requested from the live Vercel form both arrived in the owner's Gmail INBOX. The owner password was preserved. A separate controlled synthetic provider recovery token completed the live callback/form/password change and left the disabled domain account denied. Source 4d76a19 passed CI 42481163707; deployment dpl_H4vyzvankZvxXRABivHg8Z9nk3vc passed 71 named live checks. See [verification results](../testing/results.md) for scope and remaining dependencies.
