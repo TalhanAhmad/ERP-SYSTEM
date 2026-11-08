@@ -9,7 +9,7 @@ Last updated: 2026-11-08 (Asia/Karachi)
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
 - Implementation status: personal-testing demo deployed with monitored attendance jobs, an enabled daily schedule, private revision attachments and invitation management, plus restricted Resend email/reset delivery. Full specification and company production acceptance remain incomplete.
-- Publication: focused HR/announcement source 5155215 passed GitHub CI 42487129069 and is deployed as dpl_FVM6CY46egk1cz1c9pWgG5F3vvUK. Local verification: 121 unit, 104 integration and 10 browser tests (235 total), plus 21 hosted HR/announcement/auth/permission checks. Earlier milestone evidence remains recorded separately.
+- Publication: Super Admin account-management source d7fd89d passed GitHub CI 42515443745 and is deployed as dpl_14WHhC1sBzQ9JnYovXcnK9ewagNW. Local verification: 121 unit, 118 integration and 11 browser tests (250 total), plus 22 hosted account-management/permission/session checks. Earlier milestone evidence remains recorded separately.
 
 ## Implemented evidence
 
@@ -47,4 +47,4 @@ Focused HR attendance/leave/notifications and the shared Super Admin announcemen
 
 ## Account-management work
 
-Super Admin People search/filter/pagination and per-account profile/role/status controls are implemented locally. Final regression and hosted release are underway. HR remains focused on attendance, leave approvals and notifications. See [account management](operations/people-management.md). Department/team management and verified email changes remain separate follow-ups.
+Super Admin People search/filter/pagination and per-account profile/role/status controls are deployed and verified. All 250 automated tests, 22 hosted checks and source CI passed. HR remains focused on attendance, leave approvals and notifications. See [account management](operations/people-management.md). Department/team management and verified email changes remain separate follow-ups.

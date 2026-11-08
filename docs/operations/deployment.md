@@ -61,3 +61,5 @@ The eighth migration creates protected Attachment metadata with RLS/restricted-r
 The ninth migration adds protected JobRun/JobAttempt history and immutable audience/cursor rules. Operations supports super-admin dated queue/run/retry controls and safe queue counts. Schedule registration and protected manual execution are verified; the first natural timed invocation is separately pending.
 
 The tenth migration adds one protected shared announcement slot. The focused HR interface and announcement TTL/cleanup are documented in [HR and announcement operations](announcements-hr.md). Source 5155215 passed CI 42487129069; deployment dpl_FVM6CY46egk1cz1c9pWgG5F3vvUK passed 21 targeted hosted checks.
+
+Super Admin account-management source d7fd89d is deployed as dpl_14WHhC1sBzQ9JnYovXcnK9ewagNW, with successful CI 42515443745 and 22 hosted checks. It uses the existing ten migrations. See [People management](people-management.md) for role/status/session behavior and retained-work limits.

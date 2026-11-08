@@ -26,3 +26,5 @@ Node 24 LTS and pnpm 12.18.0 are required. Use synthetic data during development
 Super admins can use Operations for job progress and audited retries. The daily attendance schedule is registered; first natural execution is pending observation. See [job operations](docs/operations/jobs.md).
 
 Email setup and the restricted personal-demo sender are documented in [email operations](docs/operations/email.md). A verified domain is required before inviting other people by email.
+
+Super Admin can search/filter People and select Manage to edit a basic profile, change a role, deactivate or restore a linked account. See [account management](docs/operations/people-management.md).
