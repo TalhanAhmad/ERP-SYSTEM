@@ -31,4 +31,4 @@ Official CLI browser authentication resolved the connected-tool gap. Created a s
 
 ## Exact next action
 
-The attachment milestone is deployed and verified, including the exact 4 MiB boundary, two immutable revisions, private download scope and deactivation denial. Continue recurring job monitoring/scheduling and remaining ERP modules independently of the missing email service. SMTP/reset delivery, privileged MFA, backup restore, retention/orphan tooling, larger/resumable uploads and company production acceptance remain incomplete.
+Deploy and verify monitored attendance jobs and the daily demo schedule. Local verification passed 117 unit, 89 integration and 8 browser tests (214 total), typing/lint and production build. Private attachments remain live and previously verified. Email delivery, privileged MFA, restore and wider ERP requirements remain incomplete; natural scheduler execution must be observed separately after registration.

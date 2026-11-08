@@ -20,7 +20,15 @@ export async function GET(request: Request) {
     );
   try {
     return NextResponse.json(
-      { data: await scheduledPass() },
+      {
+        data: await scheduledPass(
+          undefined,
+          process.env,
+          request.headers.get("x-vercel-cron-schedule") === "15 0 * * *"
+            ? "CRON"
+            : "CLI",
+        ),
+      },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {

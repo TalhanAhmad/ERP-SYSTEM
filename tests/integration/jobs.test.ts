@@ -110,3 +110,21 @@ it("keeps queued mail untouched and attendance processing available without SMTP
     (await db.outbox.findUniqueOrThrow({ where: { id: record.id } })).attempts,
   ).toBe(0);
 });
+it("does not send queued email from a daily pass even when SMTP settings are present", async () => {
+  const record = await mail();
+  const { scheduledPass } = await import("@/server/jobs/scheduled");
+  const result = await scheduledPass(
+    undefined,
+    {
+      SMTP_HOST: "smtp.example.test",
+      SMTP_PORT: 587,
+      SMTP_FROM: "synthetic@example.test",
+    },
+    "CRON",
+  );
+  expect(result.mailStatus).toBe("READY");
+  expect(result.mailClaimed).toBe(0);
+  expect(
+    (await db.outbox.findUniqueOrThrow({ where: { id: record.id } })).attempts,
+  ).toBe(0);
+});

@@ -187,3 +187,9 @@ All twenty file checks below passed with the real provider, including a mobile b
 | Authorized reviewer retains historical file access after uploader deactivation | PASS |
 
 The exact-boundary draft and MIME fixtures were physically removed after testing. Two small submitted revision files remain as immutable synthetic history. The short/mobile screenshot was inspected, and the local preview was restarted to load the regenerated client; /login returned HTTP 200. Larger/resumable transfer, malware scanning/full format parsing, retention/orphan dashboards, SMTP/reset delivery, recurring scheduling, MFA and restore remain outside this acceptance.
+
+## Monitored attendance milestone — local checkpoint
+
+Typecheck/lint, 117 unit tests and 89 integration tests passed, including a 100-person active assigned audience, partial cursor resume, no-op request replay, atomic failure rollback, safe errors, competing claims, expired-lease abandonment, stale worker/role denial, corrected/raw-history preservation, schedule-date uniqueness and terminal-history protection. Real PostgreSQL is used; no production employee records are test fixtures.
+
+Repeated test runs initially captured previous active job.p fixtures in the dedicated test database. Retiring only this suite's old synthetic people fixed isolation; production audience filters were not narrowed. Reusing an already completed scheduled date was separated from testing terminal history. Initial compiler/lint findings corrected nullable system audit actors, Prisma selection typing and render-time clock work. Operations browser assertions were refined to distinguish job badges from attempt status/reason markup; the remaining seven existing browser tests passed throughout. Final browser/hosted evidence follows after rollout.

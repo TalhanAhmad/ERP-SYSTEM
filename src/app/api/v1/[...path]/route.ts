@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { context } from "@/server/context";
+import {
+  operationsSnapshot,
+  createAttendanceJob,
+  queueJobSchema,
+} from "@/server/jobs/monitoring";
 import { db } from "@/server/db";
 import { mutate } from "@/server/transaction";
 import { invariant } from "@/server/errors";
@@ -60,6 +65,11 @@ export async function GET(request: Request, { params }: Params) {
   try {
     const actor = await context(request.headers);
     const path = (await params).path.join("/");
+    if (path === "operations")
+      return NextResponse.json(
+        { data: await operationsSnapshot(actor) },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
     if (path === "me")
       return NextResponse.json({
         data: {
@@ -207,6 +217,8 @@ export async function POST(request: Request, { params }: Params) {
       request.headers.get("idempotency-key"),
       input,
       async (tx) => {
+        if (route === "operations/attendance-jobs")
+          return createAttendanceJob(tx, actor, queueJobSchema.parse(input));
         if (path[0] === "invitations" && path.length === 3) {
           const body = z
             .object({ expectedVersion: z.number().int().positive() })

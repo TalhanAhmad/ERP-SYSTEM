@@ -71,3 +71,9 @@ Implemented assignee draft upload/removal, selectable files per immutable submis
 Local verification passed 202 automated tests (117 unit, 78 integration, 7 browser), typing/lint and the production build. Tests include real SDK protocol interactions against an isolated fixture. Hosted deployment dpl_8875MGEvjDMFNBnoNgSdWqMCq7Dr is READY, with eight migrations applied. Real-provider acceptance passed twenty file checks and twenty-six other live regression checks (46 total). Source 7f0de97 passed CI run 42467966752. See docs/operations/files.md for limits, access, retry/recovery and explicit release boundaries.
 
 The real 4 MiB object round-tripped with matching digest, and a one-byte-larger upload was rejected. Draft deletion removed the object from the actual bucket. Two submitted revisions retained their own downloadable bytes, including after uploader deactivation; that deactivated account itself was denied. Both synthetic file-test accounts were deactivated and no real employee data or external email was used.
+
+## Monitored attendance milestone
+
+Implemented immutable audience snapshots, atomic per-person cursor checkpoints, claimed attempt history, safe failures and audited resume/retry controls. Added a super-admin-only Operations UI/API, preserved corrected/raw attendance and made manual processing stop after operator revocation. The ninth additive migration protects JobRun/JobAttempt with RLS, server-role grants and terminal-history constraints. Clock-modulo user selection is replaced by actual saved progress.
+
+A Hobby-compatible daily attendance cron is prepared for nominal 05:15 Karachi time (hourly precision); deployment registration and natural invocation are not yet claimed. Daily endpoint email sending is disabled. See docs/operations/jobs.md for scope, retry and throughput/recovery limits. Local type/lint, 117 unit, 89 integration and 8 browser checks passed (214 total), plus the production build. Hosted rollout is underway.

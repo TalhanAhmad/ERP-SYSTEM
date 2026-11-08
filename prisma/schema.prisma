@@ -420,3 +420,44 @@ model ReportRevision {
  createdAt DateTime @default(now()) @db.Timestamptz
  @@unique([reportId,version])
 }
+
+model JobRun {
+ id String @id @default(uuid()) @db.Uuid
+ kind String @default("ATTENDANCE")
+ workDate DateTime @db.Date
+ reason String
+ source String
+ requestedBy String? @db.Uuid
+ scheduleKey String? @unique
+ audience String[] @db.Uuid
+ total Int
+ cursor Int @default(0)
+ updatedCount Int @default(0)
+ status String @default("QUEUED")
+ activeAttemptId String? @db.Uuid
+ leaseUntil DateTime? @db.Timestamptz
+ errorCode String?
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ finishedAt DateTime? @db.Timestamptz
+ attempts JobAttempt[]
+ @@index([status,createdAt])
+}
+model JobAttempt {
+ id String @id @default(uuid()) @db.Uuid
+ runId String @db.Uuid
+ run JobRun @relation(fields:[runId],references:[id],onDelete:Restrict)
+ requestKey String
+ source String
+ actorId String? @db.Uuid
+ reason String
+ status String @default("RUNNING")
+ startCursor Int
+ endCursor Int
+ errorCode String?
+ startedAt DateTime @default(now()) @db.Timestamptz
+ finishedAt DateTime? @db.Timestamptz
+ @@unique([runId,requestKey])
+ @@index([runId,startedAt])
+}

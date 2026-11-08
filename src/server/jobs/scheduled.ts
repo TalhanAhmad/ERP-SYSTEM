@@ -1,45 +1,67 @@
 import "server-only";
 import { db } from "../db";
 import { workDate } from "@/lib/dates";
-import { reconcileAttendance } from "./attendance";
 import { processOutbox } from "./outbox";
 import { emailSender } from "./email";
 import { emailStatus } from "@/lib/email-config";
-// Bounded passes resume through durable email leases and deterministic date slices.
-// Configure a recurring scheduler; Vercel does not run a permanent Node worker.
+import { ensureScheduledAttendance, runAttendanceJob } from "./monitoring";
+// A real cursor/snapshot replaces clock-modulo user selection. Each person and
+// its cursor checkpoint commit together; short passes leave resumable work.
 export async function scheduledPass(
   send?: Parameters<typeof processOutbox>[0],
   emailInput: Record<string, unknown> = process.env,
+  source: "CRON" | "CLI" = "CLI",
+  allowEmail = false,
 ) {
-  const now = new Date();
-  const day = workDate(now);
-  const active = await db.person.count({ where: { status: "ACTIVE" } });
-  const slice =
-    Math.floor(now.getTime() / 60000) % Math.max(1, Math.ceil(active / 20));
-  const users = await db.person.findMany({
-    where: { status: "ACTIVE" },
-    select: { id: true },
-    orderBy: { id: "asc" },
-    skip: slice * 20,
-    take: 20,
-  });
+  const deadline = Date.now() + 35000;
   const mailStatus = send ? "INJECTED" : emailStatus(emailInput);
   const sender =
-    send ?? (mailStatus === "READY" ? emailSender(emailInput) : undefined);
+    send ??
+    (allowEmail && mailStatus === "READY"
+      ? emailSender(emailInput)
+      : undefined);
   const mail = sender ? await processOutbox(sender, 1) : { claimed: 0 };
-  let updated = 0;
-  for (const date of [workDate(new Date(now.getTime() - 86400000)), day])
-    updated += (
-      await reconcileAttendance(date, now, {
-        userIds: users.map((user) => user.id),
-      })
-    ).updated;
-  await db.rateLimit.deleteMany({ where: { expiresAt: { lt: now } } });
-  await db.idempotency.deleteMany({ where: { expiresAt: { lt: now } } });
+  await ensureScheduledAttendance(workDate(new Date(Date.now() - 86400000)));
+  const jobs: Awaited<ReturnType<typeof runAttendanceJob>>[] = [];
+  let attendanceUpdated = 0;
+  for (let n = 0; n < 5 && Date.now() < deadline - 5000; n++) {
+    const candidate = await db.jobRun.findFirst({
+      where: {
+        OR: [
+          { status: "QUEUED" },
+          { status: "RUNNING", leaseUntil: { lt: new Date() } },
+        ],
+      },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    });
+    if (!candidate) break;
+    try {
+      const job = await runAttendanceJob(
+        candidate.id,
+        crypto.randomUUID(),
+        null,
+        { reason: "Scheduled reconciliation/resume" },
+        source,
+        { deadline },
+      );
+      jobs.push(job);
+      attendanceUpdated += Math.max(
+        0,
+        job.updatedCount - candidate.updatedCount,
+      );
+      if (job.status !== "SUCCEEDED") break;
+    } catch (error) {
+      if ((error as { code?: string }).code === "JOB_BUSY") continue;
+      throw error;
+    }
+  }
+  await db.rateLimit.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+  await db.idempotency.deleteMany({ where: { expiresAt: { lt: new Date() } } });
   return {
     mailClaimed: mail.claimed,
     mailStatus,
-    attendanceUpdated: updated,
-    slice,
+    attendanceUpdated,
+    jobs,
+    slice: jobs.length ? Math.floor(jobs[jobs.length - 1].processed / 20) : 0,
   };
 }

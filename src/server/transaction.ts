@@ -105,7 +105,7 @@ export async function mutate(
 }
 export async function audit(
   tx: Tx,
-  actorId: string,
+  actorId: string | null,
   action: string,
   entityId: string,
   changes: Prisma.InputJsonValue = {},

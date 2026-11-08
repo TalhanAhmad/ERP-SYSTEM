@@ -682,3 +682,21 @@ fieldset {
   margin-top: 16px;
   padding: 12px;
 }
+
+.badge.SUCCEEDED {
+  color: var(--accent);
+  background: var(--light);
+}
+.badge.FAILED,
+.badge.INTERRUPTED {
+  color: #a0503c;
+  background: #fae9e4;
+}
+.badge.RUNNING {
+  color: #8b6b27;
+  background: #f7efdb;
+}
+progress {
+  width: 100%;
+  accent-color: var(--accent);
+}

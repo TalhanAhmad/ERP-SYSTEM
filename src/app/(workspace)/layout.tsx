@@ -56,10 +56,16 @@ export default async function Workspace({
             </Link>
           )}
           {person.role === "SUPER_ADMIN" && (
-            <Link href="/audit">
-              <Shield size={17} />
-              Audit log
-            </Link>
+            <>
+              <Link href="/operations">
+                <Shield size={17} />
+                Operations
+              </Link>
+              <Link href="/audit">
+                <Shield size={17} />
+                Audit log
+              </Link>
+            </>
           )}
         </nav>
         <div className="sidebar-footer">
