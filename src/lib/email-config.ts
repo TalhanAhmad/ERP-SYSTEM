@@ -10,6 +10,10 @@ const schema = z
       .refine((v) => !/[\s/@]/.test(v)),
     SMTP_PORT: z.coerce.number().int().min(1).max(65535),
     SMTP_FROM: z.email(),
+    SMTP_TEST_RECIPIENT: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z.email().optional(),
+    ),
     SMTP_USER: z.preprocess(
       (v) => (v === "" ? undefined : v),
       z.string().min(1).optional(),
@@ -23,19 +27,34 @@ const schema = z
   .refine((v) => Boolean(v.SMTP_USER) === Boolean(v.SMTP_PASSWORD))
   .refine(
     (v) =>
+      v.SMTP_HOST.toLowerCase() !== "smtp.resend.com" ||
+      v.SMTP_FROM.split("@")[1]?.toLowerCase() !== "resend.dev" ||
+      Boolean(v.SMTP_TEST_RECIPIENT),
+  )
+  .refine(
+    (v) =>
       !["production", "preview"].includes(v.VERCEL_ENV ?? "") ||
       !localHosts.has(v.SMTP_HOST.toLowerCase()),
   );
 export function emailStatus(input: Record<string, unknown> = process.env) {
   if (
-    !["SMTP_HOST", "SMTP_PORT", "SMTP_FROM", "SMTP_USER", "SMTP_PASSWORD"].some(
-      (k) => input[k] !== undefined && input[k] !== "",
-    )
+    ![
+      "SMTP_HOST",
+      "SMTP_PORT",
+      "SMTP_FROM",
+      "SMTP_USER",
+      "SMTP_PASSWORD",
+      "SMTP_TEST_RECIPIENT",
+    ].some((k) => input[k] !== undefined && input[k] !== "")
   )
     return "NOT_CONFIGURED" as const;
   return schema.safeParse(input).success
     ? ("READY" as const)
     : ("INVALID" as const);
+}
+export function emailTestMode(input: Record<string, unknown> = process.env) {
+  const parsed = schema.safeParse(input);
+  return parsed.success && Boolean(parsed.data.SMTP_TEST_RECIPIENT);
 }
 export function smtpConfiguration(
   input: Record<string, unknown> = process.env,
@@ -59,5 +78,5 @@ export function smtpConfiguration(
       ? { auth: { user: v.SMTP_USER, pass: v.SMTP_PASSWORD } }
       : {}),
   };
-  return { options, from: v.SMTP_FROM };
+  return { options, from: v.SMTP_FROM, testRecipient: v.SMTP_TEST_RECIPIENT };
 }

@@ -11,6 +11,7 @@ export function databaseOptions(
       max,
       connectionTimeoutMillis: 10000,
       idleTimeoutMillis: 20000,
+      options: "-c timezone=UTC",
     };
   const url = new URL(connectionString);
   // pg connection-string SSL parameters replace the explicit ssl object. Remove
@@ -30,6 +31,7 @@ export function databaseOptions(
     max,
     connectionTimeoutMillis: 10000,
     idleTimeoutMillis: 20000,
+    options: "-c timezone=UTC",
     ssl: { ca, rejectUnauthorized: true },
   };
 }

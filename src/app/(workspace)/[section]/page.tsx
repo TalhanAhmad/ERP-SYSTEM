@@ -23,7 +23,7 @@ import {
   InvitationAction,
 } from "@/components/work-forms";
 import { listInvitations } from "@/modules/identity/service";
-import { emailStatus } from "@/lib/email-config";
+import { emailStatus, emailTestMode } from "@/lib/email-config";
 export default async function Section({
   params,
 }: {
@@ -324,10 +324,18 @@ export default async function Section({
                 until an email service is connected.
               </p>
             )}
+            {emailTestMode() && (
+              <p className="note" role="status">
+                Email is in personal demo mode and can only reach the configured
+                test inbox. Invitations to other people need a verified sending
+                domain.
+              </p>
+            )}
             <p className="note">
-              Resending replaces the previous link and queues a new email.
-              Revoking prevents account creation. An email already being sent
-              may still arrive, but its canceled link will not work.
+              Sending or resending attempts email delivery when the service is
+              configured. Resending replaces the previous link. Revoking
+              prevents account creation. An email already being sent may still
+              arrive, but its canceled link will not work.
             </p>
             {invitations.length === 0 ? (
               <Empty text="No invitations yet." />

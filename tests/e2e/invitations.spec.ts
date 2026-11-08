@@ -32,7 +32,7 @@ test("administrator resends/revokes invitations and only a replacement link crea
       await form.getByLabel("Username").fill(`browser.${suffix}`);
       await form.getByLabel("Email", { exact: true }).fill(email);
       await form
-        .getByRole("button", { name: "Queue invitation", exact: true })
+        .getByRole("button", { name: "Send invitation", exact: true })
         .click();
       const row = page.getByRole("row").filter({ hasText: email });
       await expect(row).toBeVisible();

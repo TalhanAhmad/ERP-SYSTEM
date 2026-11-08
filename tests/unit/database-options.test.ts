@@ -5,6 +5,7 @@ describe("Verified provider TLS configuration", () => {
     const url = "postgresql://local:local@localhost:5432/encova_dev";
     expect(databaseOptions(url).connectionString).toBe(url);
     expect(databaseOptions(url).ssl).toBeUndefined();
+    expect(databaseOptions(url).options).toBe("-c timezone=UTC");
   });
   it.each(["disable", "require", "verify-full"])(
     "prevents URL sslmode=%s from replacing the trusted CA",

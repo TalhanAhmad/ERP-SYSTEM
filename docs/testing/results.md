@@ -11,8 +11,8 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm db:migrate:deploy on dev/test | PASS | Nine migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
-| pnpm test:unit | PASS — 117 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
-| pnpm test:integration | PASS — 89 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
+| pnpm test:unit | PASS — 118 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
+| pnpm test:integration | PASS — 95 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
 | pnpm test:e2e | PASS — 8 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 12.2 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
@@ -219,3 +219,11 @@ All thirteen new live Operations checks below passed. The existing eight invitat
 Vercel project metadata confirms one definition for /api/internal/jobs at 15 0 * * *, enabledAt set, disabledAt null and the current deployment ID. This verifies registration/enabled state, not actual timed delivery. The natural automatic invocation marker is still empty; wait for the first daily window and inspect Operations/provider logs. Manual protected invocations are classified Service/CLI, not Schedule. No billing upgrade was made. Daily endpoint email sending is disabled even if SMTP credentials are later supplied; mail worker setup/acceptance is separate.
 
 Anonymous navigation to /operations redirected to /login. Production dependency audit reported no known vulnerabilities. The local preview was restarted after client regeneration, preserving local database/session data. Full company throughput, automatic first-run observation, alerts, historical gap detection, real mail/MFA and restore remain unverified.
+
+## Transactional email milestone — local and provider transport
+
+118 unit, 95 integration and 8 Chromium tests passed (221 total), plus strict typecheck/lint and production build. SMTP tests use a real loopback protocol server; the actual HTTP invitation mutation sends after commit, an idempotent replay does not send twice, rejection remains durably queued, unrelated messages are untouched, expired invitations are skipped and test-recipient restrictions are enforced before SMTP. Connection-only verification emits no mail and redacts failure details.
+
+Initial fixture setup failed because Invitation.invitedBy has a real foreign key; corrected the synthetic inviter fixture. The new short-expiry case then exposed a real local database session time-zone mismatch. Explicit UTC startup options fixed timestamp comparisons; all suites passed after the fix, and the actual Supabase pooled connection accepted the option.
+
+Real Resend TLS/authentication and one owner-only self-test passed. Gmail search confirmed the requested test in INBOX. Supabase SMTP-only push/diff passed with other Auth/database/storage settings unchanged. Vercel release and reset inbox verification are pending at this checkpoint. This restricted sender cannot deliver employee invitations; inbox evidence is not a claim of complete password-reset mutation or company acceptance.

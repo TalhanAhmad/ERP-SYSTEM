@@ -5,14 +5,14 @@ This list is deliberately explicit: the full supplied specification is not compl
 ## Supabase/Vercel cutover priority
 
 - The personal demo is already deployed to isolated Supabase/Vercel projects. Complete company production acceptance separately; do not treat the demo as acceptance of the full specification.
-- Configure a verified email sender/company SMTP and a mail-worker schedule. The daily attendance schedule is registered/enabled; observe its first natural invocation. Pooled runtime/controlled migrations, closed signup, initial hosted admin linkage and private bucket are implemented and verified.
+- Verify an owned Resend sending domain and complete employee invitation/reset inbox acceptance plus an unattended mail retry worker. The restricted personal-demo sender has verified owner-only SMTP/inbox delivery. The daily attendance schedule is registered/enabled; observe its first natural invocation. Pooled runtime/controlled migrations, closed signup, initial hosted admin linkage and private bucket are implemented and verified.
 - Complete live Auth/reset/session-revocation/MFA acceptance, actual function/pool measurements and backup restore. Bounded private task-submission upload/download and access tests are now implemented and verified.
 - Remove the temporary local Better Auth compatibility only after the Supabase local/staging/production flows are verified; keep domain IDs/history.
 - Keep both provider contract tests and live Supabase acceptance. Current live sessions/work/attendance are verified with synthetic records; inbox/reset delivery, provider-wide revocation and MFA acceptance remain.
 
 ## Identity and people
 
-- Invitation resend/revoke UI/API and expiration/revocation/concurrency tests are implemented. Real email/reset delivery, privileged MFA and recovery remain; Talha confirmed no email service exists.
+- Invitation resend/revoke UI/API and expiration/revocation/concurrency tests are implemented. Real email/reset delivery, privileged MFA and recovery remain; Talha selected Resend but confirmed no domain is owned. The provider test sender reaches only the owner.
 - People detail/edit/profile screens, department/team administration, manager-cycle protection, team membership history and HR-safe directory/autocomplete scopes.
 - Role/deactivation services exist; management UI and concurrent security-change coverage remain.
 

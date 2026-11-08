@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { emailStatus, smtpConfiguration } from "@/lib/email-config";
+import {
+  emailStatus,
+  emailTestMode,
+  smtpConfiguration,
+} from "@/lib/email-config";
 const hosted = {
   SMTP_HOST: "smtp.example.test",
   SMTP_PORT: 587,
@@ -9,6 +13,24 @@ const hosted = {
   VERCEL_ENV: "production",
 };
 describe("SMTP configuration boundaries", () => {
+  it("requires an explicit test inbox for Resend's restricted default sender", () => {
+    const config = {
+      ...hosted,
+      SMTP_HOST: "smtp.resend.com",
+      SMTP_FROM: "onboarding@resend.dev",
+    };
+    expect(emailStatus(config)).toBe("INVALID");
+    expect(
+      emailStatus({ ...config, SMTP_TEST_RECIPIENT: "owner@example.test" }),
+    ).toBe("READY");
+    expect(
+      emailTestMode({ ...config, SMTP_TEST_RECIPIENT: "owner@example.test" }),
+    ).toBe(true);
+    expect(emailTestMode(hosted)).toBe(false);
+    expect(emailStatus({ ...config, SMTP_FROM: "malformed-address" })).toBe(
+      "INVALID",
+    );
+  });
   it("reports absent credentials without trying to send", () =>
     expect(emailStatus({})).toBe("NOT_CONFIGURED"));
   it("requires complete settings and paired credentials", () => {

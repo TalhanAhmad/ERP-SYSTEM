@@ -21,7 +21,7 @@ See [the backlog](planning/backlog.md). No internship workflow, advanced spreads
 
 ## Blockers and dependencies
 
-Actual company policies, real SMTP delivery and backup-client tooling/restore demonstration remain unresolved for pilot. Git author identity has been supplied and configured locally. GitHub CLI browser authentication completed as TalhanAhmad with credentials stored in the system keyring; repository ADMIN access and HTTPS push succeeded. Node/pnpm/PostgreSQL were recovered for development; Docker remains unavailable.
+Actual company policies, a verified sending domain, full employee email delivery and backup-client tooling/restore demonstration remain unresolved for pilot. Git author identity has been supplied and configured locally. GitHub CLI browser authentication completed as TalhanAhmad with credentials stored in the system keyring; repository ADMIN access and HTTPS push succeeded. Node/pnpm/PostgreSQL were recovered for development; Docker remains unavailable.
 
 ## Production stack decision
 
@@ -31,4 +31,4 @@ Official CLI browser authentication resolved the connected-tool gap. Created a s
 
 ## Exact next action
 
-Monitored attendance jobs and Operations are deployed. Vercel confirms the daily 00:15 UTC schedule is registered/enabled (around 05:15 Karachi, Hobby hourly precision); its first natural invocation has not yet been observed. Manual protected execution and recovery passed. Next remaining work includes SMTP/reset delivery, a mail-worker schedule, report reminders/cleanup/alerts, privileged MFA, restore and remaining ERP modules. Full company production acceptance remains incomplete.
+Monitored attendance jobs and Operations are deployed. Vercel confirms the daily 00:15 UTC schedule is registered/enabled (around 05:15 Karachi, Hobby hourly precision); its first natural invocation has not yet been observed. Manual protected execution and recovery passed. Resend SMTP is now authenticated and self-test inbox delivery verified; its restricted sender reaches only the owner until a domain is verified. Hosted app deployment/reset inbox verification is underway. Next remaining work includes a verified sender domain, an unattended mail retry worker, report reminders/cleanup/alerts, privileged MFA, restore and remaining ERP modules. Full company production acceptance remains incomplete.

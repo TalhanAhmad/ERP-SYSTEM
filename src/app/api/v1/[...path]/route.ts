@@ -8,6 +8,7 @@ import {
 } from "@/server/jobs/monitoring";
 import { db } from "@/server/db";
 import { mutate } from "@/server/transaction";
+import { dispatchInvitationEmail } from "@/server/jobs/invitation-email";
 import { invariant } from "@/server/errors";
 import { failure, jsonBody, mutationOrigin, rateLimit } from "@/server/http";
 import {
@@ -366,6 +367,13 @@ export async function POST(request: Request, { params }: Params) {
         );
       },
     );
+    if (
+      route === "invitations" ||
+      (path[0] === "invitations" && path.length === 3 && path[2] === "resend")
+    ) {
+      const result = z.object({ id: uuid }).parse(data);
+      await dispatchInvitationEmail(result.id);
+    }
     return NextResponse.json({ data });
   } catch (error) {
     return failure(error, requestId);
@@ -409,3 +417,4 @@ export async function PATCH(request: Request, { params }: Params) {
 }
 
 export const runtime = "nodejs";
+export const maxDuration = 60;

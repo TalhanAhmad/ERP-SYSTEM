@@ -2,6 +2,7 @@ import { context } from "@/server/context";
 import { notFound } from "next/navigation";
 import { operationsSnapshot } from "@/server/jobs/monitoring";
 import { Status } from "@/components/status";
+import { emailTestMode } from "@/lib/email-config";
 import {
   QueueAttendanceJob,
   RunJob,
@@ -32,6 +33,12 @@ export default async function Operations() {
           resume below. Schedule registration does not confirm an automatic
           invocation; review attempt history.
         </p>
+        {emailTestMode() && (
+          <p className="note">
+            Personal demo email is restricted to the configured test inbox.
+            Other recipients require a verified sending domain.
+          </p>
+        )}
         <p>
           Last automatic attempt:{" "}
           {data.lastAutomaticAttempt

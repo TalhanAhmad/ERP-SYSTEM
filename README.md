@@ -24,3 +24,5 @@ pnpm dev
 Node 24 LTS and pnpm 12.18.0 are required. Use synthetic data during development. The hosted deployment is for personal testing; no real employee-data migration or company production acceptance has been performed.
 
 Super admins can use Operations for job progress and audited retries. The daily attendance schedule is registered; first natural execution is pending observation. See [job operations](docs/operations/jobs.md).
+
+Email setup and the restricted personal-demo sender are documented in [email operations](docs/operations/email.md). A verified domain is required before inviting other people by email.

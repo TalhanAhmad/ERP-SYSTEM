@@ -22,8 +22,8 @@ export function InvitationForm({
   return (
     <MutationForm
       endpoint="/api/v1/invitations"
-      label="Queue invitation"
-      successMessage="Invitation queued for email delivery."
+      label="Send invitation"
+      successMessage="Invitation saved. Check its email status below."
     >
       <div className="form-grid">
         <label>

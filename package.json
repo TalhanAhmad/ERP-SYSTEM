@@ -19,6 +19,7 @@
     "verify:docs": "python3 scripts/verify-docs.py",
     "db:local": "tsx scripts/local-db.ts",
     "worker": "tsx --conditions=react-server scripts/worker.ts",
+    "email:verify": "tsx --conditions=react-server scripts/verify-email.ts",
     "test:e2e:prepare": "tsx --conditions=react-server tests/e2e/prepare.ts",
     "reconcile:attendance": "tsx --conditions=react-server scripts/reconcile-attendance.ts",
     "report:export": "python3 scripts/export-report.py",

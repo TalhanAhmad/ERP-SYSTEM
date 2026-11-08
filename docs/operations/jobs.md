@@ -24,7 +24,7 @@ Only an active SUPER_ADMIN can read Operations, queue a dated reconciliation or 
 
 The scheduled endpoint requires the configured CRON_SECRET bearer header. It classifies an authenticated request with the configured x-vercel-cron-schedule header as CRON; plain authenticated/manual service calls are classified CLI/Service. The header is telemetry, not the authentication boundary. The Operations card records the last CRON attempt so a manual test is not presented as a natural scheduled invocation.
 
-No recurring external email sending is enabled by this schedule. Queued/failed email counts and configuration state are visible without recipients, message bodies or invitation tokens. `pnpm worker` is an explicit controlled CLI action that can process one email when SMTP is configured, alongside attendance. No SMTP provider currently exists. Internet delivery and a suitable mail-worker schedule remain incomplete.
+No recurring external email sending is enabled by this schedule. Queued/failed email counts and configuration state are visible without recipients, message bodies or invitation tokens. `pnpm worker` is an explicit controlled CLI action that can process one email when SMTP is configured, alongside attendance. Resend is configured for restricted personal-demo delivery. Created/resent invitations now get one targeted post-commit attempt; the daily schedule still never drains email. An unattended retry worker and verified domain remain incomplete. See [email operations](email.md).
 
 `pnpm reconcile:attendance YYYY-MM-DD "Reason"` creates an audited CLI job and runs a bounded pass. Use Operations to resume any remaining work. CLI credentials must belong to the intended environment; migration-owner credentials do not belong in Vercel functions.
 
