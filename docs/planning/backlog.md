@@ -28,12 +28,12 @@ This list is deliberately explicit: the full supplied specification is not compl
 
 - Calendar administration and schedule replacement with history/race protections are deployed and verified (281 tests, green CI and 18 hosted checks).
 - Full attendance HR date filters/drilldowns, independent correction rejection reasons, administrative reconciliation retry/audit.
-- Report links, cutoff/late snapshots, calendar/leave missing status and revision history are implemented and locally verified. HR report status is superseded by the owner’s focused HR scope. Hosted acceptance is underway.
+- Report links, cutoff/late snapshots, calendar/leave missing status and revision history are implemented and locally verified. HR report status is superseded by the owner’s focused HR scope. Hosted acceptance passed (source 60c1d3d, CI 42661510686, 20 live checks).
 - Durable attendance jobs/attempts, Operations monitoring, audited resume/retry and daily Hobby schedule are implemented. First natural scheduled invocation, report reminders, invitation cleanup, broader job types, advanced monitoring/pagination/alerts and historical-gap detection remain. Email leases and restricted owner inbox delivery are verified; a verified domain and unattended retry worker remain.
 
 ## Internships and operations
 
-- Internship enrollment, mentor assignment, evidence-linked milestones and weekly feedback are implemented and passed the full 300-test acceptance; hosted publication/verification is underway.
+- Internship enrollment, mentor assignment, evidence-linked milestones and weekly feedback are deployed and verified with 300 automated checks, green CI and 20 hosted checks.
 - Company settings, scoped HR audit view, operational failure dashboard, notification preferences and mark-all-read.
 - Verified company sender/domain, company hosting approval, security headers/CSP review and privileged MFA rollout. Restricted hosted runtime roles are already configured.
 - Representative 100-user performance measurement, broad accessibility audit, full pilot browser journey, backup restore drill, incident/rollback exercise.

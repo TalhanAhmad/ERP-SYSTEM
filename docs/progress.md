@@ -9,7 +9,7 @@ Last updated: 2026-11-09 (Asia/Karachi)
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
 - Implementation status: personal-testing demo deployed with monitored attendance jobs, an enabled daily schedule, private revision attachments and invitation management, plus restricted Resend email/reset delivery. Full specification and company production acceptance remain incomplete.
-- Publication: Expanded calendar/work/organization source 78a03c5 passed GitHub CI 42639937002 and is deployed as dpl_5Vhvx3dZw61j8UNvMTfpYmrfbBzx. Verified: 121 unit, 144 integration and 16 browser tests (281 total), plus 18 hosted checks. Earlier milestone evidence remains recorded separately.
+- Publication: Reports/learning/maintenance source 60c1d3d passed GitHub CI 42661510686 and is deployed as dpl_5ynWvZVcp16XqE1dN7jWkHDPTCZQ. Verified: 121 unit, 161 integration and 18 browser tests (300 total), plus 20 hosted checks. Earlier milestone evidence remains recorded separately.
 
 ## Implemented evidence
 
@@ -59,4 +59,4 @@ The owner requested completing remaining implementation before later revisions. 
 
 ## Reports, internships and maintenance — local acceptance complete
 
-Reports now have scoped links/status/history, first-submission timing and independent reasoned review. Internships have guarded enrollment, evidence-based milestones and private weekly feedback. Notifications support preferences/read-all; maintenance has deduplicated reminders, expiry cleanup, retry leases and Operations visibility. Focused HR is excluded from report obligations because its report-writing interface is intentionally unavailable. All 300 automated checks passed (121 unit, 161 integration, 18 browser), with production build and typing/lint. Fifteen migrations are applied locally; hosted publication/acceptance is next. Advanced tables/import/export and final security/release verification continue afterward.
+Reports now have scoped links/status/history, first-submission timing and independent reasoned review. Internships have guarded enrollment, evidence-based milestones and private weekly feedback. Notifications support preferences/read-all; maintenance has deduplicated reminders, expiry cleanup, retry leases and Operations visibility. Focused HR is excluded from report obligations because its report-writing interface is intentionally unavailable. All 300 automated checks passed (121 unit, 161 integration, 18 browser), with production build and typing/lint. Fifteen hosted migrations and preflight passed. Source 60c1d3d is deployed, CI 42661510686 passed and all 20 targeted live checks passed. Advanced tables/import/export and final security/release verification continue afterward.

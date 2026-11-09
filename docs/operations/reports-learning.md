@@ -23,3 +23,7 @@ The daily pass records maintenance leases, attempts, outcomes and safe errors. I
 Resend test mode still reaches only the owner. Recipient-filtered claims leave blocked recipients' attempts untouched. At-least-once SMTP retry may duplicate mail after an ambiguous provider timeout; provider message deduplication is used where supported. On Hobby the natural daily invocation has hourly precision, so reminder/email throughput is daily and bounded. The worker command uses the same services for an externally scheduled pass; no extra always-on backend is assumed. A verified sender domain and appropriate company scheduling/hosting approval remain required for staff rollout.
 
 Migrations fourteen/fifteen add report operations and learning tables with RLS/server-only grants. Apply before deploying the code. Policies stay unconfirmed demo defaults until the owner explicitly confirms them; existing owner/demo credentials remain unchanged.
+
+## Publication evidence
+
+Source 60c1d3d passed CI 42661510686, all 300 automated checks and 20 hosted checks. Fifteen hosted migrations and preflight passed; deployment dpl_5ynWvZVcp16XqE1dN7jWkHDPTCZQ is READY. The actual pilot included real provider-backed forms, private report histories, approved learning evidence, new-user attendance/correction/leave and controlled cleanup. Existing owner/exploration credentials are unchanged.
