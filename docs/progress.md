@@ -9,7 +9,7 @@ Last updated: 2026-11-09 (Asia/Karachi)
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
 - Implementation status: personal-testing demo deployed with monitored attendance jobs, an enabled daily schedule, private revision attachments and invitation management, plus restricted Resend email/reset delivery. Full specification and company production acceptance remain incomplete.
-- Publication: Dashboard/Assignments and attendance-role source ca49e9f passed GitHub CI 42606060629 and is deployed as dpl_FyaWEkk2TToL7vZZ2GykwmctheTC. Local verification: 121 unit, 126 integration and 13 browser tests (260 total), plus 24 hosted workflow/permission/cleanup checks. Earlier milestone evidence remains recorded separately.
+- Publication: Expanded calendar/work/organization source 78a03c5 passed GitHub CI 42639937002 and is deployed as dpl_5Vhvx3dZw61j8UNvMTfpYmrfbBzx. Verified: 121 unit, 144 integration and 16 browser tests (281 total), plus 18 hosted checks. Earlier milestone evidence remains recorded separately.
 
 ## Implemented evidence
 
@@ -55,4 +55,4 @@ Implemented the approved Assignments structure, clickable matching summary cards
 
 ## Authorized completion pass — underway
 
-The owner requested completing remaining implementation before later revisions. Calendar replacement/holidays, project/task lifecycle, organization/employment profiles and company settings are implemented and passed 281 automated checks (121 unit, 144 integration, 16 browser), plus typing/lint/build. Publication and live verification of this batch are underway. Reports/notifications/jobs, internships, advanced tables/import/export and release acceptance remain queued in [the completion plan](planning/completion-plan.md). External sending-domain and company-policy/pilot decisions remain owner dependencies; independent work continues.
+The owner requested completing remaining implementation before later revisions. Calendar replacement/holidays, project/task lifecycle, organization/employment profiles and company settings are implemented and passed 281 automated checks (121 unit, 144 integration, 16 browser), plus typing/lint/build. Source 78a03c5 is pushed/deployed; CI 42639937002 and all 18 live checks passed. Reports/notifications/jobs are in progress; internships, advanced tables/import/export and release acceptance remain queued in [the completion plan](planning/completion-plan.md). External sending-domain and company-policy/pilot decisions remain owner dependencies; independent work continues.

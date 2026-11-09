@@ -4,10 +4,10 @@ The owner asked to complete the remaining implementation before further revision
 
 | Workstream | Required deliverables | Status |
 | --- | --- | --- |
-| Calendar | Prospective schedule replacement/editing, holiday administration, history/race protections, understandable field errors | Implemented; six focused database tests passed; browser/release verification pending |
-| Work lifecycle | Project detail/edit/archive/restore, member removal guards, task editing/reassignment/cancel/reopen/comments, scoped detail API | Implemented; six focused database tests passed; browser/release verification pending |
-| Organization/settings | Departments/teams, current membership and manager-cycle checks, employee profile fields, versioned company/demo policies | Implemented; six focused database tests passed; browser/release verification pending |
-| Reports/notifications/jobs | Task links/revisions, cutoff/late/missing rules, reminders, cleanup, read-all/preferences, unattended restricted email retry | Queued |
+| Calendar | Prospective schedule replacement/editing, holiday administration, history/race protections, understandable field errors | Delivered; full 281-test regression, CI 42639937002 and 18 hosted checks passed |
+| Work lifecycle | Project detail/edit/archive/restore, member removal guards, task editing/reassignment/cancel/reopen/comments, scoped detail API | Delivered; full 281-test regression, CI 42639937002 and 18 hosted checks passed |
+| Organization/settings | Departments/teams, current membership and manager-cycle checks, employee profile fields, versioned company/demo policies | Delivered; full 281-test regression, CI 42639937002 and 18 hosted checks passed |
+| Reports/notifications/jobs | Task links/revisions, cutoff/late/missing rules, reminders, cleanup, read-all/preferences, unattended restricted email retry | In progress; services/schema and initial screens are being implemented |
 | Internships | Enrollment/mentor rules, milestones/approved-task evidence, independent completion, weekly feedback, role-scoped screens | Queued |
 | Tables/import/export | Scoped pagination/sort/filter, saved columns/views, keyboard operation, atomic bulk preview/commit, task CSV preview/commit and safe exports | Queued |
 | Release verification | Meaningful unit/database/browser tests, privileged MFA capability, restore drill, measured synthetic load, accessibility/security review, CI/live acceptance, final Word report | Queued |

@@ -19,3 +19,7 @@ Super Admin opens Organization to manage departments and teams. Referenced teams
 Private contacts are visible only through the self/Super Admin detail boundary and are omitted from organization DTOs, audit bodies and mutation results. HR intentionally keeps its reduced interface. Settings contains company name, fixed supported Asia/Karachi timezone, workweek, report cutoff/reminder control and explicit policy confirmation. Unconfirmed settings stay labeled as demo defaults. Settings never rewrite historical attendance or assigned policies.
 
 Migrations eleven through thirteen add versions, immutable task comments and versioned company settings/employment end dates. Apply through the controlled migration connection before deploying code. New tables use RLS with server-only grants. No passwords or billing settings change.
+
+## Release evidence
+
+Source 78a03c5 passed CI 42639937002, 281 automated tests and 18 hosted checks. Thirteen migrations are applied; deployment dpl_5Vhvx3dZw61j8UNvMTfpYmrfbBzx is READY. Existing owner/exploration accounts remain active. Owned synthetic placement records were cleared and test teams/departments/projects archived before retiring the new fixtures. No company policy, password or billing setting was changed during hosted acceptance.
