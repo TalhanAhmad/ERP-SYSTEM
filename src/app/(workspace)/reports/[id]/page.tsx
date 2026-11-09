@@ -1,3 +1,4 @@
+import { ReportEditor } from "@/components/report-editor";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -5,7 +6,7 @@ import { context } from "@/server/context";
 import { db } from "@/server/db";
 import { reportDetail } from "@/modules/reports/service";
 import { visibleTasks } from "@/modules/tasks/service";
-import { ReportForm, DecisionForm } from "@/components/day-forms";
+import { DecisionForm } from "@/components/day-forms";
 import { ReasonAction } from "@/components/lifecycle-forms";
 import { Status } from "@/components/status";
 export default async function Report({
@@ -42,11 +43,7 @@ export default async function Report({
       </div>
       <section className="panel">
         {item.userId === actor.id && item.status === "DRAFT" ? (
-          <ReportForm
-            date={item.workDate.toISOString().slice(0, 10)}
-            report={item}
-            tasks={tasks}
-          />
+          <ReportEditor key={item.version} report={item} tasks={tasks} />
         ) : (
           <>
             <h2>Completed work</h2>
@@ -58,14 +55,6 @@ export default async function Report({
           </>
         )}
         <div className="form-actions">
-          {item.userId === actor.id && item.status === "DRAFT" && (
-            <DecisionForm
-              resource="reports"
-              id={id}
-              version={item.version}
-              action="submit"
-            />
-          )}
           {item.userId !== actor.id && item.status === "SUBMITTED" && (
             <DecisionForm
               resource="reports"

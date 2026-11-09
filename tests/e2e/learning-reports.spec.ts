@@ -271,6 +271,11 @@ test("complete intern pilot: work approval, milestone, feedback, daily report re
       .click();
     await expect(admin.locator(".page-heading .badge")).toHaveText("draft");
     await intern.reload();
+    await intern.route("**/api/v1/reports/*", async (route) => {
+      if (route.request().method() === "PATCH")
+        await new Promise((resolve) => setTimeout(resolve, 400));
+      await route.continue();
+    });
     await intern
       .getByLabel("Completed work", { exact: true })
       .fill("Pilot report version two");
