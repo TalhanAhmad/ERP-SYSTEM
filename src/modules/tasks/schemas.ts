@@ -38,6 +38,7 @@ export const reviewTask = z
     expectedVersion: z.number().int().positive(),
     decision: z.enum(["APPROVE", "REQUEST_CHANGES"]),
     feedback: z.string().trim().max(2000),
+    overrideReason: z.string().trim().min(1).max(1000).optional(),
   })
   .strict()
   .refine((v) => v.decision !== "REQUEST_CHANGES" || v.feedback.length > 0, {

@@ -91,9 +91,13 @@ export async function saveDepartment(
   expected(old?.version ?? 0, input.expectedVersion);
   if (input.archived)
     invariant(
-      !(await tx.team.count({
-        where: { departmentId: id, archivedAt: null },
-      })) && !(await tx.employeeProfile.count({ where: { departmentId: id } })),
+      !(await tx.internship.count({
+        where: { departmentId: id, status: "ACTIVE" },
+      })) &&
+        !(await tx.team.count({
+          where: { departmentId: id, archivedAt: null },
+        })) &&
+        !(await tx.employeeProfile.count({ where: { departmentId: id } })),
       "DEPARTMENT_IN_USE",
       "Move teams and employee profiles before archiving this department.",
       409,

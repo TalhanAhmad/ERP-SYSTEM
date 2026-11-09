@@ -1,3 +1,4 @@
+import { MaintenanceForm } from "@/components/maintenance-form";
 import { context } from "@/server/context";
 import { notFound } from "next/navigation";
 import { operationsSnapshot } from "@/server/jobs/monitoring";
@@ -150,6 +151,48 @@ export default async function Operations() {
             </article>
           ))
         )}
+      </section>
+      <section className="panel">
+        <h2>Report reminders and invitation cleanup</h2>
+        <p className="muted">
+          Daily maintenance has durable leases, retry counts and deduplicated
+          reminders. The daily email pass retries at most one permitted queued
+          email; restricted demo email stays owner-only.
+        </p>
+        <MaintenanceForm today={data.today} date={data.previousDate} />
+      </section>
+      <section className="panel">
+        <h2>Recent maintenance runs</h2>
+        {data.maintenance.map((run) => (
+          <article className="revision" key={run.id}>
+            <div className="panel-heading">
+              <h3>
+                {run.date ?? "Maintenance"} · {run.source.toLowerCase()}
+              </h3>
+              <Status value={run.status} />
+            </div>
+            <p>
+              {run.reportReminders} report reminders · {run.expiredInvitations}{" "}
+              expired invitations · {run.attempts} attempts
+            </p>
+            <p className="note">
+              {run.createdAt.toISOString()}
+              {run.errorCode ? " · " + run.errorCode : ""}
+            </p>
+            {run.date &&
+              (run.status === "FAILED" ||
+                (run.status === "RUNNING" &&
+                  (!run.leaseUntil || run.leaseUntil < new Date()))) && (
+                <MaintenanceForm
+                  today={data.today}
+                  date={run.date}
+                  runId={run.id}
+                  attempts={run.attempts}
+                />
+              )}
+          </article>
+        ))}
+        {!data.maintenance.length && <p>No maintenance runs recorded yet.</p>}
       </section>
     </>
   );

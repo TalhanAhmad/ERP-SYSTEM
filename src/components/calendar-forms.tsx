@@ -1,4 +1,5 @@
 "use client";
+import { TextareaField } from "./textarea-field";
 import { MutationForm } from "./mutation-form";
 export function ReplaceScheduleForm({
   id,
@@ -51,10 +52,12 @@ export function ReplaceScheduleForm({
           />
         </label>
       </div>
-      <label>
-        Reason for schedule change
-        <textarea name="reason" required maxLength={1000} />
-      </label>
+      <TextareaField
+        label="Reason for schedule change"
+        name="reason"
+        required
+        maxLength={1000}
+      />
       <p className="note">
         Earlier dates keep their original schedule. Blank end keeps the existing
         end. Recorded attendance and reserved leave block changes in the

@@ -1,4 +1,5 @@
 "use client";
+import { TextareaField } from "./textarea-field";
 import { useState } from "react";
 import { MutationForm } from "./mutation-form";
 type Department = {
@@ -26,6 +27,7 @@ export function DepartmentForm({ item }: { item?: Department }) {
   return (
     <MutationForm
       endpoint={item ? "/api/v1/departments/" + item.id : "/api/v1/departments"}
+      resetOnSuccess={!item}
       label={item ? "Save department" : "Create department"}
       transform={(f) => ({
         expectedVersion: item?.version ?? 0,
@@ -62,6 +64,7 @@ export function TeamForm({
   return (
     <MutationForm
       endpoint={item ? "/api/v1/teams/" + item.id : "/api/v1/teams"}
+      resetOnSuccess={!item}
       label={item ? "Save team" : "Create team"}
       transform={(f) => ({
         ...Object.fromEntries(f),
@@ -153,6 +156,7 @@ export function EmployeeForm({
   return (
     <MutationForm
       endpoint={"/api/v1/employee-profiles/" + userId}
+      resetOnSuccess={false}
       label="Save employment profile"
       transform={(f) => {
         const data = Object.fromEntries(f);
@@ -243,14 +247,12 @@ export function EmployeeForm({
           </select>
         </label>
       </div>
-      <label>
-        Private contact (optional)
-        <textarea
-          name="privateContact"
-          maxLength={500}
-          defaultValue={item?.privateContact ?? ""}
-        />
-      </label>
+      <TextareaField
+        label="Private contact (optional)"
+        name="privateContact"
+        maxLength={500}
+        defaultValue={item?.privateContact ?? ""}
+      />
       <p className="note">
         Private contact is restricted to this person and Super Admin; it is
         omitted from the organization directory and audit text.

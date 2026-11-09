@@ -1,3 +1,10 @@
+import { InternshipsPage } from "@/modules/internships/page";
+import { ReportsPage, ReportStatusPage } from "@/modules/reports/page";
+import { notificationPreference } from "@/modules/notifications/service";
+import {
+  NotificationPreferences,
+  ReadAllNotifications,
+} from "@/components/notification-forms";
 import { OrganizationPage } from "@/modules/organization/page";
 import { companySettings } from "@/modules/settings/service";
 import { SettingsForm } from "@/components/settings-form";
@@ -57,6 +64,12 @@ export default async function Section({
   if (section === "people" && actor.role === "SUPER_ADMIN")
     return <AdminPeoplePage actor={actor} searchParams={await searchParams} />;
   if (!hrSectionAllowed(actor.role, section)) notFound();
+  if (section === "internships" && actor.role !== "HR_ADMIN")
+    return <InternshipsPage actor={actor} searchParams={await searchParams} />;
+  if (section === "reports")
+    return <ReportsPage actor={actor} searchParams={await searchParams} />;
+  if (section === "report-status")
+    return <ReportStatusPage actor={actor} searchParams={await searchParams} />;
   if (
     actor.role === "HR_ADMIN" &&
     ["dashboard", "attendance"].includes(section)
@@ -83,6 +96,7 @@ export default async function Section({
   )
     return <DayPage section={section} />;
   if (section === "notifications") {
+    const prefs = await notificationPreference(actor);
     const items = await db.notification.findMany({
       where: { recipientId: actor.id },
       orderBy: { createdAt: "desc" },
@@ -94,6 +108,18 @@ export default async function Section({
           title="Notifications"
           subtitle="Updates from the work you’re part of."
         />
+        <section className="panel">
+          <ReadAllNotifications />
+          {actor.role !== "HR_ADMIN" && (
+            <details>
+              <summary>Notification preferences</summary>
+              <NotificationPreferences
+                version={prefs.version}
+                reportReminders={prefs.reportReminders}
+              />
+            </details>
+          )}
+        </section>
         <section className="panel">
           {items.length === 0 ? (
             <Empty text="You’re all caught up. New assignments and review updates will appear here." />

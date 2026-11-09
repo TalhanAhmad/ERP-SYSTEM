@@ -1,4 +1,5 @@
 "use client";
+import { TextareaField } from "./textarea-field";
 import { MutationForm } from "./mutation-form";
 export function CheckButton({ kind }: { kind: "in" | "out" }) {
   return (
@@ -29,10 +30,11 @@ export function LeaveForm() {
           </select>
         </label>
       </div>
-      <label>
-        Private note (optional)
-        <textarea name="privateNote" maxLength={2000} />
-      </label>
+      <TextareaField
+        label="Private note (optional)"
+        name="privateNote"
+        maxLength={2000}
+      />
     </MutationForm>
   );
 }
@@ -96,10 +98,7 @@ export function CorrectionForm({
           <input type="datetime-local" name="proposedOut" required />
         </label>
       </div>
-      <label>
-        Reason
-        <textarea name="reason" required maxLength={2000} />
-      </label>
+      <TextareaField label="Reason" name="reason" required maxLength={2000} />
       <p className="note">
         Times must fit the assigned shift. An independent HR administrator must
         approve changes.
@@ -233,14 +232,17 @@ export function ScheduleAssignmentForm({
 export function ReportForm({
   date,
   report,
+  tasks = [],
 }: {
   date: string;
+  tasks?: { id: string; title: string }[];
   report?: {
     id: string;
     version: number;
     completedText: string;
     remainingText: string;
     blockersText: string;
+    taskIds?: string[];
   };
 }) {
   return (
@@ -250,33 +252,44 @@ export function ReportForm({
       label="Save draft"
       transform={(f) => ({
         ...Object.fromEntries(f),
+        taskIds: f.getAll("taskIds"),
         ...(report ? { expectedVersion: report.version } : { workDate: date }),
       })}
     >
-      <label>
-        Completed work
-        <textarea
-          name="completedText"
-          defaultValue={report?.completedText}
-          maxLength={5000}
-        />
-      </label>
-      <label>
-        Remaining work
-        <textarea
-          name="remainingText"
-          defaultValue={report?.remainingText}
-          maxLength={5000}
-        />
-      </label>
-      <label>
-        Blockers
-        <textarea
-          name="blockersText"
-          defaultValue={report?.blockersText}
-          maxLength={5000}
-        />
-      </label>
+      {tasks.length > 0 && (
+        <fieldset>
+          <legend>Linked assignments (optional)</legend>
+          {tasks.map((t) => (
+            <label className="file-choice" key={t.id}>
+              <input
+                type="checkbox"
+                name="taskIds"
+                value={t.id}
+                defaultChecked={report?.taskIds?.includes(t.id)}
+              />
+              {t.title}
+            </label>
+          ))}
+        </fieldset>
+      )}
+      <TextareaField
+        label="Completed work"
+        name="completedText"
+        defaultValue={report?.completedText}
+        maxLength={5000}
+      />
+      <TextareaField
+        label="Remaining work"
+        name="remainingText"
+        defaultValue={report?.remainingText}
+        maxLength={5000}
+      />
+      <TextareaField
+        label="Blockers"
+        name="blockersText"
+        defaultValue={report?.blockersText}
+        maxLength={5000}
+      />
     </MutationForm>
   );
 }

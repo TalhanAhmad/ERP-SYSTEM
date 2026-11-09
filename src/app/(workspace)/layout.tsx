@@ -34,6 +34,7 @@ export default async function Workspace({
     ["people", "People", Users],
     ["attendance", "Attendance", CheckSquare],
     ["reports", "Daily reports", CheckSquare],
+    ["internships", "Internships", CheckSquare],
     ["leave", "Leave", FolderKanban],
     ["corrections", "Corrections", CheckSquare],
     ["notifications", "Notifications", Bell],

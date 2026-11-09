@@ -1,4 +1,5 @@
 "use client";
+import { TextareaField } from "./textarea-field";
 import { useState } from "react";
 import { MutationForm } from "./mutation-form";
 export function ProjectEditForm({
@@ -25,14 +26,12 @@ export function ProjectEditForm({
           defaultValue={project.name}
         />
       </label>
-      <label>
-        Project description
-        <textarea
-          name="description"
-          maxLength={5000}
-          defaultValue={project.description}
-        />
-      </label>
+      <TextareaField
+        label="Project description"
+        name="description"
+        maxLength={5000}
+        defaultValue={project.description}
+      />
     </MutationForm>
   );
 }
@@ -59,10 +58,7 @@ export function ReasonAction({
           : {}),
       })}
     >
-      <label>
-        Reason
-        <textarea name="reason" maxLength={1000} required />
-      </label>
+      <TextareaField label="Reason" name="reason" maxLength={1000} required />
       {cancelOpen && (
         <label className="file-choice">
           <input type="checkbox" name="cancelOpenTasks" />
@@ -132,14 +128,12 @@ export function TaskEditForm({
           defaultValue={task.title}
         />
       </label>
-      <label>
-        Instructions
-        <textarea
-          name="description"
-          maxLength={5000}
-          defaultValue={task.description}
-        />
-      </label>
+      <TextareaField
+        label="Instructions"
+        name="description"
+        maxLength={5000}
+        defaultValue={task.description}
+      />
       <label>
         Priority
         <select name="priority" defaultValue={task.priority}>
@@ -176,6 +170,7 @@ export function ReassignForm({
   return (
     <MutationForm
       endpoint={`/api/v1/tasks/${task.id}/reassign`}
+      resetOnSuccess={false}
       label="Save assignment"
       transform={(f) => ({
         ...Object.fromEntries(f),
@@ -214,10 +209,12 @@ export function ReassignForm({
             ))}
         </select>
       </label>
-      <label>
-        Reason for reassignment
-        <textarea name="reason" required maxLength={1000} />
-      </label>
+      <TextareaField
+        label="Reason for reassignment"
+        name="reason"
+        required
+        maxLength={1000}
+      />
     </MutationForm>
   );
 }
@@ -227,10 +224,7 @@ export function CommentForm({ taskId }: { taskId: string }) {
       endpoint={`/api/v1/tasks/${taskId}/comments`}
       label="Post comment"
     >
-      <label>
-        Comment
-        <textarea name="body" required maxLength={2000} />
-      </label>
+      <TextareaField label="Comment" name="body" required maxLength={2000} />
     </MutationForm>
   );
 }

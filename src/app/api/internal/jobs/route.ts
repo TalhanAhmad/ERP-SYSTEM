@@ -27,6 +27,7 @@ export async function GET(request: Request) {
           request.headers.get("x-vercel-cron-schedule") === "15 0 * * *"
             ? "CRON"
             : "CLI",
+          true,
         ),
       },
       { headers: { "Cache-Control": "no-store" } },

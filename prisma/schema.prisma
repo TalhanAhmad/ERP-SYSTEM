@@ -368,6 +368,9 @@ model LeaveDate {
  @@index([userId,workDate])
 }
 model DailyReport {
+ firstSubmittedAt DateTime? @db.Timestamptz
+ cutoffSnapshot String?
+ late Boolean @default(false)
  id String @id @default(uuid()) @db.Uuid
  userId String @db.Uuid
  workDate DateTime @db.Date
@@ -497,4 +500,79 @@ model CompanySettings {
  reportReminders Boolean @default(true)
  version Int @default(1)
  updatedAt DateTime @updatedAt @db.Timestamptz
+}
+
+model ReportTask {
+ reportId String @db.Uuid
+ taskId String @db.Uuid
+ @@id([reportId,taskId])
+}
+model NotificationPreference {
+ userId String @id @db.Uuid
+ reportReminders Boolean @default(true)
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.Timestamptz
+}
+model MaintenanceRun {
+ id String @id @default(uuid()) @db.Uuid
+ runKey String @unique
+ source String
+ status String @default("RUNNING")
+ leaseUntil DateTime? @db.Timestamptz
+ attempts Int @default(1)
+ result Json?
+ errorCode String?
+ createdAt DateTime @default(now()) @db.Timestamptz
+ finishedAt DateTime? @db.Timestamptz
+}
+
+model Internship {
+ id String @id @default(uuid()) @db.Uuid
+ internId String @db.Uuid
+ mentorId String @db.Uuid
+ departmentId String @db.Uuid
+ startDate DateTime @db.Date
+ endDate DateTime @db.Date
+ objective String
+ status String @default("ACTIVE")
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ @@index([internId,status])
+ @@index([mentorId,status])
+}
+model LearningMilestone {
+ id String @id @default(uuid()) @db.Uuid
+ internshipId String @db.Uuid
+ title String
+ description String
+ dueDate DateTime @db.Date
+ status String @default("PLANNED")
+ completedAt DateTime? @db.Timestamptz
+ completedBy String? @db.Uuid
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ @@index([internshipId,dueDate])
+}
+model MilestoneTask {
+ milestoneId String @db.Uuid
+ taskId String @db.Uuid
+ @@id([milestoneId,taskId])
+}
+model WeeklyFeedback {
+ id String @id @default(uuid()) @db.Uuid
+ internshipId String @db.Uuid
+ authorId String @db.Uuid
+ updatedBy String @db.Uuid
+ weekStart DateTime @db.Date
+ strengths String
+ improvements String
+ nextActions String
+ rating Int?
+ ratingExplanation String?
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ @@unique([internshipId,weekStart])
 }

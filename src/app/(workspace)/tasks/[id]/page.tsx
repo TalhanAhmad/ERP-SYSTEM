@@ -159,7 +159,11 @@ export default async function Task({
                   </div>
                 )}
               {reviewer && task.status === "IN_REVIEW" && current && (
-                <ReviewForm submissionId={current.id} version={task.version} />
+                <ReviewForm
+                  submissionId={current.id}
+                  version={task.version}
+                  override={task.reviewerId !== actor.id}
+                />
               )}{" "}
               {task.status === "APPROVED" && (
                 <div className="success">

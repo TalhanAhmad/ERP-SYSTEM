@@ -1,0 +1,10 @@
+ALTER TABLE "DailyReport" ADD COLUMN "firstSubmittedAt" TIMESTAMPTZ,ADD COLUMN "cutoffSnapshot" TEXT,ADD COLUMN late BOOLEAN NOT NULL DEFAULT false;
+CREATE TABLE "ReportTask" ("reportId" UUID NOT NULL REFERENCES "DailyReport"(id) ON DELETE RESTRICT,"taskId" UUID NOT NULL REFERENCES "Task"(id) ON DELETE RESTRICT,PRIMARY KEY("reportId","taskId"));
+CREATE TABLE "NotificationPreference" ("userId" UUID PRIMARY KEY REFERENCES "Person"(id) ON DELETE RESTRICT,"reportReminders" BOOLEAN NOT NULL DEFAULT true,version INTEGER NOT NULL DEFAULT 1 CHECK(version>0),"updatedAt" TIMESTAMPTZ NOT NULL);
+CREATE TABLE "MaintenanceRun" (id UUID PRIMARY KEY,"runKey" TEXT NOT NULL UNIQUE,source TEXT NOT NULL CHECK(source IN ('CRON','CLI','ADMIN')),status TEXT NOT NULL DEFAULT 'RUNNING' CHECK(status IN ('RUNNING','SUCCEEDED','FAILED')),"leaseUntil" TIMESTAMPTZ,attempts INTEGER NOT NULL DEFAULT 1,result JSONB,"errorCode" TEXT,"createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,"finishedAt" TIMESTAMPTZ);
+DO $$ DECLARE n TEXT; BEGIN FOREACH n IN ARRAY ARRAY['ReportTask','NotificationPreference','MaintenanceRun'] LOOP
+ EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY',n);
+ IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname='anon') THEN EXECUTE format('REVOKE ALL ON %I FROM anon',n); END IF;
+ IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE format('REVOKE ALL ON %I FROM authenticated',n); END IF;
+ IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname='encova_app') THEN EXECUTE format('GRANT SELECT,INSERT,UPDATE,DELETE ON %I TO encova_app',n); EXECUTE format('CREATE POLICY encova_server_access ON %I TO encova_app USING(true) WITH CHECK(true)',n); END IF;
+ END LOOP; END $$;

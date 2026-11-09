@@ -1,4 +1,5 @@
 "use client";
+import { TextareaField } from "./textarea-field";
 import { useState } from "react";
 import { MutationForm } from "./mutation-form";
 export function ProjectForm() {
@@ -8,10 +9,7 @@ export function ProjectForm() {
         Project name
         <input name="name" required maxLength={120} />
       </label>
-      <label>
-        Description
-        <textarea name="description" maxLength={5000} />
-      </label>
+      <TextareaField label="Description" name="description" maxLength={5000} />
     </MutationForm>
   );
 }
@@ -110,10 +108,7 @@ export function TaskForm({
         Task title
         <input name="title" required maxLength={200} />
       </label>
-      <label>
-        Instructions
-        <textarea name="description" maxLength={5000} />
-      </label>
+      <TextareaField label="Instructions" name="description" maxLength={5000} />
       <div className="form-grid">
         <label>
           Project
@@ -276,17 +271,17 @@ export function SubmissionForm({
           .filter(Boolean),
       })}
     >
-      <label>
-        What did you complete?
-        <textarea name="summary" required maxLength={5000} />
-      </label>
-      <label>
-        HTTPS artifact links (one per line, up to 10)
-        <textarea
-          name="links"
-          placeholder="https://github.com/company/project/pull/123"
-        />
-      </label>
+      <TextareaField
+        label="What did you complete?"
+        name="summary"
+        required
+        maxLength={5000}
+      />
+      <TextareaField
+        label="HTTPS artifact links (one per line, up to 10)"
+        name="links"
+        placeholder="https://github.com/company/project/pull/123"
+      />
       {attachments.length > 0 && (
         <fieldset>
           <legend>Files to include in this revision</legend>
@@ -306,9 +301,11 @@ export function SubmissionForm({
 export function ReviewForm({
   submissionId,
   version,
+  override = false,
 }: {
   submissionId: string;
   version: number;
+  override?: boolean;
 }) {
   return (
     <MutationForm
@@ -318,8 +315,17 @@ export function ReviewForm({
         expectedVersion: version,
         decision: f.get("decision"),
         feedback: f.get("feedback"),
+        ...(override ? { overrideReason: f.get("overrideReason") } : {}),
       })}
     >
+      {override && (
+        <TextareaField
+          label="Super Admin reviewer override reason"
+          name="overrideReason"
+          required
+          maxLength={1000}
+        />
+      )}
       <label>
         Decision
         <select name="decision">
@@ -327,10 +333,7 @@ export function ReviewForm({
           <option value="REQUEST_CHANGES">Request changes</option>
         </select>
       </label>
-      <label>
-        Feedback
-        <textarea name="feedback" maxLength={2000} />
-      </label>
+      <TextareaField label="Feedback" name="feedback" maxLength={2000} />
     </MutationForm>
   );
 }

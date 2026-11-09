@@ -5,6 +5,7 @@ export async function processOutbox(
   send: (mail: Email) => Promise<unknown>,
   limit = 20,
   invitationId?: string,
+  onlyRecipient?: string,
 ) {
   let claimed = 0;
   for (let n = 0; n < limit; n++) {
@@ -12,6 +13,7 @@ export async function processOutbox(
       const rows = await tx.$queryRaw<
         { id: string }[]
       >`SELECT id FROM "Outbox" WHERE "deliveredAt" IS NULL AND "canceledAt" IS NULL AND attempts<5 AND "nextAttemptAt"<=now() AND ("leaseUntil" IS NULL OR "leaseUntil"<now())
+        AND (${onlyRecipient ?? null}::text IS NULL OR lower(recipient)=lower(${onlyRecipient ?? null}::text))
         AND (${invitationId ?? null}::uuid IS NULL OR "invitationId"=${invitationId ?? null}::uuid)
         AND ("invitationId" IS NULL OR EXISTS (SELECT 1 FROM "Invitation" i WHERE i.id="Outbox"."invitationId" AND i."acceptedAt" IS NULL AND i."revokedAt" IS NULL AND i."expiresAt">now()))
         ORDER BY "createdAt" FOR UPDATE SKIP LOCKED LIMIT 1`;

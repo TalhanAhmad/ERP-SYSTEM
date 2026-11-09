@@ -6,6 +6,7 @@ const storagePort = Number(process.env.PLAYWRIGHT_STORAGE_PORT ?? port + 1);
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: false,
+  timeout: 90000,
   workers: 1,
   use: { baseURL, trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],

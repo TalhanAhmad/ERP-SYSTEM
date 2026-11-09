@@ -1,4 +1,35 @@
 import {
+  internshipDirectory,
+  internshipDetail,
+  internshipQuery,
+  saveEnrollment,
+  saveMilestone,
+  milestoneAction,
+  saveFeedback,
+  enrollmentSchema,
+  milestoneSchema,
+  milestoneActionSchema,
+  feedbackSchema,
+} from "@/modules/internships/service";
+import {
+  maintenancePass,
+  queueMaintenance,
+  maintenanceRequestSchema,
+} from "@/server/jobs/maintenance";
+import { reportDetail } from "@/modules/reports/service";
+import {
+  reportDirectory,
+  reportListQuery,
+  reportStatusDirectory,
+  reportStatusQuery,
+} from "@/modules/reports/status";
+import {
+  notificationPreference,
+  savePreference,
+  readAllNotifications,
+  preferenceSchema,
+} from "@/modules/notifications/service";
+import {
   organizationData,
   saveDepartment,
   saveTeam,
@@ -137,6 +168,43 @@ export async function GET(request: Request, { params }: Params) {
     const actor = await context(request.headers);
     const path = (await params).path.join("/");
     hrApiAccess(actor.role, "GET", path);
+    if (path === "internships")
+      return NextResponse.json({
+        data: await internshipDirectory(
+          actor,
+          internshipQuery.parse(
+            Object.fromEntries(new URL(request.url).searchParams),
+          ),
+        ),
+      });
+    if (/^internships\/[^/]+$/.test(path))
+      return NextResponse.json({
+        data: await internshipDetail(actor, uuid.parse(path.split("/")[1])),
+      });
+    if (path === "notification-preferences")
+      return NextResponse.json({ data: await notificationPreference(actor) });
+    if (path === "report-status")
+      return NextResponse.json({
+        data: await reportStatusDirectory(
+          actor,
+          reportStatusQuery.parse(
+            Object.fromEntries(new URL(request.url).searchParams),
+          ),
+        ),
+      });
+    if (path === "report-directory")
+      return NextResponse.json({
+        data: await reportDirectory(
+          actor,
+          reportListQuery.parse(
+            Object.fromEntries(new URL(request.url).searchParams),
+          ),
+        ),
+      });
+    if (/^reports\/[^/]+$/.test(path))
+      return NextResponse.json({
+        data: await reportDetail(actor, uuid.parse(path.split("/")[1])),
+      });
     if (path === "organization")
       return NextResponse.json({ data: await organizationData(actor) });
     if (path === "settings") {
@@ -373,6 +441,66 @@ export async function POST(request: Request, { params }: Params) {
       request.headers.get("idempotency-key"),
       input,
       async (tx) => {
+        if (path[0] === "internships" && path.length <= 2)
+          return saveEnrollment(
+            tx,
+            actor,
+            enrollmentSchema.parse(input),
+            path[1] ? uuid.parse(path[1]) : undefined,
+          );
+        if (path[0] === "internships" && path.length === 3) {
+          if (path[2] === "milestones")
+            return saveMilestone(
+              tx,
+              actor,
+              uuid.parse(path[1]),
+              milestoneSchema.parse(input),
+            );
+          if (path[2] === "feedback")
+            return saveFeedback(
+              tx,
+              actor,
+              uuid.parse(path[1]),
+              feedbackSchema.parse(input),
+            );
+        }
+        if (path[0] === "milestones" && path.length === 2) {
+          const old = await tx.learningMilestone.findUnique({
+            where: { id: uuid.parse(path[1]) },
+            select: { internshipId: true },
+          });
+          invariant(old, "NOT_FOUND", "Milestone not found.", 404);
+          return saveMilestone(
+            tx,
+            actor,
+            old.internshipId,
+            milestoneSchema.parse(input),
+            path[1],
+          );
+        }
+        if (
+          path[0] === "milestones" &&
+          path.length === 3 &&
+          path[2] === "status"
+        )
+          return milestoneAction(
+            tx,
+            actor,
+            uuid.parse(path[1]),
+            milestoneActionSchema.parse(input),
+          );
+        if (route === "operations/maintenance")
+          return queueMaintenance(
+            tx,
+            actor,
+            maintenanceRequestSchema.parse(input),
+          );
+        if (route === "notifications/read-all") {
+          z.object({}).strict().parse(input);
+          return readAllNotifications(tx, actor);
+        }
+        if (route === "notification-preferences")
+          return savePreference(tx, actor, preferenceSchema.parse(input));
         if (route === "settings")
           return saveSettings(tx, actor, settingsSchema.parse(input));
         if (path[0] === "departments" && path.length <= 2)
@@ -480,7 +608,10 @@ export async function POST(request: Request, { params }: Params) {
           return saveReport(tx, actor, reportSchema.parse(input));
         if (path[0] === "reports" && path.length === 3) {
           const version = z
-            .object({ expectedVersion: z.number().int().positive() })
+            .object({
+              expectedVersion: z.number().int().positive(),
+              reason: z.string().trim().min(1).max(1000).optional(),
+            })
             .strict()
             .parse(input);
           return reportAction(tx, actor, uuid.parse(path[1]), {
@@ -607,6 +738,13 @@ export async function POST(request: Request, { params }: Params) {
         );
       },
     );
+    if (route === "operations/maintenance") {
+      const queued = z
+        .object({ id: uuid, runKey: z.string(), date: z.iso.date() })
+        .parse(data);
+      await maintenancePass(queued.date, "ADMIN", queued.runKey);
+      return NextResponse.json({ data: { id: queued.id } });
+    }
     if (
       route === "invitations" ||
       (path[0] === "invitations" && path.length === 3 && path[2] === "resend")
@@ -700,6 +838,11 @@ export async function PATCH(request: Request, { params }: Params) {
         completedText: z.string().max(5000),
         remainingText: z.string().max(5000),
         blockersText: z.string().max(5000),
+        taskIds: z
+          .array(z.uuid())
+          .max(100)
+          .refine((ids) => new Set(ids).size === ids.length)
+          .optional(),
       })
       .strict()
       .parse(input);

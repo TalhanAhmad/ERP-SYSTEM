@@ -1,3 +1,4 @@
+import { maintenancePass, previousCompanyDate } from "./maintenance";
 import "server-only";
 import { cleanupExpiredAnnouncements } from "@/modules/announcements/service";
 import { db } from "../db";
@@ -22,7 +23,24 @@ export async function scheduledPass(
     (allowEmail && mailStatus === "READY"
       ? emailSender(emailInput)
       : undefined);
-  const mail = sender ? await processOutbox(sender, 1) : { claimed: 0 };
+  let maintenance:
+    | Awaited<ReturnType<typeof maintenancePass>>
+    | { failed: true; errorCode: string };
+  try {
+    maintenance = await maintenancePass(previousCompanyDate(), source);
+  } catch {
+    maintenance = { failed: true, errorCode: "MAINTENANCE_FAILED" };
+  }
+  const mail = sender
+    ? await processOutbox(
+        sender,
+        1,
+        undefined,
+        typeof emailInput.SMTP_TEST_RECIPIENT === "string"
+          ? emailInput.SMTP_TEST_RECIPIENT.trim()
+          : undefined,
+      )
+    : { claimed: 0 };
   await ensureScheduledAttendance(workDate(new Date(Date.now() - 86400000)));
   const jobs: Awaited<ReturnType<typeof runAttendanceJob>>[] = [];
   let attendanceUpdated = 0;
@@ -60,6 +78,7 @@ export async function scheduledPass(
   await db.rateLimit.deleteMany({ where: { expiresAt: { lt: new Date() } } });
   await db.idempotency.deleteMany({ where: { expiresAt: { lt: new Date() } } });
   return {
+    maintenance,
     mailClaimed: mail.claimed,
     mailStatus,
     attendanceUpdated,

@@ -15,6 +15,7 @@ export function SettingsForm({
   return (
     <MutationForm
       endpoint="/api/v1/settings"
+      resetOnSuccess={false}
       label="Save company settings"
       transform={(f) => ({
         expectedVersion: item.version,

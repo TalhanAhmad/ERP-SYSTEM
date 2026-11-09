@@ -296,6 +296,12 @@ export async function review(
     "Only the designated reviewer can review.",
     403,
   );
+  if (task.reviewerId !== actor.id)
+    invariant(
+      input.overrideReason?.trim(),
+      "OVERRIDE_REASON",
+      "Explain the Super Admin reviewer override.",
+    );
   invariant(
     task.status === "IN_REVIEW" &&
       task.submissions[0]?.id === submissionId &&
@@ -323,6 +329,7 @@ export async function review(
     decision: input.decision,
     submissionId,
     override: task.reviewerId !== actor.id,
+    ...(input.overrideReason ? { overrideReason: input.overrideReason } : {}),
   });
   await notify(
     tx,

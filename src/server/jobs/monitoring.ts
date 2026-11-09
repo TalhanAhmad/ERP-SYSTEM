@@ -409,8 +409,40 @@ export async function operationsSnapshot(actor: Actor) {
     failed = await db.outbox.count({
       where: { deliveredAt: null, canceledAt: null, attempts: { gte: 5 } },
     });
+  const maintenance = await db.maintenanceRun.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 25,
+    select: {
+      id: true,
+      source: true,
+      status: true,
+      attempts: true,
+      leaseUntil: true,
+      createdAt: true,
+      finishedAt: true,
+      errorCode: true,
+      result: true,
+    },
+  });
   return {
     jobs,
+    maintenance: maintenance.map(({ result, ...r }) => {
+      const data = result as {
+        date?: string;
+        reportReminders?: number;
+        expiredInvitations?: number;
+      } | null;
+      return {
+        ...r,
+        date: typeof data?.date === "string" ? data.date : null,
+        reportReminders:
+          typeof data?.reportReminders === "number" ? data.reportReminders : 0,
+        expiredInvitations:
+          typeof data?.expiredInvitations === "number"
+            ? data.expiredInvitations
+            : 0,
+      };
+    }),
     lastAutomaticAttempt,
     today: workDate(),
     previousDate: workDate(new Date(Date.now() - 86400000)),
