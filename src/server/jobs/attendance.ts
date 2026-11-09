@@ -11,7 +11,8 @@ export async function reconcilePersonAttendance(
   context?: { runId: string; actorId: string | null },
 ) {
   const person = await tx.person.findUnique({ where: { id: userId } });
-  if (person?.status !== "ACTIVE") return { updated: 0 };
+  if (person?.status !== "ACTIVE" || person.role === "SUPER_ADMIN")
+    return { updated: 0 };
   const assignment = await tx.scheduleAssignment.findFirst({
     where: {
       userId,

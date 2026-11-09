@@ -1,5 +1,7 @@
 import "server-only";
 import { db } from "@/server/db";
+import type { z } from "zod";
+import type { projectQuerySchema } from "./queries";
 import type { Actor } from "@/server/context";
 import { invariant } from "@/server/errors";
 import { audit, type Tx } from "@/server/transaction";
@@ -35,6 +37,51 @@ export async function listProjects(actor: Actor) {
     include: { _count: { select: { tasks: true, members: true } } },
     take: 100,
   });
+}
+export async function projectDirectory(
+  actor: Actor,
+  query: z.infer<typeof projectQuerySchema>,
+) {
+  invariant(
+    actor.role !== "HR_ADMIN",
+    "FORBIDDEN",
+    "HR uses attendance and leave approvals.",
+    403,
+  );
+  const where = {
+    ...visibleProjects(actor),
+    ...(query.status === "active"
+      ? { archivedAt: null }
+      : query.status === "archived"
+        ? { archivedAt: { not: null } }
+        : {}),
+    ...(query.q
+      ? {
+          OR: [
+            { name: { contains: query.q, mode: "insensitive" as const } },
+            {
+              description: { contains: query.q, mode: "insensitive" as const },
+            },
+          ],
+        }
+      : {}),
+  };
+  return db.$transaction(
+    async (tx) => {
+      const total = await tx.project.count({ where }),
+        pages = Math.max(1, Math.ceil(total / 25)),
+        page = Math.min(query.page, pages);
+      const items = await tx.project.findMany({
+        where,
+        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+        include: { _count: { select: { members: true, tasks: true } } },
+        take: 25,
+        skip: (page - 1) * 25,
+      });
+      return { items, total, page, pages, filters: { ...query, page } };
+    },
+    { isolationLevel: "RepeatableRead" },
+  );
 }
 export async function createProject(
   tx: Tx,

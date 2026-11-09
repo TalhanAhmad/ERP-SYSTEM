@@ -1,3 +1,6 @@
+import { attendanceQuerySchema } from "@/modules/attendance/queries";
+import { SelfAttendance } from "@/modules/attendance/self";
+import { workDate } from "@/lib/dates";
 import Link from "next/link";
 import type { Actor } from "@/server/context";
 import { hrOverview } from "./service";
@@ -5,11 +8,23 @@ import { LiveRefresh } from "@/components/live-refresh";
 export async function HrPage({
   actor,
   attendance = false,
+  searchParams = {},
 }: {
   actor: Actor;
   attendance?: boolean;
+  searchParams?: Record<string, string | string[] | undefined>;
 }) {
-  const data = await hrOverview(actor);
+  const parsed = attendanceQuerySchema.safeParse(
+    Object.fromEntries(
+      Object.entries(searchParams).filter(([key]) =>
+        ["date", "status", "q"].includes(key),
+      ),
+    ),
+  );
+  const filters = parsed.success
+    ? parsed.data
+    : attendanceQuerySchema.parse({});
+  const data = await hrOverview(actor, filters);
   const time = (value: Date | null) =>
     value
       ? new Intl.DateTimeFormat("en-GB", {
@@ -30,17 +45,78 @@ export async function HrPage({
       </div>
       <div className="stats">
         {[
-          ["Checked in", data.counts.checkedIn],
-          ["Checked out", data.counts.checkedOut],
-          ["Not checked in", data.counts.notCheckedIn],
-          ["Pending leave", data.pendingLeaves],
-        ].map(([label, count]) => (
-          <section className="stat" key={label}>
+          [
+            "Checked in",
+            data.counts.checkedIn,
+            `/attendance?date=${data.date}&status=checked-in`,
+          ],
+          [
+            "Checked out",
+            data.counts.checkedOut,
+            `/attendance?date=${data.date}&status=checked-out`,
+          ],
+          [
+            "Not checked in",
+            data.counts.notCheckedIn,
+            `/attendance?date=${data.date}&status=not-checked-in`,
+          ],
+          attendance
+            ? [
+                "On leave",
+                data.counts.onLeave,
+                `/attendance?date=${data.date}&status=on-leave`,
+              ]
+            : ["Pending leave", data.pendingLeaves, "/leave"],
+        ].map(([label, count, href]) => (
+          <Link className="stat stat-link" key={label} href={String(href)}>
             <div className="stat-top">{label}</div>
             <div className="stat-number">{count}</div>
-          </section>
+            <span className="card-action">View list →</span>
+          </Link>
         ))}
       </div>
+      {attendance && actor.role === "HR_ADMIN" && (
+        <SelfAttendance actor={actor} />
+      )}
+      {attendance && (
+        <section className="panel">
+          <form action="/attendance" method="GET" className="people-filters">
+            <label>
+              Attendance date
+              <input
+                name="date"
+                type="date"
+                required
+                max={workDate()}
+                defaultValue={filters.date}
+              />
+            </label>
+            <label>
+              Attendance status
+              <select name="status" defaultValue={filters.status}>
+                <option value="all">All staff</option>
+                <option value="checked-in">Checked in</option>
+                <option value="checked-out">Checked out</option>
+                <option value="not-checked-in">Not checked in</option>
+                <option value="on-leave">On leave</option>
+              </select>
+            </label>
+            <label>
+              Find a person
+              <input name="q" maxLength={100} defaultValue={filters.q} />
+            </label>
+            <button className="primary">Apply attendance filters</button>
+            <Link className="button" href="/attendance">
+              Reset filters
+            </Link>
+          </form>
+          {!parsed.success && (
+            <p className="error" role="alert">
+              Choose a valid date and attendance filters.
+            </p>
+          )}
+        </section>
+      )}
       {!attendance && (
         <p className="form-actions">
           <Link className="button primary" href="/attendance">
@@ -53,7 +129,9 @@ export async function HrPage({
       )}
       <section className="panel">
         <h2>Who has checked in?</h2>
-        <p className="muted">Active people · updates every 30 seconds</p>
+        <p className="muted">
+          Active staff · Super Admin excluded · updates every 30 seconds
+        </p>
         <div className="table-wrap">
           <table>
             <thead>

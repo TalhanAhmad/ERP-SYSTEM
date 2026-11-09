@@ -29,7 +29,7 @@ export default async function Workspace({
   const items = [
     ["dashboard", "Overview", LayoutDashboard],
     ["projects", "Projects", FolderKanban],
-    ["tasks", "My work", CheckSquare],
+    ["assignments", "Assignments", CheckSquare],
     ["people", "People", Users],
     ["attendance", "Attendance", CheckSquare],
     ["reports", "Daily reports", CheckSquare],

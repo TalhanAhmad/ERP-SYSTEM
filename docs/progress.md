@@ -1,6 +1,6 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-08 (Asia/Karachi)
+Last updated: 2026-11-09 (Asia/Karachi)
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded
@@ -48,3 +48,7 @@ Focused HR attendance/leave/notifications and the shared Super Admin announcemen
 ## Account-management work
 
 Super Admin People search/filter/pagination and per-account profile/role/status controls are deployed and verified. All 250 automated tests, 22 hosted checks and source CI passed. HR remains focused on attendance, leave approvals and notifications. See [account management](operations/people-management.md). Department/team management and verified email changes remain separate follow-ups.
+
+## Dashboard and attendance update in progress
+
+Implemented the approved Assignments structure, clickable matching summary cards and Super Admin attendance exemption. HR, Team Lead and Member retain personal check-in/out. All 260 automated checks passed (121 unit, 126 integration, 13 browser), plus strict typing/lint and production build. Source publication, hosted acceptance and final report remain in progress.

@@ -99,7 +99,7 @@ export async function createAttendanceJob(
   );
   const people = await tx.$queryRaw<
     { id: string }[]
-  >`SELECT p.id FROM "Person" p WHERE p.status='ACTIVE' AND EXISTS(SELECT 1 FROM "ScheduleAssignment" a WHERE a."userId"=p.id AND a."startDate"<=${dateValue(input.workDate)} AND (a."endDate" IS NULL OR a."endDate">=${dateValue(input.workDate)})) ORDER BY p.id LIMIT 1001`;
+  >`SELECT p.id FROM "Person" p WHERE p.status='ACTIVE' AND p.role<>'SUPER_ADMIN' AND EXISTS(SELECT 1 FROM "ScheduleAssignment" a WHERE a."userId"=p.id AND a."startDate"<=${dateValue(input.workDate)} AND (a."endDate" IS NULL OR a."endDate">=${dateValue(input.workDate)})) ORDER BY p.id LIMIT 1001`;
   invariant(
     people.length <= 1000,
     "JOB_LIMIT",

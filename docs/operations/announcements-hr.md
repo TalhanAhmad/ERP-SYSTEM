@@ -4,7 +4,7 @@ The owner's 8 November 2026 change replaces the broader HR interface with Overvi
 
 ## HR use
 
-Overview and Attendance show active people by display name/username, today's check-in/out times in Karachi, and Checked in, Checked out, Not checked in or On leave. Counts include pending leave approvals. Named rows refresh every 30 seconds while the tab is visible; manual refresh is available. Not checked in does not assert an absence or a scheduled shift. No attendance event is fabricated by loading these views.
+The 9 November update adds HR personal check-in/out and excludes Super Admin from staff attendance; see [assignment and attendance roles](assignments-attendance.md). Overview and Attendance show active staff by display name/username, today's check-in/out times in Karachi, and Checked in, Checked out, Not checked in or On leave. Counts include pending leave approvals. Named rows refresh every 30 seconds while the tab is visible; manual refresh is available. Not checked in does not assert an absence or a scheduled shift. No attendance event is fabricated by loading these views.
 
 Leave approvals shows other people's requests with names and approve/reject controls. HR's personal leave form and approved-request cancellation action are omitted. Existing independent-decision, version, attendance-conflict, audit and personal-notification protections remain. HR cannot approve their own request. Private task/leave notifications remain recipient-scoped.
 

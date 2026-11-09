@@ -7,6 +7,8 @@ import { projectFor, visibleProjects } from "@/modules/projects/service";
 import { assigneeTransition, independent, type TaskState } from "./policy";
 import { createTask, submitTask, reviewTask } from "./schemas";
 import type { z } from "zod";
+import type { Prisma } from "@/generated/prisma/client";
+import type { AssignmentQuery } from "./queries";
 import { attachmentFields } from "@/modules/attachments/metadata";
 export const visibleTasks = (actor: Actor) => ({
   project: visibleProjects(actor),
@@ -27,6 +29,94 @@ export async function listTasks(actor: Actor) {
     orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     take: 100,
   });
+}
+export function assignmentWhere(
+  actor: Actor,
+  view: AssignmentQuery["view"] = "all",
+  q = "",
+  project = "",
+): Prisma.TaskWhereInput {
+  return {
+    AND: [
+      visibleTasks(actor),
+      ...(view === "open"
+        ? [
+            {
+              status: {
+                notIn: ["APPROVED", "CANCELED"] as Array<
+                  "APPROVED" | "CANCELED"
+                >,
+              },
+            },
+          ]
+        : view === "review"
+          ? [
+              {
+                status: "IN_REVIEW" as const,
+                ...(actor.role === "SUPER_ADMIN"
+                  ? {}
+                  : { reviewerId: actor.id }),
+              },
+            ]
+          : view === "approved"
+            ? [{ status: "APPROVED" as const }]
+            : []),
+      ...(project ? [{ projectId: project }] : []),
+      ...(q
+        ? [
+            {
+              OR: [
+                { title: { contains: q, mode: "insensitive" as const } },
+                {
+                  project: {
+                    name: { contains: q, mode: "insensitive" as const },
+                  },
+                },
+                {
+                  assignee: {
+                    displayName: { contains: q, mode: "insensitive" as const },
+                  },
+                },
+                {
+                  assignee: {
+                    username: { contains: q, mode: "insensitive" as const },
+                  },
+                },
+              ],
+            },
+          ]
+        : []),
+    ],
+  };
+}
+export async function listAssignments(actor: Actor, query: AssignmentQuery) {
+  invariant(
+    actor.role !== "HR_ADMIN",
+    "FORBIDDEN",
+    "HR uses attendance and leave approvals.",
+    403,
+  );
+  const where = assignmentWhere(actor, query.view, query.q, query.project);
+  return db.$transaction(
+    async (tx) => {
+      const total = await tx.task.count({ where }),
+        pages = Math.max(1, Math.ceil(total / 25)),
+        page = Math.min(query.page, pages);
+      const items = await tx.task.findMany({
+        where,
+        include: {
+          assignee: { select: { id: true, displayName: true, username: true } },
+          reviewer: { select: { id: true, displayName: true, username: true } },
+          project: { select: { id: true, name: true } },
+        },
+        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+        take: 25,
+        skip: (page - 1) * 25,
+      });
+      return { items, total, page, pages, filters: { ...query, page } };
+    },
+    { isolationLevel: "RepeatableRead" },
+  );
 }
 export async function taskFor(tx: Tx, actor: Actor, id: string) {
   const initial = await tx.task.findFirst({

@@ -1,3 +1,5 @@
+import { AssignmentsPage } from "@/modules/tasks/page";
+import { ProjectsPage } from "@/modules/projects/page";
 import { AdminPeoplePage } from "@/modules/people/page";
 import Link from "next/link";
 import { HrPage } from "@/modules/hr/page";
@@ -17,12 +19,7 @@ import { listProjects } from "@/modules/projects/service";
 import { listTasks } from "@/modules/tasks/service";
 import { dashboard } from "@/modules/projects/dashboard";
 import { Status } from "@/components/status";
-import {
-  ProjectForm,
-  TaskForm,
-  MemberForm,
-  ReadButton,
-} from "@/components/work-forms";
+import { ReadButton } from "@/components/work-forms";
 export default async function Section({
   params,
   searchParams,
@@ -39,7 +36,21 @@ export default async function Section({
     actor.role === "HR_ADMIN" &&
     ["dashboard", "attendance"].includes(section)
   )
-    return <HrPage actor={actor} attendance={section === "attendance"} />;
+    return (
+      <HrPage
+        actor={actor}
+        attendance={section === "attendance"}
+        searchParams={await searchParams}
+      />
+    );
+  if (section === "attendance" && actor.role === "SUPER_ADMIN")
+    return (
+      <HrPage actor={actor} attendance searchParams={await searchParams} />
+    );
+  if (["assignments", "tasks", "my-work"].includes(section))
+    return <AssignmentsPage actor={actor} searchParams={await searchParams} />;
+  if (section === "projects")
+    return <ProjectsPage actor={actor} searchParams={await searchParams} />;
   if (
     ["attendance", "schedules", "leave", "corrections", "reports"].includes(
       section,
@@ -81,7 +92,6 @@ export default async function Section({
   }
   const projects = await listProjects(actor);
   const tasks = await listTasks(actor);
-  const manage = actor.role === "SUPER_ADMIN" || actor.role === "TEAM_LEAD";
   const managedProjects = projects.filter(
     (p) => p.managerId === actor.id || actor.role === "SUPER_ADMIN",
   );
@@ -109,15 +119,9 @@ export default async function Section({
     orderBy: { username: "asc" },
     take: 100,
   });
-  const activePeople = people.filter((p) => p.status === "ACTIVE");
   if (section === "dashboard") {
     const open = tasks.filter(
       (t) => !["APPROVED", "CANCELED"].includes(t.status),
-    );
-    const reviews = tasks.filter(
-      (t) =>
-        t.status === "IN_REVIEW" &&
-        (t.reviewerId === actor.id || actor.role === "SUPER_ADMIN"),
     );
     const counts = await dashboard(actor);
     const stats = [
@@ -126,24 +130,28 @@ export default async function Section({
         counts.projects,
         FolderKanban,
         "Projects you can access",
+        "/projects?status=active",
       ],
       [
         "Open assignments",
         counts.openTasks,
         ListTodo,
-        "Across your project memberships",
+        "Work still in progress",
+        "/assignments?view=open",
       ],
       [
         "Awaiting review",
         counts.awaitingReview,
         Clock3,
-        "Ready for your feedback",
+        "Ready for independent feedback",
+        "/assignments?view=review",
       ],
       [
         "Approved work",
         counts.approved,
         CheckCircle2,
         "Independently reviewed tasks",
+        "/assignments?view=approved",
       ],
     ] as const;
     return (
@@ -152,7 +160,9 @@ export default async function Section({
           <div>
             <span className="eyebrow">YOUR WORKDAY, AT A GLANCE</span>
             <h1>Workspace overview</h1>
-            <p className="muted">A little focus for the day ahead.</p>
+            <p className="muted">
+              Projects, assignments and team progress in one place.
+            </p>
           </div>
           <Link className="button" href="/projects">
             View projects <ArrowUpRight size={14} />
@@ -163,34 +173,52 @@ export default async function Section({
             <span className="eyebrow">LET’S MAKE PROGRESS</span>
             <h2>Hello, {actor.displayName.split(" ")[0]}.</h2>
             <p>
-              Keep your next step in sight. Pick up an assignment, share your
-              progress, or give a teammate the feedback they need.
+              {actor.role === "SUPER_ADMIN"
+                ? "Assign work, review progress and view your team’s attendance."
+                : "Open your assignments, share progress and review your teammates’ work."}
             </p>
-            <Link className="button primary" href="/tasks">
-              Go to my work →
-            </Link>
+            <div className="form-actions">
+              <Link
+                className="button primary"
+                href={
+                  actor.role === "SUPER_ADMIN"
+                    ? "/assignments/new"
+                    : "/assignments"
+                }
+              >
+                {actor.role === "SUPER_ADMIN"
+                  ? "Assign a task →"
+                  : "Go to my work →"}
+              </Link>
+              {actor.role === "SUPER_ADMIN" && (
+                <Link className="button" href="/attendance">
+                  View team attendance →
+                </Link>
+              )}
+            </div>
           </div>
           <div className="hero-symbol" aria-hidden="true">
             ✳
           </div>
         </section>
         <div className="stats">
-          {stats.map(([label, count, Icon, note]) => (
-            <section className="stat" key={label}>
+          {stats.map(([label, count, Icon, note, href]) => (
+            <Link className="stat stat-link" key={label} href={href}>
               <div className="stat-top">
                 {label}
                 <Icon size={17} />
               </div>
               <div className="stat-number">{count}</div>
               <small>{note}</small>
-            </section>
+              <span className="card-action">View list →</span>
+            </Link>
           ))}
         </div>
         <div className="split">
           <section className="panel">
             <div className="panel-heading">
               <h2>Work in motion</h2>
-              <Link className="muted" href="/tasks">
+              <Link className="muted" href="/assignments?view=open">
                 View all →
               </Link>
             </div>
@@ -207,7 +235,7 @@ export default async function Section({
               <li>
                 <span className="dot" />
                 <span>
-                  <strong>{reviews.length} pending reviews</strong>
+                  <strong>{counts.awaitingReview} pending reviews</strong>
                   <br />
                   <span className="muted">
                     Independent feedback moves work forward.
@@ -239,77 +267,15 @@ export default async function Section({
               </li>
             </ul>
             <p className="note">
-              This is an initial work-management release. Attendance, leave and
-              reports are available in the workspace. Remaining release
-              requirements are tracked in the delivery report.
+              {actor.role === "SUPER_ADMIN"
+                ? "Your attendance access is view-only. HR, Team Leads and Members record their own check-in and check-out."
+                : "Use Attendance to record your own check-in and check-out."}
             </p>
           </section>
         </div>
       </>
     );
   }
-  if (section === "projects")
-    return (
-      <>
-        <Heading
-          title="Projects"
-          subtitle="Bring the right people together around meaningful work."
-        />
-        {manage && (
-          <section className="panel">
-            <details>
-              <summary>Create a project</summary>
-              <ProjectForm />
-            </details>
-          </section>
-        )}
-        {projects.length === 0 ? (
-          <Empty text="Create your first project to start assigning work." />
-        ) : (
-          projects.map((p) => (
-            <section className="panel" key={p.id}>
-              <div className="panel-heading">
-                <h2>{p.name}</h2>
-                <Status value={p.archivedAt ? "ARCHIVED" : "ACTIVE"} />
-              </div>
-              <p className="muted">
-                {p.description || "No description provided."}
-              </p>
-              <p className="note">
-                {p._count.members} members · {p._count.tasks} tasks
-              </p>
-              {(actor.role === "SUPER_ADMIN" ||
-                (actor.role === "TEAM_LEAD" && p.managerId === actor.id)) && (
-                <details>
-                  <summary>Add a project member</summary>
-                  <MemberForm projectId={p.id} people={activePeople} />
-                </details>
-              )}
-            </section>
-          ))
-        )}
-      </>
-    );
-  if (section === "tasks" || section === "my-work")
-    return (
-      <>
-        <Heading
-          title="My work"
-          subtitle="Assignments, submissions, and the feedback that moves them forward."
-        />
-        {manage && (
-          <section className="panel">
-            <details>
-              <summary>Assign a task</summary>
-              <TaskForm projects={managedProjects} people={activePeople} />
-            </details>
-          </section>
-        )}
-        <section className="panel">
-          <TaskTable tasks={tasks} />
-        </section>
-      </>
-    );
   if (section === "people")
     return (
       <>

@@ -1,9 +1,10 @@
+import { SelfAttendance } from "./self";
+import { HrPage } from "@/modules/hr/page";
 import { context } from "@/server/context";
 import { db } from "@/server/db";
 import { workDate } from "@/lib/dates";
 import { Status } from "@/components/status";
 import {
-  CheckButton,
   LeaveForm,
   DecisionForm,
   CorrectionForm,
@@ -27,33 +28,16 @@ export async function DayPage({ section }: { section: string }) {
     </div>
   );
   if (section === "attendance") {
+    if (actor.role === "SUPER_ADMIN")
+      return <HrPage actor={actor} attendance />;
     const days = await attendanceList(actor);
-    const ownDay = days.find(
-      (d) =>
-        d.userId === actor.id &&
-        d.workDate.toISOString().slice(0, 10) === today,
-    );
     return (
       <>
         {heading(
           "Attendance",
           "Server-recorded check events, with a preserved correction history.",
         )}
-        <section className="panel">
-          <h2>Today · {today}</h2>
-          <p className="muted">
-            Asia/Karachi · A schedule must be assigned before attendance can be
-            recorded.
-          </p>
-          {ownDay && <Status value={ownDay.status} />}
-          <div className="form-actions">
-            {!ownDay?.firstIn && <CheckButton kind="in" />}
-            {ownDay?.firstIn && !ownDay.lastOut && <CheckButton kind="out" />}
-            {ownDay?.lastOut && (
-              <span className="success">Your workday is closed.</span>
-            )}
-          </div>
-        </section>
+        <SelfAttendance actor={actor} />
         <section className="panel">
           <h2>{privileged ? "Attendance records" : "My attendance history"}</h2>
           <div className="table-wrap">
@@ -113,7 +97,7 @@ export async function DayPage({ section }: { section: string }) {
       orderBy: { createdAt: "desc" },
     });
     const people = await db.person.findMany({
-      where: { status: "ACTIVE" },
+      where: { status: "ACTIVE", role: { not: "SUPER_ADMIN" } },
       select: { id: true, username: true },
     });
     return (

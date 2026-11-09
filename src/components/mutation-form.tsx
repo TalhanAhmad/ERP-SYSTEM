@@ -8,6 +8,7 @@ export function MutationForm({
   label = "Save",
   method = "POST",
   successMessage = "Saved successfully.",
+  redirectTo,
 }: {
   endpoint: string;
   children?: React.ReactNode;
@@ -15,6 +16,7 @@ export function MutationForm({
   label?: string;
   method?: "POST" | "PATCH";
   successMessage?: string;
+  redirectTo?: string;
 }) {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -58,6 +60,7 @@ export function MutationForm({
           retry.current = null;
           setSuccess(true);
           form.reset();
+          if (redirectTo) router.push(redirectTo);
           router.refresh();
         } catch (err) {
           setError(err instanceof Error ? err.message : "Unable to save.");

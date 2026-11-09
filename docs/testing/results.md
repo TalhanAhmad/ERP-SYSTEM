@@ -1,6 +1,6 @@
 # Verification results
 
-Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnpm 12.18.0, real PostgreSQL 17.9 on loopback. All test accounts and work data are synthetic. Development, test and restore databases are distinct.
+Date: 9 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnpm 12.18.0, real PostgreSQL 17.9 on loopback. All test accounts and work data are synthetic. Development, test and restore databases are distinct.
 
 ## Latest outcomes
 
@@ -12,9 +12,9 @@ Date: 8 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
 | pnpm test:unit | PASS — 121 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
-| pnpm test:integration | PASS — 118 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
+| pnpm test:integration | PASS — 126 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 11 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 45.1 seconds on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 13 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 51.8 seconds on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
@@ -296,3 +296,9 @@ Source d7fd89dd9a1050fde4e173296cc772fedd05dfff passed [GitHub Actions 425154437
 Twenty-two hosted checks passed: four retained owner/demo logins; directory search/pagination; non-admin denial; safe detail fields; actual People-to-Manage navigation; profile editing with unchanged login email/provider identity; tamper/Origin/stale rejection; immediate role change for an existing Supabase session; real open-work/project counts; retained-manager demotion denial and restoration; existing-session/new-login deactivation denial; inactive filtering; same-password reactivation with retained work; named audit history; 360px layout; protected owner controls; unchanged focused HR/direct-page denial; and management-browser sign-out.
 
 The real-provider test created only a uniquely identified synthetic account/project/task. It deactivated that account afterward and preserved all three requested exploration accounts and the owner credential. No employee profiles/roles/statuses or active announcement were modified. The mobile management screenshot was inspected. The earlier full-run timeout and holiday-dependent fixture correction are recorded above; the final full browser suite and clean-runner CI passed without weakening application rules. Provider-wide session revocation, organization administration and staff email onboarding remain outside this acceptance.
+
+## Dashboard, assignments and attendance role update
+
+Local acceptance passed 260 automated checks: 121 unit, 126 real-PostgreSQL integration and 13 Chromium browser tests, with strict typing/lint and production build. Eight new integration cases verify shared card/list counts, scope, search/pagination, review queues, Super Admin punch/schedule denial, three staff roles, filtered staff status and preserved legacy history/job exemption. Two new browser journeys cover clickable matching cards/mobile filters and actual HR/Lead/Member punches while Root remains view-only. Existing work assignment/revision/review flow passes through the new task form.
+
+The first new card browser assertion used an exact implicit label locator that included the select’s option text. The page’s accessible combobox name was correct. Switching the assertion to its accessible combobox role resolved the test mismatch; the complete 13-test run then passed in 51.8 seconds. Source publication and hosted acceptance are the remaining release checks.

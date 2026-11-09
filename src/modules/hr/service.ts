@@ -2,18 +2,24 @@ import "server-only";
 import { db } from "@/server/db";
 import type { Actor } from "@/server/context";
 import { invariant } from "@/server/errors";
-import { workDate } from "@/lib/dates";
-export async function hrOverview(actor: Actor) {
+import { attendanceQuerySchema } from "@/modules/attendance/queries";
+import type { z } from "zod";
+export async function hrOverview(
+  actor: Actor,
+  query: z.infer<typeof attendanceQuerySchema> = attendanceQuerySchema.parse(
+    {},
+  ),
+) {
   invariant(
     ["SUPER_ADMIN", "HR_ADMIN"].includes(actor.role),
     "FORBIDDEN",
     "HR access required.",
     403,
   );
-  const date = workDate();
+  const date = query.date;
   const [people, days, pendingLeaves] = await Promise.all([
     db.person.findMany({
-      where: { status: "ACTIVE" },
+      where: { status: "ACTIVE", role: { not: "SUPER_ADMIN" } },
       select: { id: true, displayName: true, username: true },
       orderBy: [{ displayName: "asc" }, { id: "asc" }],
     }),
@@ -54,7 +60,16 @@ export async function hrOverview(actor: Actor) {
   });
   return {
     date,
-    people: rows,
+    people: rows.filter(
+      (person) =>
+        (!query.q ||
+          `${person.displayName} ${person.username}`
+            .toLowerCase()
+            .includes(query.q.toLowerCase())) &&
+        (query.status === "all" ||
+          person.status.toLowerCase().replaceAll(" ", "-") === query.status),
+    ),
+    filters: query,
     pendingLeaves,
     counts: {
       people: rows.length,

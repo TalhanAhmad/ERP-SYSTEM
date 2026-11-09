@@ -17,7 +17,8 @@ export function hrApiAccess(role: string, method: string, path: string) {
           "announcements",
         ]).has(path)
       : method === "POST" &&
-        (/^leave\/[^/]+\/(approve|reject)$/.test(path) ||
+        (/^attendance\/check-(in|out)$/.test(path) ||
+          /^leave\/[^/]+\/(approve|reject)$/.test(path) ||
           /^notifications\/[^/]+\/read$/.test(path));
   invariant(
     allowed,

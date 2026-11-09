@@ -1,6 +1,6 @@
 # Encova Workspace — initial implementation report
 
-Date: 8 November 2026 (Asia/Karachi)
+Date: 9 November 2026 (Asia/Karachi)
 Repository: https://github.com/TalhanAhmad/ERP-SYSTEM
 
 ## Delivery status
@@ -32,7 +32,7 @@ The hosted encova-private Storage bucket is private; task-submission upload/down
 
 ## Verification and limits
 
-Latest local verification: 121 unit, 118 integration and 11 browser tests passed, plus strict typing, lint, normal/Supabase-mode builds, fresh migrations and dependency checks. Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
+Latest local verification: 121 unit, 126 integration and 13 browser tests passed, plus strict typing, lint, normal/Supabase-mode builds, fresh migrations and dependency checks. Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
 
 Passing tests cover only implemented behavior. The full specification remains open, notably organization/profile management, internship workflows, advanced tables/import/export, lifecycle management actions, complete settings and dashboard contracts, MFA, reminders/job-run monitoring, real SMTP delivery and backup restore. See docs/planning/backlog.md for the actionable list.
 
@@ -101,3 +101,7 @@ Implemented the owner's simplified HR scope with named attendance/check-in statu
 ## Super Admin account-management milestone
 
 Implemented searchable/paginated People management, per-account safe profile/history/counts, basic profile editing, role changes, deactivation and linked reactivation. Actions are versioned/idempotent and preserve records; UI confirmations/reasons, self/last-admin protection and root-only page/API boundaries are retained. Login email remains read-only, and HR's focused interface is unchanged. No schema migration is required. Source d7fd89d passed CI 42515443745 and deployment dpl_14WHhC1sBzQ9JnYovXcnK9ewagNW is READY. All 250 automated and 22 hosted checks passed. Existing demo credentials/access were preserved; only the new synthetic verification account was retired. See docs/operations/people-management.md for the exact session/feature limits.
+
+## Dashboard and attendance roles update
+
+Implemented the owner-approved Assignments list/filter/create structure, matching clickable dashboard cards and paginated active/archive Projects. Super Admin attendance is view-only at both UI and punch-service boundaries; new schedules and automatic absence jobs exclude Super Admin. HR, Team Lead and Member use the shared personal attendance panel. Root and HR see named staff status with date/status/name filters, and HR keeps its focused navigation and leave approvals. Existing business/history records are retained and no migration is required. All 260 local automated checks and build passed. Hosted publication/verification remains in progress. See [operations](operations/assignments-attendance.md).

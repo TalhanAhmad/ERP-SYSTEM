@@ -63,13 +63,11 @@ test("complete browser work lifecycle with three separate role sessions", async 
   const taskUrl = member.url();
   await member.getByRole("button", { name: "Start task", exact: true }).click();
   await expect(member.getByLabel("What did you complete?")).toBeVisible();
-  await member
-    .getByLabel("Choose a file")
-    .setInputFiles({
-      name: "revision-one.txt",
-      mimeType: "text/plain",
-      buffer: Buffer.from("First private revision"),
-    });
+  await member.getByLabel("Choose a file").setInputFiles({
+    name: "revision-one.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("First private revision"),
+  });
   await member
     .getByRole("button", { name: "Upload file", exact: true })
     .click();
@@ -105,13 +103,11 @@ test("complete browser work lifecycle with three separate role sessions", async 
     .click();
   await expect(reviewer.getByText("Please add boundary tests.")).toBeVisible();
   await member.reload();
-  await member
-    .getByLabel("Choose a file")
-    .setInputFiles({
-      name: "revision-two.txt",
-      mimeType: "text/plain",
-      buffer: Buffer.from("Second private revision"),
-    });
+  await member.getByLabel("Choose a file").setInputFiles({
+    name: "revision-two.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("Second private revision"),
+  });
   await member
     .getByRole("button", { name: "Upload file", exact: true })
     .click();
@@ -169,7 +165,7 @@ test("360-pixel login and workspace keep primary controls reachable", async ({
   ).toBeLessThanOrEqual(360);
   await page.getByRole("link", { name: "Go to my work" }).click();
   await expect(
-    page.getByRole("heading", { name: "My work", exact: true }),
+    page.getByRole("heading", { name: "Assignments", exact: true }),
   ).toBeVisible();
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),

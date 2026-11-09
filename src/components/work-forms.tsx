@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { MutationForm } from "./mutation-form";
 export function ProjectForm() {
   return (
@@ -87,15 +88,17 @@ export function InvitationAction({
 type Option = { id: string; displayName: string; username: string };
 export function TaskForm({
   projects,
-  people,
 }: {
-  projects: { id: string; name: string }[];
-  people: Option[];
+  projects: { id: string; name: string; people: Option[] }[];
 }) {
+  const [projectId, setProjectId] = useState("");
+  const [assigneeId, setAssigneeId] = useState("");
+  const people = projects.find((p) => p.id === projectId)?.people ?? [];
   return (
     <MutationForm
       endpoint="/api/v1/tasks"
       label="Assign task"
+      redirectTo="/assignments?view=open"
       transform={(f) => {
         const data = Object.fromEntries(f);
         if (!data.dueAt) delete data.dueAt;
@@ -114,7 +117,15 @@ export function TaskForm({
       <div className="form-grid">
         <label>
           Project
-          <select name="projectId" required>
+          <select
+            name="projectId"
+            required
+            value={projectId}
+            onChange={(e) => {
+              setProjectId(e.target.value);
+              setAssigneeId("");
+            }}
+          >
             <option value="">Select project</option>
             {projects.map((p) => (
               <option value={p.id} key={p.id}>
@@ -132,28 +143,58 @@ export function TaskForm({
             <option>URGENT</option>
           </select>
         </label>
-        {["assigneeId", "reviewerId"].map((name) => (
-          <label key={name}>
-            {name === "assigneeId" ? "Assignee" : "Independent reviewer"}
-            <select name={name} required>
-              <option value="">Select person</option>
-              {people.map((p) => (
+        <label>
+          Assignee
+          <select
+            name="assigneeId"
+            key={projectId}
+            required
+            disabled={!projectId}
+            value={assigneeId}
+            onChange={(e) => setAssigneeId(e.target.value)}
+          >
+            <option value="">Select person</option>
+            {people.map((p) => (
+              <option value={p.id} key={p.id}>
+                {p.displayName} (@{p.username})
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Independent reviewer
+          <select
+            name="reviewerId"
+            key={projectId + assigneeId}
+            required
+            disabled={!assigneeId}
+            defaultValue=""
+          >
+            <option value="">Select person</option>
+            {people
+              .filter((p) => p.id !== assigneeId)
+              .map((p) => (
                 <option value={p.id} key={p.id}>
                   {p.displayName} (@{p.username})
                 </option>
               ))}
-            </select>
-          </label>
-        ))}
+          </select>
+        </label>
         <label>
           Deadline (your local timezone)
           <input type="datetime-local" name="dueAt" />
         </label>
       </div>
       <p className="note">
-        Both people must be active project members. Add membership before
-        assigning work.
+        Choose a project first. Assignees and independent reviewers are active
+        members of that project. Add people from Projects if someone is missing.
       </p>
+      {projectId && people.length < 2 && (
+        <p className="error">
+          This project needs at least two active members before you can assign
+          work.
+        </p>
+      )}
     </MutationForm>
   );
 }

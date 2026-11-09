@@ -98,13 +98,15 @@ export async function assignSchedule(
 ) {
   requireHr(actor);
   await tx.$queryRaw`SELECT id FROM "Person" WHERE id=${input.userId}::uuid FOR UPDATE`;
+  const person = await tx.person.findFirst({
+    where: { id: input.userId, status: "ACTIVE" },
+  });
+  invariant(person, "NOT_FOUND", "Active person not found.", 404);
   invariant(
-    await tx.person.findFirst({
-      where: { id: input.userId, status: "ACTIVE" },
-    }),
-    "NOT_FOUND",
-    "Active person not found.",
-    404,
+    person.role !== "SUPER_ADMIN",
+    "SUPER_ADMIN_SCHEDULE",
+    "Super Admin accounts have view-only attendance and do not need a schedule.",
+    422,
   );
   invariant(
     await tx.schedulePolicy.findUnique({ where: { id: input.policyId } }),
@@ -146,6 +148,12 @@ export async function check(
   kind: "IN" | "OUT",
   now = new Date(),
 ) {
+  invariant(
+    actor.role !== "SUPER_ADMIN",
+    "ATTENDANCE_VIEW_ONLY",
+    "Super Admin has view-only attendance access.",
+    403,
+  );
   const date = workDate(now);
   const day = await getDay(tx, actor.id, date, now);
   const snapshot = day.snapshot as Snapshot;

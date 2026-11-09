@@ -1,3 +1,6 @@
+import { assignmentQuerySchema } from "@/modules/tasks/queries";
+import { projectQuerySchema } from "@/modules/projects/queries";
+import { attendanceQuerySchema } from "@/modules/attendance/queries";
 import { hrApiAccess } from "@/lib/hr-access";
 import { hrOverview } from "@/modules/hr/service";
 import {
@@ -21,11 +24,13 @@ import { dispatchInvitationEmail } from "@/server/jobs/invitation-email";
 import { invariant } from "@/server/errors";
 import { failure, jsonBody, mutationOrigin, rateLimit } from "@/server/http";
 import {
+  projectDirectory,
   listProjects,
   createProject,
   addMember,
 } from "@/modules/projects/service";
 import {
+  listAssignments,
   listTasks,
   assign,
   changeStatus,
@@ -94,7 +99,14 @@ export async function GET(request: Request, { params }: Params) {
       );
     if (path === "hr/overview")
       return NextResponse.json(
-        { data: await hrOverview(actor) },
+        {
+          data: await hrOverview(
+            actor,
+            attendanceQuerySchema.parse(
+              Object.fromEntries(new URL(request.url).searchParams),
+            ),
+          ),
+        },
         { headers: { "Cache-Control": "private, no-store" } },
       );
     if (path === "operations")
@@ -163,6 +175,30 @@ export async function GET(request: Request, { params }: Params) {
     }
     if (path === "reports")
       return NextResponse.json({ data: await reports(actor) });
+    if (path === "assignments")
+      return NextResponse.json(
+        {
+          data: await listAssignments(
+            actor,
+            assignmentQuerySchema.parse(
+              Object.fromEntries(new URL(request.url).searchParams),
+            ),
+          ),
+        },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
+    if (path === "project-directory")
+      return NextResponse.json(
+        {
+          data: await projectDirectory(
+            actor,
+            projectQuerySchema.parse(
+              Object.fromEntries(new URL(request.url).searchParams),
+            ),
+          ),
+        },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
     if (path === "projects")
       return NextResponse.json({ data: await listProjects(actor) });
     if (path === "tasks")
