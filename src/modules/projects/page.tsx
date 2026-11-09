@@ -91,7 +91,9 @@ export async function ProjectsPage({
       {data.items.map((p) => (
         <section className="panel" key={p.id}>
           <div className="panel-heading">
-            <h2>{p.name}</h2>
+            <h2>
+              <Link href={"/projects/" + p.id}>{p.name}</Link>
+            </h2>
             <Status value={p.archivedAt ? "ARCHIVED" : "ACTIVE"} />
           </div>
           <p className="muted">{p.description || "No description provided."}</p>

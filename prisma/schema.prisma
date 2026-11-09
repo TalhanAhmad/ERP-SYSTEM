@@ -284,6 +284,7 @@ model SchedulePolicy {
  createdAt DateTime @default(now()) @db.Timestamptz
 }
 model ScheduleAssignment {
+ version Int @default(1)
  id String @id @default(uuid()) @db.Uuid
  userId String @db.Uuid
  policyId String @db.Uuid
@@ -293,6 +294,7 @@ model ScheduleAssignment {
  @@index([userId,startDate])
 }
 model Holiday {
+ version Int @default(1)
  id String @id @default(uuid()) @db.Uuid
  date DateTime @unique @db.Date
  name String
@@ -401,6 +403,7 @@ model Team {
  @@unique([departmentId,name])
 }
 model EmployeeProfile {
+ internshipEndDate DateTime? @db.Date
  userId String @id @db.Uuid
  departmentId String? @db.Uuid
  teamId String? @db.Uuid
@@ -473,4 +476,25 @@ model Announcement {
  publishedAt DateTime @default(now()) @db.Timestamptz
  updatedAt DateTime @updatedAt @db.Timestamptz
  expiresAt DateTime @db.Timestamptz
+}
+
+model TaskComment {
+ id String @id @default(uuid()) @db.Uuid
+ taskId String @db.Uuid
+ authorId String @db.Uuid
+ body String
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@index([taskId,createdAt])
+}
+
+model CompanySettings {
+ id String @id @default("workspace")
+ companyName String @default("Encova Solutions")
+ timezone String @default("Asia/Karachi")
+ workweek Json
+ reportCutoff String @default("17:00")
+ policyConfirmedAt DateTime? @db.Timestamptz
+ reportReminders Boolean @default(true)
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.Timestamptz
 }

@@ -13,20 +13,20 @@ This list is deliberately explicit: the full supplied specification is not compl
 ## Identity and people
 
 - Invitation resend/revoke UI/API and expiration/revocation/concurrency tests are implemented. Employee email/reset delivery, privileged MFA and recovery procedures remain; Talha selected Resend but confirmed no domain is owned. The provider test sender reaches only the owner.
-- Basic Super Admin account detail/profile editing, role/status UI, linked reactivation and directory filtering/pagination are deployed and verified. Department/team administration, manager-cycle protection, team membership history, richer employee profiles and verified login-email changes remain. HR intentionally keeps its reduced scope.
+- Basic Super Admin account detail/profile editing, role/status UI, linked reactivation and directory filtering/pagination are deployed and verified. Department/team administration, manager-cycle protection, membership-change audit and employment profiles are implemented/locally verified in the completion pass. Verified login-email changes remain. HR intentionally keeps its reduced scope.
 - Provider-wide session revocation, richer identity lifecycle controls and verified login-email changes remain separate release requirements.
 
 ## Work management
 
 - Initial private attachments are delivered (4 MiB, PDF/PNG/JPEG/UTF-8 text, per-revision history). Larger/resumable files, broad retention/orphan tooling and full file scanning/format validation remain separate extensions.
 
-- Project detail/edit/archive/restore, membership removal, task editing/reassignment, reasoned cancellation/reopen, comments.
+- Project/task lifecycle and comments are implemented and locally verified in the completion pass; hosted acceptance is underway.
 - Precise server pagination/filter/sort/search contracts, task-detail read API, username picker scoped to a selected project, full OpenAPI DTOs.
 - Current UI lists cap at 100 records; advanced table controls, saved views, keyboard grid navigation, bulk changes, CSV preview/commit and exports remain.
 
 ## Attendance, leave and reports
 
-- Holiday administration, schedule-assignment replacement/effective-date editing, comprehensive historical scheduling tests.
+- Calendar administration and schedule replacement with history/race protections are implemented and locally verified; hosted acceptance is underway.
 - Full attendance HR date filters/drilldowns, independent correction rejection reasons, administrative reconciliation retry/audit.
 - Reports need task links, configurable cutoff/late flags, missing-report calculation with work-calendar/leave exceptions, report status counts for HR and accessible revision-history UI.
 - Durable attendance jobs/attempts, Operations monitoring, audited resume/retry and daily Hobby schedule are implemented. First natural scheduled invocation, report reminders, invitation cleanup, broader job types, advanced monitoring/pagination/alerts and historical-gap detection remain. Email leases and restricted owner inbox delivery are verified; a verified domain and unattended retry worker remain.

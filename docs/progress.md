@@ -52,3 +52,7 @@ Super Admin People search/filter/pagination and per-account profile/role/status 
 ## Dashboard and attendance update delivered
 
 Implemented the approved Assignments structure, clickable matching summary cards and Super Admin attendance exemption. HR, Team Lead and Member retain personal check-in/out. All 260 automated checks passed (121 unit, 126 integration, 13 browser), plus strict typing/lint and production build. Source ca49e9f is committed/pushed, CI 42606060629 passed, and the Vercel release is READY. All 24 hosted checks passed. New verification accounts were retired and their test project archived; existing exploration accounts and credentials are preserved. See [assignment and attendance operations](operations/assignments-attendance.md).
+
+## Authorized completion pass — underway
+
+The owner requested completing remaining implementation before later revisions. Calendar replacement/holidays, project/task lifecycle, organization/employment profiles and company settings are implemented and passed 281 automated checks (121 unit, 144 integration, 16 browser), plus typing/lint/build. Publication and live verification of this batch are underway. Reports/notifications/jobs, internships, advanced tables/import/export and release acceptance remain queued in [the completion plan](planning/completion-plan.md). External sending-domain and company-policy/pilot decisions remain owner dependencies; independent work continues.

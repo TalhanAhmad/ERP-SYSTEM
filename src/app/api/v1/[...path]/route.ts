@@ -1,3 +1,48 @@
+import {
+  organizationData,
+  saveDepartment,
+  saveTeam,
+  saveEmployee,
+  employeeDetail,
+  departmentSchema,
+  teamSchema,
+  employeeSchema,
+} from "@/modules/organization/service";
+import {
+  companySettings,
+  saveSettings,
+  settingsSchema,
+} from "@/modules/settings/service";
+import {
+  projectDetail,
+  editProject,
+  archiveProject,
+  removeProjectMember,
+  editProjectSchema,
+  archiveProjectSchema,
+  projectVersionSchema,
+} from "@/modules/projects/lifecycle";
+import {
+  taskDetail,
+  editTask,
+  reassignTask,
+  managerTaskAction,
+  addComment,
+  editTaskSchema,
+  reassignTaskSchema,
+  taskActionSchema,
+  commentSchema,
+} from "@/modules/tasks/lifecycle";
+import {
+  calendarData,
+  replaceSchedule,
+  replaceScheduleSchema,
+  saveHoliday,
+  removeHoliday,
+  holidaySchema,
+  holidayEditSchema,
+  versionSchema,
+} from "@/modules/attendance/calendar";
 import { assignmentQuerySchema } from "@/modules/tasks/queries";
 import { projectQuerySchema } from "@/modules/projects/queries";
 import { attendanceQuerySchema } from "@/modules/attendance/queries";
@@ -92,6 +137,31 @@ export async function GET(request: Request, { params }: Params) {
     const actor = await context(request.headers);
     const path = (await params).path.join("/");
     hrApiAccess(actor.role, "GET", path);
+    if (path === "organization")
+      return NextResponse.json({ data: await organizationData(actor) });
+    if (path === "settings") {
+      invariant(
+        actor.role === "SUPER_ADMIN",
+        "FORBIDDEN",
+        "Super Admin required.",
+        403,
+      );
+      return NextResponse.json({ data: await companySettings() });
+    }
+    if (/^employee-profiles\/[^/]+$/.test(path))
+      return NextResponse.json({
+        data: await employeeDetail(actor, uuid.parse(path.split("/")[1])),
+      });
+    if (/^projects\/[^/]+$/.test(path))
+      return NextResponse.json({
+        data: await projectDetail(actor, uuid.parse(path.split("/")[1])),
+      });
+    if (/^tasks\/[^/]+$/.test(path))
+      return NextResponse.json({
+        data: await taskDetail(actor, uuid.parse(path.split("/")[1])),
+      });
+    if (path === "calendar")
+      return NextResponse.json({ data: await calendarData(actor) });
     if (path === "announcements")
       return NextResponse.json(
         { data: await activeAnnouncement() },
@@ -303,6 +373,29 @@ export async function POST(request: Request, { params }: Params) {
       request.headers.get("idempotency-key"),
       input,
       async (tx) => {
+        if (route === "settings")
+          return saveSettings(tx, actor, settingsSchema.parse(input));
+        if (path[0] === "departments" && path.length <= 2)
+          return saveDepartment(
+            tx,
+            actor,
+            departmentSchema.parse(input),
+            path[1] ? uuid.parse(path[1]) : undefined,
+          );
+        if (path[0] === "teams" && path.length <= 2)
+          return saveTeam(
+            tx,
+            actor,
+            teamSchema.parse(input),
+            path[1] ? uuid.parse(path[1]) : undefined,
+          );
+        if (path[0] === "employee-profiles" && path.length === 2)
+          return saveEmployee(
+            tx,
+            actor,
+            uuid.parse(path[1]),
+            employeeSchema.parse(input),
+          );
         if (route === "announcements")
           return saveAnnouncement(tx, actor, announcementSchema.parse(input));
         if (route === "announcements/delete")
@@ -332,6 +425,26 @@ export async function POST(request: Request, { params }: Params) {
           if (path[2] === "reactivate")
             return reactivate(tx, actor, id, accountStatusSchema.parse(input));
         }
+        if (
+          path[0] === "schedule-assignments" &&
+          path.length === 3 &&
+          path[2] === "replace"
+        )
+          return replaceSchedule(
+            tx,
+            actor,
+            uuid.parse(path[1]),
+            replaceScheduleSchema.parse(input),
+          );
+        if (route === "holidays")
+          return saveHoliday(tx, actor, holidaySchema.parse(input));
+        if (path[0] === "holidays" && path.length === 3 && path[2] === "remove")
+          return removeHoliday(
+            tx,
+            actor,
+            uuid.parse(path[1]),
+            versionSchema.parse(input),
+          );
         if (route === "schedules")
           return createPolicy(tx, actor, policySchema.parse(input));
         if (route === "schedule-assignments")
@@ -398,6 +511,46 @@ export async function POST(request: Request, { params }: Params) {
             uuid.parse(path[1]),
             z.object({ userId: uuid }).strict().parse(input).userId,
           );
+        if (
+          path[0] === "projects" &&
+          path.length === 3 &&
+          ["archive", "restore"].includes(path[2])
+        )
+          return archiveProject(
+            tx,
+            actor,
+            uuid.parse(path[1]),
+            archiveProjectSchema.parse(input),
+            path[2] === "restore",
+          );
+        if (
+          path[0] === "projects" &&
+          path.length === 5 &&
+          path[2] === "members" &&
+          path[4] === "remove"
+        )
+          return removeProjectMember(
+            tx,
+            actor,
+            uuid.parse(path[1]),
+            uuid.parse(path[3]),
+            projectVersionSchema.parse(input),
+          );
+        if (path[0] === "tasks" && path.length === 3) {
+          const id = uuid.parse(path[1]);
+          if (path[2] === "reassign")
+            return reassignTask(tx, actor, id, reassignTaskSchema.parse(input));
+          if (path[2] === "comments")
+            return addComment(tx, actor, id, commentSchema.parse(input));
+          if (["cancel", "reopen", "return"].includes(path[2]))
+            return managerTaskAction(
+              tx,
+              actor,
+              id,
+              z.enum(["cancel", "reopen", "return"]).parse(path[2]),
+              taskActionSchema.parse(input),
+            );
+        }
         if (route === "tasks")
           return assign(tx, actor, createTask.parse(input));
         if (path[0] === "tasks" && path.length === 3) {
@@ -476,6 +629,49 @@ export async function PATCH(request: Request, { params }: Params) {
     await rateLimit(`mutation:${actor.id}`);
     const path = (await params).path;
     const input = await jsonBody(request);
+    if (path.length === 2 && ["projects", "tasks"].includes(path[0])) {
+      return NextResponse.json({
+        data: await mutate(
+          actor,
+          `PATCH:${path.join("/")}`,
+          request.headers.get("idempotency-key"),
+          input,
+          (tx) =>
+            path[0] === "projects"
+              ? editProject(
+                  tx,
+                  actor,
+                  uuid.parse(path[1]),
+                  editProjectSchema.parse(input),
+                )
+              : editTask(
+                  tx,
+                  actor,
+                  uuid.parse(path[1]),
+                  editTaskSchema.parse(input),
+                ),
+        ),
+      });
+    }
+    if (path[0] === "holidays" && path.length === 2) {
+      const body = holidayEditSchema.parse(input);
+      return NextResponse.json({
+        data: await mutate(
+          actor,
+          `PATCH:${path.join("/")}`,
+          request.headers.get("idempotency-key"),
+          input,
+          (tx) =>
+            saveHoliday(
+              tx,
+              actor,
+              body,
+              uuid.parse(path[1]),
+              body.expectedVersion,
+            ),
+        ),
+      });
+    }
     if (path[0] === "users" && path.length === 2) {
       const data = await mutate(
         actor,

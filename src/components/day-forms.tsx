@@ -116,7 +116,7 @@ export function PolicyForm() {
         name: f.get("name"),
         localStart: f.get("localStart"),
         localEnd: f.get("localEnd"),
-        weekdays: String(f.get("weekdays")).split(",").map(Number),
+        weekdays: f.getAll("weekdays").map(Number),
         graceMinutes: Number(f.get("graceMinutes")),
         closingBufferMinutes: Number(f.get("closingBufferMinutes")),
       })}
@@ -128,21 +128,34 @@ export function PolicyForm() {
       <div className="form-grid">
         <label>
           Shift starts (Asia/Karachi)
-          <input type="time" name="localStart" required />
+          <input type="time" name="localStart" required defaultValue="09:00" />
         </label>
         <label>
           Shift ends (Asia/Karachi)
-          <input type="time" name="localEnd" required />
+          <input type="time" name="localEnd" required defaultValue="17:00" />
         </label>
-        <label>
-          Weekdays (0=Sun, 1=Mon, … 6=Sat)
-          <input
-            name="weekdays"
-            required
-            placeholder="1,2,3,4,5"
-            pattern="[0-6](,[0-6])*"
-          />
-        </label>
+        <fieldset>
+          <legend>Working weekdays</legend>
+          {[
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ].map((day, i) => (
+            <label className="file-choice" key={day}>
+              <input
+                type="checkbox"
+                name="weekdays"
+                value={i}
+                defaultChecked={i >= 1 && i <= 5}
+              />
+              {day}
+            </label>
+          ))}
+        </fieldset>
         <label>
           Grace minutes
           <input name="graceMinutes" type="number" min="0" max="120" required />
@@ -159,8 +172,8 @@ export function PolicyForm() {
         </label>
       </div>
       <p className="note">
-        Confirm the actual company policy before assigning a schedule. Overnight
-        shifts are excluded.
+        Times use a day shift: the end must be later than the start (17:00 means
+        5 PM). Confirm actual company policy before assigning.
       </p>
     </MutationForm>
   );

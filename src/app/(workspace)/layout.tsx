@@ -1,3 +1,4 @@
+import { companySettings } from "@/modules/settings/service";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
@@ -37,7 +38,10 @@ export default async function Workspace({
     ["corrections", "Corrections", CheckSquare],
     ["notifications", "Notifications", Bell],
   ] as const;
-  const announcement = await activeAnnouncement();
+  const [announcement, settings] = await Promise.all([
+    activeAnnouncement(),
+    companySettings(),
+  ]);
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -66,6 +70,14 @@ export default async function Workspace({
           )}
           {person.role === "SUPER_ADMIN" && (
             <>
+              <Link href="/organization">
+                <Users size={17} />
+                Organization
+              </Link>
+              <Link href="/settings">
+                <Shield size={17} />
+                Settings
+              </Link>
               <Link href="/announcements">
                 <Megaphone size={17} />
                 Announcements
@@ -98,7 +110,7 @@ export default async function Workspace({
           <span>
             Workspace{" "}
             <span style={{ margin: "0 12px", color: "#c4cec5" }}>/</span>
-            <strong>Encova Solutions</strong>
+            <strong>{settings.companyName}</strong>
           </span>
           <span>
             {new Intl.DateTimeFormat("en-GB", {

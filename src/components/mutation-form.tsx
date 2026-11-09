@@ -1,6 +1,9 @@
 "use client";
-import { useRef, useState } from "react";
+import { useSyncExternalStore, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+const subscribe = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
 export function MutationForm({
   endpoint,
   children,
@@ -19,6 +22,7 @@ export function MutationForm({
   redirectTo?: string;
 }) {
   const router = useRouter();
+  const ready = useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [pending, setPending] = useState(false);
@@ -54,7 +58,16 @@ export function MutationForm({
           if (!response.ok) {
             retry.current = null;
             throw new Error(
-              `${data.error.message}${data.error.fields ? " Check field values." : ""}`,
+              data.error.fields
+                ? [
+                    data.error.message,
+                    ...Object.entries(data.error.fields.fieldErrors ?? {}).map(
+                      ([field, messages]) =>
+                        `${field}: ${(messages as string[]).join(" ")}`,
+                    ),
+                    ...(data.error.fields.formErrors ?? []),
+                  ].join(" ")
+                : data.error.message,
             );
           }
           retry.current = null;
@@ -69,27 +82,29 @@ export function MutationForm({
         }
       }}
     >
-      {children}
-      {error && (
-        <div className="error" role="alert">
-          {error}
-          {error.includes("Reload") && (
-            <button type="button" onClick={() => router.refresh()}>
-              Reload record
-            </button>
-          )}
+      <fieldset className="mutation-fields" disabled={!ready || pending}>
+        {children}
+        {error && (
+          <div className="error" role="alert">
+            {error}
+            {error.includes("Reload") && (
+              <button type="button" onClick={() => router.refresh()}>
+                Reload record
+              </button>
+            )}
+          </div>
+        )}
+        {success && (
+          <div className="success" role="status">
+            {successMessage}
+          </div>
+        )}
+        <div className="form-actions">
+          <button className="primary" disabled={pending}>
+            {pending ? "Saving…" : label}
+          </button>
         </div>
-      )}
-      {success && (
-        <div className="success" role="status">
-          {successMessage}
-        </div>
-      )}
-      <div className="form-actions">
-        <button className="primary" disabled={pending}>
-          {pending ? "Saving…" : label}
-        </button>
-      </div>
+      </fieldset>
     </form>
   );
 }

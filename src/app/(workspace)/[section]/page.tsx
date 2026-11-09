@@ -1,3 +1,6 @@
+import { OrganizationPage } from "@/modules/organization/page";
+import { companySettings } from "@/modules/settings/service";
+import { SettingsForm } from "@/components/settings-form";
 import { AssignmentsPage } from "@/modules/tasks/page";
 import { ProjectsPage } from "@/modules/projects/page";
 import { AdminPeoplePage } from "@/modules/people/page";
@@ -29,6 +32,28 @@ export default async function Section({
 }) {
   const { section } = await params;
   const actor = await context();
+  if (section === "organization" && actor.role === "SUPER_ADMIN")
+    return <OrganizationPage actor={actor} />;
+  if (section === "settings" && actor.role === "SUPER_ADMIN") {
+    const item = await companySettings();
+    return (
+      <>
+        <Heading
+          title="Company settings"
+          subtitle="Configure company policy and report reminders."
+        />
+        <section className="panel">
+          <SettingsForm
+            item={{
+              ...item,
+              workweek: item.workweek as number[],
+              policyConfirmedAt: item.policyConfirmedAt?.toISOString() ?? null,
+            }}
+          />
+        </section>
+      </>
+    );
+  }
   if (section === "people" && actor.role === "SUPER_ADMIN")
     return <AdminPeoplePage actor={actor} searchParams={await searchParams} />;
   if (!hrSectionAllowed(actor.role, section)) notFound();

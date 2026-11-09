@@ -16,6 +16,7 @@ export const reportSchema = z
   .strict();
 export async function reportScope(actor: Actor, tx: Tx = db) {
   if (actor.role === "SUPER_ADMIN") return {};
+  if (actor.role !== "TEAM_LEAD") return { userId: { in: [actor.id] } };
   const teams = await tx.team.findMany({
     where: { leadId: actor.id, archivedAt: null },
     select: { id: true },

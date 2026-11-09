@@ -1,0 +1,2 @@
+ALTER TABLE "ScheduleAssignment" ADD COLUMN "version" INTEGER NOT NULL DEFAULT 1 CHECK ("version">0);
+ALTER TABLE "Holiday" ADD COLUMN "version" INTEGER NOT NULL DEFAULT 1 CHECK ("version">0);

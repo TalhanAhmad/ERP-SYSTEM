@@ -1,12 +1,17 @@
+import { taskDetail } from "@/modules/tasks/lifecycle";
+import {
+  TaskEditForm,
+  ReassignForm,
+  ReasonAction,
+  CommentForm,
+} from "@/components/lifecycle-forms";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/server/db";
 import { context } from "@/server/context";
-import { visibleTasks } from "@/modules/tasks/service";
 import { Status } from "@/components/status";
 import { AttachmentForm } from "@/components/attachment-form";
-import { attachmentFields } from "@/modules/attachments/metadata";
 import { listDraftAttachments } from "@/modules/attachments/service";
 import { storageAvailable } from "@/modules/attachments/storage";
 import {
@@ -23,18 +28,21 @@ export default async function Task({
   if (!z.uuid().safeParse(id).success) notFound();
   const actor = await context();
   if (actor.role === "HR_ADMIN") notFound();
-  const task = await db.task.findFirst({
-    where: { id, ...visibleTasks(actor) },
-    include: {
-      project: true,
-      assignee: { select: { displayName: true, username: true } },
-      reviewer: { select: { displayName: true, username: true } },
-      submissions: {
-        orderBy: { revision: "desc" },
-        include: { review: true, attachments: { select: attachmentFields } },
-      },
-    },
+  const task = await taskDetail(actor, id).catch((e) => {
+    if (e.code === "NOT_FOUND") notFound();
+    throw e;
   });
+  const manage =
+    actor.role === "SUPER_ADMIN" ||
+    (actor.role === "TEAM_LEAD" && task.project.managerId === actor.id);
+  const people = manage
+    ? await db.projectMember.findMany({
+        where: { projectId: task.projectId, user: { status: "ACTIVE" } },
+        select: {
+          user: { select: { id: true, username: true, displayName: true } },
+        },
+      })
+    : [];
   if (!task) notFound();
   const own = task.assigneeId === actor.id;
   const reviewer =
@@ -47,8 +55,8 @@ export default async function Task({
   const drafts = canUpload ? await listDraftAttachments(actor, id) : [];
   return (
     <>
-      <Link className="muted" href="/tasks">
-        ← Back to my work
+      <Link className="muted" href="/assignments">
+        ← Back to assignments
       </Link>
       <div className="page-heading" style={{ marginTop: 22 }}>
         <div>
@@ -174,6 +182,69 @@ export default async function Task({
           )}
         </section>
       </div>
+      <section className="panel">
+        <h2>Comments</h2>
+        {task.comments.map((c) => (
+          <article className="revision" key={c.id}>
+            <strong>{c.author?.displayName ?? "Former member"}</strong> ·{" "}
+            {c.createdAt.toISOString()}
+            <p className="preline">{c.body}</p>
+          </article>
+        ))}
+        {!task.comments.length && <p className="muted">No comments yet.</p>}
+        {!task.project.archivedAt &&
+          !["APPROVED", "CANCELED"].includes(task.status) && (
+            <CommentForm taskId={id} />
+          )}
+      </section>
+      {manage && !task.project.archivedAt && (
+        <section className="panel">
+          <h2>Manage task</h2>
+          {!["APPROVED", "CANCELED", "IN_REVIEW"].includes(task.status) && (
+            <>
+              <details>
+                <summary>Edit task</summary>
+                <TaskEditForm
+                  task={{ ...task, dueAt: task.dueAt?.toISOString() ?? null }}
+                />
+              </details>
+              <details>
+                <summary>Reassign task</summary>
+                <ReassignForm task={task} people={people.map((m) => m.user)} />
+              </details>
+            </>
+          )}
+          {["APPROVED", "CANCELED"].includes(task.status) ? (
+            <details key="reopen">
+              <summary>Reopen task</summary>
+              <ReasonAction
+                endpoint={`/api/v1/tasks/${id}/reopen`}
+                version={task.version}
+                label="Reopen task"
+              />
+            </details>
+          ) : (
+            <details key="cancel">
+              <summary>Cancel task</summary>
+              <ReasonAction
+                endpoint={`/api/v1/tasks/${id}/cancel`}
+                version={task.version}
+                label="Cancel task"
+              />
+            </details>
+          )}
+          {task.status === "IN_REVIEW" && !own && (
+            <details>
+              <summary>Return for changes</summary>
+              <ReasonAction
+                endpoint={`/api/v1/tasks/${id}/return`}
+                version={task.version}
+                label="Return for changes"
+              />
+            </details>
+          )}
+        </section>
+      )}
     </>
   );
 }

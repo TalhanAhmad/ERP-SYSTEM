@@ -1,3 +1,4 @@
+import { CalendarPage } from "./calendar-page";
 import { SelfAttendance } from "./self";
 import { HrPage } from "@/modules/hr/page";
 import { context } from "@/server/context";
@@ -8,8 +9,6 @@ import {
   LeaveForm,
   DecisionForm,
   CorrectionForm,
-  PolicyForm,
-  ScheduleAssignmentForm,
   ReportForm,
 } from "@/components/day-forms";
 import { hr, attendanceList } from "./service";
@@ -91,43 +90,7 @@ export async function DayPage({ section }: { section: string }) {
       </>
     );
   }
-  if (section === "schedules") {
-    if (!privileged) return <p className="error">HR access is required.</p>;
-    const policies = await db.schedulePolicy.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-    const people = await db.person.findMany({
-      where: { status: "ACTIVE", role: { not: "SUPER_ADMIN" } },
-      select: { id: true, username: true },
-    });
-    return (
-      <>
-        {heading(
-          "Schedules",
-          "Define confirmed day-shift policies, then assign effective dates.",
-        )}
-        <div className="split">
-          <section className="panel">
-            <h2>Create a schedule</h2>
-            <PolicyForm />
-          </section>
-          <section className="panel">
-            <h2>Assign a schedule</h2>
-            <ScheduleAssignmentForm people={people} policies={policies} />
-          </section>
-        </div>
-        <section className="panel">
-          <h2>Policies</h2>
-          {policies.map((p) => (
-            <p key={p.id}>
-              <strong>{p.name}</strong> · {p.localStart}–{p.localEnd} ·{" "}
-              {p.graceMinutes} min grace
-            </p>
-          ))}
-        </section>
-      </>
-    );
-  }
+  if (section === "schedules") return <CalendarPage actor={actor} />;
   if (section === "leave") {
     const requests = await db.leaveRequest.findMany({
       where:

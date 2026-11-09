@@ -21,6 +21,7 @@ function requireHr(actor: Actor) {
 }
 export const dateValue = (value: string) => new Date(`${value}T00:00:00Z`);
 export async function lockDate(tx: Tx, userId: string, date: string) {
+  await tx.$queryRaw`SELECT id FROM "Person" WHERE id=${userId}::uuid FOR UPDATE`;
   await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`${userId}:${date}`},0))::text`;
 }
 export async function snapshotFor(
@@ -28,6 +29,7 @@ export async function snapshotFor(
   userId: string,
   date: string,
 ): Promise<Snapshot> {
+  await tx.$queryRaw`SELECT pg_advisory_xact_lock_shared(hashtextextended('company-calendar',0))::text`;
   const day = dateValue(date);
   const assignment = await tx.scheduleAssignment.findFirst({
     where: {
