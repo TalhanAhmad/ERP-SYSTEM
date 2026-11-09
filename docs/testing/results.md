@@ -18,11 +18,11 @@ Date: 9 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | Email source 4d76a19 pushed and verified by successful CI 42481163707; current report updated. |
+| Git commit/push | PASS | Source ca49e9f pushed and verified by successful CI 42606060629; final evidence/report updated. |
 
 ## Supabase/Vercel foundation verification
 
-Current milestone local results: 121 unit, 118 integration and 11 browser tests passed (250 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
+Current milestone local results: 121 unit, 126 integration and 13 browser tests passed (260 total); typecheck and lint passed. The six migrations applied cleanly both as an upgrade and into the separate empty encova_restore database. That database name does not constitute a backup-restore demonstration.
 
 Supabase SDK + real PostgreSQL contract tests verify safe session DTOs/HTTP-only cookies, server identity verification, client role metadata rejection, immediate domain deactivation denial, legacy endpoint closure, same-origin protection, generic reset results, internal-only redirects, sign-out cookie clearing and scheduler authentication. Provider HTTP is simulated in these tests; no live Supabase result is claimed. Separate PostgreSQL tests cover provisioning failure/retry/revocation/concurrency, RLS/grants and the bounded job pass.
 
@@ -301,4 +301,8 @@ The real-provider test created only a uniquely identified synthetic account/proj
 
 Local acceptance passed 260 automated checks: 121 unit, 126 real-PostgreSQL integration and 13 Chromium browser tests, with strict typing/lint and production build. Eight new integration cases verify shared card/list counts, scope, search/pagination, review queues, Super Admin punch/schedule denial, three staff roles, filtered staff status and preserved legacy history/job exemption. Two new browser journeys cover clickable matching cards/mobile filters and actual HR/Lead/Member punches while Root remains view-only. Existing work assignment/revision/review flow passes through the new task form.
 
-The first new card browser assertion used an exact implicit label locator that included the select’s option text. The page’s accessible combobox name was correct. Switching the assertion to its accessible combobox role resolved the test mismatch; the complete 13-test run then passed in 51.8 seconds. Source publication and hosted acceptance are the remaining release checks.
+The first new card browser assertion used an exact implicit label locator that included the select’s option text. The page’s accessible combobox name was correct. Switching the assertion to its accessible combobox role resolved the test mismatch; the complete 13-test run then passed in 51.8 seconds. Source ca49e9feddbc35a8c6ed3069b6a2249693c4dc03 passed [CI 42606060629](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42606060629). Runtime/RLS/private-bucket/TLS preflight passed without a migration, and Vercel deployment dpl_FyaWEkk2TToL7vZZ2GykwmctheTC reached READY at the canonical URL.
+
+Hosted acceptance passed 24 checks. Verified existing four role logins, scoped Lead/Member count-list agreement, four actual card links and destination filters/counts, anonymous/HR work-directory denial, Root punch denial without new ledger/events, Root schedule denial, three new roles’ actual personal punches and named Root status rows, focused HR menus, project-scoped live task creation, independent reviewer selection, member visibility, 360px layouts, sign-out and controlled cleanup. Mobile assignment/attendance screenshots were visually inspected.
+
+The private hosted script initially omitted role labels from its fixture metadata and stopped before assignment creation; this was corrected and verification repeated. On the successful pass, sign-out correctly invalidated the shared verification session, requiring fresh owner authentication for cleanup. Cleanup then retired only the three new owned fixtures and archived their synthetic project. All three persistent exploration accounts and the owner remain ACTIVE; no passwords or existing staff attendance were changed.

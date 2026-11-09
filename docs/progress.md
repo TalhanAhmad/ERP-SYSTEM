@@ -9,7 +9,7 @@ Last updated: 2026-11-09 (Asia/Karachi)
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
 - Implementation status: personal-testing demo deployed with monitored attendance jobs, an enabled daily schedule, private revision attachments and invitation management, plus restricted Resend email/reset delivery. Full specification and company production acceptance remain incomplete.
-- Publication: Super Admin account-management source d7fd89d passed GitHub CI 42515443745 and is deployed as dpl_14WHhC1sBzQ9JnYovXcnK9ewagNW. Local verification: 121 unit, 118 integration and 11 browser tests (250 total), plus 22 hosted account-management/permission/session checks. Earlier milestone evidence remains recorded separately.
+- Publication: Dashboard/Assignments and attendance-role source ca49e9f passed GitHub CI 42606060629 and is deployed as dpl_FyaWEkk2TToL7vZZ2GykwmctheTC. Local verification: 121 unit, 126 integration and 13 browser tests (260 total), plus 24 hosted workflow/permission/cleanup checks. Earlier milestone evidence remains recorded separately.
 
 ## Implemented evidence
 
@@ -27,7 +27,7 @@ Actual company policies, a verified sending domain, full employee email delivery
 
 Talha finalized Next.js + TypeScript + Tailwind, Next Route Handlers/shared services, Supabase PostgreSQL/Auth/Storage, Prisma and Vercel. See [ADR-002](decisions/ADR-002-supabase-vercel.md) and [deployment guide](operations/deployment.md). Better Auth remains local compatibility only; hosted deployments must select Supabase. The existing local admin is preserved.
 
-Official CLI browser authentication resolved the connected-tool gap. Created a separate Encova Solutions organization and Encova Workspace Demo Supabase project in Mumbai, and encova-workspace on Vercel Hobby. All nine hosted migrations and database/Auth/private-storage preflight passed. The deployment is READY at https://encova-workspace.vercel.app; live API/browser and attendance acceptance checks passed. This is a personal testing demo with no billing upgrade.
+Official CLI browser authentication resolved the connected-tool gap. Created a separate Encova Solutions organization and Encova Workspace Demo Supabase project in Mumbai, and encova-workspace on Vercel Hobby. All ten hosted migrations and database/Auth/private-storage preflight passed. The deployment is READY at https://encova-workspace.vercel.app; live API/browser and attendance acceptance checks passed. This is a personal testing demo with no billing upgrade.
 
 ## Exact next action
 
@@ -49,6 +49,6 @@ Focused HR attendance/leave/notifications and the shared Super Admin announcemen
 
 Super Admin People search/filter/pagination and per-account profile/role/status controls are deployed and verified. All 250 automated tests, 22 hosted checks and source CI passed. HR remains focused on attendance, leave approvals and notifications. See [account management](operations/people-management.md). Department/team management and verified email changes remain separate follow-ups.
 
-## Dashboard and attendance update in progress
+## Dashboard and attendance update delivered
 
-Implemented the approved Assignments structure, clickable matching summary cards and Super Admin attendance exemption. HR, Team Lead and Member retain personal check-in/out. All 260 automated checks passed (121 unit, 126 integration, 13 browser), plus strict typing/lint and production build. Source publication, hosted acceptance and final report remain in progress.
+Implemented the approved Assignments structure, clickable matching summary cards and Super Admin attendance exemption. HR, Team Lead and Member retain personal check-in/out. All 260 automated checks passed (121 unit, 126 integration, 13 browser), plus strict typing/lint and production build. Source ca49e9f is committed/pushed, CI 42606060629 passed, and the Vercel release is READY. All 24 hosted checks passed. New verification accounts were retired and their test project archived; existing exploration accounts and credentials are preserved. See [assignment and attendance operations](operations/assignments-attendance.md).

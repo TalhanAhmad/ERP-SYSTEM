@@ -40,3 +40,7 @@ This list is deliberately explicit: the full supplied specification is not compl
 - Maintain clean-runner CI verification for each source milestone and record its exact run/commit in the test results.
 
 Learning milestones remain unconfirmed until Talha demonstrates the relevant concepts. Permission to build across milestones does not fabricate learning completion.
+
+## Delivered dashboard/attendance refinement — 9 November 2026
+
+The approved Assignments/filter/create structure, clickable matching overview cards, paginated Projects and Super Admin attendance exemption are implemented, deployed and verified (260 automated tests, green CI and 24 hosted checks). HR, Team Lead and Member retain personal punches; HR keeps focused staff visibility and leave approvals. No migration or credential change is required. The broader dashboard contract, advanced tables, organization/internship/settings modules and company release gates above remain open.

@@ -17,3 +17,7 @@ HR keeps Overview, Attendance, Leave approvals and Notifications. Attendance als
 Super Admin has no personal punch controls; both direct punch endpoints return 403 before a ledger/event can be created. New schedules reject Super Admin targets. Job audience capture and reconciliation skip Super Admin, including preexisting assignments and people promoted after a job was queued. Existing raw events, historical attendance and immutable job/audit evidence remain intact.
 
 No schema migration, credential change, billing change or announcement change is needed for this release. The persistent owner exploration accounts must stay active during live tests. Create and retire only new owned synthetic verification identities.
+
+## Verification and publication
+
+Source ca49e9f passed [GitHub CI 42606060629](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42606060629). Local acceptance: 121 unit, 126 PostgreSQL integration and 13 Chromium tests (260 total), typing/lint and production build. Vercel deployment dpl_FyaWEkk2TToL7vZZ2GykwmctheTC is READY. All 24 hosted workflow, permission and cleanup checks passed. The newly created synthetic accounts were retired and their project archived; owner and persistent HR/Lead/Member exploration accounts remain active. Attendance/audit history is retained.
