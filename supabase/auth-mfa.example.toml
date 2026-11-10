@@ -1,0 +1,8 @@
+# Partial hosted configuration. Review `supabase config diff` before pushing.
+# Current CLI leaves undeclared remote properties unchanged.
+# This enables the TOTP capability; it does not enroll users or enable the app's
+# company-wide privileged-MFA requirement.
+project_id = "encova-workspace"
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true

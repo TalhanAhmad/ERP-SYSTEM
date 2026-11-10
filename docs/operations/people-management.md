@@ -16,7 +16,8 @@ A Super Admin can edit their own profile, but another Super Admin must change th
 
 ## Session and permission behavior
 
-The local compatibility provider revokes sessions on role/status changes; a restored local account signs in again. Hosted Supabase requests verify the provider identity and load the current active domain role on every request. Deactivation immediately denies application requests, and role changes apply on subsequent requests. Provider-wide token/session revocation remains separate release work. A still-valid hosted provider session may resume when an administrator intentionally reactivates that linked domain account; a new password is not implied by reactivation.
+The local compatibility provider revokes sessions on role/status changes. The hosted provider is verified on every request, and migration seventeen adds registered app-session IDs. Role/status changes and reactivation clear prior app sessions; restoring a role/account does not reactivate an old browser cookie. The user signs in again with the unchanged password. Own all-device sign-out immediately denies app access and requests Supabase global refresh-token revocation. An enrolled factor requires AAL2 for normal access. See tables-security-recovery.md for the token-expiry boundary and owner MFA rollout.
+
 
 Only Super Admin can open the management page or management APIs. The focused HR four-screen scope remains unchanged. Team Lead/Member keep their existing scoped read-only directory and cannot read administrative account detail or mutate profiles/access.
 

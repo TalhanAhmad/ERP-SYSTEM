@@ -18,7 +18,7 @@ Date: 10 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pn
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | Previous source is published; final 324-test completion release is ready for commit and hosted verification. |
+| Git commit/push | PASS | Source baf7d10b68f53883f6555864c70170931f7b2325 passed CI 42809226350 and is live as dpl_9d8mcA3q8ei1LsPNMqahrFAB4mcA; final evidence/report committed separately. |
 
 ## Supabase/Vercel foundation verification
 
@@ -325,9 +325,9 @@ Reports/learning hosted acceptance: source 60c1d3d5319abcb4efe03943a63cce8e54a6d
 
 Report edit race correction: actual rendered screenshot inspection found two saved report submissions containing the original text after a rapid Save/Submit sequence. Separate forms allowed the submit to arrive before a delayed PATCH; server versions prevented an overwrite but could not enforce UI intent. A single draft editor now saves current fields first and submits using the returned version. Retry keys persist through ambiguous network failures. The combined pilot now delays PATCH by 400 ms and verifies two distinct report bodies; both focused browser cases passed (8.7 seconds), with typing/lint/build. New live verification will explicitly compare current text and each submitted revision. No historical report or immutable revision is rewritten.
 
-## Completion release verification in progress — 10 November 2026
+## Completion release verification — 10 November 2026
 
-The core/report/learning batches above remain published. The sixteenth/seventeenth migrations and structured tables/security release are under final verification. Final local pass: 130 unit, 174 PostgreSQL integration and 20 Chromium browser checks (324 total), plus typing/lint/production build. Supabase contract coverage includes TOTP assurance and immediate app-session revocation. Final browser/accessibility/CI/live evidence will be recorded after successful execution; intermediate failures are retained in work-log steps 206–210.
+The core/report/learning batches above remain published. The sixteenth/seventeenth migrations and structured tables/security release are deployed and verified. Final local pass: 130 unit, 174 PostgreSQL integration and 20 Chromium browser checks (324 total), plus typing/lint/production build. Supabase contract coverage includes TOTP assurance and immediate app-session revocation. All final browser/accessibility/CI/live checks passed; intermediate defects/findings and fixes are retained in the work log.
 
 Isolated restore: 47 public tables, 2,116 rows and 185 constraints restored from encova_test into encova_restore with matching per-table content/count fingerprints, 1.507 seconds. Production was untouched. Backup hash: ef3dbea60c96aac4bf6adc2ccf1f7a71eb19335c94e28277a6a5a77ee014cc27. This does not validate hosted PITR or stored-file recovery.
 
@@ -336,3 +336,15 @@ Synthetic service load: 100 new members, 100 requests at concurrency 10, zero fa
 Final isolated restore repeated after the complete regression: 47 tables, 1,710 rows and 185 constraints matched, 355 ms, SHA-256 1dbaaff3dbed179f72d0abae196f4f124f0247f8f3495e1af6e2812e9f4e06f9. Counts differ from the earlier drill because the integration suite recreates its dedicated synthetic data.
 
 Natural scheduler evidence is now observed: Vercel request records show GET /api/internal/jobs at 2026-11-10 00:53:15.103 UTC, HTTP 200, clientUserAgent vercel-cron/1.0. Database attempt 554d6320-7f81-45d9-ad52-5e024995b9a0 began 00:53:17.283 UTC and succeeded; maintenance 7464ab02-dea4-43b6-9e4f-3db319562efa also succeeded. No manual request with a forged cron discriminator was used. The scheduled 00:15 expression runs with Hobby hourly precision.
+
+## Final hosted acceptance — 10 November 2026
+
+Source baf7d10b68f53883f6555864c70170931f7b2325 passed [CI 42809226350](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42809226350), including all 324 tests and the Supabase-mode build. Controlled migrations sixteen/seventeen succeeded; restricted runtime/RLS/private-bucket/TLS preflight passed. Vercel deployment dpl_9d8mcA3q8ei1LsPNMqahrFAB4mcA is READY at https://encova-workspace.vercel.app.
+
+All 56 hosted checks passed: 18 final table/security/storage checks, 20 report/learning/attendance/maintenance checks and 18 core organization/calendar/lifecycle checks. Actual browser Supabase TOTP enrollment/verification/removal, rejected AAL1 access, global logout across two sessions and role-change session revocation passed. CSV preview ownership/atomic replay, bulk stale rejection, saved-view privacy, mobile tables/exports, actual private-file bytes and independent reviewer scope passed. Report history contains distinct first/second text and retains original submission timing. Calendar replacement/holiday forms, manager cycles/private employment data, work actions, membership revocation, HR menus and Root attendance exemption passed. Only newly owned synthetic fixtures were retired/archived; all three persistent exploration accounts remain ACTIVE. Owner/demo passwords and owner MFA enrollment are unchanged. Live mobile table/report screenshots were inspected.
+
+The provider initially rejected TOTP enrollment because both TOTP switches were disabled. A reviewed partial CLI diff/push changed exactly enroll_enabled and verify_enabled to true; signup, SMTP, callbacks and password policy were left unchanged. The workspace-wide privileged-MFA policy stays off. The [partial configuration example](../../supabase/auth-mfa.example.toml) records the required capability. Verification scripts were corrected to await client navigation and use absolute URLs for browser request contexts; no app guards were weakened.
+
+Ten bounded concurrent hosted reads completed without errors: p50 1,833 ms, p95 2,180 ms, including network/auth/database costs. This is a small acceptance probe, not a 100-user hosted throughput guarantee.
+
+Protected rollback compatibility rehearsal: authenticated the prior source 5b44e83 through Vercel CLI after all seventeen migrations; old settings/projects reads and local sign-out passed. Unauthenticated old immutable URLs redirect to Vercel SSO. The canonical production alias and database were not rolled back. Company-managed backup/Storage recovery and owner rollout decisions remain explicit external gates.

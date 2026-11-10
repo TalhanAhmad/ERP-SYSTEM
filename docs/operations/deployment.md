@@ -1,5 +1,7 @@
 # Supabase + Vercel deployment and cutover
 
+Current release (10 November 2026): source baf7d10, CI 42809226350, seventeen migrations, deployment dpl_9d8mcA3q8ei1LsPNMqahrFAB4mcA READY on the canonical domain. TOTP capability is enabled; global app policy stays off. Older foundation/milestone notes below are historical; current acceptance and external gates are in testing/results.md and planning/backlog.md.
+
 Status (8 November 2026): personal testing demo deployed at https://encova-workspace.vercel.app. Official CLI browser authentication succeeded after connected project tools remained unavailable. Encova Solutions is a separate Supabase organization; Encova Workspace Demo runs in ap-south-1 (Mumbai). The Vercel encova-workspace project uses Hobby, Node 24 and bom1 functions. Ten hosted migrations and the real runtime preflight passed. Company production acceptance remains outstanding; no billing upgrade or real employee data migration was performed.
 
 ## 1. Provision isolated hosted resources

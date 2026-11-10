@@ -8,8 +8,8 @@ Last updated: 2026-11-10 (Asia/Karachi)
 - Current learning status: Awaiting learning check
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
-- Implementation status: the authorized completion pass now includes calendar/lifecycle/organization, reports/internships/maintenance, structured tables/import/export, account-security capability and isolated recovery/load/accessibility verification. The complete local regression passed 324 tests. Final source/CI/live verification is in progress. Company rollout and learner sign-off remain separate.
-- Publication: source 5b44e8317a76b070b1b31f34e14870c7b312c7db is the current live report-editor hotfix. The final table/security release is under verification; do not confuse local implementation with hosted acceptance.
+- Implementation status: the authorized completion pass now includes calendar/lifecycle/organization, reports/internships/maintenance, structured tables/import/export, account-security capability and isolated recovery/load/accessibility verification. The complete local regression passed 324 tests. Source baf7d10 passed CI and 56 final hosted checks, and is live. Company rollout and learner sign-off remain separate.
+- Publication: source baf7d10b68f53883f6555864c70170931f7b2325, CI 42809226350 SUCCESS, Vercel dpl_9d8mcA3q8ei1LsPNMqahrFAB4mcA READY at https://encova-workspace.vercel.app. Verified 130 unit + 174 integration + 20 browser tests (324), 56 live checks, natural scheduling, isolated recovery and protected prior-version compatibility.
 
 ## Implemented evidence
 
@@ -17,7 +17,7 @@ Real application and PostgreSQL migrations now exist. Authentication/invitations
 
 ## Remaining release work
 
-See [the release checklist](planning/backlog.md). Organization/internships and reports are deployed. Tables/imports/security are being finalized. An isolated full-schema/data recovery drill passed; hosted backup/PITR and Storage restoration are not claimed.
+See [the release checklist](planning/backlog.md). Organization/internships and reports are deployed. Tables/imports/security are deployed and live-verified. An isolated full-schema/data recovery drill passed; hosted backup/PITR and Storage restoration are not claimed.
 
 ## Blockers and dependencies
 
@@ -31,7 +31,7 @@ Official CLI browser authentication resolved the connected-tool gap. Created a s
 
 ## Current completion pass
 
-Finish the final full regression, controlled migrations sixteen/seventeen, Vercel deployment and synthetic hosted acceptance. A natural scheduled invocation is now verified on 10 November at 00:53 UTC (Vercel HTTP 200, vercel-cron/1.0, successful attendance and maintenance records). Daily maintenance now includes report reminders, expired-invitation cleanup and a bounded permitted-email retry. Resend remains owner-only until a verified domain is supplied. Account-security setup is optional for now; the owner and exploration accounts are not enrolled automatically. Details and evidence are recorded in [table/security/recovery operations](operations/tables-security-recovery.md).
+The authorized completion pass is finished and published. Sign in again after the app-session cutover. Future edits can build on this release. A natural scheduled invocation is now verified on 10 November at 00:53 UTC (Vercel HTTP 200, vercel-cron/1.0, successful attendance and maintenance records). Daily maintenance now includes report reminders, expired-invitation cleanup and a bounded permitted-email retry. Resend remains owner-only until a verified domain is supplied. Account-security setup is optional for now; the owner and exploration accounts are not enrolled automatically. Details and evidence are recorded in [table/security/recovery operations](operations/tables-security-recovery.md).
 
 ## Current demo password policy
 
