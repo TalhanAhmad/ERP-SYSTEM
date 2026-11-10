@@ -35,3 +35,7 @@ Test claims/concurrency, partial progress, rollback, duplicate requests, expired
 Full company acceptance still requires measured hosted throughput, monitoring/alerting, recovery drills, backup restore, real SMTP, privileged MFA and the remaining ERP requirements. No billing upgrade is performed.
 
 Provider references: [Hobby cron limits](https://vercel.com/docs/schedules/cron-jobs/usage-and-pricing), [cron authentication/concurrency/error handling](https://vercel.com/docs/schedules/cron-jobs/manage-cron-jobs).
+
+## Automatic processing observed — 10 November 2026
+
+Vercel request records confirm GET /api/internal/jobs at 00:53:15.103 UTC, HTTP 200, user agent vercel-cron/1.0. The corresponding CRON attendance attempt and maintenance run both reached SUCCEEDED. This closes the earlier first-natural-invocation observation gate; it does not establish continuous monitoring or inbox delivery to unverified employee domains.

@@ -26,7 +26,9 @@
     "db:seed": "pnpm test:e2e:prepare",
     "build:vercel": "prisma generate && next build",
     "bootstrap:supabase-admin": "tsx --conditions=react-server scripts/bootstrap-supabase-admin.ts",
-    "verify:deployment": "tsx --conditions=react-server scripts/verify-deployment.ts"
+    "verify:deployment": "tsx --conditions=react-server scripts/verify-deployment.ts",
+    "verify:recovery": "tsx scripts/verify-recovery.ts",
+    "verify:performance": "tsx --conditions=react-server scripts/verify-performance.ts"
   },
   "keywords": [],
   "author": "",
@@ -62,6 +64,7 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@playwright/test": "1.65.0",
     "@tailwindcss/postcss": "4.3.5",
     "@types/node": "26.6.6",

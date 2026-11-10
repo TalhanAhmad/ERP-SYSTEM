@@ -157,9 +157,9 @@ export async function assign(
       include: { user: true },
     });
     invariant(
-      member?.user.status === "ACTIVE",
+      member?.user.status === "ACTIVE" && member.user.role !== "HR_ADMIN",
       "INVALID_MEMBER",
-      "Assignee and reviewer must be active project members.",
+      "Assignee and reviewer must be active project members with work access.",
     );
   }
   const task = await tx.task.create({

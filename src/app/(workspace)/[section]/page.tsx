@@ -1,10 +1,7 @@
+import { ActivityPage } from "@/modules/activity/page";
+import { TablesPage } from "@/modules/views/page";
 import { InternshipsPage } from "@/modules/internships/page";
 import { ReportsPage, ReportStatusPage } from "@/modules/reports/page";
-import { notificationPreference } from "@/modules/notifications/service";
-import {
-  NotificationPreferences,
-  ReadAllNotifications,
-} from "@/components/notification-forms";
 import { OrganizationPage } from "@/modules/organization/page";
 import { companySettings } from "@/modules/settings/service";
 import { SettingsForm } from "@/components/settings-form";
@@ -27,9 +24,8 @@ import { context } from "@/server/context";
 import { db } from "@/server/db";
 import { listProjects } from "@/modules/projects/service";
 import { listTasks } from "@/modules/tasks/service";
-import { dashboard } from "@/modules/projects/dashboard";
+import { dashboard, dashboardFollowUp } from "@/modules/projects/dashboard";
 import { Status } from "@/components/status";
-import { ReadButton } from "@/components/work-forms";
 export default async function Section({
   params,
   searchParams,
@@ -64,6 +60,8 @@ export default async function Section({
   if (section === "people" && actor.role === "SUPER_ADMIN")
     return <AdminPeoplePage actor={actor} searchParams={await searchParams} />;
   if (!hrSectionAllowed(actor.role, section)) notFound();
+  if (section === "tables" && actor.role !== "HR_ADMIN")
+    return <TablesPage actor={actor} searchParams={await searchParams} />;
   if (section === "internships" && actor.role !== "HR_ADMIN")
     return <InternshipsPage actor={actor} searchParams={await searchParams} />;
   if (section === "reports")
@@ -95,52 +93,17 @@ export default async function Section({
     )
   )
     return <DayPage section={section} />;
-  if (section === "notifications") {
-    const prefs = await notificationPreference(actor);
-    const items = await db.notification.findMany({
-      where: { recipientId: actor.id },
-      orderBy: { createdAt: "desc" },
-      take: 100,
-    });
+  if (
+    section === "notifications" ||
+    (section === "audit" && actor.role === "SUPER_ADMIN")
+  )
     return (
-      <>
-        <Heading
-          title="Notifications"
-          subtitle="Updates from the work you’re part of."
-        />
-        <section className="panel">
-          <ReadAllNotifications />
-          {actor.role !== "HR_ADMIN" && (
-            <details>
-              <summary>Notification preferences</summary>
-              <NotificationPreferences
-                version={prefs.version}
-                reportReminders={prefs.reportReminders}
-              />
-            </details>
-          )}
-        </section>
-        <section className="panel">
-          {items.length === 0 ? (
-            <Empty text="You’re all caught up. New assignments and review updates will appear here." />
-          ) : (
-            items.map((item) => (
-              <div className="notification" key={item.id}>
-                <div>
-                  <Link href={item.target}>{item.title} →</Link>
-                  <p className="note">
-                    {item.createdAt.toISOString().slice(0, 10)} ·{" "}
-                    {item.readAt ? "Read" : "Unread"}
-                  </p>
-                </div>
-                {!item.readAt && <ReadButton id={item.id} />}
-              </div>
-            ))
-          )}
-        </section>
-      </>
+      <ActivityPage
+        actor={actor}
+        kind={section}
+        searchParams={await searchParams}
+      />
     );
-  }
   const projects = await listProjects(actor);
   const tasks = await listTasks(actor);
   const managedProjects = projects.filter(
@@ -174,7 +137,10 @@ export default async function Section({
     const open = tasks.filter(
       (t) => !["APPROVED", "CANCELED"].includes(t.status),
     );
-    const counts = await dashboard(actor);
+    const [counts, followUp] = await Promise.all([
+      dashboard(actor),
+      dashboardFollowUp(actor),
+    ]);
     const stats = [
       [
         "Active projects",
@@ -265,6 +231,28 @@ export default async function Section({
             </Link>
           ))}
         </div>
+        <section className="panel">
+          <h2>Workspace follow-up</h2>
+          <div className="form-actions">
+            <Link
+              className="button"
+              href="/tables?entity=tasks&deadline=overdue"
+            >
+              {followUp.overdue} overdue open assignments →
+            </Link>
+            <Link
+              className="button"
+              href="/tables?entity=report-status&status=missing"
+            >
+              {followUp.missingReports} missing daily reports →
+            </Link>
+            {actor.role === "SUPER_ADMIN" && (
+              <Link className="button" href="/operations">
+                {followUp.failures} operational failures →
+              </Link>
+            )}
+          </div>
+        </section>
         <div className="split">
           <section className="panel">
             <div className="panel-heading">
@@ -362,42 +350,6 @@ export default async function Section({
         </section>
       </>
     );
-  if (section === "audit" && actor.role === "SUPER_ADMIN") {
-    const records = await db.audit.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 100,
-    });
-    return (
-      <>
-        <Heading
-          title="Audit log"
-          subtitle="A record of successful workspace changes."
-        />
-        <section className="panel">
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Action</th>
-                  <th>Object</th>
-                  <th>Timestamp (UTC)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {records.map((r) => (
-                  <tr key={r.id}>
-                    <td>{r.action.replaceAll("_", " ").toLowerCase()}</td>
-                    <td>{r.entityId}</td>
-                    <td>{r.createdAt.toISOString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </>
-    );
-  }
   notFound();
 }
 function Heading({ title, subtitle }: { title: string; subtitle: string }) {

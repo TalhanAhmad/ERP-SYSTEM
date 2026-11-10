@@ -1,46 +1,30 @@
-# Remaining release work
+# Completion and company-release checklist
 
-This list is deliberately explicit: the full supplied specification is not complete. Existing services and screens are an initial implementation, not pilot acceptance.
+The personal-demo completion queue is distinct from company rollout and learner demonstrations. Earlier entries are preserved in work-log/results; this current checklist supersedes stale feature-pending lists.
 
-## Supabase/Vercel cutover priority
+## Implemented in the authorized completion pass
 
-- The personal demo is already deployed to isolated Supabase/Vercel projects. Complete company production acceptance separately; do not treat the demo as acceptance of the full specification.
-- Verify an owned Resend sending domain and complete employee invitation/reset inbox acceptance plus an unattended mail retry worker. The restricted personal-demo sender has verified owner-only SMTP/inbox delivery. The daily attendance schedule is registered/enabled; observe its first natural invocation. Pooled runtime/controlled migrations, closed signup, initial hosted admin linkage and private bucket are implemented and verified.
-- Complete live Auth/reset/session-revocation/MFA acceptance, actual function/pool measurements and backup restore. Bounded private task-submission upload/download and access tests are now implemented and verified.
-- Remove the temporary local Better Auth compatibility only after the Supabase local/staging/production flows are verified; keep domain IDs/history.
-- Keep both provider contract tests and live Supabase acceptance. Current live sessions/work/attendance are verified with synthetic records; inbox/reset delivery, provider-wide revocation and MFA acceptance remain.
+- Focused HR attendance/leave/notification interface, personal HR/Lead/Member punches and view-only Super Admin attendance; singleton shared expiring announcements.
+- Clickable matching dashboard cards, Assignments/create/filter workflow, project and task lifecycle/comments, independent revision/review, guarded manager transfer and private 4 MiB task evidence.
+- Organization/departments/teams/employment profiles, manager-cycle protections, configurable demo company settings, prospective calendar/holiday management and immutable attendance/correction history.
+- Linked/versioned daily reports, original cutoff/late snapshots, missing/calendar status, internship enrollment/milestones/evidence/mentor feedback, private preferences/read-all and durable daily maintenance/retries.
+- Scoped table pagination/filter/sort, personal saved columns/views, keyboard operation, guarded inline edits, atomic bulk preview/commit, task CSV validation/preview/commit and safe filtered exports.
+- Paginated notification/audit metadata, scoped overdue/missing-report/operational follow-up links, own Supabase TOTP capability, optional privileged MFA policy and immediate app-session revocation.
+- Isolated database dump/restore with content fingerprints; bounded 100-member synthetic service measurements; representative automated WCAG A/AA scans, browser/mobile/security-header checks.
 
-## Identity and people
+The final table/security source, clean-runner CI, controlled migrations and hosted checks are being completed. Do not mark a pending release accepted before its recorded results.
 
-- Invitation resend/revoke UI/API and expiration/revocation/concurrency tests are implemented. Employee email/reset delivery, privileged MFA and recovery procedures remain; Talha selected Resend but confirmed no domain is owned. The provider test sender reaches only the owner.
-- Basic Super Admin account detail/profile editing, role/status UI, linked reactivation and directory filtering/pagination are deployed and verified. Department/team administration, manager-cycle protection, membership-change audit and employment profiles are deployed and verified in the completion pass. Verified login-email changes remain. HR intentionally keeps its reduced scope.
-- Provider-wide session revocation, richer identity lifecycle controls and verified login-email changes remain separate release requirements.
+## Owner or external dependencies before company rollout
 
-## Work management
+- Supply an owned sending domain and verify it in Resend. Then verify actual employee invitation/reset delivery in multiple inboxes. The demo sender is intentionally restricted to the owner's verified inbox. Do not purchase a domain or remove the restriction automatically.
+- Enroll the owner's authenticator with their own device, record a recovery procedure and decide when to enable privileged MFA. The capability is implemented; no owner factor or global requirement is activated automatically.
+- Confirm real workweeks, shifts, report cutoffs and employee/leave policies. Existing settings are demo defaults until explicitly confirmed.
+- Approve company hosting/billing and representative real-user pilot acceptance. The deployment remains the authorized personal demo on Hobby; no upgrade is performed.
+- Approve a hosted database backup/PITR and Storage recovery exercise/retention policy. The completed isolated logical recovery drill does not prove managed-provider PITR, regional disaster recovery or private-object restoration.
+- Verified login-email changes need a confirmed dual-inbox delivery workflow and sender configuration; login email remains read-only in current account administration.
 
-- Initial private attachments are delivered (4 MiB, PDF/PNG/JPEG/UTF-8 text, per-revision history). Larger/resumable files, broad retention/orphan tooling and full file scanning/format validation remain separate extensions.
+## Future extensions outside this completion queue
 
-- Project/task lifecycle and comments are deployed and verified in the completion pass (281 tests, green CI and 18 hosted checks).
-- Precise server pagination/filter/sort/search contracts, task-detail read API, username picker scoped to a selected project, full OpenAPI DTOs.
-- Current UI lists cap at 100 records; advanced table controls, saved views, keyboard grid navigation, bulk changes, CSV preview/commit and exports remain.
+Larger/resumable files and malware scanning, broad object-retention/orphan tooling, advanced monitoring/alert integrations and organization-specific payroll/leave/pay policies require separately defined scope. The current bounds and privacy rules are documented in the operational guides. These are not silently enabled for the personal demo.
 
-## Attendance, leave and reports
-
-- Calendar administration and schedule replacement with history/race protections are deployed and verified (281 tests, green CI and 18 hosted checks).
-- Full attendance HR date filters/drilldowns, independent correction rejection reasons, administrative reconciliation retry/audit.
-- Report links, cutoff/late snapshots, calendar/leave missing status and revision history are implemented and locally verified. HR report status is superseded by the owner’s focused HR scope. Hosted acceptance passed (source 60c1d3d, CI 42661510686, 20 live checks).
-- Durable attendance jobs/attempts, Operations monitoring, audited resume/retry and daily Hobby schedule are implemented. First natural scheduled invocation, report reminders, invitation cleanup, broader job types, advanced monitoring/pagination/alerts and historical-gap detection remain. Email leases and restricted owner inbox delivery are verified; a verified domain and unattended retry worker remain.
-
-## Internships and operations
-
-- Internship enrollment, mentor assignment, evidence-linked milestones and weekly feedback are deployed and verified with 300 automated checks, green CI and 20 hosted checks.
-- Company settings, scoped HR audit view, operational failure dashboard, notification preferences and mark-all-read.
-- Verified company sender/domain, company hosting approval, security headers/CSP review and privileged MFA rollout. Restricted hosted runtime roles are already configured.
-- Representative 100-user performance measurement, broad accessibility audit, full pilot browser journey, backup restore drill, incident/rollback exercise.
-- Maintain clean-runner CI verification for each source milestone and record its exact run/commit in the test results.
-
-Learning milestones remain unconfirmed until Talha demonstrates the relevant concepts. Permission to build across milestones does not fabricate learning completion.
-
-## Delivered dashboard/attendance refinement — 9 November 2026
-
-The approved Assignments/filter/create structure, clickable matching overview cards, paginated Projects and Super Admin attendance exemption are implemented, deployed and verified (260 automated tests, green CI and 24 hosted checks). HR, Team Lead and Member retain personal punches; HR keeps focused staff visibility and leave approvals. No migration or credential change is required. The broader dashboard contract, advanced tables, organization/internship/settings modules and company release gates above remain open.
+Learning milestones remain unconfirmed until Talha demonstrates the concepts. Build authorization does not fabricate learning completion or company pilot sign-off.

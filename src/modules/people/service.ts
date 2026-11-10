@@ -241,6 +241,7 @@ export async function reactivate(
     where: { id },
     data: { status: "ACTIVE", version: { increment: 1 } },
   });
+  await tx.appSession.deleteMany({ where: { userId: target.id } });
   if (target.authUserId && env.AUTH_PROVIDER === "better-auth")
     await tx.session.deleteMany({ where: { userId: target.authUserId } });
   await audit(tx, actor.id, "PERSON_REACTIVATED", id, {
@@ -290,6 +291,7 @@ export async function changeRole(
     where: { id },
     data: { role: input.role, version: { increment: 1 } },
   });
+  await tx.appSession.deleteMany({ where: { userId: target.id } });
   if (target.authUserId && env.AUTH_PROVIDER === "better-auth")
     await tx.session.deleteMany({ where: { userId: target.authUserId } });
   await audit(tx, actor.id, "ROLE_CHANGED", id, {
@@ -347,6 +349,7 @@ export async function deactivate(
     where: { id },
     data: { status: "INACTIVE", version: { increment: 1 } },
   });
+  await tx.appSession.deleteMany({ where: { userId: target.id } });
   if (target.authUserId && env.AUTH_PROVIDER === "better-auth")
     await tx.session.deleteMany({ where: { userId: target.authUserId } });
   const assigned = await tx.task.count({

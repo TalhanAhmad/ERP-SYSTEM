@@ -15,9 +15,9 @@ export function hrApiAccess(role: string, method: string, path: string) {
           "notifications",
           "hr/overview",
           "announcements",
-        ]).has(path)
+        ]).has(path) || /^attendance\/[0-9a-f-]{36}$/.test(path)
       : method === "POST" &&
-        (path === "notifications/read-all" ||
+        (["notifications/read-all", "corrections"].includes(path) ||
           /^attendance\/check-(in|out)$/.test(path) ||
           /^leave\/[^/]+\/(approve|reject)$/.test(path) ||
           /^notifications\/[^/]+\/read$/.test(path));

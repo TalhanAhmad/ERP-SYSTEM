@@ -13,6 +13,7 @@ export function MutationForm({
   successMessage = "Saved successfully.",
   redirectTo,
   resetOnSuccess = method !== "PATCH",
+  onSuccess,
 }: {
   endpoint: string;
   children?: React.ReactNode;
@@ -22,6 +23,7 @@ export function MutationForm({
   successMessage?: string;
   redirectTo?: string;
   resetOnSuccess?: boolean;
+  onSuccess?: (data: unknown) => void;
 }) {
   const router = useRouter();
   const ready = useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
@@ -74,6 +76,7 @@ export function MutationForm({
           }
           retry.current = null;
           setSuccess(true);
+          onSuccess?.(data.data);
           if (resetOnSuccess) form.reset();
           if (redirectTo) router.push(redirectTo);
           router.refresh();

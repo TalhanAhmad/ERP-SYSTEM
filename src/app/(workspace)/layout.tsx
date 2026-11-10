@@ -24,7 +24,7 @@ export default async function Workspace({
   children: React.ReactNode;
 }) {
   const person = await context().catch((error) => {
-    if (error instanceof AppError) redirect("/login");
+    if (error instanceof AppError) redirect(error.code === "MFA_REQUIRED" ? "/security" : "/login");
     throw error;
   });
   const items = [
@@ -35,6 +35,7 @@ export default async function Workspace({
     ["attendance", "Attendance", CheckSquare],
     ["reports", "Daily reports", CheckSquare],
     ["internships", "Internships", CheckSquare],
+    ["tables", "Tables", CheckSquare],
     ["leave", "Leave", FolderKanban],
     ["corrections", "Corrections", CheckSquare],
     ["notifications", "Notifications", Bell],
@@ -102,6 +103,7 @@ export default async function Workspace({
               <small>{person.role.replaceAll("_", " ").toLowerCase()}</small>
             </div>
           </div>
+          <Link href="/security">Account security</Link>
           <Logout />
         </div>
       </aside>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Encova Workspace",
   description: "Your people, projects, and progress in one workspace.",

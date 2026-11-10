@@ -89,7 +89,11 @@ async function activeMembers(
   for (const userId of [assigneeId, reviewerId])
     invariant(
       await tx.projectMember.findFirst({
-        where: { projectId, userId, user: { status: "ACTIVE" } },
+        where: {
+          projectId,
+          userId,
+          user: { status: "ACTIVE", role: { not: "HR_ADMIN" } },
+        },
       }),
       "INVALID_MEMBER",
       "Assignee and reviewer must be active project members.",

@@ -47,6 +47,12 @@ export async function mutate(
           });
           if (previous) {
             invariant(
+              previous.actorRole === actor.role,
+              "PERMISSIONS_CHANGED",
+              "Permissions changed; use a fresh action.",
+              409,
+            );
+            invariant(
               previous.hash === hash,
               "IDEMPOTENCY_CONFLICT",
               "This key was used with different input.",
@@ -60,6 +66,7 @@ export async function mutate(
           await tx.idempotency.create({
             data: {
               actorId: actor.id,
+              actorRole: actor.role,
               operation,
               key,
               hash,

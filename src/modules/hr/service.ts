@@ -26,6 +26,7 @@ export async function hrOverview(
     db.attendanceDay.findMany({
       where: { workDate: new Date(date) },
       select: {
+        id: true,
         userId: true,
         firstIn: true,
         lastOut: true,
@@ -44,6 +45,7 @@ export async function hrOverview(
     const day = byPerson.get(person.id);
     return {
       ...person,
+      dayId: day?.id ?? null,
       firstIn: day?.firstIn ?? null,
       lastOut: day?.lastOut ?? null,
       status:

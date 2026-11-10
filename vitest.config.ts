@@ -9,5 +9,5 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  test: { environment: "node", fileParallelism: false },
+  test: { include: ["tests/**/*.test.ts"], environment: "node", fileParallelism: false },
 });

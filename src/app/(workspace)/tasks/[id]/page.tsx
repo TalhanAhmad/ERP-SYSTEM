@@ -37,7 +37,10 @@ export default async function Task({
     (actor.role === "TEAM_LEAD" && task.project.managerId === actor.id);
   const people = manage
     ? await db.projectMember.findMany({
-        where: { projectId: task.projectId, user: { status: "ACTIVE" } },
+        where: {
+          projectId: task.projectId,
+          user: { status: "ACTIVE", role: { not: "HR_ADMIN" } },
+        },
         select: {
           user: { select: { id: true, username: true, displayName: true } },
         },

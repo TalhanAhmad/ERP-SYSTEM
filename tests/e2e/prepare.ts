@@ -4,6 +4,17 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { db } from "../../src/server/db";
 if (new URL(process.env.DATABASE_URL!).pathname !== "/encova_test")
   throw new Error("E2E fixture creation requires encova_test.");
+// Integration tests own a fixed synthetic holiday. It must not turn the wall-clock
+// browser punch day into a holiday when the calendar reaches that fixture date.
+const browserWorkDate = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Karachi",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(new Date());
+await db.holiday.deleteMany({
+  where: { date: new Date(browserWorkDate), name: "Synthetic holiday" },
+});
 const provisioning = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
   secret: process.env.BETTER_AUTH_SECRET,

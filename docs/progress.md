@@ -1,6 +1,6 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-09 (Asia/Karachi)
+Last updated: 2026-11-10 (Asia/Karachi)
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded
@@ -8,8 +8,8 @@ Last updated: 2026-11-09 (Asia/Karachi)
 - Current learning status: Awaiting learning check
 - Remaining learning days including unfinished learning: 60
 - Build scope: explicitly authorized across milestones by Talha
-- Implementation status: personal-testing demo deployed with monitored attendance jobs, an enabled daily schedule, private revision attachments and invitation management, plus restricted Resend email/reset delivery. Full specification and company production acceptance remain incomplete.
-- Publication: Reports/learning/maintenance source 60c1d3d passed GitHub CI 42661510686 and is deployed as dpl_5ynWvZVcp16XqE1dN7jWkHDPTCZQ. Verified: 121 unit, 161 integration and 18 browser tests (300 total), plus 20 hosted checks. Earlier milestone evidence remains recorded separately.
+- Implementation status: the authorized completion pass now includes calendar/lifecycle/organization, reports/internships/maintenance, structured tables/import/export, account-security capability and isolated recovery/load/accessibility verification. The complete local regression passed 324 tests. Final source/CI/live verification is in progress. Company rollout and learner sign-off remain separate.
+- Publication: source 5b44e8317a76b070b1b31f34e14870c7b312c7db is the current live report-editor hotfix. The final table/security release is under verification; do not confuse local implementation with hosted acceptance.
 
 ## Implemented evidence
 
@@ -17,21 +17,21 @@ Real application and PostgreSQL migrations now exist. Authentication/invitations
 
 ## Remaining release work
 
-See [the backlog](planning/backlog.md). No internship workflow, advanced spreadsheet/import/export, full organization management, complete job monitoring, pilot deployment or backup restore is claimed. A working UI/build is not production acceptance.
+See [the release checklist](planning/backlog.md). Organization/internships and reports are deployed. Tables/imports/security are being finalized. An isolated full-schema/data recovery drill passed; hosted backup/PITR and Storage restoration are not claimed.
 
 ## Blockers and dependencies
 
-Actual company policies, a verified sending domain, full employee email delivery and backup-client tooling/restore demonstration remain unresolved for pilot. Git author identity has been supplied and configured locally. GitHub CLI browser authentication completed as TalhanAhmad with credentials stored in the system keyring; repository ADMIN access and HTTPS push succeeded. Node/pnpm/PostgreSQL were recovered for development; Docker remains unavailable.
+Actual company policies, a verified sending domain, full employee inbox delivery and owner pilot/MFA rollout decisions remain unresolved for company use. PostgreSQL client tools and an isolated restore demonstration are now complete. Git author identity has been supplied and configured locally. GitHub CLI browser authentication completed as TalhanAhmad with credentials stored in the system keyring; repository ADMIN access and HTTPS push succeeded. Node/pnpm/PostgreSQL were recovered for development; Docker remains unavailable.
 
 ## Production stack decision
 
 Talha finalized Next.js + TypeScript + Tailwind, Next Route Handlers/shared services, Supabase PostgreSQL/Auth/Storage, Prisma and Vercel. See [ADR-002](decisions/ADR-002-supabase-vercel.md) and [deployment guide](operations/deployment.md). Better Auth remains local compatibility only; hosted deployments must select Supabase. The existing local admin is preserved.
 
-Official CLI browser authentication resolved the connected-tool gap. Created a separate Encova Solutions organization and Encova Workspace Demo Supabase project in Mumbai, and encova-workspace on Vercel Hobby. All ten hosted migrations and database/Auth/private-storage preflight passed. The deployment is READY at https://encova-workspace.vercel.app; live API/browser and attendance acceptance checks passed. This is a personal testing demo with no billing upgrade.
+Official CLI browser authentication resolved the connected-tool gap. Created a separate Encova Solutions organization and Encova Workspace Demo Supabase project in Mumbai, and encova-workspace on Vercel Hobby. The first fifteen hosted migrations and database/Auth/private-storage preflight passed. The deployment is READY at https://encova-workspace.vercel.app; live API/browser and attendance acceptance checks passed. This is a personal testing demo with no billing upgrade.
 
-## Exact next action
+## Current completion pass
 
-Monitored attendance jobs and Operations are deployed. Vercel confirms the daily 00:15 UTC schedule is registered/enabled (around 05:15 Karachi, Hobby hourly precision); its first natural invocation has not yet been observed. Manual protected execution and recovery passed. Resend SMTP is now authenticated and self-test inbox delivery verified; its restricted sender reaches only the owner until a domain is verified. The updated Vercel release is READY; a reset requested through the live form arrived in the owner Gmail INBOX. Controlled synthetic callback/password-change checks passed without changing the owner password. Next remaining work includes a verified sender domain, an unattended mail retry worker, report reminders/cleanup/alerts, privileged MFA, restore and remaining ERP modules. Full company production acceptance remains incomplete.
+Finish the final full regression, controlled migrations sixteen/seventeen, Vercel deployment and synthetic hosted acceptance. A natural scheduled invocation is now verified on 10 November at 00:53 UTC (Vercel HTTP 200, vercel-cron/1.0, successful attendance and maintenance records). Daily maintenance now includes report reminders, expired-invitation cleanup and a bounded permitted-email retry. Resend remains owner-only until a verified domain is supplied. Account-security setup is optional for now; the owner and exploration accounts are not enrolled automatically. Details and evidence are recorded in [table/security/recovery operations](operations/tables-security-recovery.md).
 
 ## Current demo password policy
 
@@ -43,7 +43,7 @@ Three owner-requested demo accounts now remain ACTIVE: HR Admin, Team Lead and M
 
 ## Current implementation work
 
-Focused HR attendance/leave/notifications and the shared Super Admin announcement are deployed and verified. All ten hosted migrations and runtime preflight passed. All 235 local and 21 targeted hosted checks passed; exact scope/expiry behavior is in [HR and announcement operations](operations/announcements-hr.md). The persistent demo accounts remain ACTIVE; only the new verification fixture was deactivated.
+Focused HR attendance/leave/notifications and the shared Super Admin announcement are deployed and verified. The first fifteen hosted migrations and runtime preflight passed. All 235 local and 21 targeted hosted checks passed; exact scope/expiry behavior is in [HR and announcement operations](operations/announcements-hr.md). The persistent demo accounts remain ACTIVE; only the new verification fixture was deactivated.
 
 ## Account-management work
 

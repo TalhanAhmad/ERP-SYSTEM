@@ -413,9 +413,19 @@ export async function decideCorrection(
   tx: Tx,
   actor: Actor,
   id: string,
-  input: { expectedVersion: number; action: "approve" | "reject" },
+  input: {
+    expectedVersion: number;
+    action: "approve" | "reject";
+    reason?: string;
+  },
 ) {
   requireHr(actor);
+  if (input.action === "reject")
+    invariant(
+      input.reason?.trim(),
+      "REASON_REQUIRED",
+      "Explain why this correction is rejected.",
+    );
   await tx.$queryRaw`SELECT id FROM "AttendanceCorrection" WHERE id=${id}::uuid FOR UPDATE`;
   const record = await tx.attendanceCorrection.findUnique({ where: { id } });
   invariant(record, "NOT_FOUND", "Correction not found.", 404);
@@ -465,6 +475,7 @@ export async function decideCorrection(
       status,
       reviewerId: actor.id,
       reviewedAt: new Date(),
+      decisionReason: input.reason ?? null,
       version: { increment: 1 },
     },
   });

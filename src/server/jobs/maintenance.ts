@@ -56,6 +56,14 @@ export async function maintenancePass(
     const missing = rows.filter((r) => r.status === "missing");
     const result = await db.$transaction(
       async (tx) => {
+        const previews = await tx.changePreview.deleteMany({
+          where: {
+            OR: [
+              { committedAt: null, expiresAt: { lt: new Date() } },
+              { committedAt: { lt: new Date(Date.now() - 86400000) } },
+            ],
+          },
+        });
         const expired = await tx.invitation.findMany({
           where: {
             acceptedAt: null,
@@ -106,6 +114,7 @@ export async function maintenancePass(
         });
         const payload = {
           date,
+          expiredPreviews: previews.count,
           expiredInvitations: expired.length,
           reportReminders: notified.count,
           reportReminderStatus: root ? "READY" : "NO_ADMIN",

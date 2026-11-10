@@ -1,3 +1,20 @@
+import { attendanceDetail } from "@/modules/attendance/detail";
+import {
+  tableData,
+  savedViews,
+  savedView,
+  saveView,
+  removeView,
+  exportTable,
+  savedViewSchema,
+} from "@/modules/views/service";
+import { tableQuerySchema, entities } from "@/modules/views/queries";
+import {
+  previewBulk,
+  bulkSchema,
+  commitPreview,
+  commitSchema,
+} from "@/modules/imports/service";
 import {
   internshipDirectory,
   internshipDetail,
@@ -168,6 +185,47 @@ export async function GET(request: Request, { params }: Params) {
     const actor = await context(request.headers);
     const path = (await params).path.join("/");
     hrApiAccess(actor.role, "GET", path);
+    if (path === "tables")
+      return NextResponse.json(
+        {
+          data: await tableData(
+            actor,
+            tableQuerySchema.parse(
+              Object.fromEntries(new URL(request.url).searchParams),
+            ),
+          ),
+        },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
+    if (path === "saved-views")
+      return NextResponse.json({
+        data: await savedViews(
+          actor,
+          z
+            .enum(entities)
+            .parse(new URL(request.url).searchParams.get("entity")),
+        ),
+      });
+    if (/^saved-views\/[^/]+$/.test(path))
+      return NextResponse.json({
+        data: await savedView(actor, uuid.parse(path.split("/")[1])),
+      });
+    if (path === "exports") {
+      const url = new URL(request.url),
+        columns = url.searchParams.get("columns")?.split(",");
+      url.searchParams.delete("columns");
+      const query = tableQuerySchema.parse(
+        Object.fromEntries(url.searchParams),
+      );
+      const csv = await exportTable(actor, query, columns);
+      return new NextResponse(csv, {
+        headers: {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": `attachment; filename="encova-${query.entity}.csv"`,
+          "Cache-Control": "private, no-store",
+        },
+      });
+    }
     if (path === "internships")
       return NextResponse.json({
         data: await internshipDirectory(
@@ -281,6 +339,10 @@ export async function GET(request: Request, { params }: Params) {
       });
     if (path === "invitations")
       return NextResponse.json({ data: await listInvitations(actor) });
+    if (/^attendance\/[0-9a-f-]{36}$/.test(path))
+      return NextResponse.json({
+        data: await attendanceDetail(actor, uuid.parse(path.split("/")[1])),
+      });
     if (path === "attendance" || path === "attendance/me")
       return NextResponse.json({
         data: await attendanceList(
@@ -441,6 +503,45 @@ export async function POST(request: Request, { params }: Params) {
       request.headers.get("idempotency-key"),
       input,
       async (tx) => {
+        if (route === "saved-views")
+          return saveView(tx, actor, savedViewSchema.parse(input));
+        if (path[0] === "saved-views" && path.length === 2)
+          return saveView(
+            tx,
+            actor,
+            savedViewSchema.parse(input),
+            uuid.parse(path[1]),
+          );
+        if (
+          path[0] === "saved-views" &&
+          path.length === 3 &&
+          path[2] === "remove"
+        )
+          return removeView(
+            tx,
+            actor,
+            uuid.parse(path[1]),
+            z
+              .object({ expectedVersion: z.number().int().positive() })
+              .strict()
+              .parse(input).expectedVersion,
+          );
+        if (route === "tasks/bulk-preview")
+          return previewBulk(tx, actor, bulkSchema.parse(input));
+        if (route === "tasks/bulk-commit")
+          return commitPreview(
+            tx,
+            actor,
+            commitSchema.parse(input).previewId,
+            "TASK_BULK",
+          );
+        if (route === "imports/tasks/commit")
+          return commitPreview(
+            tx,
+            actor,
+            commitSchema.parse(input).previewId,
+            "TASK_IMPORT",
+          );
         if (path[0] === "internships" && path.length <= 2)
           return saveEnrollment(
             tx,
@@ -589,18 +690,23 @@ export async function POST(request: Request, { params }: Params) {
         if (route === "corrections")
           return requestCorrection(tx, actor, correctionSchema.parse(input));
         if (path.length === 3 && ["leave", "corrections"].includes(path[0])) {
-          const version = z
-            .object({ expectedVersion: z.number().int().positive() })
-            .strict()
-            .parse(input);
           const id = uuid.parse(path[1]);
           if (path[0] === "leave")
             return decideLeave(tx, actor, id, {
-              ...version,
+              ...z
+                .object({ expectedVersion: z.number().int().positive() })
+                .strict()
+                .parse(input),
               action: z.enum(["approve", "reject", "cancel"]).parse(path[2]),
             });
           return decideCorrection(tx, actor, id, {
-            ...version,
+            ...z
+              .object({
+                expectedVersion: z.number().int().positive(),
+                reason: z.string().trim().min(1).max(1000).optional(),
+              })
+              .strict()
+              .parse(input),
             action: z.enum(["approve", "reject"]).parse(path[2]),
           });
         }

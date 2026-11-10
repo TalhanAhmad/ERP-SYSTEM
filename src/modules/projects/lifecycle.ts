@@ -11,6 +11,7 @@ export const editProjectSchema = z
     expectedVersion: version,
     name: z.string().trim().min(1).max(120),
     description: z.string().max(5000),
+    managerId: z.uuid().optional(),
   })
   .strict();
 export const archiveProjectSchema = z
@@ -66,17 +67,48 @@ export async function editProject(
     "Restore this project before editing.",
     409,
   );
+  if (input.managerId && input.managerId !== p.managerId) {
+    invariant(
+      actor.role === "SUPER_ADMIN",
+      "FORBIDDEN",
+      "Super Admin must transfer project management.",
+      403,
+    );
+    invariant(
+      await tx.projectMember.findFirst({
+        where: {
+          projectId: id,
+          userId: input.managerId,
+          user: {
+            status: "ACTIVE",
+            role: { in: ["SUPER_ADMIN", "TEAM_LEAD"] },
+          },
+        },
+      }),
+      "INVALID_MANAGER",
+      "Add an active Team Lead or Super Admin as a project member first.",
+    );
+  }
   const item = await tx.project.update({
     where: { id },
     data: {
       name: input.name,
       description: input.description,
+      ...(input.managerId ? { managerId: input.managerId } : {}),
       version: { increment: 1 },
     },
   });
   await audit(tx, actor.id, "PROJECT_UPDATED", id, {
-    before: { name: p.name, description: p.description },
-    after: { name: item.name, description: item.description },
+    before: {
+      name: p.name,
+      description: p.description,
+      managerId: p.managerId,
+    },
+    after: {
+      name: item.name,
+      description: item.description,
+      managerId: item.managerId,
+    },
   });
   return item;
 }

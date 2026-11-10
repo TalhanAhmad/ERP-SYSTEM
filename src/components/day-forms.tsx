@@ -53,8 +53,22 @@ export function DecisionForm({
     <MutationForm
       endpoint={`/api/v1/${resource}/${id}/${action}`}
       label={action.replace(/^./, (s) => s.toUpperCase())}
-      transform={() => ({ expectedVersion: version })}
-    />
+      transform={(f) => ({
+        expectedVersion: version,
+        ...(resource === "corrections" && action === "reject"
+          ? { reason: f.get("reason") }
+          : {}),
+      })}
+    >
+      {resource === "corrections" && action === "reject" && (
+        <TextareaField
+          label="Reason for rejection"
+          name="reason"
+          required
+          maxLength={1000}
+        />
+      )}
+    </MutationForm>
   );
 }
 export function CorrectionForm({

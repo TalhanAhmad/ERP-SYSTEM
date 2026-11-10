@@ -4,8 +4,21 @@ import { useState } from "react";
 import { MutationForm } from "./mutation-form";
 export function ProjectEditForm({
   project,
+  managerOptions,
 }: {
-  project: { id: string; version: number; name: string; description: string };
+  project: {
+    id: string;
+    version: number;
+    name: string;
+    description: string;
+    managerId?: string;
+  };
+  managerOptions?: {
+    id: string;
+    displayName: string;
+    username: string;
+    status: string;
+  }[];
 }) {
   return (
     <MutationForm
@@ -26,6 +39,18 @@ export function ProjectEditForm({
           defaultValue={project.name}
         />
       </label>
+      {managerOptions && (
+        <label>
+          Project manager
+          <select name="managerId" required defaultValue={project.managerId}>
+            {managerOptions.map((p) => (
+              <option value={p.id} key={p.id}>
+                {p.displayName} (@{p.username}) · {p.status.toLowerCase()}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <TextareaField
         label="Project description"
         name="description"

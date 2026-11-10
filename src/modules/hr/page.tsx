@@ -146,7 +146,15 @@ export async function HrPage({
               {data.people.map((person) => (
                 <tr key={person.id}>
                   <td>
-                    <strong>{person.displayName}</strong>
+                    <strong>
+                      {person.dayId ? (
+                        <Link href={"/attendance/" + person.dayId}>
+                          {person.displayName}
+                        </Link>
+                      ) : (
+                        person.displayName
+                      )}
+                    </strong>
                     <div className="muted">@{person.username}</div>
                   </td>
                   <td>

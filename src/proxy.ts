@@ -1,7 +1,28 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 export async function proxy(request: NextRequest) {
-  if (process.env.AUTH_PROVIDER !== "supabase") return NextResponse.next();
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const csp = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' blob: data:",
+    "font-src 'self'",
+    `connect-src 'self'${process.env.NODE_ENV === "development" ? " ws: wss:" : ""}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join("; ");
+  const next = () => {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-nonce", nonce);
+    requestHeaders.set("Content-Security-Policy", csp);
+    const result = NextResponse.next({ request: { headers: requestHeaders } });
+    result.headers.set("Content-Security-Policy", csp);
+    return result;
+  };
+  if (process.env.AUTH_PROVIDER !== "supabase") return next();
   const url = process.env.SUPABASE_URL,
     key = process.env.SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key)
@@ -14,7 +35,7 @@ export async function proxy(request: NextRequest) {
       },
       { status: 503 },
     );
-  let response = NextResponse.next({ request });
+  let response = next();
   const supabase = createServerClient(url, key, {
     cookieOptions: {
       httpOnly: true,
@@ -28,7 +49,7 @@ export async function proxy(request: NextRequest) {
       getAll: () => request.cookies.getAll(),
       setAll: (values, cacheHeaders) => {
         values.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
+        response = next();
         values.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options),
         );

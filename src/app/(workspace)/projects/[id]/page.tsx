@@ -97,7 +97,23 @@ export default async function ProjectDetailPage({
           {!p.archivedAt && (
             <details>
               <summary>Edit project</summary>
-              <ProjectEditForm project={p} />
+              <ProjectEditForm
+                project={p}
+                managerOptions={
+                  actor.role === "SUPER_ADMIN"
+                    ? p.members
+                        .filter(
+                          (m) =>
+                            m.userId === p.managerId ||
+                            (m.user.status === "ACTIVE" &&
+                              ["SUPER_ADMIN", "TEAM_LEAD"].includes(
+                                m.user.role,
+                              )),
+                        )
+                        .map((m) => m.user)
+                    : undefined
+                }
+              />
             </details>
           )}
           <details key={p.archivedAt ? "restore" : "archive"}>

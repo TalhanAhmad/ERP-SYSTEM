@@ -9,11 +9,12 @@ import { db } from "./db";
 import { getLegacyAuth } from "./auth";
 import { supabaseWithCookies } from "./supabase/client";
 import { failure, jsonBody, mutationOrigin, rateLimit } from "./http";
+import { registerAppSession, verifiedSessionClaims } from "./security-session";
 import { invariant } from "./errors";
 export type AuthAction =
   "sign-in" | "sign-out" | "password-reset" | "password-update";
 const email = z.email().transform((v) => v.trim().toLowerCase());
-function cookieSession(request: Request) {
+export function cookieSession(request: Request) {
   const values = new Map(
     parseCookieHeader(request.headers.get("cookie") ?? "").flatMap((c) =>
       typeof c.value === "string" ? [[c.name, c.value] as const] : [],
@@ -78,6 +79,7 @@ export async function authAction(action: AuthAction, request: Request) {
             401,
           );
         }
+        await registerAppSession(session.client);
       } else {
         const result = await getLegacyAuth().api.signInEmail({
           body,
@@ -102,6 +104,20 @@ export async function authAction(action: AuthAction, request: Request) {
       if (env.AUTH_PROVIDER === "supabase") {
         const session = cookieSession(request);
         finish = session.finish;
+        const verified = await session.client.auth.getUser();
+        const active = await session.client.auth.getSession();
+        if (!verified.error && verified.data.user && active.data.session) {
+          const claims = verifiedSessionClaims(
+            active.data.session.access_token,
+          );
+          const person = await db.person.findUnique({
+            where: { supabaseUserId: verified.data.user.id },
+          });
+          if (person && claims.userId === verified.data.user.id)
+            await db.appSession.deleteMany({
+              where: { id: claims.sessionId, userId: person.id },
+            });
+        }
         const result = await session.client.auth.signOut({ scope: "local" });
         invariant(
           !result.error,
@@ -164,6 +180,17 @@ export async function authAction(action: AuthAction, request: Request) {
           "Password could not be updated. Request a new reset link.",
           422,
         );
+        const person = await registerAppSession(session.client);
+        const { data: current } = await session.client.auth.getSession();
+        if (person && current.session) {
+          const { sessionId } = verifiedSessionClaims(
+            current.session.access_token,
+          );
+          await db.appSession.deleteMany({
+            where: { userId: person.id, id: { not: sessionId } },
+          });
+          await session.client.auth.signOut({ scope: "others" });
+        }
       } else {
         invariant(body.token, "INVALID_RESET", "A reset token is required.");
         await getLegacyAuth().api.resetPassword({
@@ -194,8 +221,16 @@ export async function confirmSupabase(request: Request) {
           type: "recovery",
         })
       : { error: true };
+  let failed = Boolean(result.error);
+  if (!failed) {
+    try {
+      await registerAppSession(session.client);
+    } catch {
+      failed = true;
+    }
+  }
   const next = url.searchParams.get("next");
-  const destination = result.error
+  const destination = failed
     ? "/forgot-password"
     : next === "/dashboard"
       ? "/dashboard"

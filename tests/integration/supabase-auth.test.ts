@@ -35,6 +35,9 @@ const token = [
 ].join(".");
 let providerAccepts = true,
   serverReads = 0;
+const factorId = crypto.randomUUID();
+let factorStatus: "verified" | "unverified" | undefined;
+let upgradedToken: string | undefined;
 const providerUser = {
   id: providerId,
   aud: "authenticated",
@@ -44,6 +47,19 @@ const providerUser = {
   created_at: new Date().toISOString(),
   app_metadata: { role: "SUPER_ADMIN" },
   user_metadata: { role: "SUPER_ADMIN" },
+  get factors() {
+    return factorStatus
+      ? [
+          {
+            id: factorId,
+            factor_type: "totp",
+            status: factorStatus,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ]
+      : [];
+  },
 };
 vi.stubGlobal(
   "fetch",
@@ -51,12 +67,50 @@ vi.stubGlobal(
     const request = new Request(input, init),
       path = new URL(request.url).pathname;
     const session = {
-      access_token: token,
+      access_token: upgradedToken ?? token,
       refresh_token: "synthetic-refresh-token",
       token_type: "bearer",
       expires_in: 3600,
       user: providerUser,
     };
+    if (path.endsWith("/factors") && request.method === "POST") {
+      factorStatus = "unverified";
+      return Response.json({
+        id: factorId,
+        type: "totp",
+        totp: {
+          secret: "SYNTHETIC-CONTRACT-SECRET",
+          qr_code: "data:image/svg+xml,synthetic",
+          uri: "otpauth://totp/contract",
+        },
+      });
+    }
+    if (path.endsWith("/challenge"))
+      return Response.json({
+        id: crypto.randomUUID(),
+        expires_at: Math.floor(Date.now() / 1000) + 300,
+      });
+    if (path.endsWith("/verify") && path.includes("/factors/")) {
+      const input = await request.json();
+      if (input.code !== "123456")
+        return Response.json({ msg: "Invalid code" }, { status: 422 });
+      factorStatus = "verified";
+      const claims = JSON.parse(
+        Buffer.from(token.split(".")[1], "base64url").toString(),
+      );
+      upgradedToken = [
+        token.split(".")[0],
+        Buffer.from(JSON.stringify({ ...claims, aal: "aal2" })).toString(
+          "base64url",
+        ),
+        token.split(".")[2],
+      ].join(".");
+      return Response.json({
+        ...session,
+        access_token: upgradedToken,
+        user: providerUser,
+      });
+    }
     if (path.endsWith("/token")) return Response.json(session);
     if (path.endsWith("/user")) {
       serverReads++;
@@ -193,6 +247,145 @@ it("refuses scheduler requests without its machine credential", async () => {
   expect(
     (await GET(new Request("http://localhost:3000/api/internal/jobs"))).status,
   ).toBe(401);
+});
+function securityRequest(body: unknown, cookies = cookie) {
+  return new Request("http://localhost:3000/api/security", {
+    method: "POST",
+    headers: {
+      cookie: cookies,
+      origin: "http://localhost:3000",
+      "content-type": "application/json",
+      "x-encova-csrf": "1",
+    },
+    body: JSON.stringify(body),
+  });
+}
+it("enrolls and verifies provider TOTP without exposing tokens, then blocks an AAL1 session", async () => {
+  const { securityAction } = await import("@/server/security-http");
+  const enroll = await securityAction(securityRequest({ action: "enroll" }));
+  expect(enroll.status).toBe(200);
+  expect(enroll.headers.get("cache-control")).toContain("no-store");
+  const setup = await enroll.json();
+  expect(setup.data.id).toBe(factorId);
+  expect(setup.data).not.toHaveProperty("access_token");
+  const invalid = await securityAction(
+    securityRequest({ action: "verify", factorId, code: "000000" }),
+  );
+  expect(invalid.status).toBe(422);
+  const verified = await securityAction(
+    securityRequest({ action: "verify", factorId, code: "123456" }),
+  );
+  expect(verified.status).toBe(200);
+  await expect(context(new Headers({ cookie }))).rejects.toMatchObject({
+    code: "MFA_REQUIRED",
+  });
+  expect(
+    (await context(new Headers({ cookie }), { allowSecurity: true })).id,
+  ).toBe(person.id);
+  const changed = verified.headers
+    .getSetCookie()
+    .map((c) => c.split(";")[0])
+    .join("; ");
+  expect((await context(new Headers({ cookie: changed }))).id).toBe(person.id);
+  expect(
+    await db.audit.count({
+      where: {
+        actorId: person.id,
+        changes: { string_contains: "SYNTHETIC-CONTRACT-SECRET" },
+      },
+    }),
+  ).toBe(0);
+  // Exercise policy changes only in the isolated test database and restore them.
+  const settings = await db.companySettings.findUniqueOrThrow({
+    where: { id: "workspace" },
+  });
+  await db.person.update({
+    where: { id: person.id },
+    data: { role: "SUPER_ADMIN" },
+  });
+  try {
+    const enabled = await securityAction(
+      securityRequest(
+        { action: "policy", expectedVersion: settings.version, required: true },
+        changed,
+      ),
+    );
+    expect(enabled.status).toBe(200);
+    expect(
+      (
+        await db.companySettings.findUniqueOrThrow({
+          where: { id: "workspace" },
+        })
+      ).requirePrivilegedMfa,
+    ).toBe(true);
+    const disabled = await securityAction(
+      securityRequest(
+        {
+          action: "policy",
+          expectedVersion: settings.version + 1,
+          required: settings.requirePrivilegedMfa,
+        },
+        changed,
+      ),
+    );
+    expect(disabled.status).toBe(200);
+  } finally {
+    await db.companySettings.update({
+      where: { id: "workspace" },
+      data: { requirePrivilegedMfa: settings.requirePrivilegedMfa },
+    });
+    await db.person.update({
+      where: { id: person.id },
+      data: { role: "MEMBER" },
+    });
+  }
+  // Retire only contract state; the hosted policy is untouched.
+  factorStatus = undefined;
+  upgradedToken = undefined;
+});
+it("rejects arbitrary factor IDs and prevents non-admin MFA-policy changes", async () => {
+  const { securityAction } = await import("@/server/security-http");
+  expect(
+    (
+      await securityAction(
+        securityRequest({
+          action: "verify",
+          factorId: crypto.randomUUID(),
+          code: "123456",
+        }),
+      )
+    ).status,
+  ).toBe(404);
+  expect(
+    (
+      await securityAction(
+        securityRequest({
+          action: "policy",
+          expectedVersion: 1,
+          required: true,
+        }),
+      )
+    ).status,
+  ).toBe(403);
+});
+it("revokes app access immediately on all-device logout despite an otherwise accepted provider JWT", async () => {
+  const { securityAction } = await import("@/server/security-http");
+  expect(
+    (await securityAction(securityRequest({ action: "sign-out-all" }))).status,
+  ).toBe(200);
+  await expect(context(new Headers({ cookie }))).rejects.toMatchObject({
+    code: "UNAUTHENTICATED",
+  });
+  expect(await db.appSession.count({ where: { userId: person.id } })).toBe(0);
+  const signed = await authAction(
+    "sign-in",
+    request({ email, password: "Synthetic-test-password-only-8#" }),
+  );
+  expect(signed.status).toBe(200);
+  cookie = signed.headers
+    .getSetCookie()
+    .map((c) => c.split(";")[0])
+    .join("; ");
 });
 it("clears the SDK session cookie on server-side sign-out", async () => {
   const response = await authAction(

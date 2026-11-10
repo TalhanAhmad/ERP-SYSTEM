@@ -3,7 +3,7 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 :root {
   --ink: #152322;
-  --muted: #6e7976;
+  --muted: #59665f;
   --line: #e2e8e4;
   --paper: #f6f8f5;
   --accent: #245c49;
@@ -155,7 +155,7 @@ label + label {
   margin: 9px 0 38px 43px;
 }
 .nav-label {
-  color: #8b9690;
+  color: #59665f;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.4px;
@@ -272,7 +272,7 @@ label + label {
   margin: 8px 0;
 }
 .hero p {
-  color: #5e7261;
+  color: #536657;
   max-width: 540px;
   line-height: 1.6;
 }
@@ -375,7 +375,7 @@ tr:last-child td {
 }
 .badge.IN_REVIEW {
   background: #f7efdb;
-  color: #8b6b27;
+  color: #73551a;
 }
 .badge.BLOCKED,
 .badge.INACTIVE {
@@ -693,7 +693,7 @@ fieldset {
   background: #fae9e4;
 }
 .badge.RUNNING {
-  color: #8b6b27;
+  color: #73551a;
   background: #f7efdb;
 }
 progress {
@@ -774,4 +774,64 @@ progress {
   padding: 0;
   margin: 0;
   min-width: 0;
+}
+
+.column-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.preview-box {
+  margin-top: 24px;
+  border-top: 1px solid #dce5df;
+  padding-top: 18px;
+}
+.preview-box [role="alert"] {
+  max-height: 320px;
+  overflow: auto;
+}
+table[role="grid"]:focus-visible,
+table[role="grid"] td:focus-visible,
+table[role="grid"] th:focus-visible {
+  outline: 3px solid #245e4d;
+  outline-offset: -3px;
+}
+table[role="grid"] td {
+  min-width: 140px;
+}
+table[role="grid"] td details {
+  margin-top: 10px;
+}
+.security-content {
+  max-width: 780px;
+  margin: auto;
+}
+.authenticator-qr {
+  display: block;
+  width: 220px;
+  max-width: 100%;
+}
+.security-content code {
+  overflow-wrap: anywhere;
+}
+.people-filters label,
+.form-grid > label {
+  min-width: 0;
+  max-width: 100%;
+}
+input,
+select,
+textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+fieldset {
+  min-width: 0;
+}
+.panel-heading {
+  flex-wrap: wrap;
+}
+
+.form-actions {
+  flex-wrap: wrap;
 }

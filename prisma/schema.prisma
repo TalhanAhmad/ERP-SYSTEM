@@ -100,6 +100,7 @@ model Person {
  submissions Submission[]
  attachments Attachment[]
  decisions Review[]
+ appSessions AppSession[]
  notifications Notification[]
  @@index([status,role])
 }
@@ -217,6 +218,7 @@ model Audit {
 model Idempotency {
  id String @id @default(uuid()) @db.Uuid
  actorId String @db.Uuid
+ actorRole String?
  operation String
  key String
  hash String
@@ -329,6 +331,7 @@ model AttendanceEvent {
  @@unique([dayId,kind])
 }
 model AttendanceCorrection {
+ decisionReason String?
  id String @id @default(uuid()) @db.Uuid
  dayId String @db.Uuid
  requestedBy String @db.Uuid
@@ -497,6 +500,7 @@ model CompanySettings {
  workweek Json
  reportCutoff String @default("17:00")
  policyConfirmedAt DateTime? @db.Timestamptz
+ requirePrivilegedMfa Boolean @default(false)
  reportReminders Boolean @default(true)
  version Int @default(1)
  updatedAt DateTime @updatedAt @db.Timestamptz
@@ -575,4 +579,37 @@ model WeeklyFeedback {
  createdAt DateTime @default(now()) @db.Timestamptz
  updatedAt DateTime @updatedAt @db.Timestamptz
  @@unique([internshipId,weekStart])
+}
+
+model SavedView {
+ id String @id @default(uuid()) @db.Uuid
+ userId String @db.Uuid
+ entity String
+ name String
+ normalizedName String
+ columns Json
+ filters Json
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @updatedAt @db.Timestamptz
+ @@unique([userId,entity,normalizedName])
+}
+model ChangePreview {
+ id String @id @default(uuid()) @db.Uuid
+ userId String @db.Uuid
+ kind String
+ payload Json
+ result Json?
+ expiresAt DateTime @db.Timestamptz
+ committedAt DateTime? @db.Timestamptz
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@index([userId,expiresAt])
+}
+
+model AppSession {
+ id String @id @db.Uuid
+ userId String @db.Uuid
+ user Person @relation(fields:[userId],references:[id],onDelete:Restrict)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@index([userId])
 }

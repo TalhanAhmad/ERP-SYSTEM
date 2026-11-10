@@ -1,6 +1,6 @@
 # Verification results
 
-Date: 9 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnpm 12.18.0, real PostgreSQL 17.9 on loopback. All test accounts and work data are synthetic. Development, test and restore databases are distinct.
+Date: 10 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnpm 12.18.0, real PostgreSQL 17.9 on loopback. All test accounts and work data are synthetic. Development, test and restore databases are distinct.
 
 ## Latest outcomes
 
@@ -8,17 +8,17 @@ Date: 9 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pnp
 | --- | --- | --- |
 | pnpm install / peers check | PASS | Exact lockfile resolved; no peer dependency issues. |
 | pnpm exec prisma validate | PASS | Initial schema validated; subsequent migrations and generated client succeeded. |
-| pnpm db:migrate:deploy on dev/test | PASS | Ten migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
+| pnpm db:migrate:deploy on dev/test | PASS | Seventeen migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
-| pnpm test:unit | PASS — 121 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
-| pnpm test:integration | PASS — 126 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
+| pnpm test:unit | PASS — 130 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
+| pnpm test:integration | PASS — 174 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 13 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest milestone run: 51.8 seconds on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 20 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest completion run: 1.7 minutes on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | Source ca49e9f pushed and verified by successful CI 42606060629; final evidence/report updated. |
+| Git commit/push | PASS | Previous source is published; final 324-test completion release is ready for commit and hosted verification. |
 
 ## Supabase/Vercel foundation verification
 
@@ -324,3 +324,15 @@ The combined browser pilot exercises real separate accounts through work submiss
 Reports/learning hosted acceptance: source 60c1d3d5319abcb4efe03943a63cce8e54a6d3ba passed [CI 42661510686](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42661510686). Fifteen hosted migrations and runtime/RLS/private-storage/TLS preflight passed. Vercel dpl_5ynWvZVcp16XqE1dN7jWkHDPTCZQ is READY. All 20 live checks passed, including actual separate mentor/intern forms, independent review, evidence completion, weekly feedback, report revisions/timing, current-team access, personal preferences, real punches, independent correction with unchanged raw events, leave approval, mobile histories and maintenance replay. Mobile screenshots were inspected. Maintenance used an isolated historical date with no assigned staff; no natural cron invocation is implied. The private script first expected 422 for an evidence conflict; it was corrected to the intended 409 and the full live verification passed. Owned synthetic fixtures were retired/archived and the owner plus three persistent exploration accounts remain active.
 
 Report edit race correction: actual rendered screenshot inspection found two saved report submissions containing the original text after a rapid Save/Submit sequence. Separate forms allowed the submit to arrive before a delayed PATCH; server versions prevented an overwrite but could not enforce UI intent. A single draft editor now saves current fields first and submits using the returned version. Retry keys persist through ambiguous network failures. The combined pilot now delays PATCH by 400 ms and verifies two distinct report bodies; both focused browser cases passed (8.7 seconds), with typing/lint/build. New live verification will explicitly compare current text and each submitted revision. No historical report or immutable revision is rewritten.
+
+## Completion release verification in progress — 10 November 2026
+
+The core/report/learning batches above remain published. The sixteenth/seventeenth migrations and structured tables/security release are under final verification. Final local pass: 130 unit, 174 PostgreSQL integration and 20 Chromium browser checks (324 total), plus typing/lint/production build. Supabase contract coverage includes TOTP assurance and immediate app-session revocation. Final browser/accessibility/CI/live evidence will be recorded after successful execution; intermediate failures are retained in work-log steps 206–210.
+
+Isolated restore: 47 public tables, 2,116 rows and 185 constraints restored from encova_test into encova_restore with matching per-table content/count fingerprints, 1.507 seconds. Production was untouched. Backup hash: ef3dbea60c96aac4bf6adc2ccf1f7a71eb19335c94e28277a6a5a77ee014cc27. This does not validate hosted PITR or stored-file recovery.
+
+Synthetic service load: 100 new members, 100 requests at concurrency 10, zero failures, 210 ms total. Local p95: task page 32 ms, people page 55 ms, report status 51 ms. Timings exclude HTTP/auth/provider/network costs and do not establish hosted capacity.
+
+Final isolated restore repeated after the complete regression: 47 tables, 1,710 rows and 185 constraints matched, 355 ms, SHA-256 1dbaaff3dbed179f72d0abae196f4f124f0247f8f3495e1af6e2812e9f4e06f9. Counts differ from the earlier drill because the integration suite recreates its dedicated synthetic data.
+
+Natural scheduler evidence is now observed: Vercel request records show GET /api/internal/jobs at 2026-11-10 00:53:15.103 UTC, HTTP 200, clientUserAgent vercel-cron/1.0. Database attempt 554d6320-7f81-45d9-ad52-5e024995b9a0 began 00:53:17.283 UTC and succeeded; maintenance 7464ab02-dea4-43b6-9e4f-3db319562efa also succeeded. No manual request with a forged cron discriminator was used. The scheduled 00:15 expression runs with Hobby hourly precision.

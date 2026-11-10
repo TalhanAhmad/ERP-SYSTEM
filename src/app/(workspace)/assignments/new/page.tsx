@@ -17,7 +17,7 @@ export default async function NewAssignment() {
       id: true,
       name: true,
       members: {
-        where: { user: { status: "ACTIVE" } },
+        where: { user: { status: "ACTIVE", role: { not: "HR_ADMIN" } } },
         select: {
           user: { select: { id: true, username: true, displayName: true } },
         },

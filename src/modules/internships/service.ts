@@ -106,7 +106,9 @@ export async function internshipOptions(actor: Actor) {
     db.department.findMany({ orderBy: { name: "asc" } }),
   ]);
   return {
-    interns: people.filter((p) => p.employmentType === "INTERN"),
+    interns: people.filter(
+      (p) => p.employmentType === "INTERN" && p.role !== "HR_ADMIN",
+    ),
     mentors: people.filter((p) =>
       ["SUPER_ADMIN", "TEAM_LEAD"].includes(p.role),
     ),
@@ -267,7 +269,9 @@ export async function saveEnrollment(
   );
   if (input.status === "ACTIVE")
     invariant(
-      intern.status === "ACTIVE" && lead.status === "ACTIVE",
+      intern.status === "ACTIVE" &&
+        intern.role !== "HR_ADMIN" &&
+        lead.status === "ACTIVE",
       "INACTIVE_PARTICIPANT",
       "An active intern and active mentor are required.",
     );

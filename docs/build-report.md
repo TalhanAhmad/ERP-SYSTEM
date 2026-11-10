@@ -1,11 +1,11 @@
-# Encova Workspace — initial implementation report
+# Encova Workspace — delivery report
 
-Date: 9 November 2026 (Asia/Karachi)
+Date: 10 November 2026 (Asia/Karachi)
 Repository: https://github.com/TalhanAhmad/ERP-SYSTEM
 
 ## Delivery status
 
-The specification has been analyzed and a real Next.js/PostgreSQL implementation has been created from an empty directory. This is an initial implementation, not completion of the full 60-milestone specification. A personal testing demo is deployed on Vercel with Supabase. Company production acceptance, real-data migration, pilot acceptance and learning completion remain outstanding.
+The specification has been analyzed and a real Next.js/PostgreSQL implementation has been created from an empty directory. The authorized implementation has expanded across core management, reports/learning, calendar, tables/import/export and security/recovery. Learning milestones and company rollout are not inferred from feature delivery. A personal testing demo is deployed on Vercel with Supabase. Company production acceptance, real-data migration, pilot acceptance and learning completion remain outstanding.
 
 Talha authorized building across milestones and committing/pushing to the supplied repository. The document's daily advancement restriction is superseded by that direct authorization. The commit author email is the value supplied by Talha; the repository-local author name is Talha Ahmad.
 
@@ -32,9 +32,9 @@ The hosted encova-private Storage bucket is private; task-submission upload/down
 
 ## Verification and limits
 
-Latest local verification: 121 unit, 126 integration and 13 browser tests passed, plus strict typing, lint, normal/Supabase-mode builds, fresh migrations and dependency checks. Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
+The latest complete batch is recorded below and in docs/testing/results.md; final table/security verification is underway. Earlier regression: 121 unit, 126 integration and 13 browser tests passed, plus strict typing, lint, normal/Supabase-mode builds, fresh migrations and dependency checks. Exact results are maintained in docs/testing/results.md. Unit checks cover strict schemas, legal task transitions, independent review, Karachi midnight boundaries, CSV-cell sanitization and attendance classification. PostgreSQL checks cover transactions, locking/races, retries, immutable work history, invitation-only identity, role isolation, leave conflicts, corrections, reports and outbox recovery. Browser checks use independent accounts and a production-mode server.
 
-Passing tests cover only implemented behavior. The full specification remains open, notably organization/profile management, internship workflows, advanced tables/import/export, lifecycle management actions, complete settings and dashboard contracts, MFA, reminders/job-run monitoring, real SMTP delivery and backup restore. See docs/planning/backlog.md for the actionable list.
+Passing tests cover implemented behavior. Organization/profile/lifecycle/calendar and reports/internships/maintenance are deployed. Tables/import/export, optional MFA/session controls, activity pagination and follow-up dashboard links are locally implemented and under final verification. Isolated restore and bounded synthetic service load are measured. Company sender/domain, owner MFA rollout, policy confirmation, commercial hosting/pilot decisions and hosted backup/Storage recovery remain separate gates. See docs/planning/backlog.md.
 
 ## Progress tracking
 
@@ -117,3 +117,9 @@ All 281 local automated checks passed (121 unit, 144 integration, 16 Chromium), 
 Implemented scoped daily reports with task links, immutable submitted versions, cutoff/late snapshots, reasoned independent review and calendar-aware missing status; personal notification preferences/read-all; durable reminder/expiry maintenance with retry monitoring; and bounded unattended permitted email retry. Implemented internships, one-active enrollment, mentor-scoped learning plans, intern evidence submission, approved-work completion, private weekly feedback and explained Root overrides. Current HR scope excludes reports/internships and report reminders.
 
 All 300 automated checks, build and typing/lint passed. Fifteen hosted migrations and preflight passed. Source 60c1d3d passed CI 42661510686 and Vercel dpl_5ynWvZVcp16XqE1dN7jWkHDPTCZQ is READY. All 20 targeted hosted checks passed. Advanced table/import/export, privileged security capability and release evidence remain. An owned email domain and actual company policy/pilot approval remain external dependencies.
+
+## Final implementation pass — 10 November 2026
+
+Added scoped structured tables, personal views/columns, keyboard navigation, versioned inline edits, atomic bulk previews and CSV import/export; immutable attendance detail/correction decisions; Root manager transfer; private activity pagination and matching follow-up links. Migrations sixteen/seventeen add preview/view storage, correction reasons, a strong explained-rating constraint, registered Supabase app sessions and optional privileged MFA policy. Role/status changes now invalidate old hosted app sessions. The report editor saves current input before submitting, with a provider-latency regression test. Owner and persistent exploration credentials remain unchanged.
+
+Recovery/load and security limitations are documented in operations/tables-security-recovery.md. Existing users will sign in again after the session-registry cutover; no passwords are migrated or reset. The company-wide MFA requirement remains disabled, and restricted email delivery is preserved. The final CI/deployment/live results are appended after execution.
