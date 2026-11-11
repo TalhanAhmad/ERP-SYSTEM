@@ -370,3 +370,9 @@ Email-flow behavior follows [Supabase's updateUser API](https://supabase.com/doc
 ## Owner workweek configuration — 11 November 2026
 
 Data-only change: company workweek set to Monday–Saturday through the live versioned Settings API, version 2. Four targeted checks passed: successful versioned mutation, matching API read-back, all six named browser checkboxes checked/Sunday unchecked, and preservation of the other settings/overall policy-confirmation state. Assigned attendance schedules and history were unchanged. No application code, migration, deployment or credential change was needed; the prior 331-test/44-live source verification remains historical evidence, not a newly repeated full regression.
+
+## Owner shift configuration — 11 November 2026
+
+Data-only change following acceptance of 09:00–17:00 Pakistan time: created the Monday–Saturday company policy and prospectively replaced the three active staff assignments from 12 November. Earlier segments retain their old policy through 11 November; new assignments are ongoing. Preflight found no future ledger records or reserved leave in the affected ranges.
+
+Eight targeted live checks passed: complete non-Root coverage without overlap; correct retained old segments; exact unchanged previous AttendanceDay/AttendanceEvent hashes; Thursday/Saturday/Monday 09:00–17:00 WORKDAY snapshots; Sunday OFF_DAY snapshots for each account; actual browser assignment rows/effective dates; unchanged Root assignments and view-only attendance; no generated future ledger rows. Zero grace/closing buffer and report/leave/global-confirmation settings were preserved. No code/migration/deployment change or full-regression rerun was needed for this configuration update.

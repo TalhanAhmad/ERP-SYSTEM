@@ -68,3 +68,7 @@ The owner authorized the remaining independent work. Implemented verified own lo
 ## Confirmed workweek — 11 November 2026
 
 The owner selected Monday–Saturday. Saved CompanySettings.workweek=[1,2,3,4,5,6] through the versioned live API (settings version 2), then verified read-back and actual browser checkboxes. Sunday is excluded. Other settings and the unconfirmed overall-policy flag were preserved. Attendance follows separate employee schedules; shift start/end values were requested before configuring those prospectively. See operations/company-policy.md.
+
+## Confirmed shift — 11 November 2026
+
+Owner accepted 9:00 AM–5:00 PM, Monday–Saturday, Asia/Karachi. Assigned the new ongoing company shift to all three active non-Super-Admin staff from 12 November. Eight live checks passed, including Sunday off, earlier history preservation and Super Admin exemption. Prior assignment segments end on 11 November; earlier attendance and raw events are unchanged. Grace/closing buffer remain zero. Report deadline confirmation and leave rules remain pending; the full-policy confirmation flag stays unchanged.
