@@ -72,3 +72,7 @@ The owner selected Monday–Saturday. Saved CompanySettings.workweek=[1,2,3,4,5,
 ## Confirmed shift — 11 November 2026
 
 Owner accepted 9:00 AM–5:00 PM, Monday–Saturday, Asia/Karachi. Assigned the new ongoing company shift to all three active non-Super-Admin staff from 12 November. Eight live checks passed, including Sunday off, earlier history preservation and Super Admin exemption. Prior assignment segments end on 11 November; earlier attendance and raw events are unchanged. Grace/closing buffer remain zero. Report deadline confirmation and leave rules remain pending; the full-policy confirmation flag stays unchanged.
+
+## Confirmed report deadline — 11 November 2026
+
+Owner confirmed daily reports due at 5:00 PM Asia/Karachi. The live value was already 17:00 and was verified without rewriting settings or report history. Five targeted checks passed: API/browser value, cutoff boundary behavior, Sunday exemption, retained report metadata and preservation of other settings. Leave approval/annual allowance preference is now requested; overall company-policy sign-off remains unchanged.

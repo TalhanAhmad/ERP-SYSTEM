@@ -5,7 +5,7 @@
 | Company working days | Monday, Tuesday, Wednesday, Thursday, Friday, Saturday | Owner confirmed; saved live |
 | Weekly off day | Sunday | Derived from the confirmed workweek |
 | Shift start/end | 9:00 AM–5:00 PM, Asia/Karachi | Owner accepted; assigned prospectively from 12 November |
-| Report deadline | Current configured value retained | Awaiting owner confirmation |
+| Report deadline | 5:00 PM, Asia/Karachi | Owner confirmed; live value verified |
 | Leave allowance/rules | Awaiting owner values | Not changed |
 | Timezone | Asia/Karachi | Existing supported timezone retained |
 
@@ -16,3 +16,7 @@ Attendance and leave eligibility use each employee's assigned SchedulePolicy.wee
 ## Attendance assignment verification
 
 Eight targeted live checks passed: one ongoing assignment per active staff member; original policy retained on earlier segments; prior attendance/raw-event hashes unchanged; Thursday, Saturday and Monday resolve to the 09:00–17:00 shift; Sunday resolves to OFF_DAY for all three people; browser schedule rows show the effective date and ongoing range; Root has no new assignment/punch control; no future attendance rows were fabricated during checks. Zero-minute grace and closing buffer were retained from the previous assignments. Report cutoff and leave rules were not modified or confirmed by this shift change.
+
+## Report deadline confirmation
+
+The owner explicitly confirmed 5:00 PM Pakistan time. The live cutoff was already 17:00, so no settings mutation or version bump was required (version remains 2). Verified API and browser input, read-only before/exact/after-cutoff status behavior against the assigned workday, Sunday exemption and unchanged existing report timing/version metadata. Other settings and the overall policy-confirmation flag remain unchanged. Leave policy selection is still pending; this confirmation introduces no leave entitlement or quota.
