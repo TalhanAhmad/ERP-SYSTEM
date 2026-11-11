@@ -11,14 +11,14 @@ Date: 10 November 2026, Asia/Karachi. Environment: macOS ARM64, Node 24.22.2, pn
 | pnpm db:migrate:deploy on dev/test | PASS | Seventeen migrations, including reviewed SQL integrity constraints, applied to separate databases. Test database was recreated locally to validate a clean migration sequence. |
 | pnpm typecheck | PASS | Strict TypeScript, application/services and test sources. |
 | pnpm lint | PASS | No lint errors in latest check. |
-| pnpm test:unit | PASS — 130 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
-| pnpm test:integration | PASS — 174 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
+| pnpm test:unit | PASS — 131 tests | Task transitions, schemas/unknown fields/URLs, independent review, Karachi midnight, CSV sanitization, attendance summaries and overnight rejection. |
+| pnpm test:integration | PASS — 179 tests | Real PostgreSQL transactions, concurrent versions/submissions/reviews, rollback, scope, invitations, signup bypass denial, active/unlinked users, last-admin guard, session revocation, attendance/leave race, corrections, report immutability and worker leases/retry/recovery. |
 | pnpm build | PASS | Production compilation, TypeScript and page generation; includes password reset screens and all implemented pages. |
-| pnpm test:e2e | PASS — 20 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest completion run: 1.7 minutes on port 3100; local app on 3000 remained available. |
+| pnpm test:e2e | PASS — 21 browser tests | Separate role contexts; project/membership/task creation, start, submit, return, resubmit, approval, immutable revision visibility and unauthorized URL denial. A 360px dashboard/work check also passes. Latest readiness run: 1.4 minutes on port 3100; local app on 3000 remained available. |
 | pnpm audit --prod --json | PASS | Registry audit reported 0 info/low/moderate/high/critical vulnerabilities. This is not a general security certification. |
 | pnpm verify:docs | PASS | Required documents, 60 milestone records and local links validated. |
 | DOCX export integrity | PASS | ZIP/XML validation and macOS textutil conversion both succeeded; the Word report is readable. |
-| Git commit/push | PASS | Source baf7d10b68f53883f6555864c70170931f7b2325 passed CI 42809226350 and is live as dpl_9d8mcA3q8ei1LsPNMqahrFAB4mcA; final evidence/report committed separately. |
+| Git commit/push | PASS | Latest application source fcb7bc71a453eb59e1c645b07e8ee997814d52db passed CI 42976770350 and is live as dpl_2SSKGD2xS2jojkBuHhoqN6xjLCa4; final evidence/report committed separately. |
 
 ## Supabase/Vercel foundation verification
 
@@ -356,3 +356,13 @@ Local typing/lint/build and all 331 tests passed (131 unit, 179 PostgreSQL integ
 Actual hosted logical recovery passed: 47 public ERP tables, 1,593 rows and 185 constraints matched a single exported read-only snapshot. Private backup SHA-256: 6275f9edc19ab5cb8707ca508343bac08ecfa86b7a4435cf4b3f703dfc90e60a. All 9 private objects (333 bytes) restored and matched both source bytes and all 9 available attachment-record digests; anonymous access was denied. The source public schema/original objects were not written; the new owned bucket was cleaned. Total 30.141 seconds. Private artifacts stay under .local/recovery, excluded from Git/Word. This covers actual hosted ERP/public data and objects, not managed Auth/PITR, off-site retention or regional disaster recovery.
 
 The initial recovery retries exposed transient local DNS lookup, full-schema CREATE SCHEMA handling and delayed bucket empty/delete behavior. The final verifier uses direct TLS socket verification, lets pg_restore create the schema, checks READY and ATTACHED evidence and retries only its owned bucket cleanup. Positive evidence is written only after cleanup succeeds. No production restore or original-file deletion was performed.
+
+## Readiness publication and hosted pilot checks
+
+[CI 42976770350](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/42976770350) passed for exact source fcb7bc71a453eb59e1c645b07e8ee997814d52db, including all 331 tests and the Supabase-mode build. Runtime/RLS/private-bucket/verified-TLS preflight passed. No migration was needed. Deployment dpl_2SSKGD2xS2jojkBuHhoqN6xjLCa4 is READY at https://encova-workspace.vercel.app.
+
+All 44 follow-up live checks passed: six own-email gating/status/callback checks, eighteen table/security/private-Storage checks, and twenty report/internship/attendance/leave/maintenance checks. The actual provider/member email and domain ID remained unchanged after a blocked email request. The live security page hides email mutation inputs under restricted mail; invalid email confirmation fails, and navigation stays internal. Real TOTP, global/session-role revocation, private uploads/reviewer download, scoped CSV/bulk/views and mobile tables still pass. Actual report versions/timing, independent task/milestone review, private feedback, personal preferences, real new-intern punches, correction, leave and maintenance replay pass. New fixtures were retired and persistent exploration accounts remain ACTIVE. Owner/demo credentials and owner MFA enrollment are unchanged. Positive dual-inbox email delivery remains untested live until a sending domain is supplied.
+
+Natural processing remains healthy: CRON attendance run 69b39125-3664-4dd2-9305-ac3a3a36aa7d succeeded at 2026-11-11 00:53 UTC; daily maintenance 2e4967b5-7f96-4a3e-8f2e-ea717d2780f1 also succeeded. No orphaned encova-restore test buckets remain. The source ERP/Storage recovery receipt is distinct from local synthetic backup evidence.
+
+Email-flow behavior follows [Supabase's updateUser API](https://supabase.com/docs/reference/javascript/auth-updateuser); database/object recovery boundaries follow [Supabase's backup documentation](https://supabase.com/docs/guides/platform/backups). This release keeps the sender restriction, feature flag and company policies intact pending the owner's domain/device/company decisions.

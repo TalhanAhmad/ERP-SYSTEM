@@ -1,0 +1,9 @@
+# Partial hosted configuration; review the exact diff before applying.
+# Preserve all existing callback URLs when adapting to another deployment.
+# This prepares confirmation; EMAIL_CHANGE_ENABLED remains false until inbox acceptance.
+project_id = "encova-workspace"
+[auth]
+additional_redirect_urls = ["https://encova-workspace.vercel.app/auth/confirm", "https://encova-workspace.vercel.app/auth/confirm?next=/reset-password", "https://encova-workspace.vercel.app/reset-password", "https://encova-workspace.vercel.app/auth/confirm?next=/security&flow=email-change"]
+[auth.email]
+double_confirm_changes = true
+enable_confirmations = true
