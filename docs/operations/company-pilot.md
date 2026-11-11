@@ -14,6 +14,8 @@ The separate-role automated and hosted synthetic journeys are engineering checks
 
 Record pass/fail, date, participant, reproducible defect and resolution before approval. Do not paste credentials, tokens, personal report text or backup bytes. A failed workflow stays open until it is corrected and repeated.
 
-Company decisions still required: actual working days/hours/cutoff/leave allowances; sender domain and addresses; company hosting/billing; backup retention/off-site location and managed Auth/PITR strategy; named pilot participants and launch approval. Existing demo defaults remain unconfirmed pending these values.
+Company decisions still required: working days confirmed as Monday–Saturday; actual shift hours/cutoff/leave allowances still pending; sender domain and addresses; company hosting/billing; backup retention/off-site location and managed Auth/PITR strategy; named pilot participants and launch approval. Existing demo defaults remain unconfirmed pending these values.
 
 The owner can start their device setup at https://encova-workspace.vercel.app/security. Select Set up authenticator, scan it with their own authenticator app and enter its code on that page. Keep setup keys/codes out of chat. The application policy can be required later after privileged users and recovery arrangements are ready.
+
+Workweek update: Monday–Saturday was explicitly confirmed and saved live on 11 November. Sunday is the company weekly off day. Employee attendance schedules await shift hours; existing assignments/history were not rewritten. See company-policy.md in the operations directory.

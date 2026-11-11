@@ -18,7 +18,7 @@ Delivered and verified for the authorized personal demo: source baf7d10, CI 4280
 
 - Supply an owned sending domain and verify it in Resend. Then verify actual employee invitation/reset delivery in multiple inboxes. The demo sender is intentionally restricted to the owner's verified inbox. Do not purchase a domain or remove the restriction automatically.
 - Enroll the owner's authenticator with their own device, record a recovery procedure and decide when to enable privileged MFA. The capability is implemented; no owner factor or global requirement is activated automatically.
-- Confirm real workweeks, shifts, report cutoffs and employee/leave policies. Existing settings are demo defaults until explicitly confirmed.
+- Monday–Saturday workweek is confirmed and saved live. Shift hours, report cutoff and employee/leave rules still need owner confirmation; employee attendance assignments have not been rewritten.
 - Approve company hosting/billing and representative real-user pilot acceptance. The deployment remains the authorized personal demo on Hobby; no upgrade is performed.
 - The actual hosted public ERP database and all private objects have now been logically backed up/restored in isolation and verified. Managed Auth/PITR/regional recovery, retention and an automated off-site destination still require a company decision; the logical drill does not establish those guarantees.
 - Own verified login-email changes are implemented and contract/browser tested; they stay disabled on the live demo until a verified sender and independent inbox acceptance are available. Administrative editing of another user’s login email stays read-only.

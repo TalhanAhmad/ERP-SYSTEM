@@ -366,3 +366,7 @@ All 44 follow-up live checks passed: six own-email gating/status/callback checks
 Natural processing remains healthy: CRON attendance run 69b39125-3664-4dd2-9305-ac3a3a36aa7d succeeded at 2026-11-11 00:53 UTC; daily maintenance 2e4967b5-7f96-4a3e-8f2e-ea717d2780f1 also succeeded. No orphaned encova-restore test buckets remain. The source ERP/Storage recovery receipt is distinct from local synthetic backup evidence.
 
 Email-flow behavior follows [Supabase's updateUser API](https://supabase.com/docs/reference/javascript/auth-updateuser); database/object recovery boundaries follow [Supabase's backup documentation](https://supabase.com/docs/guides/platform/backups). This release keeps the sender restriction, feature flag and company policies intact pending the owner's domain/device/company decisions.
+
+## Owner workweek configuration — 11 November 2026
+
+Data-only change: company workweek set to Monday–Saturday through the live versioned Settings API, version 2. Four targeted checks passed: successful versioned mutation, matching API read-back, all six named browser checkboxes checked/Sunday unchecked, and preservation of the other settings/overall policy-confirmation state. Assigned attendance schedules and history were unchanged. No application code, migration, deployment or credential change was needed; the prior 331-test/44-live source verification remains historical evidence, not a newly repeated full regression.

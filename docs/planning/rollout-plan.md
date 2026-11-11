@@ -16,4 +16,6 @@ Authorized: finish remaining independent implementation and verification; preser
 
 ## Awaiting human/company input
 
-The owner has not yet supplied a sender domain or actual working-day/shift/report/leave rules. Device enrollment must be completed by the owner at /security; no authenticator secret is generated for them by this agent. Named employee inbox/pilot approval, company hosting/billing and Auth/PITR/off-site retention choices remain company decisions. Current engineering checks do not substitute for those choices or real-user approval.
+The owner confirmed Monday–Saturday working days; that company setting is saved live. A sender domain and actual shift/report/leave rules are still pending. Device enrollment must be completed by the owner at /security; no authenticator secret is generated for them by this agent. Named employee inbox/pilot approval, company hosting/billing and Auth/PITR/off-site retention choices remain company decisions. Current engineering checks do not substitute for those choices or real-user approval.
+
+Workweek update: Monday–Saturday was explicitly confirmed and saved live on 11 November. Sunday is the company weekly off day. Employee attendance schedules await shift hours; existing assignments/history were not rewritten. See company-policy.md in the operations directory.
