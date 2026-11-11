@@ -18,6 +18,10 @@ export const runtimeSchema = z
     DIRECT_URL: postgres.optional(),
     DATABASE_SSL_CA: z.string().min(1).optional(),
     APP_URL: z.url().optional(),
+    FINANCE_ENABLED: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((v) => v === "true"),
     EMAIL_CHANGE_ENABLED: z
       .enum(["true", "false"])
       .default("false")

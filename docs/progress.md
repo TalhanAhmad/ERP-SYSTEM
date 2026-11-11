@@ -2,6 +2,10 @@
 
 Last updated: 2026-11-11 (Asia/Karachi)
 
+Finance extension: started from the newly supplied specification. Its assessment,
+access foundation and separate 48-milestone tracker are in [finance progress](finance/progress.md).
+This does not replace or complete the original ERP learning roadmap below.
+
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded
 - Current learning day: 001

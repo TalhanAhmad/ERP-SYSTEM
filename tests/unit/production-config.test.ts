@@ -87,3 +87,19 @@ it("keeps login email changes disabled unless explicitly enabled", () => {
     parseRuntime({ ...production, EMAIL_CHANGE_ENABLED: "yes" }),
   ).toThrow("EMAIL_CHANGE_ENABLED");
 });
+
+it("keeps finance disabled for both local and hosted configurations by default", () => {
+  expect(parseRuntime(local).FINANCE_ENABLED).toBe(false);
+  expect(parseRuntime(production).FINANCE_ENABLED).toBe(false);
+  expect(
+    parseRuntime({ ...local, FINANCE_ENABLED: "true" }).FINANCE_ENABLED,
+  ).toBe(true);
+});
+
+it("rejects ambiguous finance flag values instead of enabling a private module", () => {
+  for (const value of ["yes", "1", "TRUE", true, 1]) {
+    expect(() => parseRuntime({ ...local, FINANCE_ENABLED: value })).toThrow(
+      "FINANCE_ENABLED",
+    );
+  }
+});

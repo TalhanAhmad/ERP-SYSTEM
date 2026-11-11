@@ -17,6 +17,7 @@ import { activeAnnouncement } from "@/modules/announcements/service";
 import { WorkspaceAnnouncement } from "@/components/workspace-announcement";
 import { hrSectionAllowed } from "@/lib/hr-access";
 import { Logout } from "@/components/auth-form";
+import { hasFinanceAccess } from "@/modules/finance/access/policy";
 export const dynamic = "force-dynamic";
 export default async function Workspace({
   children,
@@ -24,7 +25,8 @@ export default async function Workspace({
   children: React.ReactNode;
 }) {
   const person = await context().catch((error) => {
-    if (error instanceof AppError) redirect(error.code === "MFA_REQUIRED" ? "/security" : "/login");
+    if (error instanceof AppError)
+      redirect(error.code === "MFA_REQUIRED" ? "/security" : "/login");
     throw error;
   });
   const items = [
@@ -40,9 +42,10 @@ export default async function Workspace({
     ["corrections", "Corrections", CheckSquare],
     ["notifications", "Notifications", Bell],
   ] as const;
-  const [announcement, settings] = await Promise.all([
+  const [announcement, settings, financeAccess] = await Promise.all([
     activeAnnouncement(),
     companySettings(),
+    hasFinanceAccess(person),
   ]);
   return (
     <div className="shell">
@@ -68,6 +71,12 @@ export default async function Workspace({
             <Link href="/schedules">
               <CheckSquare size={17} />
               Schedules
+            </Link>
+          )}
+          {financeAccess && (
+            <Link href="/finance">
+              <Shield size={17} />
+              Finance
             </Link>
           )}
           {person.role === "SUPER_ADMIN" && (

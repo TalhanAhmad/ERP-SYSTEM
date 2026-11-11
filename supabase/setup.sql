@@ -12,12 +12,32 @@ DO $$ DECLARE t record; BEGIN
   IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname='anon') THEN EXECUTE format('REVOKE ALL ON public.%I FROM anon',t.tablename); END IF;
   IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE format('REVOKE ALL ON public.%I FROM authenticated',t.tablename); END IF;
   -- Legacy password/session tables are retained for local compatibility, never exposed to the new runtime role.
-  IF t.tablename NOT IN ('user','session','account','verification','auth_rate_limit') THEN
+  IF t.tablename NOT IN ('user','session','account','verification','auth_rate_limit') AND t.tablename NOT LIKE 'Finance%' THEN
    EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON public.%I TO encova_app',t.tablename);
    EXECUTE format('DROP POLICY IF EXISTS encova_server_access ON public.%I',t.tablename);
    EXECUTE format('CREATE POLICY encova_server_access ON public.%I TO encova_app USING (true) WITH CHECK (true)',t.tablename);
   END IF;
  END LOOP;
+END $$;
+-- Finance access is deliberately narrower than ordinary ERP data. Re-running
+-- setup must never turn the runtime into an unrestricted grant administrator.
+DO $$ BEGIN
+ IF to_regclass('public."FinanceGrant"') IS NOT NULL THEN
+  REVOKE ALL ON "FinanceGrant" FROM encova_app;
+  DROP POLICY IF EXISTS encova_server_access ON "FinanceGrant";
+  DROP POLICY IF EXISTS encova_server_read ON "FinanceGrant";
+  GRANT SELECT ON "FinanceGrant" TO encova_app;
+  CREATE POLICY encova_server_read ON "FinanceGrant" FOR SELECT TO encova_app USING(true);
+ END IF;
+ IF to_regclass('public."FinanceAuditEvent"') IS NOT NULL THEN
+  REVOKE ALL ON "FinanceAuditEvent" FROM encova_app;
+  DROP POLICY IF EXISTS encova_server_access ON "FinanceAuditEvent";
+  DROP POLICY IF EXISTS encova_server_read ON "FinanceAuditEvent";
+  DROP POLICY IF EXISTS encova_server_append ON "FinanceAuditEvent";
+  GRANT SELECT,INSERT ON "FinanceAuditEvent" TO encova_app;
+  CREATE POLICY encova_server_read ON "FinanceAuditEvent" FOR SELECT TO encova_app USING(true);
+  CREATE POLICY encova_server_append ON "FinanceAuditEvent" FOR INSERT TO encova_app WITH CHECK(true);
+ END IF;
 END $$;
 -- Keep files private. No direct authenticated/anonymous Storage policies are granted.
 -- Upload/download workflow integration is a separate acceptance gate.

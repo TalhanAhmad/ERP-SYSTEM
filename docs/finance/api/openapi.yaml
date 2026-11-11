@@ -1,0 +1,37 @@
+openapi: 3.1.0
+info:
+  title: Encova Finance Foundation
+  version: 0.1.0
+  description: Only the local access-foundation endpoint is implemented. Existing verified browser-session authentication is required when enabled. No live finance API has been enabled.
+paths:
+  /api/v1/finance/status:
+    get:
+      operationId: financeStatus
+      description: Requires the current verified application session, ACTIVE SUPER_ADMIN and explicit active finance grant. Feature disabled returns 404 before authentication. Supabase session cookies are owned by the existing authentication integration; this endpoint does not accept API keys or add an authentication mechanism.
+      responses:
+        '200':
+          description: Restricted capability status, never financial readiness
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: private, no-store, max-age=0
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [currency, stage]
+                    properties:
+                      currency: {type: string, const: PKR}
+                      stage: {type: string, const: ACCESS_FOUNDATION}
+        '401': {description: Missing or expired verified application session}
+        '403': {description: No current active finance capability}
+        '404': {description: Feature disabled}
+        '429': {description: Shared minute rate limit exceeded}
+        '500': {description: Safe internal error with request ID}
