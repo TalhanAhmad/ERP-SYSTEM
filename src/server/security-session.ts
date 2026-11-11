@@ -1,4 +1,5 @@
 import "server-only";
+import { synchronizeLoginEmail } from "./login-email";
 import { z } from "zod";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { db } from "./db";
@@ -44,12 +45,18 @@ export async function registerAppSession(client: SupabaseClient) {
       "This account is not active.",
       403,
     );
+    const updated = await synchronizeLoginEmail(
+      tx,
+      person,
+      data.user,
+      sessionId,
+    );
     await tx.appSession.upsert({
       where: { id: sessionId },
       create: { id: sessionId, userId: person.id },
       update: {},
     });
-    return person;
+    return updated;
   });
 }
 export async function assertMfa(

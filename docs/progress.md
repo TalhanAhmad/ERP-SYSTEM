@@ -1,6 +1,6 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-10 (Asia/Karachi)
+Last updated: 2026-11-11 (Asia/Karachi)
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded
@@ -60,3 +60,7 @@ The owner requested completing remaining implementation before later revisions. 
 ## Reports, internships and maintenance — local acceptance complete
 
 Reports now have scoped links/status/history, first-submission timing and independent reasoned review. Internships have guarded enrollment, evidence-based milestones and private weekly feedback. Notifications support preferences/read-all; maintenance has deduplicated reminders, expiry cleanup, retry leases and Operations visibility. Focused HR is excluded from report obligations because its report-writing interface is intentionally unavailable. All 300 automated checks passed (121 unit, 161 integration, 18 browser), with production build and typing/lint. Fifteen hosted migrations and preflight passed. Source 60c1d3d is deployed, CI 42661510686 passed and all 20 targeted live checks passed. Advanced tables/import/export and final security/release verification continue afterward.
+
+## Company-readiness follow-up — 11 November 2026
+
+The owner authorized the remaining independent work. Implemented verified own login-email changes and safe callback/status screens, kept disabled pending domain/inbox setup. Local regression passed 331 tests with typing/lint/build. A read-only consistent snapshot of the actual hosted public ERP database restored with all 47 tables/1,593 rows/185 constraints matching; all 9 private objects were restored into a separate test bucket and verified against attachment checksums, then that bucket was removed. Source records/objects were unchanged. Auth/PITR/off-site strategy and human rollout decisions are not marked complete. See operations/login-email.md, operations/company-pilot.md and planning/rollout-plan.md. Source/CI/deployment results follow verification.

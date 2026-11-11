@@ -54,3 +54,15 @@ export function supabaseAdmin(fetcher?: typeof fetch) {
     },
   });
 }
+
+// A temporary password-check session must never replace the browser's MFA session.
+export function supabasePasswordClient() {
+  const { url, key } = configured();
+  return createClient(url, key, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+}

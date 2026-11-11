@@ -1,6 +1,6 @@
 # Encova Workspace — delivery report
 
-Date: 10 November 2026 (Asia/Karachi)
+Date: 11 November 2026 (Asia/Karachi)
 Repository: https://github.com/TalhanAhmad/ERP-SYSTEM
 
 ## Delivery status
@@ -123,3 +123,9 @@ All 300 automated checks, build and typing/lint passed. Fifteen hosted migration
 Added scoped structured tables, personal views/columns, keyboard navigation, versioned inline edits, atomic bulk previews and CSV import/export; immutable attendance detail/correction decisions; Root manager transfer; private activity pagination and matching follow-up links. Migrations sixteen/seventeen add preview/view storage, correction reasons, a strong explained-rating constraint, registered Supabase app sessions and optional privileged MFA policy. Role/status changes now invalidate old hosted app sessions. The report editor saves current input before submitting, with a provider-latency regression test. Owner and persistent exploration credentials remain unchanged.
 
 Recovery/load and security limitations are documented in operations/tables-security-recovery.md. Existing users will sign in again after the session-registry cutover; no passwords are migrated or reset. The company-wide MFA requirement remains disabled, and restricted email delivery is preserved. Final source baf7d10 passed CI 42809226350 and 324 automated tests; migrations sixteen/seventeen and Vercel dpl_9d8mcA3q8ei1LsPNMqahrFAB4mcA are deployed. All 56 final hosted checks passed, including real TOTP/global logout and private Storage, plus the protected prior-app compatibility rehearsal.
+
+## Authorized readiness follow-up — 11 November 2026
+
+Added a verified own login-email request with password reauthentication in a separate temporary provider session, existing MFA/current-session checks, provider dual-inbox confirmation and atomic same-Person synchronization. Other app sessions are revoked only after the provider confirms the final address; work/identity IDs remain unchanged. Callback/status screens keep redirects internal. No password or email token is stored in audits/receipts. Security forms are disabled before hydration and during refresh, and use POST semantics. The capability remains disabled under restricted email delivery; actual employee inbox acceptance awaits a domain.
+
+The hosted-source recovery tool now uses a consistent read-only ERP snapshot, verified pooler TLS, a strictly local restore destination and a new private test bucket. It compares all public table content/counts/constraints and every restored object hash against the available attachment records. Completed: 47 tables, 1,593 rows, 185 constraints, 9 private objects/333 bytes, all 9 attached records verified, 30.141 seconds. Source ERP records and original objects were not written; the owned restore bucket was removed. Auth identity recovery, managed PITR and off-site backup are separate decisions. Latest local verification is 331 tests (131/179/21), plus typing/lint/build; CI/live publication evidence is appended after execution.

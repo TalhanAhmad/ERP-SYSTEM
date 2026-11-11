@@ -20,11 +20,15 @@ Delivered and verified for the authorized personal demo: source baf7d10, CI 4280
 - Enroll the owner's authenticator with their own device, record a recovery procedure and decide when to enable privileged MFA. The capability is implemented; no owner factor or global requirement is activated automatically.
 - Confirm real workweeks, shifts, report cutoffs and employee/leave policies. Existing settings are demo defaults until explicitly confirmed.
 - Approve company hosting/billing and representative real-user pilot acceptance. The deployment remains the authorized personal demo on Hobby; no upgrade is performed.
-- Approve a hosted database backup/PITR and Storage recovery exercise/retention policy. The completed isolated logical recovery drill does not prove managed-provider PITR, regional disaster recovery or private-object restoration.
-- Verified login-email changes need a confirmed dual-inbox delivery workflow and sender configuration; login email remains read-only in current account administration.
+- The actual hosted public ERP database and all private objects have now been logically backed up/restored in isolation and verified. Managed Auth/PITR/regional recovery, retention and an automated off-site destination still require a company decision; the logical drill does not establish those guarantees.
+- Own verified login-email changes are implemented and contract/browser tested; they stay disabled on the live demo until a verified sender and independent inbox acceptance are available. Administrative editing of another user’s login email stays read-only.
 
 ## Future extensions outside this completion queue
 
 Larger/resumable files and malware scanning, broad object-retention/orphan tooling, advanced monitoring/alert integrations and organization-specific payroll/leave/pay policies require separately defined scope. The current bounds and privacy rules are documented in the operational guides. These are not silently enabled for the personal demo.
 
 Learning milestones remain unconfirmed until Talha demonstrates the concepts. Build authorization does not fabricate learning completion or company pilot sign-off.
+
+## Follow-up implementation — 11 November 2026
+
+The own-email workflow now requires current-password and MFA/session verification, dual-address confirmation and atomic same-ID synchronization with old-session revocation. Its feature flag remains off under restricted demo mail. Local verification passed 331 tests (131 unit, 179 integration, 21 browser) plus typing/lint/build. Actual hosted logical recovery verified 47 tables/1,593 records/185 constraints and 9 private files (all 9 matching attached-record digests); originals were unchanged and the new test bucket was removed. Publication/CI/live follow-up is being recorded. Human policy/device/domain/pilot decisions remain explicit.

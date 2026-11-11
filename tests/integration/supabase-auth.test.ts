@@ -35,6 +35,9 @@ const token = [
 ].join(".");
 let providerAccepts = true,
   serverReads = 0;
+let currentEmail = email,
+  pendingEmail = "",
+  emailUpdateCalls = 0;
 const factorId = crypto.randomUUID();
 let factorStatus: "verified" | "unverified" | undefined;
 let upgradedToken: string | undefined;
@@ -42,7 +45,12 @@ const providerUser = {
   id: providerId,
   aud: "authenticated",
   role: "authenticated",
-  email,
+  get email() {
+    return currentEmail;
+  },
+  get new_email() {
+    return pendingEmail || undefined;
+  },
   email_confirmed_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   app_metadata: { role: "SUPER_ADMIN" },
@@ -52,7 +60,7 @@ const providerUser = {
       ? [
           {
             id: factorId,
-            factor_type: "totp",
+            factor_type: "totp" as const,
             status: factorStatus,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -111,8 +119,24 @@ vi.stubGlobal(
         user: providerUser,
       });
     }
-    if (path.endsWith("/token")) return Response.json(session);
+    if (path.endsWith("/token")) {
+      const body = await request.json();
+      if (body.password === "incorrect-current-password")
+        return Response.json(
+          { msg: "Invalid credentials", code: "invalid_credentials" },
+          { status: 400 },
+        );
+      return Response.json(session);
+    }
     if (path.endsWith("/user")) {
+      if (request.method === "PUT") {
+        const body = await request.json();
+        if (body.email) {
+          pendingEmail = body.email;
+          emailUpdateCalls++;
+        }
+        return Response.json(providerUser);
+      }
       serverReads++;
       return providerAccepts
         ? Response.json(providerUser)
@@ -121,7 +145,24 @@ vi.stubGlobal(
             { status: 401 },
           );
     }
-    if (path.endsWith("/verify")) return Response.json(session);
+    if (path.endsWith("/verify")) {
+      const body = await request.json();
+      if (body.type === "email_change") {
+        if (body.token_hash === "expired-email-change")
+          return Response.json(
+            { msg: "Expired", code: "otp_expired" },
+            { status: 403 },
+          );
+        if (body.token_hash === "email-change-first")
+          return Response.json({ user: providerUser });
+        if (body.token_hash === "email-change-final") {
+          currentEmail = pendingEmail;
+          pendingEmail = "";
+          return Response.json(session);
+        }
+      }
+      return Response.json(session);
+    }
     if (path.endsWith("/recover"))
       return Response.json({ msg: "Account does not exist" }, { status: 400 });
     if (path.endsWith("/logout")) return Response.json({});
@@ -367,6 +408,193 @@ it("rejects arbitrary factor IDs and prevents non-admin MFA-policy changes", asy
       )
     ).status,
   ).toBe(403);
+});
+
+it("keeps email changes disabled for restricted delivery without sending provider mail", async () => {
+  const { securityAction } = await import("@/server/security-http");
+  const before = emailUpdateCalls;
+  expect(
+    (
+      await securityAction(
+        securityRequest({
+          action: "email-change",
+          email: `next.${suffix}@example.test`,
+          password: "Synthetic-test-password-only-8#",
+        }),
+      )
+    ).status,
+  ).toBe(409);
+  expect(emailUpdateCalls).toBe(before);
+});
+it("requires current-password and MFA reauthentication before an own-email change", async () => {
+  const { securityAction } = await import("@/server/security-http"),
+    { env } = await import("@/server/env");
+  env.EMAIL_CHANGE_ENABLED = true;
+  for (const [k, v] of Object.entries({
+    SMTP_HOST: "localhost",
+    SMTP_PORT: "1025",
+    SMTP_FROM: "workspace@example.test",
+    SMTP_TEST_RECIPIENT: "",
+    SMTP_USER: "",
+    SMTP_PASSWORD: "",
+  }))
+    vi.stubEnv(k, v);
+  await db.rateLimit.deleteMany({
+    where: { id: { startsWith: "security:" + person.id } },
+  });
+  const before = emailUpdateCalls;
+  expect(
+    (
+      await securityAction(
+        securityRequest({
+          action: "email-change",
+          email: `next.${suffix}@example.test`,
+          password: "incorrect-current-password",
+        }),
+      )
+    ).status,
+  ).toBe(403);
+  expect(emailUpdateCalls).toBe(before);
+  factorStatus = "verified";
+  expect(
+    (
+      await securityAction(
+        securityRequest({
+          action: "email-change",
+          email: `next.${suffix}@example.test`,
+          password: "Synthetic-test-password-only-8#",
+        }),
+      )
+    ).status,
+  ).toBe(403);
+  expect(emailUpdateCalls).toBe(before);
+  factorStatus = undefined;
+  const r = await securityAction(
+    securityRequest({
+      action: "email-change",
+      email: `next.${suffix}@example.test`,
+      password: "Synthetic-test-password-only-8#",
+    }),
+  );
+  expect(r.status).toBe(200);
+  expect(await r.json()).toEqual({ data: { pending: true } });
+  expect(r.headers.get("cache-control")).toContain("no-store");
+  expect(
+    (await db.person.findUniqueOrThrow({ where: { id: person.id } })).email,
+  ).toBe(email);
+  expect(pendingEmail).toBe(`next.${suffix}@example.test`);
+  env.EMAIL_CHANGE_ENABLED = false;
+});
+it("handles first/final/expired email confirmations safely, preserves domain identity and revokes other app sessions", async () => {
+  const otherSession = crypto.randomUUID();
+  await db.appSession.create({ data: { id: otherSession, userId: person.id } });
+  const before = (
+    await db.person.findUniqueOrThrow({ where: { id: person.id } })
+  ).version;
+  const callback = (hash: string) =>
+    confirmSupabase(
+      new Request(
+        "http://localhost:3000/auth/confirm?flow=email-change&type=email_change&next=https://evil.example&token_hash=" +
+          hash,
+      ),
+    );
+  const first = await callback("email-change-first");
+  expect(first.headers.get("location")).toBe(
+    "http://localhost:3000/email-change?state=pending",
+  );
+  expect(
+    (await db.person.findUniqueOrThrow({ where: { id: person.id } })).email,
+  ).toBe(email);
+  expect((await callback("expired-email-change")).headers.get("location")).toBe(
+    "http://localhost:3000/email-change?state=failed",
+  );
+  const final = await callback("email-change-final");
+  expect(final.headers.get("location")).toBe(
+    "http://localhost:3000/email-change?state=complete",
+  );
+  const stored = await db.person.findUniqueOrThrow({
+    where: { id: person.id },
+  });
+  expect(stored.email).toBe(`next.${suffix}@example.test`);
+  expect(stored.version).toBe(before + 1);
+  expect(stored.supabaseUserId).toBe(providerId);
+  expect(
+    await db.appSession.findUnique({ where: { id: otherSession } }),
+  ).toBeNull();
+  const actor = await context(new Headers({ cookie }));
+  expect(actor.id).toBe(person.id);
+  expect(actor.email).toBe(stored.email);
+  expect(
+    await db.audit.count({
+      where: { actorId: person.id, action: "LOGIN_EMAIL_VERIFIED" },
+    }),
+  ).toBe(1);
+});
+it("serializes two verified-email synchronizations without duplicate audits or loss of work", async () => {
+  const current = await db.person.findUniqueOrThrow({
+    where: { id: person.id },
+  });
+  const project = await db.project.create({
+    data: {
+      name: "Email continuity " + suffix,
+      description: "Synthetic",
+      managerId: person.id,
+    },
+  });
+  currentEmail = `third.${suffix}@example.test`;
+  const results = await Promise.all([
+    context(new Headers({ cookie })),
+    context(new Headers({ cookie })),
+  ]);
+  expect(results.map((p) => p.email)).toEqual([currentEmail, currentEmail]);
+  const updated = await db.person.findUniqueOrThrow({
+    where: { id: person.id },
+  });
+  expect(updated.version).toBe(current.version + 1);
+  expect(
+    (await db.project.findUniqueOrThrow({ where: { id: project.id } }))
+      .managerId,
+  ).toBe(person.id);
+  expect(
+    await db.audit.count({
+      where: { actorId: person.id, action: "LOGIN_EMAIL_VERIFIED" },
+    }),
+  ).toBe(2);
+  await db.project.update({
+    where: { id: project.id },
+    data: { archivedAt: new Date() },
+  });
+});
+it("refuses verified-email collisions without overwriting either person or reviving sessions", async () => {
+  const { synchronizeLoginEmail } = await import("@/server/login-email");
+  const other = await db.person.create({
+    data: {
+      username: "sdk.other." + suffix,
+      email: "collision." + suffix + "@example.test",
+      displayName: "Email collision fixture",
+      status: "ACTIVE",
+    },
+  });
+  const current = await db.person.findUniqueOrThrow({
+    where: { id: person.id },
+  });
+  await expect(
+    db.$transaction((tx) =>
+      synchronizeLoginEmail(
+        tx,
+        current,
+        { ...providerUser, email: other.email },
+        crypto.randomUUID(),
+      ),
+    ),
+  ).rejects.toMatchObject({ code: "EMAIL_LINK_CONFLICT" });
+  expect(
+    (await db.person.findUniqueOrThrow({ where: { id: person.id } })).email,
+  ).toBe(current.email);
+  await db.person.update({
+    where: { id: other.id },
+    data: { status: "INACTIVE" },
+  });
 });
 it("revokes app access immediately on all-device logout despite an otherwise accepted provider JWT", async () => {
   const { securityAction } = await import("@/server/security-http");

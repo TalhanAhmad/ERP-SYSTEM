@@ -1,19 +1,30 @@
 "use client";
-import { useState } from "react";
+import { useState, useSyncExternalStore, useTransition } from "react";
 import { useRouter } from "next/navigation";
+const subscribe = () => () => {};
 export function SecurityPanel({
   factors,
   level,
   admin,
   required,
   version,
+  emailChangesAvailable,
+  pendingEmail,
 }: {
   factors: { id: string; status: string }[];
   level: string;
   admin: boolean;
   required: boolean;
   version: number;
+  emailChangesAvailable: boolean;
+  pendingEmail: string;
 }) {
+  const ready = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+  const [refreshing, startTransition] = useTransition();
   const router = useRouter(),
     [enrollment, setEnrollment] = useState<{
       id: string;
@@ -42,8 +53,12 @@ export function SecurityPanel({
         router.refresh();
       } else {
         setEnrollment(null);
-        setMessage("Account security updated.");
-        router.refresh();
+        setMessage(
+          input.action === "email-change"
+            ? "Confirm the change from both your current and new email inboxes. Your login email stays unchanged until confirmation completes."
+            : "Account security updated.",
+        );
+        startTransition(() => router.refresh());
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to update security.");
@@ -60,7 +75,10 @@ export function SecurityPanel({
           ? "This session is verified with your authenticator."
           : "Verify a six-digit authenticator code to unlock an enrolled account."}
       </p>
-      <fieldset className="mutation-fields" disabled={pending}>
+      <fieldset
+        className="mutation-fields"
+        disabled={!ready || pending || refreshing}
+      >
         {!factor && (
           <button
             className="primary"
@@ -90,6 +108,7 @@ export function SecurityPanel({
         {factor && (
           <>
             <form
+              method="post"
               onSubmit={(e) => {
                 e.preventDefault();
                 action({
@@ -113,6 +132,7 @@ export function SecurityPanel({
               <button className="primary">Verify authenticator</button>
             </form>
             <form
+              method="post"
               onSubmit={(e) => {
                 e.preventDefault();
                 action({ action: "remove", factorId: factor.id });
@@ -128,6 +148,7 @@ export function SecurityPanel({
         )}
         {admin && (
           <form
+            method="post"
             onSubmit={(e) => {
               e.preventDefault();
               const f = new FormData(e.currentTarget);
@@ -155,7 +176,63 @@ export function SecurityPanel({
             <button>Save authenticator policy</button>
           </form>
         )}
+        <h2>Login email</h2>
+        {pendingEmail && (
+          <p>
+            Waiting for confirmation: {pendingEmail}. Confirm both inboxes, then
+            sign in with the new address.
+          </p>
+        )}
+        {!emailChangesAvailable ? (
+          <p>
+            Email delivery must be configured before login email changes are
+            available.
+          </p>
+        ) : (
+          <form
+            method="post"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const form = e.currentTarget,
+                fields = new FormData(form);
+              await action({
+                action: "email-change",
+                email: fields.get("email"),
+                password: fields.get("password"),
+              });
+              const password = form.elements.namedItem("password");
+              if (password instanceof HTMLInputElement) password.value = "";
+            }}
+          >
+            <p>
+              Confirmation is required from both email addresses. Your work and
+              history stay with this account.
+            </p>
+            <label>
+              New login email
+              <input
+                name="email"
+                type="email"
+                maxLength={254}
+                required
+                autoComplete="email"
+              />
+            </label>
+            <label>
+              Current password
+              <input
+                name="password"
+                type="password"
+                required
+                autoComplete="current-password"
+                maxLength={128}
+              />
+            </label>
+            <button>Send confirmation emails</button>
+          </form>
+        )}
         <form
+          method="post"
           onSubmit={(e) => {
             e.preventDefault();
             action({ action: "sign-out-all" });

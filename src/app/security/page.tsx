@@ -1,3 +1,4 @@
+import { loginEmailAvailable } from "@/server/login-email";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { context } from "@/server/context";
@@ -12,10 +13,12 @@ export default async function SecurityPage() {
   );
   const settings = await companySettings();
   let factors: { id: string; status: string }[] = [],
-    level = "aal1";
+    level = "aal1",
+    pendingEmail = "";
   if (env.AUTH_PROVIDER === "supabase") {
     const client = await supabaseServer(),
       { data } = await client.auth.getUser();
+    pendingEmail = data.user?.new_email ?? "";
     factors = (data.user?.factors ?? [])
       .filter((f) => f.factor_type === "totp")
       .map((f) => ({ id: f.id, status: f.status }));
@@ -37,6 +40,8 @@ export default async function SecurityPage() {
           admin={actor.role === "SUPER_ADMIN"}
           required={settings.requirePrivilegedMfa}
           version={settings.version}
+          emailChangesAvailable={loginEmailAvailable()}
+          pendingEmail={pendingEmail}
         />
       ) : (
         <p>

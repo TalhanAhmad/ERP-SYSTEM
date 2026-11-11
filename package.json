@@ -28,7 +28,8 @@
     "bootstrap:supabase-admin": "tsx --conditions=react-server scripts/bootstrap-supabase-admin.ts",
     "verify:deployment": "tsx --conditions=react-server scripts/verify-deployment.ts",
     "verify:recovery": "tsx scripts/verify-recovery.ts",
-    "verify:performance": "tsx --conditions=react-server scripts/verify-performance.ts"
+    "verify:performance": "tsx --conditions=react-server scripts/verify-performance.ts",
+    "verify:hosted-recovery": "tsx scripts/verify-hosted-recovery.ts"
   },
   "keywords": [],
   "author": "",

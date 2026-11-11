@@ -211,16 +211,48 @@ export async function confirmSupabase(request: Request) {
     );
   const session = cookieSession(request),
     url = new URL(request.url);
+  const emailFlow = url.searchParams.get("flow") === "email-change";
   const code = url.searchParams.get("code"),
     hash = url.searchParams.get("token_hash");
   const result = code
     ? await session.client.auth.exchangeCodeForSession(code)
-    : hash && url.searchParams.get("type") === "recovery"
+    : hash &&
+        (emailFlow
+          ? url.searchParams.get("type") === "email_change"
+          : url.searchParams.get("type") === "recovery")
       ? await session.client.auth.verifyOtp({
           token_hash: hash,
-          type: "recovery",
+          type: emailFlow ? "email_change" : "recovery",
         })
       : { error: true };
+  if (emailFlow) {
+    // First secure-email confirmation can succeed without issuing an auth session.
+    if (!code && !hash)
+      return session.finish(
+        NextResponse.redirect(
+          new URL("/email-change?state=pending", env.APP_URL),
+        ),
+      );
+    if (result.error)
+      return session.finish(
+        NextResponse.redirect(
+          new URL("/email-change?state=failed", env.APP_URL),
+        ),
+      );
+    if ("data" in result && !result.data?.session)
+      return session.finish(
+        NextResponse.redirect(
+          new URL("/email-change?state=pending", env.APP_URL),
+        ),
+      );
+    const verified = await session.client.auth.getUser();
+    if (!verified.error && verified.data.user?.new_email)
+      return session.finish(
+        NextResponse.redirect(
+          new URL("/email-change?state=pending", env.APP_URL),
+        ),
+      );
+  }
   let failed = Boolean(result.error);
   if (!failed) {
     try {
@@ -230,11 +262,15 @@ export async function confirmSupabase(request: Request) {
     }
   }
   const next = url.searchParams.get("next");
-  const destination = failed
-    ? "/forgot-password"
-    : next === "/dashboard"
-      ? "/dashboard"
-      : "/reset-password";
+  const destination = emailFlow
+    ? failed
+      ? "/email-change?state=failed"
+      : "/email-change?state=complete"
+    : failed
+      ? "/forgot-password"
+      : next === "/dashboard"
+        ? "/dashboard"
+        : "/reset-password";
   return session.finish(
     NextResponse.redirect(new URL(destination, env.APP_URL)),
   );

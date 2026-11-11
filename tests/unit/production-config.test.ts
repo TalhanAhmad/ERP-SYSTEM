@@ -76,3 +76,14 @@ it("sanitizes invalid hosted database URLs without echoing credentials", () => {
     }),
   ).toThrow("Invalid server configuration: DATABASE_URL");
 });
+
+it("keeps login email changes disabled unless explicitly enabled", () => {
+  expect(parseRuntime(production).EMAIL_CHANGE_ENABLED).toBe(false);
+  expect(
+    parseRuntime({ ...production, EMAIL_CHANGE_ENABLED: "true" })
+      .EMAIL_CHANGE_ENABLED,
+  ).toBe(true);
+  expect(() =>
+    parseRuntime({ ...production, EMAIL_CHANGE_ENABLED: "yes" }),
+  ).toThrow("EMAIL_CHANGE_ENABLED");
+});

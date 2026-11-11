@@ -1,4 +1,5 @@
 import "server-only";
+import { loginEmailSchema, requestLoginEmail } from "./login-email";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { context } from "./context";
@@ -9,6 +10,7 @@ import { failure, jsonBody, mutationOrigin, rateLimit } from "./http";
 import { invariant } from "./errors";
 import { audit, expected } from "./transaction";
 const actionSchema = z.discriminatedUnion("action", [
+  loginEmailSchema.extend({ action: z.literal("email-change") }).strict(),
   z.object({ action: z.literal("enroll") }).strict(),
   z
     .object({
@@ -60,7 +62,19 @@ export async function securityAction(request: Request) {
       "Unable to verify account security.",
       503,
     );
-    if (input.action === "verify") {
+    if (input.action === "email-change") {
+      // Unlike enrollment/challenge, an email mutation requires full current MFA access.
+      await context(request.headers);
+      await rateLimit("email-change:" + actor.id, 3);
+      const result = await requestLoginEmail(
+        actor,
+        session.client,
+        user.user,
+        input,
+        () => context(request.headers),
+      );
+      return finish(NextResponse.json({ data: result }));
+    } else if (input.action === "verify") {
       invariant(
         factors.some(
           (f) => f.id === input.factorId && f.factor_type === "totp",
