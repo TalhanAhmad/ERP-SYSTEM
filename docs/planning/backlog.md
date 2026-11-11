@@ -14,11 +14,14 @@ The personal-demo completion queue is distinct from company rollout and learner 
 
 Delivered and verified for the authorized personal demo: source baf7d10, CI 42809226350, seventeen hosted migrations, 324 automated checks and 56 final live checks. Test fixtures were retired and persistent exploration accounts preserved. Natural daily processing and protected previous-deployment compatibility are verified.
 
+## Confirmed operating rules
+
+The owner confirmed Monday–Saturday working days, 09:00–17:00 Asia/Karachi shifts (assigned prospectively from 12 November), reports due at 17:00, and HR approval-based leave without a fixed annual quota. These choices and targeted live configuration checks are recorded in operations/company-policy.md. Earlier history, existing permissions and zero-minute timing tolerances were retained. They are not outstanding configuration questions.
+
 ## Owner or external dependencies before company rollout
 
 - Supply an owned sending domain and verify it in Resend. Then verify actual employee invitation/reset delivery in multiple inboxes. The demo sender is intentionally restricted to the owner's verified inbox. Do not purchase a domain or remove the restriction automatically.
 - Enroll the owner's authenticator with their own device, record a recovery procedure and decide when to enable privileged MFA. The capability is implemented; no owner factor or global requirement is activated automatically.
-- Monday–Saturday, 09:00–17:00 Asia/Karachi is confirmed. The three active staff assignments use it prospectively from 12 November, with prior history retained. The 17:00 report cutoff is now owner-confirmed and verified. Employee/leave rules and remaining timing tolerances still need owner confirmation.
 - Approve company hosting/billing and representative real-user pilot acceptance. The deployment remains the authorized personal demo on Hobby; no upgrade is performed.
 - The actual hosted public ERP database and all private objects have now been logically backed up/restored in isolation and verified. Managed Auth/PITR/regional recovery, retention and an automated off-site destination still require a company decision; the logical drill does not establish those guarantees.
 - Own verified login-email changes are implemented and contract/browser tested; they stay disabled on the live demo until a verified sender and independent inbox acceptance are available. Administrative editing of another user’s login email stays read-only.

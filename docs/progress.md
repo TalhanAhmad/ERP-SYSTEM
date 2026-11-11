@@ -76,3 +76,7 @@ Owner accepted 9:00 AM–5:00 PM, Monday–Saturday, Asia/Karachi. Assigned the 
 ## Confirmed report deadline — 11 November 2026
 
 Owner confirmed daily reports due at 5:00 PM Asia/Karachi. The live value was already 17:00 and was verified without rewriting settings or report history. Five targeted checks passed: API/browser value, cutoff boundary behavior, Sunday exemption, retained report metadata and preservation of other settings. Leave approval/annual allowance preference is now requested; overall company-policy sign-off remains unchanged.
+
+## Confirmed leave workflow — 11 November 2026
+
+Owner selected the current HR approval-only workflow with no fixed annual leave quota. Eight targeted live checks passed for pending/independent approval, actual HR approve/reject forms, overlap/off-day handling, focused HR navigation and owned-fixture cleanup. No code/schema/deployment or quota-setting change was needed. All four requested operating choices—working days, shift hours, report deadline and leave workflow—are now recorded in operations/company-policy.md. Existing security/billing settings and historical leave/attendance were preserved.

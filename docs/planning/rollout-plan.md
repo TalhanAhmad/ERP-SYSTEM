@@ -12,10 +12,12 @@ Authorized: finish remaining independent implementation and verification; preser
 - Email capability implemented, gated off for restricted delivery; positive SDK/DB confirmation contracts plus safe public-page/browser checks pass.
 - Actual hosted public ERP snapshot and all available private objects restored and verified in isolated targets; owned bucket cleaned.
 - Full regression: 331 automated checks. Follow-up hosted checks: 44. Source fcb7bc7 passed CI 42976770350 and is deployed as dpl_2SSKGD2xS2jojkBuHhoqN6xjLCa4. Natural attendance/maintenance processing also succeeded on 11 November.
-- Word report updated; owner/demo passwords, emails and MFA enrollment, company defaults and billing remain unchanged.
+- Word report updated; owner/demo credentials, owner MFA enrollment and billing remain unchanged. The subsequently confirmed operating rules are recorded in operations/company-policy.md.
 
 ## Awaiting human/company input
 
-The owner confirmed Monday–Saturday working days; that company setting is saved live. The 09:00–17:00 shift is accepted and assigned from 12 November. The 17:00 report deadline is also confirmed and verified. A sender domain and actual leave rules are still pending. Device enrollment must be completed by the owner at /security; no authenticator secret is generated for them by this agent. Named employee inbox/pilot approval, company hosting/billing and Auth/PITR/off-site retention choices remain company decisions. Current engineering checks do not substitute for those choices or real-user approval.
+The owner confirmed Monday–Saturday working days; that company setting is saved live. The 09:00–17:00 shift is accepted and assigned from 12 November. The 17:00 report deadline is also confirmed and verified. HR approval-only leave with no fixed annual quota is also confirmed and live-verified. A sender domain is still pending. Device enrollment must be completed by the owner at /security; no authenticator secret is generated for them by this agent. Named employee inbox/pilot approval, company hosting/billing and Auth/PITR/off-site retention choices remain company decisions. Current engineering checks do not substitute for those choices or real-user approval.
 
 Workweek update: Monday–Saturday was explicitly confirmed and saved live on 11 November. Sunday is the company weekly off day. Employee schedules now use the accepted 09:00–17:00 shift prospectively from 12 November; earlier assignment segments and history are preserved. See company-policy.md in the operations directory.
+
+Operating-rule collection is complete: Monday–Saturday, 09:00–17:00 Asia/Karachi from 12 November; 17:00 reports; HR-approved leave without an automatic annual quota. Remaining rollout items are the sender domain/inbox acceptance, owner device enrollment, actual human pilot/company hosting decisions and managed Auth/PITR/off-site strategy.
