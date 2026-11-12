@@ -25,6 +25,10 @@ export default async function FinancePage() {
       <div className="panel">
         <h2>Accounting setup is in progress</h2>
         <p>
+          <Link href="/finance/accounts">Chart of accounts</Link> ·{" "}
+          <Link href="/finance/periods">Accounting periods</Link>
+        </p>
+        <p>
           Transactions and reports will be available after accounting setup and
           verification are complete.
         </p>

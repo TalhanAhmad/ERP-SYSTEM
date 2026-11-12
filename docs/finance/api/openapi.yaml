@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova Finance Access",
-    "version": "0.2.0",
-    "description": "F01\u2013F04 access/ownership only. Finance remains disabled live. All responses, including errors, use private/no-store. Existing browser sessions only; no new API key or Bearer login mechanism. No public bootstrap/recovery endpoints."
+    "title": "Encova Finance Access and Setup",
+    "version": "0.3.0",
+    "description": "Implemented F01\u2013F05 access, ownership and account/period setup. Finance remains disabled live. All responses including errors are private/no-store. Existing verified browser sessions; no API-key/Bearer login mechanism. No public bootstrap/recovery or monetary posting endpoint."
   },
   "security": [
     {
@@ -763,6 +763,1031 @@
           }
         }
       }
+    },
+    "/api/v1/finance/accounts": {
+      "post": {
+        "operationId": "createAccounts",
+        "description": "Current Finance Owner only. Fresh password plus Supabase fresh TOTP, shared six/minute actor reauthentication limit; strict allowlisted body. Versions refer to the target record. Atomic config/audit/permanent receipt; no credentials retained. Account mappings/parents/normal sides/control types are cross-validated; used mappings cannot change. Periods are inclusive and non-overlapping, used dates fixed. Closing/reopening is not exposed.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canonical setup result {data:{id,version}}; successful replay returns the original record version after current authorization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Stale version, duplicate code, mapping/parent/used-period state, inclusive period overlap or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listAccounts",
+        "description": "Current active selected Super Admin, owner or read-only administrator. Feature-off 404 before finance queries; authorization precedes query/ID validation. All responses private/no-store. No arbitrary sort or query expression.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "maximum": 10000
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "ARCHIVED",
+                "ALL"
+              ],
+              "default": "ACTIVE"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "ASSET",
+                "LIABILITY",
+                "EQUITY",
+                "INCOME",
+                "DIRECT_COST",
+                "OPERATING_EXPENSE",
+                "OTHER_INCOME",
+                "OTHER_EXPENSE"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Authorized setup DTO. List: items,total,pages,page,pageSize,filters,canManage; accounts also returns up to 100 active parent groups. Detail: item,canManage,latest 25 restricted history entries; accounts also groups and derived mappingLocked. No balances, financial transactions or credentials. Record usage is nullable ISO timestamp; period dates are ISO dates. Unknown filters rejected. Fixed code/id or startDate-desc/id order; out-of-range page is clamped."
+          }
+        }
+      }
+    },
+    "/api/v1/finance/accounts/{id}": {
+      "patch": {
+        "operationId": "updateAccounts",
+        "description": "Current Finance Owner only. Fresh password plus Supabase fresh TOTP, shared six/minute actor reauthentication limit; strict allowlisted body. Versions refer to the target record. Atomic config/audit/permanent receipt; no credentials retained. Account mappings/parents/normal sides/control types are cross-validated; used mappings cannot change. Periods are inclusive and non-overlapping, used dates fixed. Closing/reopening is not exposed.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Stale version, duplicate code, mapping/parent/used-period state, inclusive period overlap or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical setup result {data:{id,version}}; successful replay returns the original record version after current authorization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getAccounts",
+        "description": "Current active selected Super Admin, owner or read-only administrator. Feature-off 404 before finance queries; authorization precedes query/ID validation. All responses private/no-store. No arbitrary sort or query expression.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Authorized setup DTO. List: items,total,pages,page,pageSize,filters,canManage; accounts also returns up to 100 active parent groups. Detail: item,canManage,latest 25 restricted history entries; accounts also groups and derived mappingLocked. No balances, financial transactions or credentials. Record usage is nullable ISO timestamp; period dates are ISO dates. Unknown filters rejected. Fixed code/id or startDate-desc/id order; out-of-range page is clamped."
+          }
+        }
+      }
+    },
+    "/api/v1/finance/accounts/{id}/archive": {
+      "post": {
+        "operationId": "archiveAccounts",
+        "description": "Current Finance Owner only. Fresh password plus Supabase fresh TOTP, shared six/minute actor reauthentication limit; strict allowlisted body. Versions refer to the target record. Atomic config/audit/permanent receipt; no credentials retained. Account mappings/parents/normal sides/control types are cross-validated; used mappings cannot change. Periods are inclusive and non-overlapping, used dates fixed. Closing/reopening is not exposed.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupStateChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Stale version, duplicate code, mapping/parent/used-period state, inclusive period overlap or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical setup result {data:{id,version}}; successful replay returns the original record version after current authorization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/accounts/{id}/reactivate": {
+      "post": {
+        "operationId": "reactivateAccounts",
+        "description": "Current Finance Owner only. Fresh password plus Supabase fresh TOTP, shared six/minute actor reauthentication limit; strict allowlisted body. Versions refer to the target record. Atomic config/audit/permanent receipt; no credentials retained. Account mappings/parents/normal sides/control types are cross-validated; used mappings cannot change. Periods are inclusive and non-overlapping, used dates fixed. Closing/reopening is not exposed.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupStateChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Stale version, duplicate code, mapping/parent/used-period state, inclusive period overlap or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical setup result {data:{id,version}}; successful replay returns the original record version after current authorization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods": {
+      "post": {
+        "operationId": "createPeriods",
+        "description": "Current Finance Owner only. Fresh password plus Supabase fresh TOTP, shared six/minute actor reauthentication limit; strict allowlisted body. Versions refer to the target record. Atomic config/audit/permanent receipt; no credentials retained. Account mappings/parents/normal sides/control types are cross-validated; used mappings cannot change. Periods are inclusive and non-overlapping, used dates fixed. Closing/reopening is not exposed.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canonical setup result {data:{id,version}}; successful replay returns the original record version after current authorization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Stale version, duplicate code, mapping/parent/used-period state, inclusive period overlap or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listPeriods",
+        "description": "Current active selected Super Admin, owner or read-only administrator. Feature-off 404 before finance queries; authorization precedes query/ID validation. All responses private/no-store. No arbitrary sort or query expression.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "maximum": 10000
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "OPEN",
+                "CLOSED",
+                "VOID"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Authorized setup DTO. List: items,total,pages,page,pageSize,filters,canManage; accounts also returns up to 100 active parent groups. Detail: item,canManage,latest 25 restricted history entries; accounts also groups and derived mappingLocked. No balances, financial transactions or credentials. Record usage is nullable ISO timestamp; period dates are ISO dates. Unknown filters rejected. Fixed code/id or startDate-desc/id order; out-of-range page is clamped."
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}": {
+      "patch": {
+        "operationId": "updatePeriods",
+        "description": "Current Finance Owner only. Fresh password plus Supabase fresh TOTP, shared six/minute actor reauthentication limit; strict allowlisted body. Versions refer to the target record. Atomic config/audit/permanent receipt; no credentials retained. Account mappings/parents/normal sides/control types are cross-validated; used mappings cannot change. Periods are inclusive and non-overlapping, used dates fixed. Closing/reopening is not exposed.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Stale version, duplicate code, mapping/parent/used-period state, inclusive period overlap or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical setup result {data:{id,version}}; successful replay returns the original record version after current authorization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getPeriods",
+        "description": "Current active selected Super Admin, owner or read-only administrator. Feature-off 404 before finance queries; authorization precedes query/ID validation. All responses private/no-store. No arbitrary sort or query expression.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Authorized setup DTO. List: items,total,pages,page,pageSize,filters,canManage; accounts also returns up to 100 active parent groups. Detail: item,canManage,latest 25 restricted history entries; accounts also groups and derived mappingLocked. No balances, financial transactions or credentials. Record usage is nullable ISO timestamp; period dates are ISO dates. Unknown filters rejected. Fixed code/id or startDate-desc/id order; out-of-range page is clamped."
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}/void": {
+      "post": {
+        "operationId": "voidPeriods",
+        "description": "Current Finance Owner only. Fresh password plus Supabase fresh TOTP, shared six/minute actor reauthentication limit; strict allowlisted body. Versions refer to the target record. Atomic config/audit/permanent receipt; no credentials retained. Account mappings/parents/normal sides/control types are cross-validated; used mappings cannot change. Periods are inclusive and non-overlapping, used dates fixed. Closing/reopening is not exposed.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupStateChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Stale version, duplicate code, mapping/parent/used-period state, inclusive period overlap or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical setup result {data:{id,version}}; successful replay returns the original record version after current authorization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -795,6 +1820,339 @@
             "description": "Mandatory fresh TOTP for Supabase, including when company MFA is optional; absent only in guarded loopback Better Auth development."
           }
         }
+      },
+      "AccountCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9][A-Z0-9._-]{1,19}$",
+            "description": "Trimmed and uppercased before validation."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ASSET",
+              "LIABILITY",
+              "EQUITY",
+              "INCOME",
+              "DIRECT_COST",
+              "OPERATING_EXPENSE",
+              "OTHER_INCOME",
+              "OTHER_EXPENSE"
+            ]
+          },
+          "normalSide": {
+            "type": "string",
+            "enum": [
+              "DEBIT",
+              "CREDIT"
+            ]
+          },
+          "reportGroup": {
+            "type": "string",
+            "enum": [
+              "CURRENT_ASSETS",
+              "NONCURRENT_ASSETS",
+              "CURRENT_LIABILITIES",
+              "NONCURRENT_LIABILITIES",
+              "EQUITY",
+              "REVENUE",
+              "DIRECT_COSTS",
+              "OPERATING_EXPENSES",
+              "OTHER_INCOME",
+              "OTHER_EXPENSES"
+            ]
+          },
+          "controlType": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "CASH",
+              "RECEIVABLES",
+              "PAYABLES",
+              "CLIENT_ADVANCE",
+              "SUPPLIER_ADVANCE",
+              "FIXED_ASSET",
+              "ACCUMULATED_DEPRECIATION",
+              "INVESTMENT",
+              "LOAN_RECEIVABLE",
+              "LOAN_PAYABLE"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "const": "PKR",
+            "default": "PKR"
+          },
+          "parentId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "isPosting": {
+            "type": "boolean"
+          },
+          "isContra": {
+            "type": "boolean"
+          },
+          "isCashEquivalent": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "type",
+          "normalSide",
+          "reportGroup",
+          "controlType",
+          "isPosting",
+          "isContra",
+          "isCashEquivalent",
+          "reason",
+          "reauth"
+        ]
+      },
+      "AccountUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9][A-Z0-9._-]{1,19}$",
+            "description": "Trimmed and uppercased before validation."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ASSET",
+              "LIABILITY",
+              "EQUITY",
+              "INCOME",
+              "DIRECT_COST",
+              "OPERATING_EXPENSE",
+              "OTHER_INCOME",
+              "OTHER_EXPENSE"
+            ]
+          },
+          "normalSide": {
+            "type": "string",
+            "enum": [
+              "DEBIT",
+              "CREDIT"
+            ]
+          },
+          "reportGroup": {
+            "type": "string",
+            "enum": [
+              "CURRENT_ASSETS",
+              "NONCURRENT_ASSETS",
+              "CURRENT_LIABILITIES",
+              "NONCURRENT_LIABILITIES",
+              "EQUITY",
+              "REVENUE",
+              "DIRECT_COSTS",
+              "OPERATING_EXPENSES",
+              "OTHER_INCOME",
+              "OTHER_EXPENSES"
+            ]
+          },
+          "controlType": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "CASH",
+              "RECEIVABLES",
+              "PAYABLES",
+              "CLIENT_ADVANCE",
+              "SUPPLIER_ADVANCE",
+              "FIXED_ASSET",
+              "ACCUMULATED_DEPRECIATION",
+              "INVESTMENT",
+              "LOAN_RECEIVABLE",
+              "LOAN_PAYABLE"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "const": "PKR",
+            "default": "PKR"
+          },
+          "parentId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "isPosting": {
+            "type": "boolean"
+          },
+          "isContra": {
+            "type": "boolean"
+          },
+          "isCashEquivalent": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "type",
+          "normalSide",
+          "reportGroup",
+          "controlType",
+          "isPosting",
+          "isContra",
+          "isCashEquivalent",
+          "reason",
+          "reauth",
+          "expectedVersion"
+        ]
+      },
+      "PeriodCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real ISO date 0001\u20139999 inclusive."
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "description": "On or after startDate; both boundaries exclude overlap with any non-VOID period."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "name",
+          "startDate",
+          "endDate",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PeriodUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real ISO date 0001\u20139999 inclusive."
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "description": "On or after startDate; both boundaries exclude overlap with any non-VOID period."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          }
+        },
+        "required": [
+          "name",
+          "startDate",
+          "endDate",
+          "reason",
+          "reauth",
+          "expectedVersion"
+        ]
+      },
+      "SetupStateChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PkrAmount": {
+        "type": "string",
+        "pattern": "^(?:0|[1-9]\\d{0,17})(?:\\.\\d{1,2})?(?![\\s\\S])",
+        "description": "Shared internal validation contract, not an endpoint. Exact unsigned PKR decimal string, normalized to two decimals, max 999999999999999999.99. No numeric JSON, exponent or signed input."
       }
     }
   }

@@ -15,6 +15,8 @@
 | Investment classification/measurement per holding | Pending company/accountant | No guessed valuations |
 | Tax/withholding codes and rates | Pending company/accountant | No inferred Pakistan tax rates |
 | Evidence retention and malware scanner | Pending operator/company | Quarantine unavailable files; never assume clean |
-| Live MFA/reauthentication and owner recovery | Pending secure implementation and human setup | Preserve current ERP access while finance remains disabled |
+| Live MFA/reauthentication and owner recovery | Implemented F04; hosted human setup pending | Preserve current ERP access while finance remains disabled |
 | Staging, accountant representative dataset, live opening balances | Pending | Isolated fixtures only until reviewed |
 | Finance deployment/launch | Pending separate authorization and acceptance | No finance migration or enablement on live services in this delivery |
+
+F05 decisions: setup mutations are Finance Owner-only, selected administrators read-only; account codes are retained on archive, group and control mappings checked, no mutable account balances. Periods use inclusive non-overlapping dates; unused voiding corrects setup, while close/reopen is deferred to F39. Exact PKR strings, precision-64 isolated Decimal and line-level HALF_UP rounding are implementation rules, not company chart/tax/fiscal-year approval. No company chart or period is seeded.

@@ -4,10 +4,18 @@ FinanceGrant: UUID id and Person user/issuer/revoker references (ON DELETE RESTR
 
 FinanceAuditEvent: UUID id, restricted Person actor reference, action, entity type/id, reason, JSON data, request UUID and timestamp. UPDATE/DELETE are rejected by a database trigger. Append writes are not routed into ordinary ERP Audit. Validated service payload schemas will accompany actual owner/posting operations; this table is not an arbitrary finance API.
 
-Both tables have RLS enabled, no anon/authenticated grants and restricted encova_app grants. Runtime: SELECT FinanceGrant; SELECT/INSERT FinanceAuditEvent. The migration seeds zero rows. Owner/settings/ledger/subledger tables are pending, not flattened into JSON placeholders. The FinanceGrant partial uniqueness constraint lives in reviewed SQL because Prisma schema syntax does not represent it.
+Both tables have RLS enabled, no anon/authenticated grants and restricted encova_app grants. Runtime: SELECT FinanceGrant; SELECT/INSERT FinanceAuditEvent. The migration seeds zero rows. Owner/settings control tables are described below; ledger/subledger tables remain pending. The FinanceGrant partial uniqueness constraint lives in reviewed SQL because Prisma schema syntax does not represent it.
 
 ## F04 control schema
 
 FinanceSettings is a UUID singleton with PKR CHECK, current owner Person, owner grant (including a composite FK to the same Person), positive version and server timestamps. FinanceOwnershipTransfer references current/target Persons, has a 24-hour expiry, constrained state/acceptance metadata, version and one pending-transfer partial unique index. FinanceAccessReceipt has a unique actor/operation/key, server-computed canonical JSON SHA-256 request hash, canonical result and immutable history trigger; no credentials are stored.
 
 Database triggers block owner deletion/demotion/deactivation/grant removal and validate owner eligibility and an active matching grant. Selected accounts' email/provider bindings are protected; only the existing verified self-email synchronization can set a transaction-local self-service marker for email (never replacement provider IDs). Runtime reads control tables and invokes the dedicated owner-checked command; it cannot invoke operator setup/recovery. These are control records, not an accounting ledger or monetary source.
+
+## F05 setup schema
+
+FinanceAccount stores a unique retained uppercase code (2–20 characters), name, typed classification/normal side/report group/control type, PKR, optional parent group, posting/contra/cash-equivalent flags, active state, positive version, optional first-used marker and timestamps. There is no balance column. SQL checks enforce normal/contra compatibility and control/group restrictions; a serialized hierarchy trigger prevents cycles, incompatible parents, posting parents and active children under archived parents. Used account/ancestor mappings freeze; labels remain correctable. No DELETE path exists.
+
+FinancePeriod stores an explicit inclusive start/end DATE, OPEN/CLOSED/VOID state, first-used marker, future close metadata, version and timestamps. GiST exclusion on daterange(startDate,endDate,'[]') for non-VOID rows prevents any overlap without an extension. Both dates are real calendar dates within years 0001–9999. Only OPEN setup can be amended; unused OPEN periods may be voided without deletion. Used dates cannot change/void. Close/reopen behavior is reserved for F39.
+
+FinanceSetupReceipt permanently binds actor/operation/key to server-canonical JSON SHA-256 and original {id,version}; its immutable trigger and the finance-only before/after audit commit with the configuration. No passwords, MFA codes, session IDs or monetary entries appear in these records. Runtime is SELECT-only on all three tables plus EXECUTE on the narrow owner-checked setup command; anon/authenticated have neither table nor function access. Migration operator privileges are a separate trust boundary.

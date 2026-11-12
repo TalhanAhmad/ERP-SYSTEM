@@ -108,6 +108,7 @@ model Person {
  financeAuditEvents FinanceAuditEvent[]
  financeOwnership FinanceSettings?
  financeAccessReceipts FinanceAccessReceipt[]
+ financeSetupReceipts FinanceSetupReceipt[]
  @@index([status,role])
 }
 
@@ -179,6 +180,57 @@ model FinanceAuditEvent {
  createdAt DateTime @default(now()) @db.Timestamptz
  @@index([entityType,entityId,createdAt])
  @@index([actorId,createdAt])
+}
+
+model FinanceAccount {
+ id String @id @default(uuid()) @db.Uuid
+ code String @unique
+ name String
+ type String
+ normalSide String
+ reportGroup String
+ controlType String @default("NONE")
+ currency String @default("PKR")
+ parentId String? @db.Uuid
+ parent FinanceAccount? @relation("FinanceAccountTree",fields:[parentId],references:[id],onDelete:Restrict)
+ children FinanceAccount[] @relation("FinanceAccountTree")
+ isPosting Boolean @default(true)
+ isContra Boolean @default(false)
+ isCashEquivalent Boolean @default(false)
+ active Boolean @default(true)
+ usedAt DateTime? @db.Timestamptz
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([active,type,code])
+ @@index([parentId])
+}
+
+model FinancePeriod {
+ id String @id @default(uuid()) @db.Uuid
+ name String
+ startDate DateTime @db.Date
+ endDate DateTime @db.Date
+ state String @default("OPEN")
+ usedAt DateTime? @db.Timestamptz
+ closedAt DateTime? @db.Timestamptz
+ closedById String? @db.Uuid
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([state,startDate,id])
+}
+
+model FinanceSetupReceipt {
+ id String @id @default(uuid()) @db.Uuid
+ actorId String @db.Uuid
+ actor Person @relation(fields:[actorId],references:[id],onDelete:Restrict)
+ operation String
+ key String
+ requestHash String
+ result Json
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@unique([actorId,operation,key])
 }
 model Project {
  id String @id @default(uuid()) @db.Uuid
