@@ -1,6 +1,6 @@
 # F06–F10 verification — 12 November 2026
 
-488 distinct local tests: 185 unit, 275 real PostgreSQL integration and 28 Chromium browser. Strict typing/lint and both local/Supabase-mode production builds passed. Distinct total **488**. New scope adds 18 unit, 44 integration and 2 browser cases to F05's 424; repeated runs are not added. Publication and exact-source clean-runner CI are pending; local evidence below is complete.
+488 distinct local tests: 185 unit, 275 real PostgreSQL integration and 28 Chromium browser. Strict typing/lint and both local/Supabase-mode production builds passed. Distinct total **488**. New scope adds 18 unit, 44 integration and 2 browser cases to F05's 424; repeated runs are not added. Source 4be8c72eed903d2acd7b22be793a76bba638c55a is committed/pushed; [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43238001511) passed the full fresh-database verification.
 
 | Check | Actual result |
 | --- | --- |
@@ -33,3 +33,9 @@ Migration 23 initially failed SQL CASE parsing; confirmed no partial table, reso
 Only encova_test and owned synthetic fixtures were changed. Finance config/journal/audit history is retained; cleanup releases only its owned singleton/grants, retires owned backend people and preserves ERP records. Hosted MFA contract remains the prior SDK/mock-provider test; no live device/accountant/financial launch or production-throughput claim is made.
 
 Final focused ledger repeat passed27/27 after adding an archived-project assertion to the existing posting-boundary case; typing/lint passed again and the distinct count remains488. Both Word reports passed ZIP/XML/image relationship checks; the focused report also passed the macOS document parser. All99 changed/new files passed a scan against16 configured private values, without printing them. No application code changed after the complete local regression. Exact source/CI publication follows.
+
+## Final publication evidence
+
+Exact-source [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43238001511) passed on 4be8c72eed903d2acd7b22be793a76bba638c55a: 185 unit +275 PostgreSQL integration +28 Chromium browser tests (**488**), all27 migrations applied to fresh PostgreSQL, strict typing/lint, local and Supabase-mode production builds and documentation. CI browser suite passed in2.2 minutes; the complete verify job took5m19s. Source is committed/pushed on finance/foundation; draft PR#1 remains unmerged. Hosted ERP retains17 migrations with finance disabled; no live finance migration/grant or deployment occurred.
+
+The final tracking commit updates documentation/Word evidence only. Its documentation links, Word ZIP/XML/images/private-value checks are validated before push; the passing source CI above covers the unchanged application/schema source.

@@ -2,7 +2,7 @@
 
 Date: 12 November 2026 (Asia/Karachi). Requested by Talha: complete through F10, test/reverify, commit/push and provide a report.
 
-**Delivered through F10: 10/48 finance milestones complete; 38 remain.** 488 distinct local tests: 185 unit, 275 real PostgreSQL integration and 28 Chromium browser. Strict typing/lint and both local/Supabase-mode production builds passed. Publication and exact-source clean-runner CI are pending; local evidence below is complete.
+**Delivered through F10: 10/48 finance milestones complete; 38 remain.** 488 distinct local tests: 185 unit, 275 real PostgreSQL integration and 28 Chromium browser. Strict typing/lint and both local/Supabase-mode production builds passed. Source 4be8c72eed903d2acd7b22be793a76bba638c55a is committed/pushed; [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43238001511) passed the full fresh-database verification.
 
 | Milestone | Delivered behavior | Verification |
 | --- | --- | --- |
@@ -21,7 +21,7 @@ Date: 12 November 2026 (Asia/Karachi). Requested by Talha: complete through F10,
 | 254 | Built shared register/drawer and verified the first real journal browser journey; corrected date/label/cleanup issues |
 | 255 | Added party/cash owner setup, protected mappings, searchable chart choices and complete backend regression |
 | 256 | Closed exact snapshot/batch/retry boundaries; full local 488-test regression and both builds passed; reports prepared |
-| Publication | Exact source, clean-runner CI and final report commit are recorded below when complete |
+| 257–258 | Source 4be8c72 committed/pushed; CI43238001511 passed all488 tests and27 fresh migrations; final reports exported/validated and pushed |
 
 The [complete work log](../work-log.md) and [focused verification](testing/F06-F10-results.md) retain commands, failures/corrections and results. The full [Word progress tracker](../Encova_Progress_Report.docx) includes prior ERP and finance history. A focused Encova_F06-F10_Report.docx is exported alongside this file.
 
@@ -37,4 +37,10 @@ Next F11: typed earned/deferred invoices and posting services. Remaining work in
 
 ![Cash-account register](screenshots/cash-accounts-mobile.png)
 
-Final report validation: full and focused Word ZIP/XML/image relationships passed; macOS extracted the focused document successfully. Configured private-value scan passed across all99 milestone files. Exact-source publication and CI are being recorded.
+Final report validation: full and focused Word ZIP/XML/image relationships passed; macOS extracted the focused document successfully. Configured private-value scan passed across all99 milestone files. Exact-source publication and clean-runner verification passed.
+
+## Final publication evidence
+
+Exact-source [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43238001511) passed on 4be8c72eed903d2acd7b22be793a76bba638c55a: 185 unit +275 PostgreSQL integration +28 Chromium browser tests (**488**), all27 migrations applied to fresh PostgreSQL, strict typing/lint, local and Supabase-mode production builds and documentation. CI browser suite passed in2.2 minutes; the complete verify job took5m19s. Source is committed/pushed on finance/foundation; draft PR#1 remains unmerged. Hosted ERP retains17 migrations with finance disabled; no live finance migration/grant or deployment occurred.
+
+The final tracking commit updates documentation/Word evidence only. Its documentation links, Word ZIP/XML/images/private-value checks are validated before push; the passing source CI above covers the unchanged application/schema source.
