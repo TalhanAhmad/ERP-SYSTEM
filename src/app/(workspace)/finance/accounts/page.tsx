@@ -4,28 +4,31 @@ import { accountQuerySchema } from "@/modules/finance/accounting/schemas";
 import { accountTypes } from "@/modules/finance/accounting/catalog";
 import { financePageData } from "@/modules/finance/accounting/page-data";
 import { FinanceNavigation } from "@/modules/finance/components/setup-navigation";
+import { FinanceRegister } from "@/modules/finance/components/finance-register";
 export const dynamic = "force-dynamic";
 export default async function Accounts({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const raw = await searchParams;
-  const { data, invalid } = await financePageData(async (actor) => {
-    const parsed = accountQuerySchema.safeParse(raw);
-    return {
-      data: await accounts(actor, parsed.success ? parsed.data : {}),
-      invalid: !parsed.success,
-    };
-  });
+  const raw = await searchParams,
+    { data, invalid } = await financePageData(async (actor) => {
+      const p = accountQuerySchema.safeParse(raw);
+      return {
+        data: await accounts(actor, p.success ? p.data : {}),
+        invalid: !p.success,
+      };
+    });
   const href = (page: number) =>
     "/finance/accounts?" +
-    new URLSearchParams({
-      ...Object.fromEntries(
-        Object.entries(data.filters).map(([k, v]) => [k, String(v)]),
+    new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...data.filters, page }).map(([k, v]) => [
+          k,
+          String(v),
+        ]),
       ),
-      page: String(page),
-    });
+    );
   return (
     <section>
       <FinanceNavigation />
@@ -33,7 +36,7 @@ export default async function Accounts({
       <h1>Chart of accounts</h1>
       <p>
         Configure account classification before recording financial activity.
-        Balances will come from posted journals.
+        Balances derive from posted journals.
       </p>
       {data.canManage && (
         <Link className="button primary" href="/finance/accounts/new">
@@ -46,7 +49,36 @@ export default async function Accounts({
           <Link href="/finance/accounts">Clear filters</Link>
         </p>
       )}
-      <section className="panel" aria-label="Account register">
+      <FinanceRegister
+        label="Account"
+        columns={[
+          "Code / name",
+          "Type / normal side",
+          "Report group",
+          "Control",
+          "State",
+        ]}
+        total={data.total}
+        page={data.page}
+        pages={data.pages}
+        href={href}
+        rows={data.items.map((a) => ({
+          id: a.id,
+          name: a.code + " · " + a.name,
+          href: "/finance/accounts/" + a.id,
+          endpoint: "/api/v1/finance/accounts/" + a.id,
+          cells: [
+            a.type +
+              " · " +
+              a.normalSide +
+              (!a.isPosting ? " · group" : "") +
+              (a.isContra ? " · contra" : ""),
+            a.reportGroup,
+            a.controlType + (a.isCashEquivalent ? " · cash equivalent" : ""),
+            a.active ? "Active" : "Archived",
+          ],
+        }))}
+      >
         <form method="get" className="form-grid">
           <label>
             Search accounts
@@ -69,68 +101,17 @@ export default async function Accounts({
               ))}
             </select>
           </label>
+          <label>
+            Rows per page
+            <select name="pageSize" defaultValue={data.pageSize}>
+              {[25, 50, 100].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
           <button type="submit">Apply account filters</button>
         </form>
-        <p>
-          {data.total} matching accounts · Page {data.page} of {data.pages}
-        </p>
-        <div
-          className="table-wrap"
-          role="region"
-          aria-label="Account table"
-          tabIndex={0}
-        >
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Code / name</th>
-                <th scope="col">Type / normal side</th>
-                <th scope="col">Report group</th>
-                <th scope="col">Control</th>
-                <th scope="col">State</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.items.map((a) => (
-                <tr key={a.id}>
-                  <td>
-                    <Link href={`/finance/accounts/${a.id}`}>
-                      {a.code} · {a.name}
-                    </Link>
-                  </td>
-                  <td>
-                    {a.type} · {a.normalSide}
-                    {!a.isPosting ? " · group" : ""}
-                    {a.isContra ? " · contra" : ""}
-                  </td>
-                  <td>{a.reportGroup}</td>
-                  <td>
-                    {a.controlType}
-                    {a.isCashEquivalent ? " · cash equivalent" : ""}
-                  </td>
-                  <td>{a.active ? "Active" : "Archived"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {!data.items.length && (
-          <p>
-            No accounts match.{" "}
-            {data.canManage
-              ? "Create the chart after company review."
-              : "The Finance Owner manages the chart."}
-          </p>
-        )}
-        <nav aria-label="Account pagination" className="form-actions">
-          {data.page > 1 && (
-            <Link href={href(data.page - 1)}>Previous accounts</Link>
-          )}
-          {data.page < data.pages && (
-            <Link href={href(data.page + 1)}>Next accounts</Link>
-          )}
-        </nav>
-      </section>
+      </FinanceRegister>
     </section>
   );
 }

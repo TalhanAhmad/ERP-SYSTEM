@@ -17,3 +17,11 @@ A proposed Prisma test-database reset was blocked before execution and abandoned
 21: 20261112010000_finance_accounts_periods adds empty account/period/setup-receipt tables, typed checks, inclusive GiST exclusion, hierarchy/usage/retention triggers, atomic owner-checked commands and narrow runtime/RLS privileges. 22: 20261112020000_finance_used_group_guard extends the account guard to freeze ancestor mapping when any descendant is used. It preserves migration 21 and all data. Neither adds company chart/fiscal-year/financial seeds or modifies the ERP tables.
 
 Both were successfully applied only to encova_test by the guarded additive migration deploy command. No database reset was used. Fresh-runner application and test results are tracked in testing/results.md; no hosted migration is implied. supabase/setup.sql replay restores only config SELECT and command EXECUTE, never broad finance CRUD. Tests revoke then replay privileges and actually execute the command under encova_app.
+
+## F06–F10 additive migrations — 12 November 2026
+
+23 (20261112030000_finance_journal_engine): empty typed drafts/ledger/receipt tables, immutable/deferred guards and restricted atomic ledger command. Initial SQL CASE parse failed with no partial table; resolved only the failed record and corrected before successful deployment. No reset.
+
+24 (20261112040000_finance_draft_guards): deferred saved-draft cardinality/range/source checks and immutable restricted revision snapshots. 25 (20261112050000_finance_parties_cash): empty party/cash mapping tables, retention/usage/GL-binding guards and owner-only master command. 26 (20261112060000_finance_snapshot_precision): keep audit line amounts as exact decimal strings. 27 (20261112070000_finance_batch_results): canonical updated batch versions and identified first-row conflict. Applied SQL checksums remain unchanged; all corrections are additive. All five migrations are explicitly transactional.
+
+All 27 migrations are applied only to encova_test in local verification. No company chart, fiscal period, opening book or hosted grant/migration is seeded. Fresh-runner verification is recorded against the exact source in testing/F06-F10-results.md. supabase/setup.sql replays narrow SELECT/EXECUTE privileges without widening to generic CRUD.

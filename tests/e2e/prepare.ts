@@ -31,6 +31,9 @@ for (const [username, role] of [
   ["e2e.finance.target", "SUPER_ADMIN"],
   ["e2e.finance.third", "SUPER_ADMIN"],
   ["e2e.finance.setup", "SUPER_ADMIN"],
+  ["e2e.finance.ledger", "SUPER_ADMIN"],
+  ["e2e.finance.writer", "SUPER_ADMIN"],
+  ["e2e.finance.masters", "SUPER_ADMIN"],
 ] as const) {
   const email = `${username}@example.test`;
   if (await db.person.findUnique({ where: { email } })) continue;
@@ -52,21 +55,23 @@ for (const [username, role] of [
     },
   });
 }
-const financePerson = await db.person.findUniqueOrThrow({
-  where: { username: "e2e.finance" },
-});
-if (
-  !(await db.financeGrant.findFirst({
-    where: { userId: financePerson.id, revokedAt: null },
-  }))
-) {
-  await db.financeGrant.create({
-    data: {
-      userId: financePerson.id,
-      grantedById: financePerson.id,
-      reason: "Explicit isolated browser finance fixture",
-    },
+for (const username of ["e2e.finance", "e2e.finance.writer"]) {
+  const financePerson = await db.person.findUniqueOrThrow({
+    where: { username },
   });
+  if (
+    !(await db.financeGrant.findFirst({
+      where: { userId: financePerson.id, revokedAt: null },
+    }))
+  ) {
+    await db.financeGrant.create({
+      data: {
+        userId: financePerson.id,
+        grantedById: financePerson.id,
+        reason: "Explicit isolated browser finance fixture",
+      },
+    });
+  }
 }
 console.log("Synthetic browser fixtures ready.");
 await db.$disconnect();

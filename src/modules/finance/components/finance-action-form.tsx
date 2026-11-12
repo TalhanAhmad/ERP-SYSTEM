@@ -14,6 +14,8 @@ export function FinanceActionForm({
   disabled = false,
   method = "POST",
   redirectPrefix,
+  onSaved,
+  onReload,
 }: {
   label: string;
   endpoint: string;
@@ -23,6 +25,8 @@ export function FinanceActionForm({
   disabled?: boolean;
   method?: "POST" | "PATCH";
   redirectPrefix?: string;
+  onSaved?: () => void;
+  onReload?: () => void;
 }) {
   const router = useRouter();
   const ready = useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
@@ -58,7 +62,8 @@ export function FinanceActionForm({
           });
           const result = await response.json();
           if (!response.ok) {
-            retry.current = null;
+            if (response.status < 500 && response.status !== 429)
+              retry.current = null;
             const fields = result.error.fields?.fieldErrors ?? {};
             throw new Error(
               [
@@ -74,6 +79,7 @@ export function FinanceActionForm({
           retry.current = null;
           if (redirectPrefix) router.push(redirectPrefix + result.data.id);
           router.refresh();
+          onSaved?.();
         } catch (error) {
           setError(
             error instanceof Error
@@ -126,7 +132,13 @@ export function FinanceActionForm({
         {error && (
           <div role="alert" className="error">
             {error}
-            <button type="button" onClick={() => router.refresh()}>
+            <button
+              type="button"
+              onClick={() => {
+                router.refresh();
+                onReload?.();
+              }}
+            >
               Reload records
             </button>
           </div>

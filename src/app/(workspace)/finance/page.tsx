@@ -23,14 +23,14 @@ export default async function FinancePage() {
       <p className="eyebrow">FINANCE · PKR</p>
       <h1>Finance setup</h1>
       <div className="panel">
-        <h2>Accounting setup is in progress</h2>
+        <h2>Ledger and accounting setup</h2>
         <p>
+          <Link href="/finance/journals">Journal register</Link> ·{" "}
           <Link href="/finance/accounts">Chart of accounts</Link> ·{" "}
           <Link href="/finance/periods">Accounting periods</Link>
         </p>
         <p>
-          Transactions and reports will be available after accounting setup and
-          verification are complete.
+          Ordinary journal adjustments are available. Invoices, payments and financial reports follow in later milestones.
         </p>
         <Link href="/dashboard" className="button secondary">
           Back to workspace

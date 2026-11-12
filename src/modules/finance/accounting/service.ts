@@ -34,6 +34,10 @@ export const setupSchemas = {
   PERIOD_VOID: versionReasonSchema,
 };
 const domainErrors: Record<string, [number, string]> = {
+  FINANCE_CASH_MAPPING: [
+    409,
+    "Archive the linked cash account before archiving its GL account; linked cash mappings must remain valid.",
+  ],
   FINANCE_FORBIDDEN: [403, "Finance access is unavailable."],
   FINANCE_OWNER_REQUIRED: [
     403,

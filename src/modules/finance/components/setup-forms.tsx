@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { AccountPicker } from "./account-picker";
 import { FinanceActionForm } from "./finance-action-form";
 import {
   accountTypes,
@@ -191,29 +192,16 @@ export function AccountForm({
               ))}
             </select>
           </label>
-          <label>
-            Parent group
-            <select
-              name="parentId"
-              value={draft.parentId ?? ""}
-              onChange={(e) =>
-                setDraft({ ...draft, parentId: e.target.value || null })
-              }
-            >
-              <option value="">No parent group</option>
-              {draft.parentId &&
-                !compatible.some((g) => g.id === draft.parentId) && (
-                  <option value={draft.parentId}>
-                    Current parent (retained)
-                  </option>
-                )}
-              {compatible.map((g) => (
-                <option value={g.id} key={g.id}>
-                  {g.code} · {g.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <AccountPicker
+            kind="parent"
+            label="Parent group"
+            value={draft.parentId}
+            type={draft.type}
+            group={draft.reportGroup}
+            exclude={item?.id}
+            initial={compatible}
+            onChange={(id) => setDraft({ ...draft, parentId: id })}
+          />
         </div>
         <label className="check-label">
           <input

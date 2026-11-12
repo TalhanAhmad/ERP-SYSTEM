@@ -11,3 +11,7 @@
 ## F05 limits
 
 No ledger/posting engine yet; account/period setup does not establish balanced books. F06 must lock period, posting accounts and ancestors and mark usage in the same transaction as the first posting, proving races against setup changes. Closing/reopening is F39. Company chart/fiscal year remain unset. Parent option lists are bounded to the first 100 active groups (existing parent retained); complete searchable selection is scheduled with shared registers/F10. No real books should rely on a synthetic fixture or inferred tax/asset/reporting policy. Both fresh migrations and full CI remain separately evidenced in testing/results.md.
+
+## F06–F10 remaining limits
+
+The ordinary-adjustment engine is verified; the full commercial invoice/cash/subledger dataset, financial statements, close/reopen and live accounting acceptance remain later work. Global structural serialization is deliberately conservative; no production-throughput guarantee is claimed. Complete parent search is now implemented; optional project/person selectors retain a 100-active-record UI bound. Supporting evidence is a required reference, not a claim that finance attachment scanning/upload/PDF generation already exists. Company policies/chart/year/opening books, hosted MFA setup, staging/recovery/accountant review and separate release approval remain outstanding. No finance feature is enabled live by a passing local/CI suite.

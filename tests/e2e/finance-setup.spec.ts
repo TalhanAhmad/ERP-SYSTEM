@@ -112,7 +112,12 @@ test("owner configures accounts and periods; selected administrators have a read
     await page.getByLabel("Account code").fill(prefix + ".C");
     await page.getByLabel("Control register").selectOption("CASH");
     await page.getByLabel("Cash-equivalent account", { exact: false }).check();
-    await page.getByLabel("Parent group").selectOption(groupId);
+    await page
+      .getByLabel("Search parent group", { exact: true })
+      .fill(prefix + ".G");
+    await page
+      .getByLabel("Parent group", { exact: true })
+      .selectOption(groupId);
     await authorize(page.locator("form"), "Create account");
     await expect(page).toHaveURL(/\/finance\/accounts\/[0-9a-f-]+$/);
     const leafPath = new URL(page.url()).pathname;

@@ -9,11 +9,11 @@
 | [F03](days/F03.md) | Build grants and shared access policy; denied-role integration tests | Complete |
 | [F04](days/F04.md) | Implement owner bootstrap/transfer/revoke; escalation and owner-lock tests | Complete |
 | [F05](days/F05.md) | Build accounts, periods, PKR validation, and reviewed migrations | Complete |
-| [F06](days/F06.md) | Implement posting engine and DB balancing/immutability safeguards | Pending |
-| [F07](days/F07.md) | Add idempotency, draft versions, reversals, and concurrency tests | Pending |
-| [F08](days/F08.md) | Run core accounting fixture subset; review design and re-estimate | Pending |
-| [F09](days/F09.md) | Build shared finance register, filters, pagination, drawer, error states | Pending |
-| [F10](days/F10.md) | Add parties, cash accounts, chart of accounts UI and validation | Pending |
+| [F06](days/F06.md) | Implement posting engine and DB balancing/immutability safeguards | Complete |
+| [F07](days/F07.md) | Add idempotency, draft versions, reversals, and concurrency tests | Complete |
+| [F08](days/F08.md) | Run core accounting fixture subset; review design and re-estimate | Complete |
+| [F09](days/F09.md) | Build shared finance register, filters, pagination, drawer, error states | Complete |
+| [F10](days/F10.md) | Add parties, cash accounts, chart of accounts UI and validation | Complete |
 | [F11](days/F11.md) | Implement earned/deferred invoice schema and posting services | Pending |
 | [F12](days/F12.md) | Build invoice screens, lines, previews, and private printable invoice | Pending |
 | [F13](days/F13.md) | Implement receipts and partial/multiple invoice allocations | Pending |

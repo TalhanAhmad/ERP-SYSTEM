@@ -110,6 +110,10 @@ model Person {
  financeAccessReceipts FinanceAccessReceipt[]
  financeSetupReceipts FinanceSetupReceipt[]
  financeClosedPeriods FinancePeriod[] @relation("FinancePeriodCloser")
+ financeJournalDrafts FinanceJournalDraft[]
+ financeJournalEntries FinanceJournalEntry[]
+ financeLedgerReceipts FinanceLedgerReceipt[]
+ financeParties FinanceParty[]
  @@index([status,role])
 }
 
@@ -195,6 +199,9 @@ model FinanceAccount {
  parentId String? @db.Uuid
  parent FinanceAccount? @relation("FinanceAccountTree",fields:[parentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  children FinanceAccount[] @relation("FinanceAccountTree")
+ journalDraftLines FinanceJournalDraftLine[]
+ journalLines FinanceJournalLine[]
+ cashAccount FinanceCashAccount?
  isPosting Boolean @default(true)
  isContra Boolean @default(false)
  isCashEquivalent Boolean @default(false)
@@ -217,6 +224,7 @@ model FinancePeriod {
  closedAt DateTime? @db.Timestamptz
  closedById String? @db.Uuid
  closedBy Person? @relation("FinancePeriodCloser",fields:[closedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journals FinanceJournalEntry[]
  version Int @default(1)
  createdAt DateTime @default(now()) @db.Timestamptz
  updatedAt DateTime @default(now()) @db.Timestamptz
@@ -234,6 +242,120 @@ model FinanceSetupReceipt {
  createdAt DateTime @default(now()) @db.Timestamptz
  @@unique([actorId,operation,key])
 }
+
+model FinanceJournalDraft {
+ id String @id @default(uuid()) @db.Uuid
+ reference String @unique
+ description String
+ evidence String
+ postingDate DateTime @db.Date
+ currency String @default("PKR")
+ state String @default("DRAFT")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ lines FinanceJournalDraftLine[]
+ entry FinanceJournalEntry?
+ @@index([state,postingDate,id])
+}
+model FinanceJournalDraftLine {
+ id String @id @default(uuid()) @db.Uuid
+ draftId String @db.Uuid
+ draft FinanceJournalDraft @relation(fields:[draftId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ accountId String @db.Uuid
+ account FinanceAccount @relation(fields:[accountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ description String
+ debit Decimal @db.Decimal(20,2)
+ credit Decimal @db.Decimal(20,2)
+ projectId String? @db.Uuid
+ project Project? @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ @@unique([draftId,sequence])
+}
+model FinanceJournalEntry {
+ id String @id @default(uuid()) @db.Uuid
+ reference String @unique
+ sourceType String
+ sourceId String @db.Uuid
+ sourceAction String
+ draftId String? @unique @db.Uuid
+ draft FinanceJournalDraft? @relation(fields:[draftId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ postingDate DateTime @db.Date
+ periodId String @db.Uuid
+ period FinancePeriod @relation(fields:[periodId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ description String
+ evidence String
+ currency String @default("PKR")
+ postedById String @db.Uuid
+ postedBy Person @relation(fields:[postedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ postedAt DateTime @default(now()) @db.Timestamptz
+ reversalOfId String? @unique @db.Uuid
+ reversalOf FinanceJournalEntry? @relation("FinanceJournalReversal",fields:[reversalOfId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reversedBy FinanceJournalEntry? @relation("FinanceJournalReversal")
+ lines FinanceJournalLine[]
+ @@unique([sourceType,sourceId,sourceAction])
+ @@index([postingDate,id])
+}
+model FinanceJournalLine {
+ id String @id @default(uuid()) @db.Uuid
+ journalId String @db.Uuid
+ journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ accountId String @db.Uuid
+ account FinanceAccount @relation(fields:[accountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ description String
+ debit Decimal @db.Decimal(20,2)
+ credit Decimal @db.Decimal(20,2)
+ projectId String? @db.Uuid
+ project Project? @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ @@unique([journalId,sequence])
+ @@index([accountId,journalId])
+}
+model FinanceLedgerReceipt {
+ id String @id @default(uuid()) @db.Uuid
+ actorId String @db.Uuid
+ actor Person @relation(fields:[actorId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ operation String
+ key String
+ requestHash String
+ result Json
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@unique([actorId,operation,key])
+}
+
+model FinanceParty {
+ id String @id @default(uuid()) @db.Uuid
+ name String
+ legalName String
+ kind String
+ contactEmail String?
+ phone String?
+ address String?
+ userId String? @db.Uuid
+ user Person? @relation(fields:[userId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ active Boolean @default(true)
+ usedAt DateTime? @db.Timestamptz
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([active,kind,name,id])
+}
+model FinanceCashAccount {
+ id String @id @default(uuid()) @db.Uuid
+ name String
+ kind String
+ glAccountId String @unique @db.Uuid
+ glAccount FinanceAccount @relation(fields:[glAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ currency String @default("PKR")
+ maskedReference String?
+ active Boolean @default(true)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([active,name,id])
+}
 model Project {
  id String @id @default(uuid()) @db.Uuid
  name String
@@ -246,6 +368,8 @@ model Project {
  updatedAt DateTime @updatedAt @db.Timestamptz
  members ProjectMember[]
  tasks Task[]
+ financeDraftLines FinanceJournalDraftLine[]
+ financeJournalLines FinanceJournalLine[]
 }
 model ProjectMember {
  projectId String @db.Uuid

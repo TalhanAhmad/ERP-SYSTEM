@@ -5,35 +5,38 @@ import { periodQuerySchema } from "@/modules/finance/accounting/schemas";
 import { financePageData } from "@/modules/finance/accounting/page-data";
 import { PeriodForm } from "@/modules/finance/components/setup-forms";
 import { FinanceNavigation } from "@/modules/finance/components/setup-navigation";
+import { FinanceRegister } from "@/modules/finance/components/finance-register";
 export const dynamic = "force-dynamic";
 export default async function Periods({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const raw = await searchParams;
-  const { data, invalid } = await financePageData(async (actor) => {
-    const parsed = periodQuerySchema.safeParse(raw);
-    return {
-      data: await periods(actor, parsed.success ? parsed.data : {}),
-      invalid: !parsed.success,
-    };
-  });
+  const raw = await searchParams,
+    { data, invalid } = await financePageData(async (actor) => {
+      const p = periodQuerySchema.safeParse(raw);
+      return {
+        data: await periods(actor, p.success ? p.data : {}),
+        invalid: !p.success,
+      };
+    });
   const href = (page: number) =>
     "/finance/periods?" +
-    new URLSearchParams({
-      ...Object.fromEntries(
-        Object.entries(data.filters).map(([k, v]) => [k, String(v)]),
+    new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...data.filters, page }).map(([k, v]) => [
+          k,
+          String(v),
+        ]),
       ),
-      page: String(page),
-    });
+    );
   return (
     <section>
       <FinanceNavigation />
       <h1>Accounting periods</h1>
       <p>
-        Dates include both boundaries. No fiscal year is preselected. Period
-        close and reopen will use a separate reviewed workflow.
+        Both date boundaries are inclusive. Choose the actual reporting dates.
+        Period close and reopen use a separate reviewed workflow.
       </p>
       {invalid && (
         <p role="alert" className="error">
@@ -47,7 +50,25 @@ export default async function Periods({
           <PeriodForm hosted={env.AUTH_PROVIDER === "supabase"} />
         </section>
       )}
-      <section className="panel" aria-label="Period register">
+      <FinanceRegister
+        label="Period"
+        columns={["Period", "Start", "End", "State"]}
+        total={data.total}
+        page={data.page}
+        pages={data.pages}
+        href={href}
+        rows={data.items.map((p) => ({
+          id: p.id,
+          name: p.name,
+          href: "/finance/periods/" + p.id,
+          endpoint: "/api/v1/finance/periods/" + p.id,
+          cells: [
+            p.startDate.toISOString().slice(0, 10),
+            p.endDate.toISOString().slice(0, 10),
+            p.state,
+          ],
+        }))}
+      >
         <form method="get" className="form-grid">
           <label>
             Search periods
@@ -61,50 +82,17 @@ export default async function Periods({
               ))}
             </select>
           </label>
+          <label>
+            Rows per page
+            <select name="pageSize" defaultValue={data.pageSize}>
+              {[25, 50, 100].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
           <button type="submit">Apply period filters</button>
         </form>
-        <p>
-          {data.total} matching periods · Page {data.page} of {data.pages}
-        </p>
-        <div
-          className="table-wrap"
-          role="region"
-          aria-label="Period table"
-          tabIndex={0}
-        >
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Period</th>
-                <th scope="col">Start</th>
-                <th scope="col">End</th>
-                <th scope="col">State</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.items.map((p) => (
-                <tr key={p.id}>
-                  <td>
-                    <Link href={`/finance/periods/${p.id}`}>{p.name}</Link>
-                  </td>
-                  <td>{p.startDate.toISOString().slice(0, 10)}</td>
-                  <td>{p.endDate.toISOString().slice(0, 10)}</td>
-                  <td>{p.state}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {!data.items.length && <p>No periods match this view.</p>}
-        <nav aria-label="Period pagination" className="form-actions">
-          {data.page > 1 && (
-            <Link href={href(data.page - 1)}>Previous periods</Link>
-          )}
-          {data.page < data.pages && (
-            <Link href={href(data.page + 1)}>Next periods</Link>
-          )}
-        </nav>
-      </section>
+      </FinanceRegister>
     </section>
   );
 }
