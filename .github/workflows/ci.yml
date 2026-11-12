@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17
@@ -43,7 +43,11 @@ jobs:
       - run: pnpm test:integration
       - run: pnpm test:e2e:prepare
       - run: pnpm build
-      - run: pnpm exec playwright install --with-deps chromium
+      # The 24.04 runner already supplies Chromium's shared libraries. Reinstalling
+      # optional OS/font packages failed on the Ubuntu mirror DNS before tests.
+      # Install the exact browser required by the lockfile; browser launch still
+      # validates runtime dependencies and the complete E2E suite remains required.
+      - run: pnpm exec playwright install chromium
       - run: pnpm test:e2e
       - name: Verify Supabase-mode production build (configuration fixtures only)
         run: pnpm build:vercel

@@ -35,3 +35,17 @@ Learning milestones remain unconfirmed until Talha demonstrates the concepts. Bu
 ## Follow-up implementation — 11 November 2026
 
 The own-email workflow now requires current-password and MFA/session verification, dual-address confirmation and atomic same-ID synchronization with old-session revocation. Its feature flag remains off under restricted demo mail. Local verification passed 331 tests (131 unit, 179 integration, 21 browser) plus typing/lint/build. Actual hosted logical recovery verified 47 tables/1,593 records/185 constraints and 9 private files (all 9 matching attached-record digests); originals were unchanged and the new test bucket was removed. Source fcb7bc7 passed CI 42976770350, was deployed to Vercel and passed all 44 follow-up live checks. Human policy/device/domain/pilot decisions remain explicit.
+
+## Newly requested finance extension
+
+Track this separately in [finance progress](../finance/progress.md) and [48 finance milestones](../finance/planning/milestones.md). F01–F03 access foundation is implemented/locally verified. Next F04 adds controlled owner bootstrap/transfer/revoke, generic-admin owner/credential protections and required step-up authentication; F05–F08 build the accounting core. The remainder is new accounting scope, not an unrecorded completion of the ERP queue. Finance remains disabled live and requires separate financial acceptance/release.
+
+F04 owner controls are now implemented/locally verified with 369 tests and both builds; the first four finance milestones are complete. F05 accounts/periods/PKR validation and the posting core follow. Actual hosted ownership/MFA setup and financial launch remain separate from software completion.
+
+## Finance setup follow-up — 12 November 2026
+
+F01–F05 implementation acceptance is complete: 5/48 finance milestones, 43 remaining. Accounts/periods now have current-owner setup, selected-admin read-only access, strict configuration/version/hierarchy/usage rules and permanent restricted receipts/audit. Exact PKR strings and high-precision line rounding are shared primitives. Local acceptance totals 424 distinct tests (167 unit, 231 PostgreSQL integration, 26 browser), typing/lint and both builds. Final repeats/publication/CI are tracked in the finance results. Next F06 builds the posting engine; no journal, opening balance, company chart or fiscal year is seeded. Hosted ERP remains unchanged with finance disabled and 17 migrations; the test schema has 22. Word report and work log include this milestone. See the separate finance progress/results for current publication evidence.
+
+## Finance through F10 — 12 November 2026
+
+F01–F10 engineering acceptance is complete: 10/48 finance groups,38 remaining. Ordinary journal posting/reversal/idempotency, database balancing/immutability, dated core subset, shared accessible registers/drawer editing, parties/cash mappings and complete parent search are implemented. 488 distinct local tests: 185 unit, 275 real PostgreSQL integration and 28 Chromium browser. Strict typing/lint and both local/Supabase-mode production builds passed. Test schema has27 migrations; hosted ERP keeps17 with finance disabled. No company books, credential change, hosted migration/grant, merge or deployment occurs. Publication/clean CI follows in the focused finance results. Original ERP/learning progress is unchanged. Next F11: earned/deferred invoices.

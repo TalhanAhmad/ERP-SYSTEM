@@ -16,6 +16,7 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "tsx scripts/check-migration-target.ts && prisma migrate deploy",
     "bootstrap:admin": "tsx --conditions=react-server scripts/bootstrap-admin.ts",
+    "finance:owner": "tsx --conditions=react-server scripts/finance/setup-owner.ts",
     "verify:docs": "python3 scripts/verify-docs.py",
     "db:local": "tsx scripts/local-db.ts",
     "worker": "tsx --conditions=react-server scripts/worker.ts",

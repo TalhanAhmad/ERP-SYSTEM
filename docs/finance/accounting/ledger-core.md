@@ -1,0 +1,23 @@
+# Ledger core — F06–F08
+
+Implemented and tested with synthetic records on 12 November 2026. No hosted migration, journal or opening book is created by development.
+
+Journal drafts have typed header/line tables, required source reference, supporting-evidence reference and PKR. Each line has exactly one positive side. Draft totals must fit NUMERIC(20,2); drafts may be unbalanced while edited, but posting requires at least two balanced positive-total lines. The UI previews exact integer-paisa sums; server validation and PostgreSQL remain authoritative. No mutable balance field exists.
+
+The shared ledger command rechecks current active selected role/grant/session and fresh authentication. SQL takes the existing admin serialization lock, current-person/access locks, then structural configuration lock 629815 before target draft, period and sorted account rows. That lock is intentionally exclusive for initial posting/configuration, including direct SQL statement guards. This conservative core sacrifices parallel write throughput for clear serialization. No network/storage work runs inside it. Future subledgers must preserve ordering and extend the private engine; they cannot write ordinary table CRUD.
+
+The transaction writes server UUID/reference, typed immutable journal lines, source state, first-use markers on account/ancestors/period, restricted audit and permanent receipt. Deferred PostgreSQL constraints check line count, exact totals, source header/line correspondence and exact opposite reversal lines. Posted headers/lines and posted/voided sources cannot be rewritten or deleted. Extra balanced lines cannot be appended to an already posted journal. Runtime tables remain read-only; only a current-session checked command may write.
+
+Generic manual adjustments categorically reject CASH, AR, AP, advance, fixed asset, investment and loan control accounts. Those workflows are not yet implemented and cannot be simulated by bypassing their controls. Future invoice/payment adapters require explicit source/subledger extensions behind these same invariants; the current adapter accepts manual journal drafts and their reversals only.
+
+F07 receipts use actor/operation/key plus canonical normalized request hash. Same-key/same-input replay returns the original result after current authorization, while changed input fails. Source/action uniqueness prevents duplicate posting with another key. Versions guard draft edit/post/void. Batch void locks and validates all selected drafts before updating any; no bulk posting exists. Restricted immutable audit snapshots retain header/line values for each draft change. Authentication material is excluded.
+
+A reversal creates a separate opposite journal with its own open date, no earlier than the original, and one unique original link. Original source state remains POSTED in storage, with REVERSED derived from the append-only reversal link. History/date-cutoff queries retain original and reversal independently. No independent reviewer approval is claimed.
+
+## F08 accounting subset and design review
+
+The tested subset posts a 120,000 prepayment/accrual, recognizes 10,000 expense and reverses recognition the next day. Before reversal: prepayment 110,000 debit, expense 10,000 debit and accrual 120,000 credit. All original/reversal debits and credits total 140,000 each; net is zero. This is an ordinary-account engine fixture, not the later full invoice/cash/asset/investment acceptance dataset. Those subledgers are still required and cannot be marked complete from generic journals.
+
+Coverage includes raw SQL imbalance/source tampering, source/line immutability, protected controls, current proof/session/grant, used mappings, concurrent same/different-key posting, stale edits, atomic batch conflicts, dated reversals and post/period-void serialization. Closing/reopening is F39; its future writer must acquire the same configuration/period protocol. No close workflow or load-tested concurrent settlement design is claimed now.
+
+The initial 240–320-hour whole-project allowance is superseded at F08 by **260–360 focused engineering hours remaining at F08**, excluding human/provider/accountant waiting. This is a planning range, not hours spent or a delivery date. Broad typed subledgers, policy decisions, financial statements, exports, reconciliation and recovery account for most remaining work. After F10, the working remaining allowance is 240–340 hours, subject to re-estimation at the first invoice/receipt fixture. The serialized initial core and retained test data do not establish production throughput; measure representative volumes before changing lock granularity. Original 60-day learning progress is unchanged.

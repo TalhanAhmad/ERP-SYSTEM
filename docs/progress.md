@@ -1,6 +1,10 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-11 (Asia/Karachi)
+Last updated: 2026-11-12 (Asia/Karachi)
+
+Finance extension: started from the newly supplied specification. Its assessment,
+access foundation and separate 48-milestone tracker are in [finance progress](finance/progress.md).
+This does not replace or complete the original ERP learning roadmap below.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded
@@ -80,3 +84,21 @@ Owner confirmed daily reports due at 5:00 PM Asia/Karachi. The live value was al
 ## Confirmed leave workflow — 11 November 2026
 
 Owner selected the current HR approval-only workflow with no fixed annual leave quota. Eight targeted live checks passed for pending/independent approval, actual HR approve/reject forms, overlap/off-day handling, focused HR navigation and owned-fixture cleanup. No code/schema/deployment or quota-setting change was needed. All four requested operating choices—working days, shift hours, report deadline and leave workflow—are now recorded in operations/company-policy.md. Existing security/billing settings and historical leave/attendance were preserved.
+
+## Finance owner controls — 12 November 2026
+
+F04 implementation is complete with 369 passing local tests (133 unit, 211 real PostgreSQL integration, 25 browser), strict typing/lint and both builds. Owner-only grants/revokes, recipient-accepted transfers, fresh password plus hosted TOTP, operator-only setup/recovery and database owner/identity protections are implemented. Finance remains disabled live; no hosted grant/migration/device enrollment occurred. The finance plan is now 4/48 milestones complete; accounting core work begins at F05. See [finance progress](finance/progress.md). Source 9fea005 is pushed; clean-runner CI 43173242785 passed all checks.
+
+F04 clean-runner evidence: [CI 43173242785](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43173242785) passed on source 9fea005624c8c734659e289da85d114499482cfd. No live finance migration/grant or merge occurred.
+
+## Finance account/period setup — 12 November 2026
+
+F01–F05 implementation acceptance is complete: 5/48 finance milestones, 43 remaining. Accounts/periods now have current-owner setup, selected-admin read-only access, strict configuration/version/hierarchy/usage rules and permanent restricted receipts/audit. Exact PKR strings and high-precision line rounding are shared primitives. Local acceptance totals 424 distinct tests (167 unit, 231 PostgreSQL integration, 26 browser), typing/lint and both builds. Final repeats/publication/CI are tracked in the finance results. Next F06 builds the posting engine; no journal, opening balance, company chart or fiscal year is seeded. Hosted ERP remains unchanged with finance disabled and 17 migrations; the test schema has 22. Word report and work log include this milestone. See the separate finance progress/results for current publication evidence.
+
+F05 clean-runner [CI 43215176008](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43215176008) passed on source 109a83c9721be9017571b8cc78259c661f0e1820: all 22 migrations on fresh PostgreSQL, 167 unit + 231 integration + 26 browser tests (424), strict typing/lint, local/Supabase-mode production builds and docs. Browser suite passed in 1.5 minutes. Initial source 03dc3e2 also passed CI 43214839447; counts are not doubled. No hosted migration, finance grant, merge or launch occurred.
+
+## Finance through F10 — 12 November 2026
+
+F01–F10 engineering acceptance is complete: 10/48 finance groups,38 remaining. Ordinary journal posting/reversal/idempotency, database balancing/immutability, dated core subset, shared accessible registers/drawer editing, parties/cash mappings and complete parent search are implemented. 488 distinct local tests: 185 unit, 275 real PostgreSQL integration and 28 Chromium browser. Strict typing/lint and both local/Supabase-mode production builds passed. Test schema has27 migrations; hosted ERP keeps17 with finance disabled. No company books, credential change, hosted migration/grant, merge or deployment occurs. Publication/clean CI follows in the focused finance results. Original ERP/learning progress is unchanged. Next F11: earned/deferred invoices.
+
+Exact-source [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43238001511) passed on 4be8c72eed903d2acd7b22be793a76bba638c55a: 185 unit +275 PostgreSQL integration +28 Chromium browser tests (**488**), all27 migrations applied to fresh PostgreSQL, strict typing/lint, local and Supabase-mode production builds and documentation. CI browser suite passed in2.2 minutes; the complete verify job took5m19s. Source is committed/pushed on finance/foundation; draft PR#1 remains unmerged. Hosted ERP retains17 migrations with finance disabled; no live finance migration/grant or deployment occurred.

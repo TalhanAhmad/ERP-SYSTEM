@@ -58,6 +58,9 @@ export async function synchronizeLoginEmail(
     "Your verified email needs administrator review. Your workspace records are preserved.",
     409,
   );
+  // Only this verified self-service path may synchronize a selected finance
+  // identity's email. The marker is transaction-local and never client supplied.
+  await tx.$queryRaw`SELECT set_config('encova.finance_self_email', ${person.id}, true)`;
   const updated = await tx.person.update({
     where: { id: person.id },
     data: { email, version: { increment: 1 } },

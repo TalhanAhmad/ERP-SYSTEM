@@ -29,6 +29,9 @@ export default defineConfig({
         BETTER_AUTH_URL: baseURL,
         APP_URL: baseURL,
         AUTH_PROVIDER: "better-auth",
+        // Explicit test-only enablement exercises selection/denial and revocation.
+        // Application deployments still default to FINANCE_ENABLED=false.
+        FINANCE_ENABLED: "true",
         SUPABASE_URL: `http://127.0.0.1:${storagePort}`,
         SUPABASE_PUBLISHABLE_KEY: "synthetic-publishable-key",
         SUPABASE_SECRET_KEY: "synthetic-storage-server-key",

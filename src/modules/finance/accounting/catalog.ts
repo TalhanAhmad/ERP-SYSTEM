@@ -1,0 +1,55 @@
+export const accountTypes = [
+  "ASSET",
+  "LIABILITY",
+  "EQUITY",
+  "INCOME",
+  "DIRECT_COST",
+  "OPERATING_EXPENSE",
+  "OTHER_INCOME",
+  "OTHER_EXPENSE",
+] as const;
+export const normalSides = ["DEBIT", "CREDIT"] as const;
+export const reportGroups = [
+  "CURRENT_ASSETS",
+  "NONCURRENT_ASSETS",
+  "CURRENT_LIABILITIES",
+  "NONCURRENT_LIABILITIES",
+  "EQUITY",
+  "REVENUE",
+  "DIRECT_COSTS",
+  "OPERATING_EXPENSES",
+  "OTHER_INCOME",
+  "OTHER_EXPENSES",
+] as const;
+export const controlTypes = [
+  "NONE",
+  "CASH",
+  "RECEIVABLES",
+  "PAYABLES",
+  "CLIENT_ADVANCE",
+  "SUPPLIER_ADVANCE",
+  "FIXED_ASSET",
+  "ACCUMULATED_DEPRECIATION",
+  "INVESTMENT",
+  "LOAN_RECEIVABLE",
+  "LOAN_PAYABLE",
+] as const;
+export const groupsByType: Record<
+  (typeof accountTypes)[number],
+  readonly (typeof reportGroups)[number][]
+> = {
+  ASSET: ["CURRENT_ASSETS", "NONCURRENT_ASSETS"],
+  LIABILITY: ["CURRENT_LIABILITIES", "NONCURRENT_LIABILITIES"],
+  EQUITY: ["EQUITY"],
+  INCOME: ["REVENUE"],
+  DIRECT_COST: ["DIRECT_COSTS"],
+  OPERATING_EXPENSE: ["OPERATING_EXPENSES"],
+  OTHER_INCOME: ["OTHER_INCOME"],
+  OTHER_EXPENSE: ["OTHER_EXPENSES"],
+};
+export const debitTypes: readonly string[] = [
+  "ASSET",
+  "DIRECT_COST",
+  "OPERATING_EXPENSE",
+  "OTHER_EXPENSE",
+];

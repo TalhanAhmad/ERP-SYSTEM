@@ -28,3 +28,5 @@ Super admins can use Operations for job progress and audited retries. The daily 
 Email setup and the restricted personal-demo sender are documented in [email operations](docs/operations/email.md). A verified domain is required before inviting other people by email.
 
 Super Admin can search/filter People and select Manage to edit a basic profile, change a role, deactivate or restore a linked account. See [account management](docs/operations/people-management.md).
+
+Finance is being developed as a separate restricted PKR accounting extension. Start with [finance progress](docs/finance/progress.md), [the repository assessment](docs/finance/repository-assessment.md) and [the finance plan](docs/finance/planning/milestones.md). The initial access foundation is disabled by default; no ledger or live finance launch is claimed.

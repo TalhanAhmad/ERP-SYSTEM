@@ -1,0 +1,9 @@
+flowchart TD
+  UI[Finance setup screen] --> G[Current session and finance grant]
+  API[Finance status route] --> G
+  G --> DB[(PostgreSQL access foundation)]
+  S[Planned finance services] -.-> G
+  S -.-> P[Planned atomic posting engine]
+  P -.-> L[(Planned ledger and subledgers)]
+  P -.-> A[Planned restricted audit and outbox writes]
+  A -.-> W[Planned authorized jobs and private files]

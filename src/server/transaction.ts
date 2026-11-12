@@ -23,6 +23,13 @@ export async function mutate(
     try {
       return await db.$transaction(
         async (tx) => {
+          // Finance ownership commands share this administration lock. Acquire
+          // it before actor/target rows to avoid opposite-order owner races.
+          if (
+            operation.startsWith("users/") ||
+            operation.startsWith("PATCH:users/")
+          )
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(987661)::text`;
           // Per-actor serialization makes domain writes and idempotency reservation atomic.
           await tx.$queryRaw`SELECT id FROM "Person" WHERE id=${actor.id}::uuid FOR UPDATE`;
           const current = await tx.person.findUnique({

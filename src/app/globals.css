@@ -835,3 +835,11 @@ fieldset {
 .form-actions {
   flex-wrap: wrap;
 }
+
+.finance-drawer { width: min(960px, calc(100vw - 2rem)); max-height: 90dvh; overflow: auto; border: 1px solid var(--border, #dce4df); border-radius: 12px; padding: 24px; color: #182724; background: #fff; }
+.finance-drawer::backdrop { background: rgb(12 30 24 / 55%); }
+.finance-drawer dd { margin: 0 0 1rem; overflow-wrap: anywhere; white-space: pre-wrap; }
+.finance-drawer dt { font-weight: 700; }
+.money-cell { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.account-picker { min-width: 0; }
+.finance-drawer button[aria-pressed="true"] { background: #225d49; color: #fff; }

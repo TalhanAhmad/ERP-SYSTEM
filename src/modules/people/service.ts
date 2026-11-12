@@ -17,6 +17,7 @@ import { env } from "@/server/env";
 import type { Actor } from "@/server/context";
 import { audit, expected, type Tx } from "@/server/transaction";
 import { invariant } from "@/server/errors";
+import { protectFinanceOwner } from "@/modules/finance/access/owner-guard";
 const personFields = {
   id: true,
   displayName: true,
@@ -271,6 +272,12 @@ export async function changeRole(
     target.status === "ACTIVE" &&
     input.role !== "SUPER_ADMIN"
   )
+    await protectFinanceOwner(tx, id);
+  if (
+    target.role === "SUPER_ADMIN" &&
+    target.status === "ACTIVE" &&
+    input.role !== "SUPER_ADMIN"
+  )
     invariant(
       (await tx.person.count({
         where: { role: "SUPER_ADMIN", status: "ACTIVE" },
@@ -324,6 +331,8 @@ export async function deactivate(
     "HR can deactivate ordinary members only.",
     403,
   );
+  if (target.role === "SUPER_ADMIN" && target.status === "ACTIVE")
+    await protectFinanceOwner(tx, id);
   if (target.role === "SUPER_ADMIN" && target.status === "ACTIVE")
     invariant(
       (await tx.person.count({
