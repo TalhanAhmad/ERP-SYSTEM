@@ -109,6 +109,7 @@ model Person {
  financeOwnership FinanceSettings?
  financeAccessReceipts FinanceAccessReceipt[]
  financeSetupReceipts FinanceSetupReceipt[]
+ financeClosedPeriods FinancePeriod[] @relation("FinancePeriodCloser")
  @@index([status,role])
 }
 
@@ -192,7 +193,7 @@ model FinanceAccount {
  controlType String @default("NONE")
  currency String @default("PKR")
  parentId String? @db.Uuid
- parent FinanceAccount? @relation("FinanceAccountTree",fields:[parentId],references:[id],onDelete:Restrict)
+ parent FinanceAccount? @relation("FinanceAccountTree",fields:[parentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  children FinanceAccount[] @relation("FinanceAccountTree")
  isPosting Boolean @default(true)
  isContra Boolean @default(false)
@@ -215,6 +216,7 @@ model FinancePeriod {
  usedAt DateTime? @db.Timestamptz
  closedAt DateTime? @db.Timestamptz
  closedById String? @db.Uuid
+ closedBy Person? @relation("FinancePeriodCloser",fields:[closedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
  version Int @default(1)
  createdAt DateTime @default(now()) @db.Timestamptz
  updatedAt DateTime @default(now()) @db.Timestamptz
@@ -224,7 +226,7 @@ model FinancePeriod {
 model FinanceSetupReceipt {
  id String @id @default(uuid()) @db.Uuid
  actorId String @db.Uuid
- actor Person @relation(fields:[actorId],references:[id],onDelete:Restrict)
+ actor Person @relation(fields:[actorId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  operation String
  key String
  requestHash String
