@@ -1,6 +1,6 @@
 # Finance backlog
 
-Active: finish F03 access verification and publish the bounded foundation delivery. Next F04: owner bootstrap/transfer/revoke, shared owner locks across all generic role/status/delete/credential paths, recent reauthentication and live MFA, restricted atomic audit.
+F01–F04 are implemented and locally verified. Publication/CI for F04 is being recorded. Next F05: accounts, periods and exact PKR validation; then F06–F08 posting/constraints, idempotency/reversals/concurrency and the first accounting fixture. Actual hosted owner setup requires human MFA enrollment and controlled deployment; no live grant is created here.
 
 Then F05–F08 chart/period/money/posting constraints, permanent idempotency/reversals/concurrency and the first real accounting fixture. F09–F42 implement usable registers/subledgers/reporting/jobs in the supplied order; F43–F48 complete acceptance/restore/accountant review and request a separate launch decision.
 

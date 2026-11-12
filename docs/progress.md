@@ -1,6 +1,6 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-11 (Asia/Karachi)
+Last updated: 2026-11-12 (Asia/Karachi)
 
 Finance extension: started from the newly supplied specification. Its assessment,
 access foundation and separate 48-milestone tracker are in [finance progress](finance/progress.md).
@@ -84,3 +84,7 @@ Owner confirmed daily reports due at 5:00 PM Asia/Karachi. The live value was al
 ## Confirmed leave workflow — 11 November 2026
 
 Owner selected the current HR approval-only workflow with no fixed annual leave quota. Eight targeted live checks passed for pending/independent approval, actual HR approve/reject forms, overlap/off-day handling, focused HR navigation and owned-fixture cleanup. No code/schema/deployment or quota-setting change was needed. All four requested operating choices—working days, shift hours, report deadline and leave workflow—are now recorded in operations/company-policy.md. Existing security/billing settings and historical leave/attendance were preserved.
+
+## Finance owner controls — 12 November 2026
+
+F04 implementation is complete with 369 passing local tests (133 unit, 211 real PostgreSQL integration, 25 browser), strict typing/lint and both builds. Owner-only grants/revokes, recipient-accepted transfers, fresh password plus hosted TOTP, operator-only setup/recovery and database owner/identity protections are implemented. Finance remains disabled live; no hosted grant/migration/device enrollment occurred. The finance plan is now 4/48 milestones complete; accounting core work begins at F05. See [finance progress](finance/progress.md). Publication/CI evidence follows after push.

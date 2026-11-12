@@ -39,3 +39,5 @@ The own-email workflow now requires current-password and MFA/session verificatio
 ## Newly requested finance extension
 
 Track this separately in [finance progress](../finance/progress.md) and [48 finance milestones](../finance/planning/milestones.md). F01–F03 access foundation is implemented/locally verified. Next F04 adds controlled owner bootstrap/transfer/revoke, generic-admin owner/credential protections and required step-up authentication; F05–F08 build the accounting core. The remainder is new accounting scope, not an unrecorded completion of the ERP queue. Finance remains disabled live and requires separate financial acceptance/release.
+
+F04 owner controls are now implemented/locally verified with 369 tests and both builds; the first four finance milestones are complete. F05 accounts/periods/PKR validation and the posting core follow. Actual hosted ownership/MFA setup and financial launch remain separate from software completion.

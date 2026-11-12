@@ -27,6 +27,9 @@ for (const [username, role] of [
   ["e2e.reviewer", "MEMBER"],
   ["e2e.outsider", "MEMBER"],
   ["e2e.finance", "SUPER_ADMIN"],
+  ["e2e.finance.owner", "SUPER_ADMIN"],
+  ["e2e.finance.target", "SUPER_ADMIN"],
+  ["e2e.finance.third", "SUPER_ADMIN"],
 ] as const) {
   const email = `${username}@example.test`;
   if (await db.person.findUnique({ where: { email } })) continue;

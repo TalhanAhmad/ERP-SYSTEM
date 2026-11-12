@@ -7,7 +7,7 @@
 | [F01](days/F01.md) | Inspect repository; document actual progress, gaps, dependencies, and revised estimate | Complete |
 | [F02](days/F02.md) | Add finance docs and feature flag; preserve existing ERP progress | Complete |
 | [F03](days/F03.md) | Build grants and shared access policy; denied-role integration tests | Complete |
-| [F04](days/F04.md) | Implement owner bootstrap/transfer/revoke; escalation and owner-lock tests | Pending |
+| [F04](days/F04.md) | Implement owner bootstrap/transfer/revoke; escalation and owner-lock tests | Complete |
 | [F05](days/F05.md) | Build accounts, periods, PKR validation, and reviewed migrations | Pending |
 | [F06](days/F06.md) | Implement posting engine and DB balancing/immutability safeguards | Pending |
 | [F07](days/F07.md) | Add idempotency, draft versions, reversals, and concurrency tests | Pending |

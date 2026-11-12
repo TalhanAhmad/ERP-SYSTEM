@@ -62,6 +62,41 @@ export async function rateLimit(key: string, max = 60) {
   );
 }
 export function failure(error: unknown, requestId: string) {
+  // Database guards also apply while finance is hidden. Preserve a business
+  // conflict response without querying finance tables on older live schemas.
+  const cause = (
+    error as {
+      meta?: {
+        driverAdapterError?: {
+          cause?: { originalCode?: string; originalMessage?: string };
+        };
+      };
+    } | null
+  )?.meta?.driverAdapterError?.cause;
+  if (
+    cause?.originalCode === "P0001" &&
+    cause.originalMessage === "FINANCE_OWNER_PROTECTED"
+  )
+    return failure(
+      new AppError(
+        "FINANCE_OWNER_PROTECTED",
+        "Transfer finance ownership before changing this account's access.",
+        409,
+      ),
+      requestId,
+    );
+  if (
+    cause?.originalCode === "P0001" &&
+    cause.originalMessage === "FINANCE_IDENTITY_PROTECTED"
+  )
+    return failure(
+      new AppError(
+        "FINANCE_IDENTITY_PROTECTED",
+        "Login identity changes must use verified self-service.",
+        409,
+      ),
+      requestId,
+    );
   if (error instanceof AppError)
     return NextResponse.json(
       { error: { code: error.code, message: error.message, requestId } },

@@ -7,3 +7,5 @@
 - tests/integration/finance-access.test.ts: real PostgreSQL/session/HTTP boundary checks.
 
 Accounting and feature folders will be created with their implementation; no empty service scaffolds stand in for working features.
+
+F04 adds access/{schemas,reauth,service,http,owner-guard}.ts, components/access-panel.tsx, concrete grants/ownership-transfer routes, /finance/access, scripts/finance/setup-owner.ts, ownership migrations 19/20 and real-PostgreSQL/browser/provider-contract tests. No accounting feature folder is represented as implemented yet.

@@ -596,6 +596,61 @@ it("refuses verified-email collisions without overwriting either person or reviv
     data: { status: "INACTIVE" },
   });
 });
+it("finance reauthentication requires a fresh password and TOTP even when the company MFA policy is optional", async () => {
+  const { env } = await import("@/server/env");
+  const original = env.FINANCE_ENABLED;
+  env.FINANCE_ENABLED = true;
+  const { verifyFinanceReauthentication, consumeFinanceProof } =
+    await import("@/modules/finance/access/reauth");
+  const prior = await db.person.findUniqueOrThrow({ where: { id: person.id } });
+  await db.person.update({
+    where: { id: person.id },
+    data: { role: "SUPER_ADMIN" },
+  });
+  const previousFactor = factorStatus;
+  factorStatus = "verified";
+  try {
+    await expect(
+      verifyFinanceReauthentication(securityRequest({}), {
+        password: "incorrect-current-password",
+        code: "123456",
+      }),
+    ).rejects.toMatchObject({ code: "FINANCE_REAUTH_REQUIRED" });
+    await expect(
+      verifyFinanceReauthentication(securityRequest({}), {
+        password: "Synthetic-test-password-only-8#",
+      }),
+    ).rejects.toMatchObject({ code: "FINANCE_MFA_REQUIRED" });
+    await expect(
+      verifyFinanceReauthentication(securityRequest({}), {
+        password: "Synthetic-test-password-only-8#",
+        code: "000000",
+      }),
+    ).rejects.toMatchObject({ code: "FINANCE_MFA_REQUIRED" });
+    const verified = await verifyFinanceReauthentication(securityRequest({}), {
+      password: "Synthetic-test-password-only-8#",
+      code: "123456",
+    });
+    expect(
+      consumeFinanceProof(verified.proof, person.id, "contract-only").provider,
+    ).toBe("supabase");
+    expect(Object.keys(verified.proof)).toEqual([]);
+    factorStatus = undefined;
+    await expect(
+      verifyFinanceReauthentication(securityRequest({}), {
+        password: "Synthetic-test-password-only-8#",
+        code: "123456",
+      }),
+    ).rejects.toMatchObject({ code: "FINANCE_MFA_REQUIRED" });
+  } finally {
+    env.FINANCE_ENABLED = original;
+    factorStatus = previousFactor;
+    await db.person.update({
+      where: { id: person.id },
+      data: { role: prior.role },
+    });
+  }
+});
 it("revokes app access immediately on all-device logout despite an otherwise accepted provider JWT", async () => {
   const { securityAction } = await import("@/server/security-http");
   expect(

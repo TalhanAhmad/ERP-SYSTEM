@@ -4,7 +4,7 @@ from datetime import datetime,timezone,timedelta
 from xml.sax.saxutils import escape
 from zipfile import ZipFile,ZIP_DEFLATED
 root=Path(__file__).resolve().parent.parent
-sources=['docs/build-report.md','docs/progress.md','docs/work-log.md','docs/testing/results.md','docs/planning/backlog.md','docs/finance/progress.md','docs/finance/repository-assessment.md','docs/finance/decisions.md','docs/finance/testing/results.md','docs/finance/planning/milestones.md']
+sources=['docs/build-report.md','docs/progress.md','docs/work-log.md','docs/testing/results.md','docs/planning/backlog.md','docs/finance/progress.md','docs/finance/repository-assessment.md','docs/finance/decisions.md','docs/finance/testing/results.md','docs/finance/planning/milestones.md','docs/finance/planning/days/F04.md']
 paras=[]
 for name in sources:
  text=(root/name).read_text()

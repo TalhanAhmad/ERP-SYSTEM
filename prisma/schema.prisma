@@ -106,10 +106,11 @@ model Person {
  issuedFinanceGrants FinanceGrant[] @relation("FinanceGrantIssuer")
  revokedFinanceGrants FinanceGrant[] @relation("FinanceGrantRevoker")
  financeAuditEvents FinanceAuditEvent[]
+ financeOwnership FinanceSettings?
+ financeAccessReceipts FinanceAccessReceipt[]
  @@index([status,role])
 }
 
-// Access foundation only. Owner setup and the accounting ledger are later milestones.
 // No public/admin endpoint may create these grants through generic Person updates.
 model FinanceGrant {
  id String @id @default(uuid()) @db.Uuid
@@ -123,7 +124,46 @@ model FinanceGrant {
  revokedAt DateTime? @db.Timestamptz
  reason String
  version Int @default(1)
+ ownership FinanceSettings?
+ @@unique([id,userId])
  @@index([userId,revokedAt])
+}
+
+model FinanceSettings {
+ id String @id @default("00000000-0000-0000-0000-000000000001") @db.Uuid
+ ownerId String @unique @db.Uuid
+ owner Person @relation(fields:[ownerId],references:[id],onDelete:Restrict)
+ ownerGrantId String @unique @db.Uuid
+ ownerGrant FinanceGrant @relation(fields:[ownerGrantId],references:[id],onDelete:Restrict)
+ currency String @default("PKR")
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+}
+
+model FinanceOwnershipTransfer {
+ id String @id @default(uuid()) @db.Uuid
+ currentOwnerId String @db.Uuid
+ targetOwnerId String @db.Uuid
+ status String @default("PENDING")
+ reason String
+ version Int @default(1)
+ expiresAt DateTime @db.Timestamptz
+ acceptedAt DateTime? @db.Timestamptz
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@index([targetOwnerId,status])
+}
+
+model FinanceAccessReceipt {
+ id String @id @default(uuid()) @db.Uuid
+ actorId String @db.Uuid
+ actor Person @relation(fields:[actorId],references:[id],onDelete:Restrict)
+ operation String
+ key String
+ requestHash String
+ result Json
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@unique([actorId,operation,key])
 }
 
 model FinanceAuditEvent {

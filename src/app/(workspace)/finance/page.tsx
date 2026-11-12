@@ -31,6 +31,9 @@ export default async function FinancePage() {
         <Link href="/dashboard" className="button secondary">
           Back to workspace
         </Link>
+        <p>
+          <Link href="/finance/access">Finance access and ownership</Link>
+        </p>
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 # Encova Workspace — delivery report
 
-Date: 11 November 2026 (Asia/Karachi)
+Date: 12 November 2026 (Asia/Karachi)
 Repository: https://github.com/TalhanAhmad/ERP-SYSTEM
 
 ## Delivery status
@@ -137,3 +137,9 @@ Analyzed the newly supplied Finance DOCX against actual source. Completed F01–
 Verification passed 348 distinct automated checks: 133 unit, 191 PostgreSQL integration and 24 browser cases. The complete 23-case browser regression passed, followed by all three focused finance browser cases including one added anonymous-session case (two overlap the full run). Typecheck, lint, local production build and Supabase-mode production build passed. Finance-specific coverage includes stale role/status, revocation, Data API/runtime denial, locking, unique grants, immutable audit and 360px automated accessibility. The setup script was replayed twice without widening finance permissions.
 
 The actual ledger, owner controls, documents, settlements, assets/investments, reports and finance launch remain pending. See [finance progress](finance/progress.md), [decisions](finance/decisions.md) and [results](finance/testing/results.md). Existing ERP company policies and live credentials/data are unchanged. Source 6a82a27 and CI correction 02c26a7 are pushed in draft PR #1. CI 43058677199 passed on 02c26a7 with all 348 tests, both builds and required checks. The first Ubuntu mirror DNS failure and canceled retry are recorded; pinning the current Ubuntu 24.04 runner and retaining exact-browser installation allowed full browser verification without redundant optional OS/font installs. No application test was skipped.
+
+## Finance ownership delivered — F04, 12 November 2026
+
+Added controlled explicit bootstrap/recovery, owner-only grant/revoke, expiring transfer with target acceptance/cancellation, fresh self-password and hosted TOTP verification, private process-local capabilities, permanent restricted receipts/audit and version checks. Database guards protect the current owner and selected identity bindings across generic administration, including when finance is disabled. The operator command is unavailable to ordinary runtime/database API roles; normal clients have no setup/recovery endpoint.
+
+Added a usable Finance access screen with wrong-password recovery, current owner/selected roles, grant/transfer/revoke controls and keyboard-accessible mobile history tables. Final local acceptance: 369 tests (133 unit + 211 integration + 25 browser), strict typing/lint and both builds. Migrations 19/20 are additive and test-only. A proposed reset was blocked and abandoned; the additive route preserved existing data and migration checksums. No live financial grant, MFA setup, credentials, deployment or money data changed. Source publication/CI is being recorded in finance progress.

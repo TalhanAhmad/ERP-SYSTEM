@@ -1,37 +1,801 @@
-openapi: 3.1.0
-info:
-  title: Encova Finance Foundation
-  version: 0.1.0
-  description: Only the local access-foundation endpoint is implemented. Existing verified browser-session authentication is required when enabled. No live finance API has been enabled.
-paths:
-  /api/v1/finance/status:
-    get:
-      operationId: financeStatus
-      description: Requires the current verified application session, ACTIVE SUPER_ADMIN and explicit active finance grant. Feature disabled returns 404 before authentication. Supabase session cookies are owned by the existing authentication integration; this endpoint does not accept API keys or add an authentication mechanism.
-      responses:
-        '200':
-          description: Restricted capability status, never financial readiness
-          headers:
-            Cache-Control:
-              schema:
-                type: string
-                const: private, no-store, max-age=0
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                required: [data]
-                properties:
-                  data:
-                    type: object
-                    additionalProperties: false
-                    required: [currency, stage]
-                    properties:
-                      currency: {type: string, const: PKR}
-                      stage: {type: string, const: ACCESS_FOUNDATION}
-        '401': {description: Missing or expired verified application session}
-        '403': {description: No current active finance capability}
-        '404': {description: Feature disabled}
-        '429': {description: Shared minute rate limit exceeded}
-        '500': {description: Safe internal error with request ID}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Encova Finance Access",
+    "version": "0.2.0",
+    "description": "F01\u2013F04 access/ownership only. Finance remains disabled live. All responses, including errors, use private/no-store. Existing browser sessions only; no new API key or Bearer login mechanism. No public bootstrap/recovery endpoints."
+  },
+  "security": [
+    {
+      "existingBrowserSession": []
+    }
+  ],
+  "paths": {
+    "/api/v1/finance/status": {
+      "get": {
+        "operationId": "financeStatus",
+        "description": "Current ACTIVE SUPER_ADMIN plus explicit grant; disabled feature returns 404 before authentication. Capability status only, not accounting readiness.",
+        "responses": {
+          "200": {
+            "description": "Minimal capability status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "currency",
+                        "stage"
+                      ],
+                      "properties": {
+                        "currency": {
+                          "const": "PKR"
+                        },
+                        "stage": {
+                          "const": "ACCESS_FOUNDATION"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/access": {
+      "get": {
+        "operationId": "financeAccessSnapshot",
+        "description": "Authorized owner/control snapshot. Only the current owner receives eligible administrators and all active grants; other selected users receive their own grants/pending target transfer. Includes bounded recent restricted audit history.",
+        "responses": {
+          "200": {
+            "description": "Current control snapshot; dates are ISO timestamps, IDs UUIDs, owner/settings/record versions are integers."
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/access/grants": {
+      "post": {
+        "operationId": "grantFinanceAccess",
+        "description": "Requires fresh self-password verification plus fresh Supabase TOTP; only the current owner may act except acceptance by the intended selected recipient. Version is FinanceSettings for create/revoke/request, FinanceOwnershipTransfer for accept/cancel. Replays return the canonical result after current authorization; credentials are not hashed/stored in receipts.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "targetId",
+                  "expectedVersion",
+                  "reason",
+                  "reauth"
+                ],
+                "properties": {
+                  "targetId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  },
+                  "reauth": {
+                    "$ref": "#/components/schemas/Reauthentication"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canonical access-action result (including successful replay)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state, protected owner or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid input or ineligible target"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/access/grants/{id}/revoke": {
+      "post": {
+        "operationId": "revokeFinanceAccess",
+        "description": "Requires fresh self-password verification plus fresh Supabase TOTP; only the current owner may act except acceptance by the intended selected recipient. Version is FinanceSettings for create/revoke/request, FinanceOwnershipTransfer for accept/cancel. Replays return the canonical result after current authorization; credentials are not hashed/stored in receipts.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion",
+                  "grantVersion",
+                  "reason",
+                  "reauth"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "grantVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  },
+                  "reauth": {
+                    "$ref": "#/components/schemas/Reauthentication"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Canonical access-action result (including successful replay)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state, protected owner or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid input or ineligible target"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/ownership-transfers": {
+      "post": {
+        "operationId": "requestFinanceOwnership",
+        "description": "Requires fresh self-password verification plus fresh Supabase TOTP; only the current owner may act except acceptance by the intended selected recipient. Version is FinanceSettings for create/revoke/request, FinanceOwnershipTransfer for accept/cancel. Replays return the canonical result after current authorization; credentials are not hashed/stored in receipts.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "targetId",
+                  "expectedVersion",
+                  "reason",
+                  "reauth"
+                ],
+                "properties": {
+                  "targetId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  },
+                  "reauth": {
+                    "$ref": "#/components/schemas/Reauthentication"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canonical access-action result (including successful replay)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state, protected owner or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid input or ineligible target"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/ownership-transfers/{id}/accept": {
+      "post": {
+        "operationId": "acceptFinanceOwnership",
+        "description": "Requires fresh self-password verification plus fresh Supabase TOTP; only the current owner may act except acceptance by the intended selected recipient. Version is FinanceSettings for create/revoke/request, FinanceOwnershipTransfer for accept/cancel. Replays return the canonical result after current authorization; credentials are not hashed/stored in receipts.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion",
+                  "reason",
+                  "reauth"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  },
+                  "reauth": {
+                    "$ref": "#/components/schemas/Reauthentication"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Canonical access-action result (including successful replay)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state, protected owner or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid input or ineligible target"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/ownership-transfers/{id}/cancel": {
+      "post": {
+        "operationId": "cancelFinanceOwnership",
+        "description": "Requires fresh self-password verification plus fresh Supabase TOTP; only the current owner may act except acceptance by the intended selected recipient. Version is FinanceSettings for create/revoke/request, FinanceOwnershipTransfer for accept/cancel. Replays return the canonical result after current authorization; credentials are not hashed/stored in receipts.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "expectedVersion",
+                  "reason",
+                  "reauth"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  },
+                  "reauth": {
+                    "$ref": "#/components/schemas/Reauthentication"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Canonical access-action result (including successful replay)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state, protected owner or request-key conflict"
+          },
+          "422": {
+            "description": "Invalid input or ineligible target"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "existingBrowserSession": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Cookie",
+        "description": "The existing authenticated browser Cookie header (Supabase SSR or guarded local Better Auth). This describes the whole existing session header, not a new API key; browsers send it automatically. Do not expose cookies to client JavaScript or shared logs."
+      }
+    },
+    "schemas": {
+      "Reauthentication": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "password"
+        ],
+        "properties": {
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "writeOnly": true
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[0-9]{6}$",
+            "writeOnly": true,
+            "description": "Mandatory fresh TOTP for Supabase, including when company MFA is optional; absent only in guarded loopback Better Auth development."
+          }
+        }
+      }
+    }
+  }
+}
