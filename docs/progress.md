@@ -87,4 +87,6 @@ Owner selected the current HR approval-only workflow with no fixed annual leave 
 
 ## Finance owner controls — 12 November 2026
 
-F04 implementation is complete with 369 passing local tests (133 unit, 211 real PostgreSQL integration, 25 browser), strict typing/lint and both builds. Owner-only grants/revokes, recipient-accepted transfers, fresh password plus hosted TOTP, operator-only setup/recovery and database owner/identity protections are implemented. Finance remains disabled live; no hosted grant/migration/device enrollment occurred. The finance plan is now 4/48 milestones complete; accounting core work begins at F05. See [finance progress](finance/progress.md). Publication/CI evidence follows after push.
+F04 implementation is complete with 369 passing local tests (133 unit, 211 real PostgreSQL integration, 25 browser), strict typing/lint and both builds. Owner-only grants/revokes, recipient-accepted transfers, fresh password plus hosted TOTP, operator-only setup/recovery and database owner/identity protections are implemented. Finance remains disabled live; no hosted grant/migration/device enrollment occurred. The finance plan is now 4/48 milestones complete; accounting core work begins at F05. See [finance progress](finance/progress.md). Source 9fea005 is pushed; clean-runner CI 43173242785 passed all checks.
+
+F04 clean-runner evidence: [CI 43173242785](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43173242785) passed on source 9fea005624c8c734659e289da85d114499482cfd. No live finance migration/grant or merge occurred.
