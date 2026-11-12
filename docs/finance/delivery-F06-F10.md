@@ -27,7 +27,7 @@ The [complete work log](../work-log.md) and [focused verification](testing/F06-F
 
 ## Boundaries and next work
 
-All new migrations/configuration are local/test-only. Hosted ERP stays on 17 migrations with finance disabled; no real owner/grant, company chart/fiscal period/opening balance, live deployment, credential change or merge occurred. Manual journals reject protected cash/AR/AP/advance/asset/investment/loan controls. Cash-account setup stores no balance or full bank number and does not execute transfers. No financial statements or company/accountant approval are implied by a balanced engine subset.
+All new migrations/configuration are local/test-only. Hosted ERP stays on 17 migrations with finance disabled; no real owner/grant, company chart/fiscal period/opening balance, live deployment, credential change occurred in the F10 implementation delivery. PR integration was subsequently authorized and completed below. Manual journals reject protected cash/AR/AP/advance/asset/investment/loan controls. Cash-account setup stores no balance or full bank number and does not execute transfers. No financial statements or company/accountant approval are implied by a balanced engine subset.
 
 Next F11: typed earned/deferred invoices and posting services. Remaining work includes receipts/settlements, payables, assets/investments/funding, reconciliation, statements/exports/closing/opening books, restore and accountant acceptance. At F08 the remaining planning range was revised to 260–360 focused engineering hours; after F10 the working range is 240–340, excluding human/provider waiting. No actual hours or delivery date are invented. Original 60-day learning progress is preserved.
 
@@ -41,6 +41,10 @@ Final report validation: full and focused Word ZIP/XML/image relationships passe
 
 ## Final publication evidence
 
-Exact-source [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43238001511) passed on 4be8c72eed903d2acd7b22be793a76bba638c55a: 185 unit +275 PostgreSQL integration +28 Chromium browser tests (**488**), all27 migrations applied to fresh PostgreSQL, strict typing/lint, local and Supabase-mode production builds and documentation. CI browser suite passed in2.2 minutes; the complete verify job took5m19s. Source is committed/pushed on finance/foundation; draft PR#1 remains unmerged. Hosted ERP retains17 migrations with finance disabled; no live finance migration/grant or deployment occurred.
+Exact-source [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43238001511) passed on 4be8c72eed903d2acd7b22be793a76bba638c55a: 185 unit +275 PostgreSQL integration +28 Chromium browser tests (**488**), all27 migrations applied to fresh PostgreSQL, strict typing/lint, local and Supabase-mode production builds and documentation. CI browser suite passed in2.2 minutes; the complete verify job took5m19s. Source was pushed on finance/foundation; PR#1 is now merged into main at 7d9ca2e. Hosted ERP retains17 migrations with finance disabled; no live finance migration/grant or deployment occurred.
 
 The final tracking commit updates documentation/Word evidence only. Its documentation links, Word ZIP/XML/images/private-value checks are validated before push; the passing source CI above covers the unchanged application/schema source.
+
+## PR merge — 12 November 2026
+
+PR #1 was merged into main at 2026-11-12 15:17:24 UTC (20:17 Pakistan time), after Talha explicitly requested the merge. Merge commit: 7d9ca2e19b1b912b8b65cb2f2d24bc94def7abde. A merge commit preserved all ten individual finance commits and their original attribution. PR-head 9256e8b had passing CI 43239515265 before merging. Local main was fast-forwarded to the merged result; application/schema content is unchanged from the verified PR head. Finance remains disabled by default; no manual hosted migration or enablement was performed.
