@@ -9,16 +9,35 @@ export function AccountPicker({
   type,
   group,
   exclude,
+  partyId,
+  invoiceId,
   initial = [],
   required = false,
 }: {
-  kind: "parent" | "journal" | "cash";
+  kind:
+    | "parent"
+    | "journal"
+    | "cash"
+    | "receivable"
+    | "revenue"
+    | "deferred"
+    | "party"
+    | "project"
+    | "invoice"
+    | "cash-account"
+    | "fee"
+    | "advance"
+    | "advance-source"
+    | "credit-invoice"
+    | "invoice-line";
   label: string;
   value: string | null;
   onChange: (id: string | null) => void;
   type?: string;
   group?: string;
   exclude?: string;
+  partyId?: string;
+  invoiceId?: string;
   initial?: Option[];
   required?: boolean;
 }) {
@@ -37,6 +56,16 @@ export function AccountPicker({
   useEffect(() => {
     const abort = new AbortController();
     const timer = setTimeout(async () => {
+      if (
+        (["invoice", "advance-source", "credit-invoice"].includes(kind) &&
+          !partyId) ||
+        (kind === "invoice-line" && !invoiceId)
+      ) {
+        setResult({ items: [], total: 0, page: 1, pages: 1 });
+        setError("");
+        setPending(false);
+        return;
+      }
       setPending(true);
       setError("");
       try {
@@ -47,9 +76,23 @@ export function AccountPicker({
           ...(type ? { type } : {}),
           ...(group ? { group } : {}),
           ...(exclude ? { exclude } : {}),
+          ...(partyId ? { partyId } : {}),
+          ...(invoiceId ? { invoiceId } : {}),
         });
         const response = await fetch(
-          "/api/v1/finance/account-options?" + query,
+          "/api/v1/finance/" +
+            ([
+              "party",
+              "project",
+              "invoice",
+              "cash-account",
+              "advance-source",
+              "credit-invoice",
+              "invoice-line",
+            ].includes(kind)
+              ? "invoice-options?"
+              : "account-options?") +
+            query,
           { signal: abort.signal, cache: "no-store" },
         );
         const body = await response.json();
@@ -57,7 +100,7 @@ export function AccountPicker({
         setResult(body.data);
       } catch (e) {
         if (!abort.signal.aborted)
-          setError(e instanceof Error ? e.message : "Unable to load accounts.");
+          setError(e instanceof Error ? e.message : "Unable to load choices.");
       } finally {
         if (!abort.signal.aborted) setPending(false);
       }
@@ -66,7 +109,7 @@ export function AccountPicker({
       clearTimeout(timer);
       abort.abort();
     };
-  }, [kind, q, page, type, group, exclude, retry]);
+  }, [kind, q, page, type, group, exclude, partyId, invoiceId, retry]);
   const selected =
     result.items.find((i) => i.id === value) ??
     initial.find((i) => i.id === value);
@@ -93,9 +136,7 @@ export function AccountPicker({
         required={required}
         aria-busy={pending}
       >
-        <option value="">
-          {required ? "Choose an account" : "No parent group"}
-        </option>
+        <option value="">{required ? "Choose an account" : "None"}</option>
         {value && !result.items.some((i) => i.id === value) && (
           <option value={value}>
             {selected
@@ -105,7 +146,7 @@ export function AccountPicker({
         )}
         {result.items.map((i) => (
           <option key={i.id} value={i.id}>
-            {i.code} · {i.name}
+            {[i.code, i.name].filter(Boolean).join(" · ")}
           </option>
         ))}
       </select>
@@ -113,7 +154,7 @@ export function AccountPicker({
         {pending
           ? "Searching…"
           : result.total +
-            " matching accounts · page " +
+            " matching choices · page " +
             result.page +
             " of " +
             result.pages}
@@ -122,7 +163,7 @@ export function AccountPicker({
         <p role="alert">
           {error}{" "}
           <button type="button" onClick={() => setRetry((x) => x + 1)}>
-            Retry account search
+            Retry search
           </button>
         </p>
       )}

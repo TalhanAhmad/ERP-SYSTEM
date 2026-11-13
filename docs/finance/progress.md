@@ -1,27 +1,22 @@
 # Finance progress
 
-Updated: 12 November 2026 (Asia/Karachi). Engineering acceptance is separate from the original ERP/learning roadmap; no effort hours asserted.
+Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F10 complete: 10 of 48 finance milestones; 38 remain.** Talha explicitly authorized completing through F10. Next is F11: earned/deferred invoice schema and typed posting services.
+**F01–F15 complete:15 of 48 finance milestones; 33 remain.** Talha explicitly requested completion through F15 and a separate commit/push for each milestone. Next is F16: bills, immediate expenses and category/project splits.
 
-F06–F08 add ordinary manual journal drafts/posting, PostgreSQL deferred balancing/source/immutability guards, atomic first-use markers, permanent request/source identities, versions, batch void, dated reversals and an exact core accounting subset. F09 supplies shared registers, full-filter original totals, drawer draft editing, keyboard/mobile/retry states and searchable account choices. F10 adds owner-managed parties/cash mappings and chart UI. Current selected finance administrators may post ordinary journals; setup remains owner-only.
+F12 supplies invoice screens/line previews/private posted PDF. F13 supplies partial/multiple receipts and explicit fees. F14 supplies unallocated/mixed advances and later applications without duplicate cash. F15 supplies capped original-line credits, paid-credit liability/refunds, dated reversals and whole settlement release while retaining cash. Typed sources, dated events, snapshots, private access and the one balanced engine remain enforced. See [delivery report](delivery-F12-F15.md), [exact verification](testing/F12-F15-results.md) and [customer accounting rules](accounting/customer-cycle.md).
 
-488 distinct local tests: 185 unit, 275 real PostgreSQL integration and 28 Chromium browser. Strict typing/lint and both local/Supabase-mode production builds passed. All 29 concrete finance OpenAPI paths/verbs/references were checked. Updated Word reports and synthetic mobile evidence accompany the source. Source 4be8c72eed903d2acd7b22be793a76bba638c55a is committed/pushed; [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43238001511) passed the full fresh-database verification.
+Final local verification: **596 tests** (216 unit + 346 real PostgreSQL integration + 34 Chromium browser), strict typing/lint and both local/Supabase-mode production builds passed. Full browser 2.0 minutes, including all original ERP journeys. All 60 concrete finance API paths/verbs/references are verified; Word/private-value and local-link checks accompany publication.
 
-The isolated test schema has **27 additive migrations**; hosted ERP remains on 17 with finance disabled. No hosted grant/owner setup, financial migration, real chart/fiscal year/opening balance, manual financial deployment occurred. Protected controls cannot be posted through generic manual journals. Invoices/payments/subledgers, cash movements, financial statements and close/reopen remain future milestones; the tested core subset is not the full end-to-end accounting fixture.
+Separate pushes: F12 abf7c6c (CI 43407757976 passed), F13 1e8c8dc (CI 43409706332 passed), F14 b141833 (CI 43412224862 passed). F15 b5a424bc passed CI 43419008430 on a fresh runner with all 596 tests and 33 migrations. Branch finance/invoices-f11, existing draft PR #2 expands to F11–F15; no merge is implied.
 
-Current branch: main; source branch finance/foundation was merged through [PR #1](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/1). Prior F05 source 109a83c passed CI 43215176008; it is historical evidence, not F10 verification. Exact new publication evidence is in [results](testing/F06-F10-results.md).
+Test schema:33 additive migrations. Hosted ERP's last verified17-migration schema and disabled finance are untouched by this delivery. No real chart/year/cutover/opening books, hosted owner/grant/MFA setup, financial deployment, automatic client email or launch occurred. The designated intended owner remains the existing zablerkhanahmad@gmail.com account; synthetic tests do not configure live ownership.
 
-[Focused F06–F10 report](delivery-F06-F10.md) · [milestones](planning/milestones.md) · [ledger design/estimate](accounting/ledger-core.md) · [decisions](decisions.md) · [risks](risks.md).
+F16–F48 remain, including suppliers/expenses, configurable tax/withholding, financial attachments, cash/funding/assets/investments/projects, reconciliation/statements/exports, closing/opening books/jobs, complete F43 fixtures and company/accountant/release acceptance. Register totals are source views, not financial statements. All 60 original learner demonstrations remain separate and pending.
 
-Company/accountant policies, chart/fiscal year/cutover, live MFA-device setup, representative reports and separate launch acceptance remain open. At F10 the working remaining planning range is 240–340 focused engineering hours, excluding external waiting; no completion date or actual time spent is claimed. Original learner demonstrations remain pending.
+Historical F01–F10 was merged through PR #1 at7d9ca2e on 12 November 2026. F11 source d748284 passed CI 43399849090. Their records remain in prior focused reports; they are not used as final F15 source verification.
 
-## Final publication evidence
 
-Exact-source [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43238001511) passed on 4be8c72eed903d2acd7b22be793a76bba638c55a: 185 unit +275 PostgreSQL integration +28 Chromium browser tests (**488**), all27 migrations applied to fresh PostgreSQL, strict typing/lint, local and Supabase-mode production builds and documentation. CI browser suite passed in2.2 minutes; the complete verify job took5m19s. Source was pushed on finance/foundation; PR#1 is now merged into main at 7d9ca2e. Hosted ERP retains17 migrations with finance disabled; no live finance migration/grant or deployment occurred.
+## Final F15 publication
 
-The final tracking commit updates documentation/Word evidence only. Its documentation links, Word ZIP/XML/images/private-value checks are validated before push; the passing source CI above covers the unchanged application/schema source.
-
-## PR merge — 12 November 2026
-
-PR #1 was merged into main at 2026-11-12 15:17:24 UTC (20:17 Pakistan time), after Talha explicitly requested the merge. Merge commit: 7d9ca2e19b1b912b8b65cb2f2d24bc94def7abde. A merge commit preserved all ten individual finance commits and their original attribution. PR-head 9256e8b had passing CI 43239515265 before merging. Local main was fast-forwarded to the merged result; application/schema content is unchanged from the verified PR head. Finance remains disabled by default; no manual hosted migration or enablement was performed.
+[CI 43419008430](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43419008430) passed on exact source **b5a424bc42121a185da4d44d857e5ad59040107b**: all 33 migrations on fresh PostgreSQL, 216 unit + 346 integration + 34 Chromium tests (**596**), strict typing/lint, local and Supabase-mode production builds and documentation/API verification. Each requested milestone was committed/pushed separately; [draft PR #2](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/2) now covers F11–F15 on finance/invoices-f11. No merge or hosted finance release occurred.

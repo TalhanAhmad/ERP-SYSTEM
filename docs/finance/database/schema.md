@@ -27,3 +27,29 @@ FinanceJournalDraft and FinanceJournalDraftLine hold typed versioned manual sour
 FinanceParty contains bounded legal/display/contact data, kind, optional existing Person binding, archive state, version and future first-use marker. FinanceCashAccount contains name/kind, one unique protected CASH GL reference, PKR, optional four digits, state/version. They never add money fields to Person/Project DTOs and store no full bank number or balance. Used identity/mapping guards and retention FKs prevent silent replacement/deletion. All new tables use Finance prefix so runtime replay cannot give them generic ERP CRUD.
 
 Runtime gets SELECT plus EXECUTE only on the current-session checked ledger/master commands. RLS/Data API roles deny all new financial tables/functions. The migration/operator role remains privileged and separate. Closing/reopening and commercial document/subledger schemas are future milestones.
+
+## F11 invoice and dated billing schema
+
+FinanceInvoice stores unique server-generated number, optional external reference, client/AR/project references, three date-only fields, evidence/description, PKR, draft/posted/voided state, optimistic version, exact independently computed totals and frozen posted party contact snapshot. FinanceInvoiceLine stores typed quantity/rate, explicit discount, gross/net/zero-tax/total, earned/deferred treatment and revenue/deferred/project references. Posted header/lines are immutable; retention FKs prohibit deletion of source relationships.
+
+FinanceJournalEntry adds unique invoiceId and constrained INVOICE source identity. FinanceJournalLine adds partyId/invoiceLineId; ordinary journals cannot populate these or hit protected controls. FinanceReceivableEvent links one invoice to its exact journal/account/party/effective date/positive INVOICE amount. FinanceDeferredRevenueEvent links each positive deferred line to its BILLED journal/date/amount. Both are immutable. Commit-time checks prove source totals, GL and events agree; they are dated event history, not editable balances. Current future-recognition revenue mapping is frozen at billing.
+
+Invoice numbering uses a private bounded NO CYCLE sequence, not count+1. Its gaps are intentional and voided numbers stay reserved. Runtime reads tables and calls only encova_finance_invoice_command. Common encova_finance_emit_journal and snapshot/usage helpers remain private. See [invoice design](../accounting/invoices.md) for exact source and deferred recognition boundaries.
+
+
+## F13 receipt sources
+
+FinanceCustomerDocument stores typed receipt headers, exact cash/fee/settlement values, dates, retained numbers, state/version and frozen posted party snapshot. FinanceCustomerAllocation links one receipt to positive allocations over 1–100 distinct invoices. FinanceJournalEntry adds a constrained unique customerDocumentId source. FinanceReceivableEvent adds typed negative RECEIPT events linked to the document; initial positive INVOICE matching remains separately checked. No authoritative mutable balance is stored.
+
+Commit-time expected-line/event checks reject missing/extra/mismatched source effects and any negative dated invoice balance. Current active mapped bank/cash and ordinary expense accounts are rechecked at posting. Source/journal/events freeze after posting. The runtime can SELECT and call the checked customer command; private expected-line/emitter/capacity helpers and numbering sequence stay inaccessible. Ordinary ERP DTOs do not expose these relations.
+
+
+## F14 client advance pools
+
+FinanceCustomerDocument adds typed sourceDocumentId/advanceAccountId and exact advanceAmount. RECEIPT may issue a client-advance pool with unallocated/mixed cash; ADVANCE_APPLICATION references one original pool and one or more invoices. FinanceClientBalanceEvent binds each immutable signed event to its document, original source, party, liability account, journal and effective date. RECEIVED increases a pool; APPLIED reduces it. Expected GL/source/event and nonnegative dated balances are checked at commit. Pool usage never creates duplicate bank movement or revenue. Narrow SELECT/command privileges and Data API denial apply after runtime setup replay.
+
+## F15 credit and correction schema
+
+FinanceCustomerDocument adds constrained customer-credit/refund/internal-release/reversal kinds and creditInvoiceId, unique retained reversalOfId and unallocationOfId references. Original stored POSTED/version never rewrites; current REVERSED is derived. FinanceCustomerCreditLine stores one positive amount per original invoice line. FinanceCustomerCreditSplit is computed only inside posting and is immutable; its AR/held-balance amounts independently reconcile at commit. FinanceInvoiceCreditEvent is immutable dated signed credit eligibility history, distinct from financial AR and deferred events.
+
+Existing AR, client-balance and deferred events gain only typed signed source kinds with source-retention FKs. The private expected-line/AR/fund/credit adapters and one shared emitter prove exact source/GL/event correspondence. Commit checks reject wrong paid/unpaid splits, extra/missing effects, over-credit, negative dated AR/funds/deferral, and source mutation. Private correction commands freeze contacts, retain original numbers, and create separate dated effects; generic journals stay blocked on controls. No JSON commercial catch-all or mutable balance authority is introduced.

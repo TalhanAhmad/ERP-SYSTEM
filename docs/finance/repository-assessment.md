@@ -25,3 +25,13 @@ The supplied baseline is 48 four-hour milestones (192 focused engineering hours)
 ## Learning note
 
 A role says which kind of administrator a person is; a finance grant selects which active administrators may access private books. Cash received is not automatically earned revenue. Existing ERP test success cannot establish accounting correctness. Human learning/sign-off has not been assessed.
+
+
+## Finance F11 — 13 November 2026
+
+F11 earned/deferred invoice backend is locally accepted: typed exact sources, private versioned API, shared emitter, immutable dated AR/BILLED events and posted client snapshots. Full regression passed207 unit +299 PostgreSQL integration +29 Chromium tests (**535**), strict typing/lint and local build. Final hosted-mode build, report validation and exact-source CI publication are in [F11 verification](testing/F11-results.md). F12 remains invoice editor/preview/private printable document. Test schema28 migrations; no hosted finance migration/grant/enablement, real financial seed or deployment. Original ERP learning acceptance remains separate.
+
+
+## Finance completion through F15 — 13 November 2026
+
+F12 invoice screens/private PDF, F13 receipts, F14 client advances and F15 credits/refunds/dated corrections are locally accepted and separately committed/pushed as requested. Final **596 tests** passed (216 unit +346 PostgreSQL integration +34 Chromium), strict typing/lint, both production builds and all60 concrete API paths/verbs/references. [Exact current results](testing/F12-F15-results.md) record the separate source commits and final F15 CI after publication. Original ERP learning acceptance remains separate.33 test migrations; no hosted finance migration/grant/enablement, real financial seed, deployment, client email or merge.

@@ -22,3 +22,31 @@ for n in range(1,49):
 for name in ['README.md','specification.md','decisions.md','progress.md','repository-assessment.md','risks.md','api/openapi.yaml','testing/results.md','architecture/system.mmd']:
  assert (root/'docs/finance'/name).is_file(),f'Missing finance document {name}'
 print('PASS: 60 ERP and 48 separate finance milestone records, required status documents, and local documentation links.')
+
+# Concrete finance API and documentation must agree in both directions.
+import json
+api=json.loads((root/'docs/finance/api/openapi.yaml').read_text())
+verbs={'GET','POST','PATCH','DELETE','PUT','HEAD','OPTIONS'}
+actual={}
+for route in (root/'src/app/api/v1/finance').rglob('route.ts'):
+ path='/'+str(route.parent.relative_to(root/'src/app')).replace('[id]','{id}')
+ exports=set(re.findall(r'export\s+(?:async\s+)?function\s+(GET|POST|PATCH|DELETE|PUT|HEAD|OPTIONS)\b|export\s+const\s+(GET|POST|PATCH|DELETE|PUT|HEAD|OPTIONS)\b',route.read_text()))
+ actual[path]={next(x for x in pair if x).lower() for pair in exports}
+ for block in re.findall(r'export\s*\{([^}]+)\}',route.read_text()):
+  for item in block.split(','):
+   exported=item.strip().split(' as ')[-1].strip()
+   if exported in verbs:actual[path].add(exported.lower())
+assert set(actual)==set(api['paths']), 'Concrete finance paths must match OpenAPI exactly'
+for path,methods in actual.items():
+ assert methods==set(api['paths'][path]),f'Finance verb mismatch: {path}'
+def api_refs(obj):
+ if isinstance(obj,dict):
+  for key,value in obj.items():
+   if key=='$ref' and value.startswith('#/'):
+    target=api
+    for part in value[2:].split('/'):target=target[part]
+   else:api_refs(value)
+ elif isinstance(obj,list):
+  for item in obj:api_refs(item)
+api_refs(api)
+print(f'PASS: {len(actual)} concrete finance API paths, all exported verbs and local OpenAPI references match.')

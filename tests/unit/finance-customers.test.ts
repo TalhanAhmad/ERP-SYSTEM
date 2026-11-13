@@ -1,0 +1,173 @@
+import { it, expect } from "vitest";
+import { receiptSchema } from "@/modules/finance/receivables/customer/schemas";
+const invoiceId = crypto.randomUUID(),
+  base = {
+    reference: "TEST",
+    partyId: crypto.randomUUID(),
+    cashAccountId: crypto.randomUUID(),
+    documentDate: "2026-01-01",
+    postingDate: "2026-01-01",
+    description: "Synthetic receipt",
+    evidence: "Synthetic bank evidence",
+    cashAmount: "9800",
+    feeAmount: "200",
+    feeAccountId: crypto.randomUUID(),
+    allocations: [{ invoiceId, amount: "10000" }],
+    reason: "Reviewed synthetic settlement",
+  };
+it("normalizes exact cash/fee/allocation strings without interpreting withholding as fees", () => {
+  expect(receiptSchema.parse(base)).toMatchObject({
+    cashAmount: "9800.00",
+    feeAmount: "200.00",
+    allocations: [{ amount: "10000.00" }],
+  });
+  expect(
+    receiptSchema.safeParse({ ...base, withholdingAmount: "200" }).success,
+  ).toBe(false);
+});
+it("rejects settlement-equation mismatches and duplicate allocations", () => {
+  expect(receiptSchema.safeParse({ ...base, cashAmount: "9801" }).success).toBe(
+    false,
+  );
+  expect(
+    receiptSchema.safeParse({
+      ...base,
+      allocations: [
+        { invoiceId, amount: "5000" },
+        { invoiceId, amount: "5000" },
+      ],
+    }).success,
+  ).toBe(false);
+});
+it("requires explicit appropriate fee pairing and positive cash and allocation", () => {
+  for (const patch of [
+    { feeAccountId: null },
+    { feeAmount: "0" },
+    { cashAmount: "0" },
+    { allocations: [{ invoiceId, amount: "0" }] },
+  ])
+    expect(receiptSchema.safeParse({ ...base, ...patch }).success).toBe(false);
+});
+it("rejects forged identity/totals/currency and date coercions", () => {
+  for (const patch of [
+    { number: "RCP-0000000001" },
+    { totalAmount: "10000" },
+    { currency: "USD" },
+    { postingDate: "2025-12-31" },
+    { postingDate: "2026-02-30" },
+    { cashAmount: 9800 },
+  ])
+    expect(receiptSchema.safeParse({ ...base, ...patch }).success).toBe(false);
+});
+it("permits unallocated and mixed receipts only with a mapped advance account", () => {
+  const advanceAccountId = crypto.randomUUID();
+  expect(
+    receiptSchema.safeParse({
+      ...base,
+      cashAmount: "10000",
+      feeAmount: "0",
+      feeAccountId: null,
+      allocations: [],
+      advanceAccountId,
+    }).success,
+  ).toBe(true);
+  expect(
+    receiptSchema.safeParse({
+      ...base,
+      cashAmount: "10000",
+      feeAmount: "0",
+      feeAccountId: null,
+      allocations: [{ invoiceId, amount: "6000" }],
+      advanceAccountId,
+    }).success,
+  ).toBe(true);
+  expect(receiptSchema.safeParse({ ...base, advanceAccountId }).success).toBe(
+    false,
+  );
+  expect(
+    receiptSchema.safeParse({ ...base, advanceAmount: "999" }).success,
+  ).toBe(false);
+});
+it("requires positive unique advance applications and rejects any cash or actor override", async () => {
+  const { applicationSchema } =
+      await import("@/modules/finance/receivables/customer/schemas"),
+    input = {
+      reference: "AAP",
+      partyId: base.partyId,
+      sourceDocumentId: crypto.randomUUID(),
+      documentDate: base.documentDate,
+      postingDate: base.postingDate,
+      description: base.description,
+      evidence: base.evidence,
+      allocations: base.allocations,
+      reason: base.reason,
+    };
+  expect(applicationSchema.safeParse(input).success).toBe(true);
+  for (const patch of [
+    { cashAmount: "100" },
+    { feeAmount: "0" },
+    { actorId: crypto.randomUUID() },
+    { allocations: [] },
+    { allocations: [{ invoiceId, amount: "0" }] },
+  ])
+    expect(applicationSchema.safeParse({ ...input, ...patch }).success).toBe(
+      false,
+    );
+});
+it("accepts exact capped-line credit requests and rejects actor, tax, duplicate and total overrides", async () => {
+  const { creditSchema } =
+      await import("@/modules/finance/receivables/customer/schemas"),
+    invoiceLineId = crypto.randomUUID(),
+    input = {
+      reference: "CN",
+      partyId: base.partyId,
+      invoiceId,
+      advanceAccountId: crypto.randomUUID(),
+      documentDate: base.documentDate,
+      postingDate: base.postingDate,
+      description: base.description,
+      evidence: base.evidence,
+      creditLines: [{ invoiceLineId, amount: "10.25" }],
+      reason: base.reason,
+    };
+  expect(creditSchema.parse(input).creditLines[0].amount).toBe("10.25");
+  for (const patch of [
+    { totalAmount: "10" },
+    { actorId: crypto.randomUUID() },
+    { taxAmount: "1" },
+    { creditLines: [{ invoiceLineId, amount: "0" }] },
+    {
+      creditLines: [
+        { invoiceLineId, amount: "5" },
+        { invoiceLineId, amount: "5" },
+      ],
+    },
+  ])
+    expect(creditSchema.safeParse({ ...input, ...patch }).success).toBe(false);
+});
+it("keeps refunds separate from expense/fee/settlement inputs", async () => {
+  const { refundSchema } =
+      await import("@/modules/finance/receivables/customer/schemas"),
+    input = {
+      reference: "RFN",
+      partyId: base.partyId,
+      sourceDocumentId: crypto.randomUUID(),
+      cashAccountId: base.cashAccountId,
+      cashAmount: "12.34",
+      documentDate: base.documentDate,
+      postingDate: base.postingDate,
+      description: base.description,
+      evidence: base.evidence,
+      reason: base.reason,
+    };
+  expect(refundSchema.safeParse(input).success).toBe(true);
+  for (const patch of [
+    { feeAmount: "1" },
+    { allocations: [] },
+    { cashAmount: "0" },
+    { cashAmount: 12.34 },
+    { cashAmount: "1.001" },
+    { expenseAccountId: crypto.randomUUID() },
+  ])
+    expect(refundSchema.safeParse({ ...input, ...patch }).success).toBe(false);
+});

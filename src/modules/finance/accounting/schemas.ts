@@ -63,7 +63,12 @@ export const accountSchema = z
       "INVESTMENT",
       "LOAN_RECEIVABLE",
     ];
-    const liabilityControls = ["PAYABLES", "CLIENT_ADVANCE", "LOAN_PAYABLE"];
+    const liabilityControls = [
+      "PAYABLES",
+      "CLIENT_ADVANCE",
+      "LOAN_PAYABLE",
+      "DEFERRED_REVENUE",
+    ];
     if (
       (assetControls.includes(a.controlType) && a.type !== "ASSET") ||
       (liabilityControls.includes(a.controlType) && a.type !== "LIABILITY")
