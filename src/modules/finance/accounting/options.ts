@@ -7,6 +7,10 @@ import { accountTypes, reportGroups } from "./catalog";
 export const optionQuerySchema = z
   .object({
     kind: z.enum([
+      "payable",
+      "cost",
+      "prepayment",
+      "fixed-asset",
       "parent",
       "journal",
       "cash",
@@ -36,6 +40,22 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           ? { controlType: "CASH", type: "ASSET", isContra: false }
           : {}),
       ...({
+        payable: {
+          controlType: "PAYABLES",
+          type: "LIABILITY",
+          isContra: false,
+        },
+        cost: {
+          controlType: "NONE",
+          type: { in: ["DIRECT_COST", "OPERATING_EXPENSE", "OTHER_EXPENSE"] },
+          isContra: false,
+        },
+        prepayment: { controlType: "NONE", type: "ASSET", isContra: false },
+        "fixed-asset": {
+          controlType: "FIXED_ASSET",
+          type: "ASSET",
+          isContra: false,
+        },
         receivable: {
           controlType: "RECEIVABLES",
           type: "ASSET",
@@ -62,7 +82,16 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           isContra: false,
         },
       }[
-        query.kind as "receivable" | "revenue" | "deferred" | "fee" | "advance"
+        query.kind as
+          | "payable"
+          | "cost"
+          | "prepayment"
+          | "fixed-asset"
+          | "receivable"
+          | "revenue"
+          | "deferred"
+          | "fee"
+          | "advance"
       ] ?? {}),
       ...(query.type ? { type: query.type } : {}),
       ...(query.group ? { reportGroup: query.group } : {}),

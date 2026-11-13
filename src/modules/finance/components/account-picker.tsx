@@ -15,6 +15,11 @@ export function AccountPicker({
   required = false,
 }: {
   kind:
+    | "payable"
+    | "cost"
+    | "prepayment"
+    | "fixed-asset"
+    | "supplier"
     | "parent"
     | "journal"
     | "cash"
@@ -83,6 +88,7 @@ export function AccountPicker({
           "/api/v1/finance/" +
             ([
               "party",
+              "supplier",
               "project",
               "invoice",
               "cash-account",

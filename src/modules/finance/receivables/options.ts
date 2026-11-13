@@ -8,6 +8,7 @@ export async function invoiceOptions(actor: Pick<Actor, "id">, input: unknown) {
       .object({
         kind: z.enum([
           "party",
+          "supplier",
           "project",
           "invoice",
           "cash-account",
@@ -149,13 +150,21 @@ export async function invoiceOptions(actor: Pick<Actor, "id">, input: unknown) {
       };
     }
     const where = {
-      ...(q.kind === "party"
-        ? { active: true, kind: { in: ["CLIENT", "BOTH"] } }
+      ...(q.kind === "party" || q.kind === "supplier"
+        ? {
+            active: true,
+            kind: {
+              in:
+                q.kind === "supplier"
+                  ? ["SUPPLIER", "BOTH", "EMPLOYEE"]
+                  : ["CLIENT", "BOTH"],
+            },
+          }
         : { archivedAt: null }),
       name: { contains: q.q, mode: "insensitive" as const },
     };
     const total =
-      q.kind === "party"
+      q.kind === "party" || q.kind === "supplier"
         ? await tx.financeParty.count({ where })
         : await tx.project.count({ where });
     const pages = Math.max(1, Math.ceil(total / 25)),
@@ -168,7 +177,7 @@ export async function invoiceOptions(actor: Pick<Actor, "id">, input: unknown) {
         take: 25,
       };
     const items =
-      q.kind === "party"
+      q.kind === "party" || q.kind === "supplier"
         ? await tx.financeParty.findMany(opts)
         : await tx.project.findMany(opts);
     return {

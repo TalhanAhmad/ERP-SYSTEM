@@ -34,6 +34,7 @@ for (const [username, role] of [
   ["e2e.finance.ledger", "SUPER_ADMIN"],
   ["e2e.finance.writer", "SUPER_ADMIN"],
   ["e2e.finance.masters", "SUPER_ADMIN"],
+  ["e2e.finance.bills", "SUPER_ADMIN"],
   ["e2e.finance.invoices", "SUPER_ADMIN"],
   ["e2e.finance.invoice.ui", "SUPER_ADMIN"],
   ["e2e.finance.receipt.ui", "SUPER_ADMIN"],

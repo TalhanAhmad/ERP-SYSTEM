@@ -8,6 +8,7 @@ export function FinanceNavigation() {
       <Link href="/finance/receipt-unallocations">Settlement releases</Link>
       <Link href="/finance/advance-applications">Apply advances</Link>
       <Link href="/finance/receipts">Receipts</Link>
+      <Link href="/finance/bills">Bills &amp; expenses</Link>
       <Link href="/finance/invoices">Invoices</Link>
       <Link href="/finance/journals">Journals</Link>
       <Link href="/finance/parties">Parties</Link>

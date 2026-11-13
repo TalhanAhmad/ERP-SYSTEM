@@ -2,7 +2,9 @@
 
 Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F15 complete:15 of 48 finance milestones; 33 remain.** Talha explicitly requested completion through F15 and a separate commit/push for each milestone. Next is F16: bills, immediate expenses and category/project splits.
+**F01–F16 complete: 16 of 48 finance milestones; 32 remain.** Current authorized scope continues through F25 on finance/f16-f25, with separate milestone commits/pushes. F16 adds bills/immediate paid expenses and cost/project splits. Latest observed checks: 219 distinct unit cases,355 PostgreSQL integration cases, one new Chromium bill journey, typing/lint and both production builds passed. Prior34 browser journeys will be rerun with the final scope. See [current delivery tracker](delivery-F16-F25.md). Current test schema34 additive migrations; live finance remains disabled.
+
+The following records describe the previously completed and merged F15 release:
 
 F12 supplies invoice screens/line previews/private posted PDF. F13 supplies partial/multiple receipts and explicit fees. F14 supplies unallocated/mixed advances and later applications without duplicate cash. F15 supplies capped original-line credits, paid-credit liability/refunds, dated reversals and whole settlement release while retaining cash. Typed sources, dated events, snapshots, private access and the one balanced engine remain enforced. See [delivery report](delivery-F12-F15.md), [exact verification](testing/F12-F15-results.md) and [customer accounting rules](accounting/customer-cycle.md).
 

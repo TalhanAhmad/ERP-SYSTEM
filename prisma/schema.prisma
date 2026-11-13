@@ -80,6 +80,7 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ financeBills FinanceBill[]
  customerDocuments FinanceCustomerDocument[]
  id String @id @default(uuid()) @db.Uuid
  supabaseUserId String? @unique @db.Uuid
@@ -190,6 +191,9 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ payableBills FinanceBill[] @relation("BillPayable")
+ costBillLines FinanceBillLine[] @relation("BillCost")
+ payableEvents FinancePayableEvent[]
  clientBalanceEvents FinanceClientBalanceEvent[]
  customerAdvanceDocuments FinanceCustomerDocument[] @relation("CustomerAdvanceAccount")
  customerFeeDocuments FinanceCustomerDocument[] @relation("CustomerFeeAccount")
@@ -284,6 +288,10 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ billId String? @unique @db.Uuid
+ bill FinanceBill? @relation(fields:[billId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ payableEvents FinancePayableEvent[]
+
  invoiceCreditEvents FinanceInvoiceCreditEvent[]
  clientBalanceEvents FinanceClientBalanceEvent[]
  customerDocumentId String? @unique @db.Uuid
@@ -317,6 +325,9 @@ model FinanceJournalEntry {
  @@index([postingDate,id])
 }
 model FinanceJournalLine {
+ billLineId String? @db.Uuid
+ billLine FinanceBillLine? @relation(fields:[billLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+
  id String @id @default(uuid()) @db.Uuid
  journalId String @db.Uuid
  journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -348,6 +359,8 @@ model FinanceLedgerReceipt {
 }
 
 model FinanceParty {
+ bills FinanceBill[]
+ payableEvents FinancePayableEvent[]
  clientBalanceEvents FinanceClientBalanceEvent[]
  customerDocuments FinanceCustomerDocument[]
  id String @id @default(uuid()) @db.Uuid
@@ -370,6 +383,7 @@ model FinanceParty {
  @@index([active,kind,name,id])
 }
 model FinanceCashAccount {
+ expenseBills FinanceBill[]
  customerDocuments FinanceCustomerDocument[]
  id String @id @default(uuid()) @db.Uuid
  name String
@@ -484,6 +498,8 @@ model FinanceDeferredRevenueEvent {
  @@index([effectiveDate,id])
 }
 model Project {
+ financeBills FinanceBill[]
+ financeBillLines FinanceBillLine[]
  customerDocuments FinanceCustomerDocument[]
  id String @id @default(uuid()) @db.Uuid
  name String
@@ -1116,4 +1132,81 @@ model FinanceInvoiceCreditEvent {
  currency String @default("PKR")
  @@unique([customerDocumentId,invoiceLineId])
  @@index([invoiceLineId,effectiveDate,id])
+}
+
+model FinanceBill {
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique
+ kind String
+ reference String
+ referenceReliable Boolean @default(true)
+ duplicateAcknowledged Boolean @default(false)
+ partyId String @db.Uuid
+ party FinanceParty @relation(fields:[partyId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ payableAccountId String? @db.Uuid
+ payableAccount FinanceAccount? @relation("BillPayable",fields:[payableAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ cashAccountId String? @db.Uuid
+ cashAccount FinanceCashAccount? @relation(fields:[cashAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ projectId String? @db.Uuid
+ project Project? @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ billDate DateTime @db.Date
+ postingDate DateTime @db.Date
+ dueDate DateTime @db.Date
+ description String
+ evidence String
+ currency String @default("PKR")
+ state String @default("DRAFT")
+ version Int @default(1)
+ lineAmount Decimal @db.Decimal(20,2)
+ discountAmount Decimal @db.Decimal(20,2)
+ netAmount Decimal @db.Decimal(20,2)
+ taxAmount Decimal @db.Decimal(20,2)
+ totalAmount Decimal @db.Decimal(20,2)
+ partySnapshot Json?
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ lines FinanceBillLine[]
+ entry FinanceJournalEntry?
+ payableEvents FinancePayableEvent[]
+ @@index([partyId,postingDate,id])
+}
+model FinanceBillLine {
+ id String @id @default(uuid()) @db.Uuid
+ billId String @db.Uuid
+ bill FinanceBill @relation(fields:[billId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ description String
+ quantity Decimal @db.Decimal(20,6)
+ unitRate Decimal @db.Decimal(20,6)
+ lineAmount Decimal @db.Decimal(20,2)
+ discountAmount Decimal @db.Decimal(20,2)
+ netAmount Decimal @db.Decimal(20,2)
+ taxAmount Decimal @db.Decimal(20,2)
+ totalAmount Decimal @db.Decimal(20,2)
+ treatment String
+ costAccountId String @db.Uuid
+ costAccount FinanceAccount @relation("BillCost",fields:[costAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ projectId String? @db.Uuid
+ project Project? @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalLines FinanceJournalLine[]
+ @@unique([billId,sequence])
+}
+model FinancePayableEvent {
+ id String @id @default(uuid()) @db.Uuid
+ billId String @db.Uuid
+ bill FinanceBill @relation(fields:[billId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ partyId String @db.Uuid
+ party FinanceParty @relation(fields:[partyId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ accountId String @db.Uuid
+ account FinanceAccount @relation(fields:[accountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalId String @db.Uuid
+ journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ effectiveDate DateTime @db.Date
+ kind String
+ amount Decimal @db.Decimal(20,2)
+ currency String @default("PKR")
+ @@unique([billId,journalId])
+ @@index([billId,effectiveDate,id])
 }
