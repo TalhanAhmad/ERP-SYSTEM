@@ -41,7 +41,7 @@ DO $$ BEGIN
 END $$;
 -- Keep files private. No direct authenticated/anonymous Storage policies are granted.
 DO $$ DECLARE t TEXT; BEGIN
- FOREACH t IN ARRAY ARRAY['FinanceSettings','FinanceOwnershipTransfer','FinanceAccessReceipt','FinanceAccount','FinancePeriod','FinanceSetupReceipt','FinanceJournalDraft','FinanceJournalDraftLine','FinanceJournalEntry','FinanceJournalLine','FinanceLedgerReceipt','FinanceParty','FinanceCashAccount','FinanceInvoice','FinanceInvoiceLine','FinanceReceivableEvent','FinanceDeferredRevenueEvent'] LOOP
+ FOREACH t IN ARRAY ARRAY['FinanceSettings','FinanceOwnershipTransfer','FinanceAccessReceipt','FinanceAccount','FinancePeriod','FinanceSetupReceipt','FinanceJournalDraft','FinanceJournalDraftLine','FinanceJournalEntry','FinanceJournalLine','FinanceLedgerReceipt','FinanceParty','FinanceCashAccount','FinanceInvoice','FinanceInvoiceLine','FinanceCustomerDocument','FinanceCustomerAllocation','FinanceReceivableEvent','FinanceDeferredRevenueEvent'] LOOP
   IF to_regclass(format('public.%I',t)) IS NOT NULL THEN
    EXECUTE format('REVOKE ALL ON public.%I FROM encova_app',t);
    EXECUTE format('DROP POLICY IF EXISTS encova_server_access ON public.%I',t);
@@ -80,3 +80,5 @@ DO $$ BEGIN
   ON CONFLICT(id) DO UPDATE SET public=false,file_size_limit=10485760,allowed_mime_types=EXCLUDED.allowed_mime_types;
  END IF;
 END $$;
+
+DO $$ BEGIN IF to_regprocedure('public.encova_finance_customer_command(uuid,text,text,timestamptz,text,text,jsonb,text,uuid)') IS NOT NULL THEN GRANT EXECUTE ON FUNCTION public.encova_finance_customer_command(UUID,TEXT,TEXT,TIMESTAMPTZ,TEXT,TEXT,JSONB,TEXT,UUID) TO encova_app; END IF; END $$;

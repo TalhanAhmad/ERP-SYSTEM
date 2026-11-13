@@ -80,6 +80,7 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ customerDocuments FinanceCustomerDocument[]
  id String @id @default(uuid()) @db.Uuid
  supabaseUserId String? @unique @db.Uuid
  authUserId String? @unique
@@ -189,6 +190,7 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ customerFeeDocuments FinanceCustomerDocument[] @relation("CustomerFeeAccount")
  id String @id @default(uuid()) @db.Uuid
  code String @unique
  name String
@@ -280,6 +282,9 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ customerDocumentId String? @unique @db.Uuid
+ customerDocument FinanceCustomerDocument? @relation(fields:[customerDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+
  id String @id @default(uuid()) @db.Uuid
  reference String @unique
  sourceType String
@@ -339,6 +344,7 @@ model FinanceLedgerReceipt {
 }
 
 model FinanceParty {
+ customerDocuments FinanceCustomerDocument[]
  id String @id @default(uuid()) @db.Uuid
  name String
  legalName String
@@ -359,6 +365,7 @@ model FinanceParty {
  @@index([active,kind,name,id])
 }
 model FinanceCashAccount {
+ customerDocuments FinanceCustomerDocument[]
  id String @id @default(uuid()) @db.Uuid
  name String
  kind String
@@ -374,6 +381,7 @@ model FinanceCashAccount {
 }
 
 model FinanceInvoice {
+ customerAllocations FinanceCustomerAllocation[]
  id String @id @default(uuid()) @db.Uuid
  number String @unique @default(dbgenerated("('INV-'::text || lpad(nextval('public.finance_invoice_number'::regclass)::text, 10, '0'::text))"))
  reference String?
@@ -432,6 +440,9 @@ model FinanceInvoiceLine {
  @@unique([invoiceId,sequence])
 }
 model FinanceReceivableEvent {
+ customerDocumentId String? @db.Uuid
+ customerDocument FinanceCustomerDocument? @relation(fields:[customerDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+
  id String @id @default(uuid()) @db.Uuid
  invoiceId String @db.Uuid
  invoice FinanceInvoice @relation(fields:[invoiceId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -462,6 +473,7 @@ model FinanceDeferredRevenueEvent {
  @@index([effectiveDate,id])
 }
 model Project {
+ customerDocuments FinanceCustomerDocument[]
  id String @id @default(uuid()) @db.Uuid
  name String
  description String
@@ -973,4 +985,50 @@ model AppSession {
  user Person @relation(fields:[userId],references:[id],onDelete:Restrict)
  createdAt DateTime @default(now()) @db.Timestamptz
  @@index([userId])
+}
+
+model FinanceCustomerDocument {
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique @default(dbgenerated("('RCP-'::text || lpad(nextval('public.finance_customer_number'::regclass)::text, 10, '0'::text))"))
+ kind String
+ reference String
+ partyId String @db.Uuid
+ party FinanceParty @relation(fields:[partyId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ cashAccountId String? @db.Uuid
+ cashAccount FinanceCashAccount? @relation(fields:[cashAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ feeAccountId String? @db.Uuid
+ feeAccount FinanceAccount? @relation("CustomerFeeAccount",fields:[feeAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ projectId String? @db.Uuid
+ project Project? @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ documentDate DateTime @db.Date
+ postingDate DateTime @db.Date
+ description String
+ evidence String
+ currency String @default("PKR")
+ state String @default("DRAFT")
+ version Int @default(1)
+ cashAmount Decimal @db.Decimal(20,2)
+ feeAmount Decimal @db.Decimal(20,2)
+ allocationAmount Decimal @db.Decimal(20,2)
+ totalAmount Decimal @db.Decimal(20,2)
+ partySnapshot Json?
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ allocations FinanceCustomerAllocation[]
+ entry FinanceJournalEntry?
+ receivableEvents FinanceReceivableEvent[]
+ @@index([kind,postingDate,id])
+}
+model FinanceCustomerAllocation {
+ id String @id @default(uuid()) @db.Uuid
+ documentId String @db.Uuid
+ document FinanceCustomerDocument @relation(fields:[documentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ invoiceId String @db.Uuid
+ invoice FinanceInvoice @relation(fields:[invoiceId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ amount Decimal @db.Decimal(20,2)
+ @@unique([documentId,invoiceId])
+ @@unique([documentId,sequence])
 }

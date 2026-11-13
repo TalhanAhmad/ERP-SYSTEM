@@ -35,3 +35,10 @@ FinanceInvoice stores unique server-generated number, optional external referenc
 FinanceJournalEntry adds unique invoiceId and constrained INVOICE source identity. FinanceJournalLine adds partyId/invoiceLineId; ordinary journals cannot populate these or hit protected controls. FinanceReceivableEvent links one invoice to its exact journal/account/party/effective date/positive INVOICE amount. FinanceDeferredRevenueEvent links each positive deferred line to its BILLED journal/date/amount. Both are immutable. Commit-time checks prove source totals, GL and events agree; they are dated event history, not editable balances. Current future-recognition revenue mapping is frozen at billing.
 
 Invoice numbering uses a private bounded NO CYCLE sequence, not count+1. Its gaps are intentional and voided numbers stay reserved. Runtime reads tables and calls only encova_finance_invoice_command. Common encova_finance_emit_journal and snapshot/usage helpers remain private. See [invoice design](../accounting/invoices.md) for exact source and deferred recognition boundaries.
+
+
+## F13 receipt sources
+
+FinanceCustomerDocument stores typed receipt headers, exact cash/fee/settlement values, dates, retained numbers, state/version and frozen posted party snapshot. FinanceCustomerAllocation links one receipt to positive allocations over 1–100 distinct invoices. FinanceJournalEntry adds a constrained unique customerDocumentId source. FinanceReceivableEvent adds typed negative RECEIPT events linked to the document; initial positive INVOICE matching remains separately checked. No authoritative mutable balance is stored.
+
+Commit-time expected-line/event checks reject missing/extra/mismatched source effects and any negative dated invoice balance. Current active mapped bank/cash and ordinary expense accounts are rechecked at posting. Source/journal/events freeze after posting. The runtime can SELECT and call the checked customer command; private expected-line/emitter/capacity helpers and numbering sequence stay inaccessible. Ordinary ERP DTOs do not expose these relations.

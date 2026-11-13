@@ -3,6 +3,7 @@ export function FinanceNavigation() {
   return (
     <nav aria-label="Finance navigation" className="form-actions">
       <Link href="/finance">Finance</Link>
+      <Link href="/finance/receipts">Receipts</Link>
       <Link href="/finance/invoices">Invoices</Link>
       <Link href="/finance/journals">Journals</Link>
       <Link href="/finance/parties">Parties</Link>

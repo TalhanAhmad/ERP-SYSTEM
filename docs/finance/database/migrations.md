@@ -31,3 +31,8 @@ All 27 migrations are applied only to encova_test in local verification. No comp
 28: 20261112080000_finance_invoice_core creates empty typed invoice/line/dated-AR/deferred-event tables and a private noncycling invoice-number sequence. Extends ledger source identity/party/line references and account control checks with DEFERRED_REVENUE. Refactors manual/invoice emission through one private function while preserving source/balance/immutability enforcement; adds checked invoice command, deferred source/event consistency, exact calculation, permanent receipt/audit and narrow runtime/RLS grants.
 
 Applied successfully on its first deployment only to encova_test; no earlier applied checksum was edited, no reset, financial seed, live owner grant or hosted migration. Local test schema now has28 migrations; hosted ERP remains17. CI must apply the whole chain to a fresh isolated database before publication is accepted. supabase/setup.sql replay grants only invoice SELECT/checked-command EXECUTE and never sequence/private-emitter access.
+
+
+## F13 — 13 November 2026
+
+29 (20261113010000_finance_receipts) creates empty typed customer document/allocation sources, extends shared journal/dated AR source integrity and checked receipt commands, and reserves dated invoice capacity. 30 (20261113020000_finance_receipt_validation) removes a PL/pgSQL record/alias collision. 31 (20261113030000_finance_receipt_cash_usage) uses the existing GL usage marker rather than a nonexistent cash-master marker. Applied checksums are unchanged; no reset. All31 migrations apply only to encova_test; no live financial seed/grant/migration.

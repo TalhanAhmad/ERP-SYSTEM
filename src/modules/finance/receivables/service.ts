@@ -179,6 +179,7 @@ export async function invoiceDetail(actor: Pick<Actor, "id">, id: string) {
           },
         },
         receivableEvents: {
+          include: { customerDocument: { select: { number: true } } },
           orderBy: [{ effectiveDate: "asc" }, { id: "asc" }],
         },
       },
@@ -200,7 +201,12 @@ export async function invoiceDetail(actor: Pick<Actor, "id">, id: string) {
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: 50,
     });
+    const balance = await tx.financeReceivableEvent.aggregate({
+      where: { invoiceId: id },
+      _sum: { amount: true },
+    });
     return {
+      receivableBalance: balance._sum.amount?.toFixed(2) ?? "0.00",
       item: {
         ...amounts(invoice),
         invoiceDate: date(invoice.invoiceDate),

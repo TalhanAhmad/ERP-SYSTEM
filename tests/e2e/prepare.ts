@@ -36,6 +36,8 @@ for (const [username, role] of [
   ["e2e.finance.masters", "SUPER_ADMIN"],
   ["e2e.finance.invoices", "SUPER_ADMIN"],
   ["e2e.finance.invoice.ui", "SUPER_ADMIN"],
+  ["e2e.finance.receipt.ui", "SUPER_ADMIN"],
+  ["e2e.finance.receipt.writer", "SUPER_ADMIN"],
   ["e2e.finance.invoice.writer", "SUPER_ADMIN"],
 ] as const) {
   const email = `${username}@example.test`;
@@ -62,6 +64,7 @@ for (const username of [
   "e2e.finance",
   "e2e.finance.writer",
   "e2e.finance.invoice.writer",
+  "e2e.finance.receipt.writer",
 ]) {
   const financePerson = await db.person.findUniqueOrThrow({
     where: { username },

@@ -121,6 +121,20 @@ export default async function Invoice({
           </section>
         </>
       )}
+      {i.state === "POSTED" && (
+        <section className="panel" aria-label="Invoice settlements">
+          <h2>Invoice settlements</h2>
+          <p>
+            Outstanding receivable: <MoneyCell value={data.receivableBalance} />
+          </p>
+          {i.receivableEvents.map((e) => (
+            <p key={e.id}>
+              {e.effectiveDate} · {e.customerDocument?.number ?? i.number} ·{" "}
+              {e.kind} · <MoneyCell value={e.amount} />
+            </p>
+          ))}
+        </section>
+      )}
       {i.entry && (
         <p>
           Posted journal: {i.entry.reference} · {i.entry.postingDate}

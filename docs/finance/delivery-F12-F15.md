@@ -10,7 +10,13 @@ Initial 49 focused tests passed. Browser journey passed (3.7 seconds): uncertain
 
 ## F13 — receipts and partial/multiple allocations
 
-Pending.
+Typed receipt/allocation sources, private searchable registers/detail/editor, fresh-auth create/edit/post/void, exact cash-plus-fee settlement equation and dated immutable receivable events. Partial and multi-invoice settlements post cash/fee debits and invoice AR credits through the existing single private emitter. Invoice views show actual dated settlement history and remaining receivable. Retained archived invoice projects may settle.
+
+Capacity checks reserve the balance at the candidate date and every later effective date, so a backdated receipt cannot consume a balance already settled later. Current selected access/session, strict input, versions, permanent keys, source/event/GL commit integrity and runtime-only checked commands remain enforced. No generic protected-control bypass.
+
+Full local regression: 212 unit and 314 PostgreSQL integration tests passed, strict typing/lint and local build passed. New multi-invoice/explicit-fee browser journey passed (4.3 seconds), including 360px WCAG/overflow. Targeted accounting regression passed all70 checks. Supabase-mode production build also passed using synthetic configuration only. F12 source abf7c6ccc0492414aeb9db8635f8eab7ae9652f5 passed CI43407757976, including complete30 browser tests.
+
+Additive migration29 creates empty typed receipt sources/allocations and extends the shared emitter. Initial real posting tests exposed a loop-record/SQL-alias collision and an attempted cash-master usedAt update; existing cash mappings already freeze through their GL account usedAt marker. Additive30/31 correct those functions, preserving all applied checksums/data. No invalid receipt committed, reset or hosted migration occurred. Test schema now31 migrations.
 
 ## F14 — client advances and later application
 

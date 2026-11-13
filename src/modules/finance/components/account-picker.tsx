@@ -9,6 +9,7 @@ export function AccountPicker({
   type,
   group,
   exclude,
+  partyId,
   initial = [],
   required = false,
 }: {
@@ -20,13 +21,17 @@ export function AccountPicker({
     | "revenue"
     | "deferred"
     | "party"
-    | "project";
+    | "project"
+    | "invoice"
+    | "cash-account"
+    | "fee";
   label: string;
   value: string | null;
   onChange: (id: string | null) => void;
   type?: string;
   group?: string;
   exclude?: string;
+  partyId?: string;
   initial?: Option[];
   required?: boolean;
 }) {
@@ -55,10 +60,11 @@ export function AccountPicker({
           ...(type ? { type } : {}),
           ...(group ? { group } : {}),
           ...(exclude ? { exclude } : {}),
+          ...(partyId ? { partyId } : {}),
         });
         const response = await fetch(
           "/api/v1/finance/" +
-            (["party", "project"].includes(kind)
+            (["party", "project", "invoice", "cash-account"].includes(kind)
               ? "invoice-options?"
               : "account-options?") +
             query,
@@ -78,7 +84,7 @@ export function AccountPicker({
       clearTimeout(timer);
       abort.abort();
     };
-  }, [kind, q, page, type, group, exclude, retry]);
+  }, [kind, q, page, type, group, exclude, partyId, retry]);
   const selected =
     result.items.find((i) => i.id === value) ??
     initial.find((i) => i.id === value);
