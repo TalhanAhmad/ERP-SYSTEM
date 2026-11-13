@@ -2,7 +2,7 @@
 
 Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F19 complete: 19 of 48 finance milestones; 29 remain.** Current authorized scope continues through F25 on finance/f16-f25, with separate milestone commits/pushes. F16 adds bills/immediate paid expenses and cost/project splits. Latest observed checks: 219 distinct unit cases,355 PostgreSQL integration cases, one new Chromium bill journey, typing/lint and both production builds passed. Prior34 browser journeys will be rerun with the final scope. See [current delivery tracker](delivery-F16-F25.md). Current test schema34 additive migrations; live finance remains disabled.
+**F01–F20 complete: 20 of 48 finance milestones; 28 remain.** Current authorized scope continues through F25 on finance/f16-f25 with separate milestone commits/pushes. F19 passed fresh CI43459582746 with660 checks (228 unit/394 integration/38 browser),47 migrations and both builds. F20 adds verified cash/transfers:12 PostgreSQL,3 unit and one browser journey; local build/type/lint passed. Test schema48;103 concrete API paths. See [current delivery tracker](delivery-F16-F25.md). Hosted finance remains disabled.
 
 The following records describe the previously completed and merged F15 release:
 

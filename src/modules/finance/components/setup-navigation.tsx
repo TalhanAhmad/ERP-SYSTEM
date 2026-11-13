@@ -13,6 +13,7 @@ export function FinanceNavigation() {
       <Link href="/finance/supplier-credits">Supplier credits</Link>
       <Link href="/finance/supplier-refunds">Supplier refunds</Link>
       <Link href="/finance/supplier-releases">Payment releases</Link>
+      <Link href="/finance/cash-register">Cash register</Link><Link href="/finance/transfers">Transfers</Link>
       <Link href="/finance/attachments">Evidence</Link>
       <Link href="/finance/tax-codes">Tax policies</Link>
       <Link href="/finance/bills">Bills &amp; expenses</Link>

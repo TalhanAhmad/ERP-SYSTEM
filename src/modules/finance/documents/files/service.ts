@@ -35,6 +35,7 @@ const publicSelect = {
   customerDocumentId: true,
   supplierDocumentId: true,
   journalDraftId: true,
+  movementId:true,
   scanResult: true,
   createdAt: true,
   blobDeletedAt: true,
@@ -393,6 +394,7 @@ export async function files(actor: Pick<Actor, "id">, input: unknown = {}) {
         CUSTOMER_DOCUMENT: "customerDocumentId",
         SUPPLIER_DOCUMENT: "supplierDocumentId",
         JOURNAL_DRAFT: "journalDraftId",
+        MOVEMENT:"movementId",
       };
     const where: Prisma.FinanceFileWhereInput = {
       ...(q.state === "ACTIVE"

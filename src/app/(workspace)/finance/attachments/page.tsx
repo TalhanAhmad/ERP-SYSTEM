@@ -94,7 +94,7 @@ export default async function Evidence({
                     )[f.supplierDocument?.kind ?? ""] ?? "supplier-payments",
                     f.supplierDocumentId,
                   ]
-                : ["journals", f.journalDraftId];
+                : f.movementId?["movements",f.movementId]:["journals", f.journalDraftId];
         return (
           <section className="panel" key={f.id}>
             <h2>{f.fileName}</h2>

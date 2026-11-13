@@ -27,6 +27,7 @@ await privateOperator(schema, async (data, verified, verifyAgain) => {
                 { customerDocument: { state: "DRAFT" } },
                 { supplierDocument: { state: "DRAFT" } },
                 { journalDraft: { state: "DRAFT" } },
+              {movement:{state:"DRAFT"}},
               ],
             },
           ],

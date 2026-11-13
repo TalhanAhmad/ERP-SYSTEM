@@ -10,7 +10,7 @@ export const sourceSchema = z
       "BILL",
       "CUSTOMER_DOCUMENT",
       "SUPPLIER_DOCUMENT",
-      "JOURNAL_DRAFT",
+      "JOURNAL_DRAFT", "MOVEMENT",
     ]),
     sourceId: z.uuid(),
   })
