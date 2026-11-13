@@ -9,6 +9,8 @@ ns = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 main_sources = ['docs/build-report.md','docs/progress.md','docs/work-log.md','docs/testing/results.md','docs/planning/backlog.md','docs/finance/progress.md','docs/finance/repository-assessment.md','docs/finance/decisions.md','docs/finance/testing/results.md','docs/finance/planning/milestones.md','docs/finance/planning/days/F04.md','docs/finance/planning/days/F05.md']
 main_sources += [f'docs/finance/planning/days/F{n:02}.md' for n in range(6,11)]
 main_sources += ['docs/finance/accounting/ledger-core.md','docs/finance/testing/F06-F10-results.md','docs/finance/delivery-F06-F10.md']
+main_sources += ['docs/finance/planning/days/F11.md','docs/finance/accounting/invoices.md','docs/finance/testing/F11-results.md','docs/finance/delivery-F11.md']
+f11_sources = ['docs/finance/delivery-F11.md','docs/finance/planning/days/F11.md','docs/finance/accounting/invoices.md','docs/finance/testing/F11-results.md']
 focused_sources = ['docs/finance/delivery-F06-F10.md'] + [f'docs/finance/planning/days/F{n:02}.md' for n in range(6,11)] + ['docs/finance/accounting/ledger-core.md','docs/finance/testing/F06-F10-results.md']
 
 def report_xml(sources):
@@ -49,7 +51,7 @@ types='''<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/pa
 rels='''<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'''
 docrels='''<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'''
 
-for target_name, sources in [('docs/Encova_Progress_Report.docx',main_sources),('docs/finance/Encova_F06-F10_Report.docx',focused_sources)]:
+for target_name, sources in [('docs/Encova_Progress_Report.docx',main_sources),('docs/finance/Encova_F06-F10_Report.docx',focused_sources),('docs/finance/Encova_F11_Report.docx',f11_sources)]:
     xml, images = report_xml(sources)
     image_rels = ''.join(f'<Relationship Id="rIdImage{i}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image{i}.png"/>' for i in range(1,len(images)+1))
     relationships = docrels.replace('</Relationships>',image_rels+'</Relationships>')

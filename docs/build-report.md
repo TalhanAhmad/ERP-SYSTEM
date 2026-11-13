@@ -161,3 +161,8 @@ Exact-source [CI 43238001511](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/
 ## PR merge — 12 November 2026
 
 PR #1 was merged into main at 2026-11-12 15:17:24 UTC (20:17 Pakistan time), after Talha explicitly requested the merge. Merge commit: 7d9ca2e19b1b912b8b65cb2f2d24bc94def7abde. A merge commit preserved all ten individual finance commits and their original attribution. PR-head 9256e8b had passing CI 43239515265 before merging. Local main was fast-forwarded to the merged result; application/schema content is unchanged from the verified PR head. Finance remains disabled by default; no manual hosted migration or enablement was performed.
+
+
+## Finance F11 — 13 November 2026
+
+F11 earned/deferred invoice backend is locally accepted: typed exact sources, private versioned API, shared emitter, immutable dated AR/BILLED events and posted client snapshots. Full regression passed207 unit +299 PostgreSQL integration +29 Chromium tests (**535**), strict typing/lint and local build. Final hosted-mode build, report validation and exact-source CI publication are in [F11 verification](finance/testing/F11-results.md). F12 remains invoice editor/preview/private printable document. Test schema28 migrations; no hosted finance migration/grant/enablement, real financial seed or deployment. Original ERP learning acceptance remains separate.

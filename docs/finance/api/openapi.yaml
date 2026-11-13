@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova Finance Ledger and Setup",
-    "version": "0.4.0",
-    "description": "Implemented F01\u2013F10: access/ownership, accounts/periods, ordinary journal drafts/post/reversal/batch void, parties/cash setup and bounded account options. Feature defaults off; no hosted finance launch. All responses including errors private/no-store, Vary Cookie. Current verified browser sessions; no public bootstrap or recovery. Typed invoice/cash/payment/asset/investment workflows and financial statements are later milestones, not generic control-account bypasses."
+    "title": "Encova Finance Ledger, Setup and Invoices",
+    "version": "0.5.0",
+    "description": "Implemented F01\u2013F11: access/ownership, accounts/periods, manual journals, masters and earned/deferred invoice backend. Finance defaults off. All responses including errors private/no-store, Vary Cookie. Invoice editor/private PDF is F12; receipts/recognition/credit notes/taxes/reports remain later milestones. Current verified sessions; no public bootstrap/recovery."
   },
   "security": [
     {
@@ -3738,6 +3738,510 @@
           }
         }
       }
+    },
+    "/api/v1/finance/invoices": {
+      "post": {
+        "operationId": "createInvoice",
+        "description": "Current ACTIVE selected Super Admin; fresh password and hosted fresh TOTP, canonical Origin/CSRF, permanent Idempotency-Key, shared six/minute reauth limit. Typed atomic command with optimistic source version. Only drafts editable/voidable. Post: open period, no future Pakistan date, active source mappings, balanced GL plus matching immutable dated AR/BILLED events, posted contact snapshot. No network/file/email in transaction.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listInvoices",
+        "description": "Current selected access before input validation. Private/no-store, Vary Cookie. Detail: typed source, frozen posted partySnapshot distinct from current party contact, journal, dated receivableEvents, deferredEvents and restricted history. List: stable page/count and full-filter document totals; totals include source states and are not balances/financial statements. Amounts canonical two-decimal strings, quantities/rates six, dates ISO.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "POSTED",
+                "VOIDED"
+              ],
+              "default": "ALL"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Real ISO date, years 0001\u20139999. Posting uses open-period and Pakistan-time future-date checks."
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Real ISO date, years 0001\u20139999. Posting uses open-period and Pakistan-time future-date checks."
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "date_desc",
+                "date_asc",
+                "number"
+              ],
+              "default": "date_desc"
+            }
+          },
+          {
+            "name": "partyId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "List {data:{items,total,page,pages,pageSize,filters,totals}} or detail {data:{item,deferredEvents,history}}. item includes ordered lines, nullable entry and receivableEvents; no credential material. Unknown filters rejected, page clamped, exact totals cover all filtered documents."
+          }
+        }
+      }
+    },
+    "/api/v1/finance/invoices/{id}": {
+      "patch": {
+        "operationId": "updateInvoice",
+        "description": "Current ACTIVE selected Super Admin; fresh password and hosted fresh TOTP, canonical Origin/CSRF, permanent Idempotency-Key, shared six/minute reauth limit. Typed atomic command with optimistic source version. Only drafts editable/voidable. Post: open period, no future Pakistan date, active source mappings, balanced GL plus matching immutable dated AR/BILLED events, posted contact snapshot. No network/file/email in transaction.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceCommandResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getInvoice",
+        "description": "Current selected access before input validation. Private/no-store, Vary Cookie. Detail: typed source, frozen posted partySnapshot distinct from current party contact, journal, dated receivableEvents, deferredEvents and restricted history. List: stable page/count and full-filter document totals; totals include source states and are not balances/financial statements. Amounts canonical two-decimal strings, quantities/rates six, dates ISO.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "List {data:{items,total,page,pages,pageSize,filters,totals}} or detail {data:{item,deferredEvents,history}}. item includes ordered lines, nullable entry and receivableEvents; no credential material. Unknown filters rejected, page clamped, exact totals cover all filtered documents."
+          }
+        }
+      }
+    },
+    "/api/v1/finance/invoices/{id}/post": {
+      "post": {
+        "operationId": "postInvoice",
+        "description": "Current ACTIVE selected Super Admin; fresh password and hosted fresh TOTP, canonical Origin/CSRF, permanent Idempotency-Key, shared six/minute reauth limit. Typed atomic command with optimistic source version. Only drafts editable/voidable. Post: open period, no future Pakistan date, active source mappings, balanced GL plus matching immutable dated AR/BILLED events, posted contact snapshot. No network/file/email in transaction.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceCommandResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/invoices/{id}/void": {
+      "post": {
+        "operationId": "voidInvoice",
+        "description": "Current ACTIVE selected Super Admin; fresh password and hosted fresh TOTP, canonical Origin/CSRF, permanent Idempotency-Key, shared six/minute reauth limit. Typed atomic command with optimistic source version. Only drafts editable/voidable. Post: open period, no future Pakistan date, active source mappings, balanced GL plus matching immutable dated AR/BILLED events, posted contact snapshot. No network/file/email in transaction.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceCommandResult"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3833,7 +4337,8 @@
               "ACCUMULATED_DEPRECIATION",
               "INVESTMENT",
               "LOAN_RECEIVABLE",
-              "LOAN_PAYABLE"
+              "LOAN_PAYABLE",
+              "DEFERRED_REVENUE"
             ]
           },
           "currency": {
@@ -3943,7 +4448,8 @@
               "ACCUMULATED_DEPRECIATION",
               "INVESTMENT",
               "LOAN_RECEIVABLE",
-              "LOAN_PAYABLE"
+              "LOAN_PAYABLE",
+              "DEFERRED_REVENUE"
             ]
           },
           "currency": {
@@ -4671,6 +5177,335 @@
                     }
                   }
                 }
+              }
+            }
+          }
+        }
+      },
+      "InvoiceLine": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "description",
+          "quantity",
+          "unitRate",
+          "recognition",
+          "revenueAccountId"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,13})(\\.[0-9]{1,6})?$",
+            "description": "Positive exact decimal; maximum 14 integer and 6 fractional digits."
+          },
+          "unitRate": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,13})(\\.[0-9]{1,6})?$",
+            "description": "Nonnegative exact decimal; maximum 14 integer and 6 fractional digits."
+          },
+          "discountAmount": {
+            "$ref": "#/components/schemas/PkrAmount",
+            "default": "0.00"
+          },
+          "recognition": {
+            "type": "string",
+            "enum": [
+              "EARNED",
+              "DEFERRED"
+            ]
+          },
+          "revenueAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deferredAccountId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "description": "DEFERRED requires active liability DEFERRED_REVENUE control; EARNED requires null deferredAccountId. Revenue mapping always required. Server rounds quantity\u00d7rate HALF_UP first, subtracts explicit PKR discount not exceeding rounded gross. Zero lines retained but do not post. No tax inputs in F11."
+      },
+      "InvoiceCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "partyId",
+          "receivableAccountId",
+          "invoiceDate",
+          "postingDate",
+          "dueDate",
+          "description",
+          "evidence",
+          "lines",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 80,
+            "default": null
+          },
+          "partyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "receivableAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "invoiceDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real ISO date years 0001\u20139999"
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real ISO date years 0001\u20139999"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real ISO date years 0001\u20139999"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "currency": {
+            "type": "string",
+            "const": "PKR",
+            "default": "PKR"
+          },
+          "lines": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLine"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "description": "Server generates immutable INV- plus 10-digit number. Client cannot submit number/totals/snapshot/actor. Active CLIENT/BOTH party; posting and due dates on/after invoiceDate. Totals recomputed independently in PostgreSQL. Tax zero is an unsupported-tax boundary, not an exemption claim."
+      },
+      "InvoiceUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "partyId",
+          "receivableAccountId",
+          "invoiceDate",
+          "postingDate",
+          "dueDate",
+          "description",
+          "evidence",
+          "lines",
+          "reason",
+          "reauth",
+          "expectedVersion"
+        ],
+        "properties": {
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 80,
+            "default": null
+          },
+          "partyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "receivableAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "invoiceDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real ISO date years 0001\u20139999"
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real ISO date years 0001\u20139999"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real ISO date years 0001\u20139999"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "currency": {
+            "type": "string",
+            "const": "PKR",
+            "default": "PKR"
+          },
+          "lines": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLine"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "description": "Server generates immutable INV- plus 10-digit number. Client cannot submit number/totals/snapshot/actor. Active CLIENT/BOTH party; posting and due dates on/after invoiceDate. Totals recomputed independently in PostgreSQL. Tax zero is an unsupported-tax boundary, not an exemption claim."
+      },
+      "InvoiceAction": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "InvoiceCommandResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "version",
+              "number",
+              "journalId"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "number": {
+                "type": "string",
+                "pattern": "^INV-[0-9]{10}$"
+              },
+              "journalId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             }
           }

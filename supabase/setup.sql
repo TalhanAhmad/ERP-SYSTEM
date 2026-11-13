@@ -41,7 +41,7 @@ DO $$ BEGIN
 END $$;
 -- Keep files private. No direct authenticated/anonymous Storage policies are granted.
 DO $$ DECLARE t TEXT; BEGIN
- FOREACH t IN ARRAY ARRAY['FinanceSettings','FinanceOwnershipTransfer','FinanceAccessReceipt','FinanceAccount','FinancePeriod','FinanceSetupReceipt','FinanceJournalDraft','FinanceJournalDraftLine','FinanceJournalEntry','FinanceJournalLine','FinanceLedgerReceipt','FinanceParty','FinanceCashAccount'] LOOP
+ FOREACH t IN ARRAY ARRAY['FinanceSettings','FinanceOwnershipTransfer','FinanceAccessReceipt','FinanceAccount','FinancePeriod','FinanceSetupReceipt','FinanceJournalDraft','FinanceJournalDraftLine','FinanceJournalEntry','FinanceJournalLine','FinanceLedgerReceipt','FinanceParty','FinanceCashAccount','FinanceInvoice','FinanceInvoiceLine','FinanceReceivableEvent','FinanceDeferredRevenueEvent'] LOOP
   IF to_regclass(format('public.%I',t)) IS NOT NULL THEN
    EXECUTE format('REVOKE ALL ON public.%I FROM encova_app',t);
    EXECUTE format('DROP POLICY IF EXISTS encova_server_access ON public.%I',t);
@@ -65,6 +65,11 @@ END $$;
 DO $$ BEGIN
  IF to_regprocedure('public.encova_finance_master_command(uuid,text,text,timestamp with time zone,text,jsonb,text,uuid)') IS NOT NULL THEN
   GRANT EXECUTE ON FUNCTION encova_finance_master_command(UUID,TEXT,TEXT,TIMESTAMPTZ,TEXT,JSONB,TEXT,UUID) TO encova_app;
+ END IF;
+END $$;
+DO $$ BEGIN
+ IF to_regprocedure('public.encova_finance_invoice_command(uuid,text,text,timestamp with time zone,text,jsonb,text,uuid)') IS NOT NULL THEN
+  GRANT EXECUTE ON FUNCTION encova_finance_invoice_command(UUID,TEXT,TEXT,TIMESTAMPTZ,TEXT,JSONB,TEXT,UUID) TO encova_app;
  END IF;
 END $$;
 -- Upload/download workflow integration is a separate acceptance gate.

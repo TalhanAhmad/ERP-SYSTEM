@@ -60,3 +60,15 @@ export function sumPkrLines(lines: readonly unknown[]) {
   for (const line of lines) total = total.plus(pkrAmountSchema.parse(line));
   return bounded(total);
 }
+
+export function subtractPkr(value: unknown, deduction: unknown) {
+  const amount = new Decimal(parsePkr(value)),
+    discount = new Decimal(parsePkr(deduction));
+  invariant(
+    discount.lte(amount),
+    "PKR_DEDUCTION",
+    "Discount cannot exceed the rounded line amount.",
+    422,
+  );
+  return bounded(amount.minus(discount));
+}

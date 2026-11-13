@@ -33,6 +33,7 @@ export const controlTypes = [
   "INVESTMENT",
   "LOAN_RECEIVABLE",
   "LOAN_PAYABLE",
+  "DEFERRED_REVENUE",
 ] as const;
 export const groupsByType: Record<
   (typeof accountTypes)[number],
