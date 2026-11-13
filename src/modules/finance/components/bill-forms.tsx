@@ -8,6 +8,7 @@ import { formatPkr } from "./money-cell";
 type Bill = Awaited<ReturnType<typeof billDetail>>["item"];
 type Line = {
   key: string;
+  taxCodeId: string | null;
   description: string;
   quantity: string;
   unitRate: string;
@@ -36,7 +37,7 @@ export function BillForm({ item, hosted }: { item?: Bill; hosted: boolean }) {
   let preview = "Add lines to preview totals.";
   try {
     if (lines.length)
-      preview = "Bill total: " + formatPkr(invoicePreview(lines));
+      preview = "Rounded lines less discounts: " + formatPkr(invoicePreview(lines));
   } catch {
     preview = "Check quantities, rates and discounts to preview totals.";
   }
@@ -64,6 +65,7 @@ export function BillForm({ item, hosted }: { item?: Bill; hosted: boolean }) {
         currency: "PKR",
         lines: lines.map((l) => ({
           description: l.description,
+          taxCodeId: l.taxCodeId,
           quantity: l.quantity,
           unitRate: l.unitRate,
           discountAmount: l.discountAmount,
@@ -240,6 +242,12 @@ export function BillForm({ item, hosted }: { item?: Bill; hosted: boolean }) {
             onChange={(id) => edit(l.key, { costAccountId: id ?? "" })}
           />
           <AccountPicker
+            kind="tax-code"
+            label={"Tax policy for line " + (i + 1)}
+            value={l.taxCodeId}
+            onChange={(id) => edit(l.key, { taxCodeId: id })}
+          />
+          <AccountPicker
             kind="project"
             label={"Project for line " + (i + 1)}
             value={l.projectId}
@@ -261,6 +269,7 @@ export function BillForm({ item, hosted }: { item?: Bill; hosted: boolean }) {
             ...lines,
             {
               key: crypto.randomUUID(),
+              taxCodeId: null,
               description: "",
               quantity: "1",
               unitRate: "0.00",

@@ -20,6 +20,12 @@ export function AccountPicker({
     | "cost"
     | "prepayment"
     | "fixed-asset"
+    | "tax-code"
+    | "withholding-code"
+    | "tax-input"
+    | "tax-output"
+    | "withholding-receivable"
+    | "withholding-payable"
     | "supplier"
     | "supplier-advance"
     | "bill"
@@ -90,7 +96,12 @@ export function AccountPicker({
       setError("");
       try {
         const query = new URLSearchParams({
-          kind,
+          kind:
+            kind === "tax-code"
+              ? "INDIRECT"
+              : kind === "withholding-code"
+                ? "WITHHOLDING"
+                : kind,
           q,
           page: String(page),
           ...(type ? { type } : {}),
@@ -102,30 +113,56 @@ export function AccountPicker({
         });
         const response = await fetch(
           "/api/v1/finance/" +
-            ([
-              "bill",
-              "credit-bill",
-              "bill-line",
-              "supplier-advance-source",
-            ].includes(kind)
-              ? "supplier-options?"
+            (["tax-code", "withholding-code"].includes(kind)
+              ? "tax-codes?"
               : [
-                    "party",
-                    "supplier",
-                    "project",
-                    "invoice",
-                    "cash-account",
-                    "advance-source",
-                    "credit-invoice",
-                    "invoice-line",
+                    "bill",
+                    "credit-bill",
+                    "bill-line",
+                    "supplier-advance-source",
                   ].includes(kind)
-                ? "invoice-options?"
-                : "account-options?") +
+                ? "supplier-options?"
+                : [
+                      "party",
+                      "supplier",
+                      "project",
+                      "invoice",
+                      "cash-account",
+                      "advance-source",
+                      "credit-invoice",
+                      "invoice-line",
+                    ].includes(kind)
+                  ? "invoice-options?"
+                  : "account-options?") +
             query,
           { signal: abort.signal, cache: "no-store" },
         );
         const body = await response.json();
         if (!response.ok) throw new Error(body.error.message);
+        if (["tax-code", "withholding-code"].includes(kind))
+          body.data.items = body.data.items.map(
+            (i: {
+              id: string;
+              code: string;
+              name: string;
+              rate: string;
+              effectiveFrom: string;
+              effectiveTo: string | null;
+              mode: string;
+            }) => ({
+              ...i,
+              name:
+                i.name +
+                " · " +
+                i.rate +
+                "% · " +
+                i.mode +
+                " · " +
+                i.effectiveFrom +
+                " to " +
+                (i.effectiveTo ?? "open end"),
+            }),
+          );
         setResult(body.data);
       } catch (e) {
         if (!abort.signal.aborted)

@@ -77,7 +77,17 @@ export default async function Bill({
                   <td>
                     <MoneyCell value={l.discountAmount} />
                   </td>
-                  <td>{l.treatment}</td>
+                  <td>
+                    {l.treatment}
+                    {l.taxSnapshot && (
+                      <small>
+                        {" "}
+                        · Tax {(l.taxSnapshot as { code: string }).code} ·{" "}
+                        {(l.taxSnapshot as { rate: string }).rate}% ·{" "}
+                        {(l.taxSnapshot as { mode: string }).mode}
+                      </small>
+                    )}
+                  </td>
                   <td>
                     <MoneyCell value={l.totalAmount} />
                   </td>

@@ -12,6 +12,10 @@ import {
   type InvoiceAction,
 } from "./schemas";
 const errors: Record<string, string> = {
+ FINANCE_TAX_POLICY:"Choose an applicable reviewed tax/withholding policy for the posting date.",
+ FINANCE_TAX_MAPPING:"The tax policy or mapped accounts are inactive or invalid. Review the draft before posting.",
+ FINANCE_TAX_MISMATCH:"Tax snapshots, amounts and mapped journal must agree.",
+ FINANCE_CREDIT_TAX_ORDER:"A later taxed credit reserves the tax split. Correct it first or use a later posting date.",
   FINANCE_FORBIDDEN: "Finance access is unavailable.",
   FINANCE_REAUTH_REQUIRED: "Verify your password and authenticator again.",
   FINANCE_INVALID_INPUT: "Check the invoice fields.",

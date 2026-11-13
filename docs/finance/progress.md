@@ -2,7 +2,7 @@
 
 Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F17 complete: 17 of 48 finance milestones; 31 remain.** Current authorized scope continues through F25 on finance/f16-f25, with separate milestone commits/pushes. F16 adds bills/immediate paid expenses and cost/project splits. Latest observed checks: 219 distinct unit cases,355 PostgreSQL integration cases, one new Chromium bill journey, typing/lint and both production builds passed. Prior34 browser journeys will be rerun with the final scope. See [current delivery tracker](delivery-F16-F25.md). Current test schema34 additive migrations; live finance remains disabled.
+**F01–F18 complete: 18 of 48 finance milestones; 30 remain.** Current authorized scope continues through F25 on finance/f16-f25, with separate milestone commits/pushes. F16 adds bills/immediate paid expenses and cost/project splits. Latest observed checks: 219 distinct unit cases,355 PostgreSQL integration cases, one new Chromium bill journey, typing/lint and both production builds passed. Prior34 browser journeys will be rerun with the final scope. See [current delivery tracker](delivery-F16-F25.md). Current test schema34 additive migrations; live finance remains disabled.
 
 The following records describe the previously completed and merged F15 release:
 
@@ -30,3 +30,6 @@ Historical F01–F10 was merged through PR #1 at7d9ca2e on 12 November 2026. F11
 
 ## F17 development
 Supplier payments, advances, original-cost credits/refunds and dated corrections implemented. Latest focused regression96 and new Chromium journey passed. Current source test schema36, API89 paths. F18 next; no live financial migration or activation. F16 source68afc4b passed fresh-runner CI43445524244 with609 distinct tests (219unit+355integration+35browser).
+
+## F18 development
+Reviewed policy setup, inclusive/exclusive source taxes, original net/tax credits and evidenced settlement withholding implemented; all remain explicit and optional. No real rates or live enablement. Test schema43 and API91 paths;12 tax integration and225 unit checks passed. New browser policy/source/PDF/withholding journey passed5.5s. F19 next. F17 exact-source CI43447137270 passed626 tests on a fresh runner.

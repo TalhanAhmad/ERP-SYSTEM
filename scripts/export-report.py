@@ -18,6 +18,7 @@ f11_sources = ['docs/finance/delivery-F11.md','docs/finance/planning/days/F11.md
 focused_sources = ['docs/finance/delivery-F06-F10.md'] + [f'docs/finance/planning/days/F{n:02}.md' for n in range(6,11)] + ['docs/finance/accounting/ledger-core.md','docs/finance/testing/F06-F10-results.md']
 
 f16_f25_sources = ['docs/finance/delivery-F16-F25.md'] + [f'docs/finance/planning/days/F{n:02}.md' for n in range(16,26)]
+f16_f25_sources += ['docs/finance/accounting/taxes.md']
 main_sources += f16_f25_sources
 
 def report_xml(sources):

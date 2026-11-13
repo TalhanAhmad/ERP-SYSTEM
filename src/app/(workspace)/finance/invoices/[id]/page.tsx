@@ -81,7 +81,17 @@ export default async function Invoice({
                   <td>
                     <MoneyCell value={l.discountAmount} />
                   </td>
-                  <td>{l.recognition}</td>
+                  <td>
+                    {l.recognition}
+                    {l.taxSnapshot && (
+                      <small>
+                        {" "}
+                        · Tax {(l.taxSnapshot as { code: string }).code} ·{" "}
+                        {(l.taxSnapshot as { rate: string }).rate}% ·{" "}
+                        {(l.taxSnapshot as { mode: string }).mode}
+                      </small>
+                    )}
+                  </td>
                   <td>
                     <MoneyCell value={l.totalAmount} />
                   </td>

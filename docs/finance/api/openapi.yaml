@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova Finance Ledger, Setup and Invoices",
-    "version": "0.11.0",
-    "description": "Implemented F01\u2013F15: restricted ownership/setup, exact ledger, invoice UI/private PDFs, receipts, advances/applications, credit notes/refunds and dated settlement releases/reversals. Default disabled; no hosted finance launch. Current browser sessions, fresh password/hosted TOTP on writes, no public bootstrap or automatic client email. Tax/withholding and financial statements remain later milestones. F16 adds supplier bills, immediate paid expenses, cost/project splits and duplicate-reference/review safeguards; no automatic payroll. F17 adds typed supplier payments/advances/applications/credits/refunds and dated corrections; supplier refunds receive cash and clear a recoverable asset. Supplier fee amount is currently zero; withholding follows F18."
+    "title": "Encova Finance Sources, Tax and Withholding",
+    "version": "0.12.0",
+    "description": "Implemented F01\u2013F18: private selected-admin accounting with owner-reviewed tax policy, net/tax invoice and purchase posting, capped original-tax credits and evidenced customer/supplier withholding in gross settlements. Default disabled, no hosted financial launch, real tax rates or legal compliance claims. See source-bound accounting and progress evidence."
   },
   "security": [
     {
@@ -10261,6 +10261,206 @@
           }
         ]
       }
+    },
+    "/api/v1/finance/tax-codes": {
+      "get": {
+        "operationId": "taxCodeList",
+        "description": "Private current finance access; paginated company policies and current owner capability. Filters q/kind/active/page; kind ALL/INDIRECT/WITHHOLDING, active ALL/ACTIVE/RETIRED; page size25.",
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "List {data:{items,total,page,pages,pageSize,filters,totals}} or detail {data:{item,deferredEvents,history}}. item includes ordered lines, nullable entry and receivableEvents; no credential material. Unknown filters rejected, page clamped, exact totals cover all filtered documents."
+          }
+        }
+      },
+      "post": {
+        "operationId": "taxCodeCreate",
+        "description": "Fresh reauthentication, canonical Origin/CSRF, permanent key and current Finance Owner required. Create an explicit immutable effective-dated reviewed policy; separate mapped input/output controls. No automatic tax or legal compliance.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaxCodeCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Private current-owner tax policy result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/tax-codes/{id}/retire": {
+      "post": {
+        "operationId": "taxCodeRetire",
+        "description": "Current Finance Owner retires a code with fresh auth, CSRF, permanent key and reason. Original posted snapshots and existing date versions persist; new use cannot post.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaxCodeRetire"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Private current-owner tax policy result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCommandResult"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -10357,7 +10557,11 @@
               "INVESTMENT",
               "LOAN_RECEIVABLE",
               "LOAN_PAYABLE",
-              "DEFERRED_REVENUE"
+              "DEFERRED_REVENUE",
+              "TAX_INPUT",
+              "TAX_OUTPUT",
+              "WITHHOLDING_RECEIVABLE",
+              "WITHHOLDING_PAYABLE"
             ]
           },
           "currency": {
@@ -10468,7 +10672,11 @@
               "INVESTMENT",
               "LOAN_RECEIVABLE",
               "LOAN_PAYABLE",
-              "DEFERRED_REVENUE"
+              "DEFERRED_REVENUE",
+              "TAX_INPUT",
+              "TAX_OUTPUT",
+              "WITHHOLDING_RECEIVABLE",
+              "WITHHOLDING_PAYABLE"
             ]
           },
           "currency": {
@@ -11265,9 +11473,17 @@
               }
             ],
             "default": null
+          },
+          "taxCodeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
           }
         },
-        "description": "DEFERRED requires active liability DEFERRED_REVENUE control; EARNED requires null deferredAccountId. Revenue mapping always required. Server rounds quantity\u00d7rate HALF_UP first, subtracts explicit PKR discount not exceeding rounded gross. Zero lines retained but do not post. No tax inputs in F11."
+        "description": "Server rounds quantity \u00d7 rate HALF_UP first, subtracts the explicit discount, then applies the optional effective-dated company policy. No code means no tax. Taxed lines retain actual rate/mode/rounding/account snapshot; only net revenue is earned or deferred. Bill treatments use expense, prepayment or fixed-asset category mappings."
       },
       "InvoiceCreate": {
         "type": "object",
@@ -11361,7 +11577,7 @@
             "$ref": "#/components/schemas/Reauthentication"
           }
         },
-        "description": "Server generates immutable INV- plus 10-digit number. Client cannot submit number/totals/snapshot/actor. Active CLIENT/BOTH party; posting and due dates on/after invoiceDate. Totals recomputed independently in PostgreSQL. Tax zero is an unsupported-tax boundary, not an exemption claim."
+        "description": "Server generates the source number, exact net/tax/total amounts and private party/policy snapshots. Drafts only may be edited or voided. An applicable active optional tax policy is required at creation/edit and posting. Posted source, policy snapshot, dated subledger and exact journal remain immutable."
       },
       "InvoiceUpdate": {
         "type": "object",
@@ -11460,7 +11676,7 @@
             "minimum": 1
           }
         },
-        "description": "Server generates immutable INV- plus 10-digit number. Client cannot submit number/totals/snapshot/actor. Active CLIENT/BOTH party; posting and due dates on/after invoiceDate. Totals recomputed independently in PostgreSQL. Tax zero is an unsupported-tax boundary, not an exemption claim."
+        "description": "Server generates the source number, exact net/tax/total amounts and private party/policy snapshots. Drafts only may be edited or voided. An applicable active optional tax policy is required at creation/edit and posting. Posted source, policy snapshot, dated subledger and exact journal remain immutable."
       },
       "InvoiceAction": {
         "type": "object",
@@ -11629,6 +11845,18 @@
             ],
             "format": "uuid",
             "default": null
+          },
+          "withholdingCodeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "withholdingAmount": {
+            "$ref": "#/components/schemas/PkrAmount",
+            "default": "0.00"
           }
         },
         "required": [
@@ -11644,7 +11872,7 @@
           "reason",
           "reauth"
         ],
-        "description": "Cash plus explicit fees equals invoice allocations plus a server-computed unallocated advance. A CLIENT_ADVANCE account is required exactly when a remainder exists. No client computed totals/source/actor/number overrides."
+        "description": "Gross settlement = cash + explicit supported fees + evidenced withholding = invoice/bill allocations + unallocated advance. Positive withholding requires an applicable company-reviewed withholding code and mapped recoverable/customer or payable/supplier control; zero cash allowed when withholding is positive. No automatic statutory rate inference or filing."
       },
       "ReceiptUpdate": {
         "type": "object",
@@ -11749,6 +11977,18 @@
             ],
             "format": "uuid",
             "default": null
+          },
+          "withholdingCodeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "withholdingAmount": {
+            "$ref": "#/components/schemas/PkrAmount",
+            "default": "0.00"
           }
         },
         "required": [
@@ -11765,7 +12005,7 @@
           "reauth",
           "expectedVersion"
         ],
-        "description": "Positive cash; fee positive iff feeAccountId supplied; cash+fee equals positive distinct invoice settlements. Server recomputes exact totals. No withholding/tax/actor/number/total override."
+        "description": "Gross settlement = cash + explicit supported fees + evidenced withholding = invoice/bill allocations + unallocated advance. Positive withholding requires an applicable company-reviewed withholding code and mapped recoverable/customer or payable/supplier control; zero cash allowed when withholding is positive. No automatic statutory rate inference or filing."
       },
       "CustomerCommandResult": {
         "type": "object",
@@ -12473,9 +12713,17 @@
           "costAccountId": {
             "type": "string",
             "format": "uuid"
+          },
+          "taxCodeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
           }
         },
-        "description": "DEFERRED requires active liability DEFERRED_REVENUE control; EARNED requires null deferredAccountId. Revenue mapping always required. Server rounds quantity\u00d7rate HALF_UP first, subtracts explicit PKR discount not exceeding rounded gross. Zero lines retained but do not post. No tax inputs in F11."
+        "description": "Server rounds quantity \u00d7 rate HALF_UP first, subtracts the explicit discount, then applies the optional effective-dated company policy. No code means no tax. Taxed lines retain actual rate/mode/rounding/account snapshot; only net revenue is earned or deferred. Bill treatments use expense, prepayment or fixed-asset category mappings."
       },
       "BillCreate": {
         "type": "object",
@@ -12591,7 +12839,7 @@
             "format": "uuid"
           }
         },
-        "description": "Server generates immutable INV- plus 10-digit number. Client cannot submit number/totals/snapshot/actor. Active CLIENT/BOTH party; posting and due dates on/after billDate. Totals recomputed independently in PostgreSQL. Tax zero is an unsupported-tax boundary, not an exemption claim."
+        "description": "Server generates the source number, exact net/tax/total amounts and private party/policy snapshots. Drafts only may be edited or voided. An applicable active optional tax policy is required at creation/edit and posting. Posted source, policy snapshot, dated subledger and exact journal remain immutable."
       },
       "BillUpdate": {
         "type": "object",
@@ -12712,7 +12960,7 @@
             "format": "uuid"
           }
         },
-        "description": "Server generates immutable INV- plus 10-digit number. Client cannot submit number/totals/snapshot/actor. Active CLIENT/BOTH party; posting and due dates on/after billDate. Totals recomputed independently in PostgreSQL. Tax zero is an unsupported-tax boundary, not an exemption claim."
+        "description": "Server generates the source number, exact net/tax/total amounts and private party/policy snapshots. Drafts only may be edited or voided. An applicable active optional tax policy is required at creation/edit and posting. Posted source, policy snapshot, dated subledger and exact journal remain immutable."
       },
       "BillAction": {
         "type": "object",
@@ -12877,6 +13125,18 @@
             ],
             "format": "uuid",
             "default": null
+          },
+          "withholdingCodeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "withholdingAmount": {
+            "$ref": "#/components/schemas/PkrAmount",
+            "default": "0.00"
           }
         },
         "required": [
@@ -12892,7 +13152,7 @@
           "reason",
           "reauth"
         ],
-        "description": "Cash plus explicit fees equals bill allocations plus a server-computed unallocated advance. A SUPPLIER_ADVANCE account is required exactly when a remainder exists. No supplier computed totals/source/actor/number overrides."
+        "description": "Gross settlement = cash + explicit supported fees + evidenced withholding = invoice/bill allocations + unallocated advance. Positive withholding requires an applicable company-reviewed withholding code and mapped recoverable/customer or payable/supplier control; zero cash allowed when withholding is positive. No automatic statutory rate inference or filing."
       },
       "SupplierPaymentUpdate": {
         "type": "object",
@@ -12993,6 +13253,18 @@
             ],
             "format": "uuid",
             "default": null
+          },
+          "withholdingCodeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "withholdingAmount": {
+            "$ref": "#/components/schemas/PkrAmount",
+            "default": "0.00"
           }
         },
         "required": [
@@ -13009,7 +13281,7 @@
           "reauth",
           "expectedVersion"
         ],
-        "description": "Positive cash; fee positive iff feeAccountId supplied; cash+fee equals positive distinct bill settlements. Server recomputes exact totals. No withholding/tax/actor/number/total override."
+        "description": "Gross settlement = cash + explicit supported fees + evidenced withholding = invoice/bill allocations + unallocated advance. Positive withholding requires an applicable company-reviewed withholding code and mapped recoverable/customer or payable/supplier control; zero cash allowed when withholding is positive. No automatic statutory rate inference or filing."
       },
       "SupplierCommandResult": {
         "type": "object",
@@ -13662,6 +13934,137 @@
           "advanceAccountId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "TaxCodeCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "name",
+          "kind",
+          "effectiveFrom",
+          "rate",
+          "mode",
+          "rounding",
+          "inputAccountId",
+          "outputAccountId",
+          "policyEvidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9][A-Z0-9._-]{0,39}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "kind": {
+            "enum": [
+              "INDIRECT",
+              "WITHHOLDING"
+            ]
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "default": null
+          },
+          "rate": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,3})([.][0-9]{1,6})?$"
+          },
+          "mode": {
+            "enum": [
+              "EXCLUSIVE",
+              "INCLUSIVE"
+            ]
+          },
+          "rounding": {
+            "enum": [
+              "HALF_UP",
+              "DOWN"
+            ]
+          },
+          "inputAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "outputAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "policyEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "description": "Only current Finance Owner may create an immutable policy version. Explicit rate 0\u20131000%; separate recoverable and liability controls, effective date intervals cannot overlap for same code (even retired versions). Withholding mode EXCLUSIVE; settlement amounts are entered from evidence. No rates are seeded or statutory compliance inferred."
+      },
+      "TaxCodeRetire": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "TaxCommandResult": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "id",
+              "code",
+              "active"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "code": {
+                "type": "string"
+              },
+              "active": {
+                "type": "boolean"
+              }
+            }
           }
         }
       }

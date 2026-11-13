@@ -55,6 +55,8 @@ export const accountSchema = z
           "Group accounts cannot be controls, contra accounts or cash equivalents.",
       });
     const assetControls = [
+      "TAX_INPUT",
+      "WITHHOLDING_RECEIVABLE",
       "CASH",
       "RECEIVABLES",
       "SUPPLIER_ADVANCE",
@@ -64,6 +66,8 @@ export const accountSchema = z
       "LOAN_RECEIVABLE",
     ];
     const liabilityControls = [
+      "TAX_OUTPUT",
+      "WITHHOLDING_PAYABLE",
       "PAYABLES",
       "CLIENT_ADVANCE",
       "LOAN_PAYABLE",

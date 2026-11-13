@@ -80,6 +80,7 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ financeTaxCodes FinanceTaxCode[]
  supplierDocuments FinanceSupplierDocument[]
  financeBills FinanceBill[]
  customerDocuments FinanceCustomerDocument[]
@@ -192,6 +193,14 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ inputTaxCodes FinanceTaxCode[] @relation("TaxInput")
+ outputTaxCodes FinanceTaxCode[] @relation("TaxOutput")
+ taxedInvoiceLines FinanceInvoiceLine[] @relation("FinanceInvoiceLineTax")
+ taxedBillLines FinanceBillLine[] @relation("FinanceBillLineTax")
+ withheldCustomerDocuments FinanceCustomerDocument[] @relation("FinanceCustomerDocumentWithholding")
+ withheldSupplierDocuments FinanceSupplierDocument[] @relation("FinanceSupplierDocumentWithholding")
+ creditTaxSplits FinanceCreditTaxSplit[]
+
  supplierBalanceEvents FinanceSupplierBalanceEvent[]
  supplierAdvanceDocuments FinanceSupplierDocument[] @relation("SupplierAdvanceAccount")
  supplierFeeDocuments FinanceSupplierDocument[] @relation("SupplierFeeAccount")
@@ -447,6 +456,11 @@ model FinanceInvoice {
  @@index([state,postingDate,id])
 }
 model FinanceInvoiceLine {
+ taxCodeId String? @db.Uuid
+ taxCode FinanceTaxCode? @relation(fields:[taxCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ taxSnapshot Json?
+ taxAccountId String? @db.Uuid
+ taxAccount FinanceAccount? @relation("FinanceInvoiceLineTax",fields:[taxAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  customerCreditLines FinanceCustomerCreditLine[]
  creditEvents FinanceInvoiceCreditEvent[]
  id String @id @default(uuid()) @db.Uuid
@@ -1027,6 +1041,12 @@ model AppSession {
 }
 
 model FinanceCustomerDocument {
+ withholdingCodeId String? @db.Uuid
+ withholdingCode FinanceTaxCode? @relation(fields:[withholdingCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ withholdingSnapshot Json?
+ withholdingAmount Decimal @default(0) @db.Decimal(20,2)
+ withholdingAccountId String? @db.Uuid
+ withholdingAccount FinanceAccount? @relation("FinanceCustomerDocumentWithholding",fields:[withholdingAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  creditInvoiceId String? @db.Uuid
  creditInvoice FinanceInvoice? @relation("CustomerCreditInvoice",fields:[creditInvoiceId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  reversalOfId String? @unique @db.Uuid
@@ -1114,6 +1134,7 @@ model FinanceClientBalanceEvent {
 }
 
 model FinanceCustomerCreditLine {
+ taxSplit FinanceCreditTaxSplit?
  id String @id @default(uuid()) @db.Uuid
  documentId String @db.Uuid
  document FinanceCustomerDocument @relation(fields:[documentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -1187,6 +1208,11 @@ model FinanceBill {
  @@index([partyId,postingDate,id])
 }
 model FinanceBillLine {
+ taxCodeId String? @db.Uuid
+ taxCode FinanceTaxCode? @relation(fields:[taxCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ taxSnapshot Json?
+ taxAccountId String? @db.Uuid
+ taxAccount FinanceAccount? @relation("FinanceBillLineTax",fields:[taxAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  supplierCreditLines FinanceSupplierCreditLine[]
  creditEvents FinanceBillCreditEvent[]
  id String @id @default(uuid()) @db.Uuid
@@ -1230,6 +1256,12 @@ model FinancePayableEvent {
 }
 
 model FinanceSupplierDocument {
+ withholdingCodeId String? @db.Uuid
+ withholdingCode FinanceTaxCode? @relation(fields:[withholdingCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ withholdingSnapshot Json?
+ withholdingAmount Decimal @default(0) @db.Decimal(20,2)
+ withholdingAccountId String? @db.Uuid
+ withholdingAccount FinanceAccount? @relation("FinanceSupplierDocumentWithholding",fields:[withholdingAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  creditBillId String? @db.Uuid
  creditBill FinanceBill? @relation("SupplierCreditBill",fields:[creditBillId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  reversalOfId String? @unique @db.Uuid
@@ -1316,6 +1348,7 @@ model FinanceSupplierBalanceEvent {
 }
 
 model FinanceSupplierCreditLine {
+ taxSplit FinanceCreditTaxSplit?
  id String @id @default(uuid()) @db.Uuid
  documentId String @db.Uuid
  document FinanceSupplierDocument @relation(fields:[documentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -1346,4 +1379,41 @@ model FinanceBillCreditEvent {
  currency String @default("PKR")
  @@unique([supplierDocumentId,billLineId])
  @@index([billLineId,effectiveDate,id])
+}
+
+model FinanceTaxCode {
+ id String @id @default(uuid()) @db.Uuid
+ code String
+ name String
+ kind String
+ effectiveFrom DateTime @db.Date
+ effectiveTo DateTime? @db.Date
+ rate Decimal @db.Decimal(12,6)
+ mode String
+ rounding String
+ inputAccountId String @db.Uuid
+ inputAccount FinanceAccount @relation("TaxInput",fields:[inputAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ outputAccountId String @db.Uuid
+ outputAccount FinanceAccount @relation("TaxOutput",fields:[outputAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ policyEvidence String
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ active Boolean @default(true)
+ invoiceLines FinanceInvoiceLine[]
+ billLines FinanceBillLine[]
+ customerDocuments FinanceCustomerDocument[]
+ supplierDocuments FinanceSupplierDocument[]
+ @@unique([code,effectiveFrom])
+}
+model FinanceCreditTaxSplit {
+ id String @id @default(uuid()) @db.Uuid
+ customerCreditLineId String? @unique @db.Uuid
+ customerCreditLine FinanceCustomerCreditLine? @relation(fields:[customerCreditLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ supplierCreditLineId String? @unique @db.Uuid
+ supplierCreditLine FinanceSupplierCreditLine? @relation(fields:[supplierCreditLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ netAmount Decimal @db.Decimal(20,2)
+ taxAmount Decimal @db.Decimal(20,2)
+ taxAccountId String? @db.Uuid
+ taxAccount FinanceAccount? @relation(fields:[taxAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
 }

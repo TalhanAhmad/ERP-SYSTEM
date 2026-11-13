@@ -15,6 +15,7 @@ import {
 export const billLineSchema = z
   .object({
     description: z.string().trim().min(1).max(500),
+    taxCodeId: z.uuid().nullable().default(null),
     quantity: quantitySchema,
     unitRate: unitRateSchema,
     discountAmount: pkrAmountSchema.default("0.00"),

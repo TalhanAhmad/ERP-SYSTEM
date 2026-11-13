@@ -32,6 +32,9 @@ export function SupplierForm({
       item?.advanceAccountId ?? null,
     ),
     [bill, setBill] = useState<string | null>(item?.creditBillId ?? null);
+  const [withholding, setWithholding] = useState<string | null>(
+    item?.withholdingCodeId ?? null,
+  );
   const [allocations, setAllocations] = useState(
       () =>
         item?.allocations.map((a) => ({
@@ -68,6 +71,8 @@ export function SupplierForm({
         ...(item ? { expectedVersion: item.version } : {}),
         ...(isPayment
           ? {
+              withholdingCodeId: withholding,
+              withholdingAmount: String(f.get("withholdingAmount")),
               cashAccountId: cash,
               advanceAccountId: advance,
               feeAccountId: null,
@@ -252,6 +257,30 @@ export function SupplierForm({
               : []
           }
         />
+      )}
+      {isPayment && (
+        <>
+          <label>
+            Evidenced withholding (PKR)
+            <input
+              name="withholdingAmount"
+              inputMode="decimal"
+              required
+              defaultValue={item?.withholdingAmount ?? "0.00"}
+            />
+          </label>
+          <AccountPicker
+            kind="withholding-code"
+            label="Withholding policy"
+            value={withholding}
+            onChange={setWithholding}
+          />
+          <p>
+            Enter the withholding from settlement evidence. Cash, explicit fees
+            (when supported) and withholding together must equal bill/invoice
+            allocations plus any advance.
+          </p>
+        </>
       )}
       <label>
         Document description

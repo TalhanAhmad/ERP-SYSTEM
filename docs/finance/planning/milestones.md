@@ -21,7 +21,7 @@
 | [F15](days/F15.md) | Add customer credits, refunds, and settlement reversal tests | Complete |
 | [F16](days/F16.md) | Implement bills, immediate expenses, and category/project splits | Complete |
 | [F17](days/F17.md) | Implement supplier payments, advances, credits, and refunds | Complete |
-| [F18](days/F18.md) | Add configurable tax and withholding mappings with reviewed fixtures | Pending |
+| [F18](days/F18.md) | Add configurable tax and withholding mappings with reviewed fixtures | Complete |
 | [F19](days/F19.md) | Build private attachment upload, quarantine, download, and access tests | Pending |
 | [F20](days/F20.md) | Build cash register and transfers; verify internal-transfer exclusion | Pending |
 | [F21](days/F21.md) | Implement capital, distributions, and founder-funded company costs | Pending |

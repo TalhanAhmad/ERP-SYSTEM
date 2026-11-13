@@ -168,7 +168,8 @@ export async function ReceiptDetail({
         {resource === "RECEIPT" && (
           <p>
             Cash received <MoneyCell value={i.cashAmount} /> · Fees{" "}
-            <MoneyCell value={i.feeAmount} /> · Invoice settlements{" "}
+            <MoneyCell value={i.feeAmount} /> · Withholding{" "}
+            <MoneyCell value={i.withholdingAmount} /> · Invoice settlements{" "}
             <MoneyCell value={i.allocationAmount} /> · Held advance{" "}
             <MoneyCell value={i.advanceAmount} />
           </p>

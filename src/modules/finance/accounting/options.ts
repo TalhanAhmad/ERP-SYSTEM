@@ -7,6 +7,10 @@ import { accountTypes, reportGroups } from "./catalog";
 export const optionQuerySchema = z
   .object({
     kind: z.enum([
+      "tax-input",
+      "tax-output",
+      "withholding-receivable",
+      "withholding-payable",
       "supplier-advance",
       "payable",
       "cost",
@@ -41,6 +45,26 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           ? { controlType: "CASH", type: "ASSET", isContra: false }
           : {}),
       ...({
+        "tax-input": {
+          controlType: "TAX_INPUT",
+          type: "ASSET",
+          isContra: false,
+        },
+        "tax-output": {
+          controlType: "TAX_OUTPUT",
+          type: "LIABILITY",
+          isContra: false,
+        },
+        "withholding-receivable": {
+          controlType: "WITHHOLDING_RECEIVABLE",
+          type: "ASSET",
+          isContra: false,
+        },
+        "withholding-payable": {
+          controlType: "WITHHOLDING_PAYABLE",
+          type: "LIABILITY",
+          isContra: false,
+        },
         "supplier-advance": {
           controlType: "SUPPLIER_ADVANCE",
           type: "ASSET",
@@ -89,6 +113,10 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
         },
       }[
         query.kind as
+          | "tax-input"
+          | "tax-output"
+          | "withholding-receivable"
+          | "withholding-payable"
           | "supplier-advance"
           | "payable"
           | "cost"

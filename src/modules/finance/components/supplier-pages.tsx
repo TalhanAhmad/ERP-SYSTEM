@@ -173,7 +173,8 @@ export async function PaymentDetail({
         {resource === "PAYMENT" && (
           <p>
             Cash received <MoneyCell value={i.cashAmount} /> · Fees{" "}
-            <MoneyCell value={i.feeAmount} /> · Bill settlements{" "}
+            <MoneyCell value={i.feeAmount} /> · Withholding{" "}
+            <MoneyCell value={i.withholdingAmount} /> · Bill settlements{" "}
             <MoneyCell value={i.allocationAmount} /> · Held advance{" "}
             <MoneyCell value={i.advanceAmount} />
           </p>

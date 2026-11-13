@@ -8,6 +8,10 @@ import { requireFinanceEnabled, withFinanceAccess } from "../access/policy";
 import { consumeFinanceProof, type FinanceProof } from "../access/reauth";
 import { billSchemas, billQuerySchema, type BillAction } from "./schemas";
 const errors: Record<string, string> = {
+ FINANCE_TAX_POLICY:"Choose an applicable reviewed tax/withholding policy for the posting date.",
+ FINANCE_TAX_MAPPING:"The tax policy or mapped accounts are inactive or invalid. Review the draft before posting.",
+ FINANCE_TAX_MISMATCH:"Tax snapshots, amounts and mapped journal must agree.",
+ FINANCE_CREDIT_TAX_ORDER:"A later taxed credit reserves the tax split. Correct it first or use a later posting date.",
   FINANCE_DUPLICATE_REFERENCE:
     "This supplier reference already has a posted bill or expense. Open the original record.",
   FINANCE_DUPLICATE_REVIEW:
