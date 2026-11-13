@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Encova Finance Ledger, Setup and Invoices",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "description": "Implemented F01\u2013F11: access/ownership, accounts/periods, manual journals, masters and earned/deferred invoice backend. Finance defaults off. All responses including errors private/no-store, Vary Cookie. Invoice editor/private PDF is F12; receipts/recognition/credit notes/taxes/reports remain later milestones. Current verified sessions; no public bootstrap/recovery."
   },
   "security": [
@@ -3649,7 +3649,8 @@
                 "receivable",
                 "revenue",
                 "deferred",
-                "fee"
+                "fee",
+                "advance"
               ]
             },
             "required": true
@@ -4250,7 +4251,7 @@
     "/api/v1/finance/invoice-options": {
       "get": {
         "operationId": "invoiceOptions",
-        "description": "Current selected access. kind party/project/invoice/cash-account, optional q<=100/page1..10000; invoice requires partyId and returns posted positive available receivables for that party. All results bounded25/page with stable/clamped pagination. Private/no-store.",
+        "description": "Current selected access. kind party/project/invoice/cash-account, optional q<=100/page1..10000; invoice requires partyId and returns posted positive available receivables for that party. All results bounded25/page with stable/clamped pagination. Private/no-store. advance-source requires partyId and returns bounded positive posted receipt pools with current available decimal-string balance labels.",
         "responses": {
           "200": {
             "description": "data:{items:[{id,code,name}],total,page,pages}"
@@ -4701,6 +4702,497 @@
       "post": {
         "operationId": "voidReceipt",
         "description": "Current selected ACTIVE finance Super Admin, fresh password/hosted TOTP on writes, Origin/CSRF/key/six-per-minute reauth. Strict versioned typed receipt source, private/no-store. Partial/multi-invoice settlements cannot overdraw current or future dated balances. Cash/fees/allocations/GL/events/audit/receipt atomic. No new revenue or arbitrary control journal.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,number,version,journalId}} including replay; no duplicate accounting effects.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerCommandResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/advance-applications": {
+      "post": {
+        "operationId": "createAdvanceApplication",
+        "description": "Current selected finance access; fresh-auth/CSRF/key/version controls on writes. Apply one posted same-client advance pool to distinct eligible invoices; source and all effective-date capacities checked atomically. Debit client liability, credit AR; no new cash or revenue. Typed source/GL/pool/AR/audit/receipt commit together. Private/no-store.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canonical {data:{id,number,version,journalId}} including replay; no duplicate accounting effects.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listAdvanceApplications",
+        "description": "Current selected finance access; fresh-auth/CSRF/key/version controls on writes. Apply one posted same-client advance pool to distinct eligible invoices; source and all effective-date capacities checked atomically. Debit client liability, credit AR; no new cash or revenue. Typed source/GL/pool/AR/audit/receipt commit together. Private/no-store.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "POSTED",
+                "VOIDED"
+              ],
+              "default": "ALL"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Real ISO date, years 0001\u20139999. Posting uses open-period and Pakistan-time future-date checks."
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Real ISO date, years 0001\u20139999. Posting uses open-period and Pakistan-time future-date checks."
+            }
+          },
+          {
+            "name": "partyId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "List {data:{items,total,page,pages,pageSize,filters,totals}} or detail {data:{item,deferredEvents,history}}. item includes ordered lines, nullable entry and receivableEvents; no credential material. Unknown filters rejected, page clamped, exact totals cover all filtered documents."
+          }
+        }
+      }
+    },
+    "/api/v1/finance/advance-applications/{id}": {
+      "patch": {
+        "operationId": "updateAdvanceApplication",
+        "description": "Current selected finance access; fresh-auth/CSRF/key/version controls on writes. Apply one posted same-client advance pool to distinct eligible invoices; source and all effective-date capacities checked atomically. Debit client liability, credit AR; no new cash or revenue. Typed source/GL/pool/AR/audit/receipt commit together. Private/no-store.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,number,version,journalId}} including replay; no duplicate accounting effects.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerCommandResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getAdvanceApplication",
+        "description": "Current selected finance access; fresh-auth/CSRF/key/version controls on writes. Apply one posted same-client advance pool to distinct eligible invoices; source and all effective-date capacities checked atomically. Debit client liability, credit AR; no new cash or revenue. Typed source/GL/pool/AR/audit/receipt commit together. Private/no-store.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "List {data:{items,total,page,pages,pageSize,filters,totals}} or detail {data:{item,deferredEvents,history}}. item includes ordered lines, nullable entry and receivableEvents; no credential material. Unknown filters rejected, page clamped, exact totals cover all filtered documents."
+          }
+        }
+      }
+    },
+    "/api/v1/finance/advance-applications/{id}/post": {
+      "post": {
+        "operationId": "postAdvanceApplication",
+        "description": "Current selected finance access; fresh-auth/CSRF/key/version controls on writes. Apply one posted same-client advance pool to distinct eligible invoices; source and all effective-date capacities checked atomically. Debit client liability, credit AR; no new cash or revenue. Typed source/GL/pool/AR/audit/receipt commit together. Private/no-store.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,number,version,journalId}} including replay; no duplicate accounting effects.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerCommandResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/advance-applications/{id}/void": {
+      "post": {
+        "operationId": "voidAdvanceApplication",
+        "description": "Current selected finance access; fresh-auth/CSRF/key/version controls on writes. Apply one posted same-client advance pool to distinct eligible invoices; source and all effective-date capacities checked atomically. Debit client liability, credit AR; no new cash or revenue. Typed source/GL/pool/AR/audit/receipt commit together. Private/no-store.",
         "parameters": [
           {
             "name": "Origin",
@@ -6120,7 +6612,7 @@
           },
           "allocations": {
             "type": "array",
-            "minItems": 1,
+            "minItems": 0,
             "maxItems": 100,
             "items": {
               "type": "object",
@@ -6147,6 +6639,14 @@
           },
           "reauth": {
             "$ref": "#/components/schemas/Reauthentication"
+          },
+          "advanceAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
           }
         },
         "required": [
@@ -6162,7 +6662,7 @@
           "reason",
           "reauth"
         ],
-        "description": "Positive cash; fee positive iff feeAccountId supplied; cash+fee equals positive distinct invoice settlements. Server recomputes exact totals. No withholding/tax/actor/number/total override."
+        "description": "Cash plus explicit fees equals invoice allocations plus a server-computed unallocated advance. A CLIENT_ADVANCE account is required exactly when a remainder exists. No client computed totals/source/actor/number overrides."
       },
       "ReceiptUpdate": {
         "type": "object",
@@ -6228,7 +6728,7 @@
           },
           "allocations": {
             "type": "array",
-            "minItems": 1,
+            "minItems": 0,
             "maxItems": 100,
             "items": {
               "type": "object",
@@ -6259,6 +6759,14 @@
           "expectedVersion": {
             "type": "integer",
             "minimum": 1
+          },
+          "advanceAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
           }
         },
         "required": [
@@ -6304,7 +6812,7 @@
               },
               "number": {
                 "type": "string",
-                "pattern": "^RCP-[0-9]{10}$"
+                "pattern": "^(RCP|AAP)-[0-9]{10}$"
               },
               "journalId": {
                 "anyOf": [
@@ -6320,6 +6828,193 @@
             }
           }
         }
+      },
+      "ApplicationCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "partyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "documentDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "currency": {
+            "const": "PKR",
+            "default": "PKR"
+          },
+          "allocations": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "invoiceId",
+                "amount"
+              ],
+              "properties": {
+                "invoiceId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "amount": {
+                  "$ref": "#/components/schemas/PkrAmount"
+                }
+              }
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "sourceDocumentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "reference",
+          "partyId",
+          "sourceDocumentId",
+          "documentDate",
+          "postingDate",
+          "description",
+          "evidence",
+          "allocations",
+          "reason",
+          "reauth"
+        ]
+      },
+      "ApplicationUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "partyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "documentDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "currency": {
+            "const": "PKR",
+            "default": "PKR"
+          },
+          "allocations": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "invoiceId",
+                "amount"
+              ],
+              "properties": {
+                "invoiceId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "amount": {
+                  "$ref": "#/components/schemas/PkrAmount"
+                }
+              }
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "sourceDocumentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "reference",
+          "partyId",
+          "sourceDocumentId",
+          "documentDate",
+          "postingDate",
+          "description",
+          "evidence",
+          "allocations",
+          "reason",
+          "reauth",
+          "expectedVersion"
+        ]
       }
     }
   }

@@ -112,7 +112,7 @@ test("selected administrator receives cash against multiple invoices with an exp
       .getByLabel("Fee expense account", { exact: true })
       .selectOption(fee.id);
     await form
-      .getByLabel("Receipt description")
+      .getByLabel("Document description")
       .fill("Actual synthetic bank collection");
     await form
       .getByLabel("Supporting evidence reference")

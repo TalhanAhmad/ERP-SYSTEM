@@ -5,7 +5,7 @@ import {
   versionSchema,
 } from "../../accounting/schemas";
 import { pkrAmountSchema, sumPkrLines } from "../../accounting/money";
-export type CustomerResource = "RECEIPT";
+export type CustomerResource = "RECEIPT" | "ADVANCE_APPLICATION";
 export const allocationSchema = z
   .object({
     invoiceId: z.uuid(),
@@ -20,6 +20,7 @@ export const receiptSchema = z
     reference: z.string().trim().min(1).max(80),
     partyId: z.uuid(),
     cashAccountId: z.uuid(),
+    advanceAccountId: z.uuid().nullable().default(null),
     feeAccountId: z.uuid().nullable().default(null),
     projectId: z.uuid().nullable().default(null),
     documentDate: accountingDateSchema,
@@ -32,7 +33,7 @@ export const receiptSchema = z
       "Cash received must be positive.",
     ),
     feeAmount: pkrAmountSchema.default("0.00"),
-    allocations: z.array(allocationSchema).min(1).max(100),
+    allocations: z.array(allocationSchema).max(100),
     reason: reasonSchema,
   })
   .strict()
@@ -59,9 +60,13 @@ export const receiptSchema = z
         message: "Combine allocations to the same invoice.",
       });
     try {
+      const total = sumPkrLines([d.cashAmount, d.feeAmount]),
+        applied = sumPkrLines(d.allocations.map((a) => a.amount));
+      const cashCents = BigInt(total.replace(".", "")),
+        appliedCents = BigInt(applied.replace(".", ""));
       if (
-        sumPkrLines([d.cashAmount, d.feeAmount]) !==
-        sumPkrLines(d.allocations.map((a) => a.amount))
+        appliedCents > cashCents ||
+        cashCents > appliedCents !== (d.advanceAccountId !== null)
       )
         throw new Error();
     } catch {
@@ -69,7 +74,48 @@ export const receiptSchema = z
         code: "custom",
         path: ["allocations"],
         message:
-          "Invoice settlements must equal cash received plus explicit fees, within the supported PKR range.",
+          "Settlements cannot exceed cash plus fees. Select a client advance account exactly when money remains unallocated.",
+      });
+    }
+  });
+export const applicationSchema = z
+  .object({
+    reference: z.string().trim().min(1).max(80),
+    partyId: z.uuid(),
+    sourceDocumentId: z.uuid(),
+    projectId: z.uuid().nullable().default(null),
+    documentDate: accountingDateSchema,
+    postingDate: accountingDateSchema,
+    description: z.string().trim().min(1).max(1000),
+    evidence: z.string().trim().min(3).max(1000),
+    currency: z.literal("PKR").default("PKR"),
+    allocations: z.array(allocationSchema).min(1).max(100),
+    reason: reasonSchema,
+  })
+  .strict()
+  .superRefine((d, c) => {
+    if (d.postingDate < d.documentDate)
+      c.addIssue({
+        code: "custom",
+        path: ["postingDate"],
+        message: "Posting cannot precede application date.",
+      });
+    if (
+      new Set(d.allocations.map((a) => a.invoiceId)).size !==
+      d.allocations.length
+    )
+      c.addIssue({
+        code: "custom",
+        path: ["allocations"],
+        message: "Combine allocations to the same invoice.",
+      });
+    try {
+      sumPkrLines(d.allocations.map((a) => a.amount));
+    } catch {
+      c.addIssue({
+        code: "custom",
+        path: ["allocations"],
+        message: "Total exceeds the supported PKR range.",
       });
     }
   });
@@ -77,10 +123,10 @@ const actionSchema = z
   .object({ expectedVersion: versionSchema, reason: reasonSchema })
   .strict();
 export const customerSchemas = (resource: CustomerResource) => {
-  if (resource !== "RECEIPT") throw new Error("Unsupported customer resource");
+  const schema = resource === "RECEIPT" ? receiptSchema : applicationSchema;
   return {
-    CREATE: receiptSchema,
-    UPDATE: receiptSchema.safeExtend({ expectedVersion: versionSchema }),
+    CREATE: schema,
+    UPDATE: schema.safeExtend({ expectedVersion: versionSchema }),
     POST: actionSchema,
     VOID: actionSchema,
   };

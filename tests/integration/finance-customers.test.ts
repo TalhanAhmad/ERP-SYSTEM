@@ -681,3 +681,269 @@ it("executes the checked receipt adapter under encova_app while helper/table/seq
     await sql.end();
   }
 });
+async function advanceAccount() {
+  return account({
+    type: "LIABILITY",
+    normalSide: "CREDIT",
+    reportGroup: "CURRENT_LIABILITIES",
+    controlType: "CLIENT_ADVANCE",
+  });
+}
+async function application(
+  action: Parameters<typeof customerCommand>[3],
+  input: unknown,
+  key = crypto.randomUUID(),
+  who = "owner",
+) {
+  const v = await proof(who);
+  return customerCommand(
+    v.actor,
+    v.proof,
+    "ADVANCE_APPLICATION",
+    action,
+    input,
+    key,
+  );
+}
+const applicationBody = (
+  sourceDocumentId: string,
+  allocations: { invoiceId: string; amount: string }[],
+  patch: Record<string, unknown> = {},
+) => ({
+  reference: prefix + ".AAP" + ++count,
+  partyId: client,
+  sourceDocumentId,
+  projectId: null,
+  documentDate: period.start,
+  postingDate: period.start,
+  description: "Apply held client advance",
+  evidence: "Synthetic allocation authorization",
+  currency: "PKR",
+  allocations,
+  reason: "Reviewed advance application",
+  ...patch,
+});
+it("holds an unallocated advance as liability and applies it later without a second cash movement", async () => {
+  const liability = await advanceAccount(),
+    r = await postReceipt(
+      receipt([], "50000", { advanceAccountId: liability }),
+    ),
+    i = await invoice("300000"),
+    a = await application(
+      "CREATE",
+      applicationBody(r.item.id, [{ invoiceId: i.id, amount: "20000" }]),
+    );
+  await application("POST", {
+    id: a.id,
+    expectedVersion: 1,
+    reason: "Apply part of held money",
+  });
+  const v = await customerDetail(people.selected, "ADVANCE_APPLICATION", a.id);
+  expect(
+    v.item.entry!.lines.map((l) => [l.accountId, l.debit, l.credit]),
+  ).toEqual([
+    [liability, "20000.00", "0.00"],
+    [ar, "0.00", "20000.00"],
+  ]);
+  expect(v.availableAdvance).toBe("30000.00");
+  expect(await outstanding(i.id)).toBe("280000.00");
+  expect(
+    (await customerDetail(people.owner, "RECEIPT", r.item.id)).item
+      .advanceAmount,
+  ).toBe("50000.00");
+});
+it("splits a mixed receipt into invoice settlement and client advance exactly once", async () => {
+  const liability = await advanceAccount(),
+    i = await invoice("100"),
+    r = await postReceipt(
+      receipt([{ invoiceId: i.id, amount: "60" }], "100", {
+        advanceAccountId: liability,
+      }),
+    );
+  expect(r.item).toMatchObject({
+    cashAmount: "100.00",
+    allocationAmount: "60.00",
+    advanceAmount: "40.00",
+    totalAmount: "100.00",
+  });
+  expect(r.availableAdvance).toBe("40.00");
+  expect(await outstanding(i.id)).toBe("40.00");
+  expect(r.item.entry!.lines.map((l) => l.accountId)).toEqual([
+    cash,
+    ar,
+    liability,
+  ]);
+});
+it("prevents concurrent advance applications from overdrawing a source pool", async () => {
+  const liability = await advanceAccount(),
+    r = await postReceipt(receipt([], "50", { advanceAccountId: liability })),
+    i = await invoice("100"),
+    a = await application(
+      "CREATE",
+      applicationBody(r.item.id, [{ invoiceId: i.id, amount: "40" }]),
+    ),
+    b = await application(
+      "CREATE",
+      applicationBody(r.item.id, [{ invoiceId: i.id, amount: "40" }]),
+    );
+  const results = await Promise.allSettled(
+    [a, b].map((d) =>
+      application("POST", {
+        id: d.id,
+        expectedVersion: 1,
+        reason: "Concurrent pool reservation",
+      }),
+    ),
+  );
+  expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+  expect(
+    (await customerDetail(people.owner, "RECEIPT", r.item.id)).availableAdvance,
+  ).toBe("10.00");
+});
+it("reserves future pool applications when a new application is backdated", async () => {
+  const liability = await advanceAccount(),
+    r = await postReceipt(receipt([], "100", { advanceAccountId: liability })),
+    i = await invoice("100"),
+    day = (n: number) =>
+      new Date(new Date(period.start).getTime() + n * 86400000)
+        .toISOString()
+        .slice(0, 10),
+    a = await application(
+      "CREATE",
+      applicationBody(r.item.id, [{ invoiceId: i.id, amount: "40" }], {
+        documentDate: day(5),
+        postingDate: day(5),
+      }),
+    );
+  await application("POST", {
+    id: a.id,
+    expectedVersion: 1,
+    reason: "Later effective application",
+  });
+  const b = await application(
+    "CREATE",
+    applicationBody(r.item.id, [{ invoiceId: i.id, amount: "80" }], {
+      documentDate: day(1),
+      postingDate: day(1),
+    }),
+  );
+  await expect(
+    application("POST", {
+      id: b.id,
+      expectedVersion: 1,
+      reason: "Reject backdated pool overdraw",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_ADVANCE_UNAVAILABLE" });
+});
+it("rejects another party's pool, unposted sources and pre-receipt application dates", async () => {
+  const liability = await advanceAccount(),
+    i = await invoice("100"),
+    other = await party(),
+    late = period.end;
+  const r = await postReceipt(
+      receipt([], "100", { advanceAccountId: liability, postingDate: late }),
+    ),
+    draft = await customer(
+      "CREATE",
+      receipt([], "100", { advanceAccountId: liability }),
+    );
+  for (const input of [
+    applicationBody(r.item.id, [{ invoiceId: i.id, amount: "10" }], {
+      partyId: other,
+    }),
+    applicationBody(draft.id, [{ invoiceId: i.id, amount: "10" }]),
+    applicationBody(r.item.id, [{ invoiceId: i.id, amount: "10" }]),
+  ]) {
+    const d = await application("CREATE", input);
+    await expect(
+      application("POST", {
+        id: d.id,
+        expectedVersion: 1,
+        reason: "Invalid advance source",
+      }),
+    ).rejects.toMatchObject({ code: "FINANCE_ADVANCE_UNAVAILABLE" });
+  }
+});
+it("applies retained advance after source bank archive and preserves immutable fund events", async () => {
+  const liability = await advanceAccount(),
+    cashGl = await account({ controlType: "CASH" }),
+    b = (
+      await master("CASH_CREATE", {
+        name: prefix + " retained bank",
+        kind: "BANK",
+        glAccountId: cashGl,
+        currency: "PKR",
+        reason: "Synthetic retained source bank",
+      })
+    ).id,
+    r = await postReceipt(
+      receipt([], "100", { cashAccountId: b, advanceAccountId: liability }),
+    ),
+    i = await invoice("100");
+  await master("CASH_ARCHIVE", {
+    id: b,
+    expectedVersion: 1,
+    reason: "Retain old source bank",
+  });
+  const a = await application(
+    "CREATE",
+    applicationBody(r.item.id, [{ invoiceId: i.id, amount: "10" }]),
+  );
+  await application("POST", {
+    id: a.id,
+    expectedVersion: 1,
+    reason: "Apply existing held balance",
+  });
+  await expect(
+    db.financeClientBalanceEvent.deleteMany({
+      where: { sourceDocumentId: r.item.id },
+    }),
+  ).rejects.toThrow();
+  expect(
+    (await customerDetail(people.owner, "RECEIPT", r.item.id)).availableAdvance,
+  ).toBe("90.00");
+});
+it("replays application posting without duplicating AR or pool events", async () => {
+  const liability = await advanceAccount(),
+    r = await postReceipt(receipt([], "100", { advanceAccountId: liability })),
+    i = await invoice("100"),
+    a = await application(
+      "CREATE",
+      applicationBody(r.item.id, [{ invoiceId: i.id, amount: "10" }]),
+    ),
+    key = crypto.randomUUID(),
+    input = {
+      id: a.id,
+      expectedVersion: 1,
+      reason: "Permanent application replay",
+    };
+  expect(await application("POST", input, key)).toEqual(
+    await application("POST", input, key),
+  );
+  expect(
+    await db.financeClientBalanceEvent.count({ where: { documentId: a.id } }),
+  ).toBe(1);
+  expect(await outstanding(i.id)).toBe("90.00");
+});
+it("denies runtime direct balance mutation and private capacity helper after setup replay", async () => {
+  const sql = new pg.Client({ connectionString: url });
+  await sql.connect();
+  try {
+    await sql.query(await readFile("supabase/setup.sql", "utf8"));
+    await sql.query("SET ROLE encova_app");
+    for (const statement of [
+      'DELETE FROM "FinanceClientBalanceEvent"',
+      `SELECT encova_finance_client_capacity('${crypto.randomUUID()}',DATE '${period.start}')`,
+    ])
+      await expect(sql.query(statement)).rejects.toMatchObject({
+        code: "42501",
+      });
+    await sql.query("RESET ROLE");
+    await sql.query("SET ROLE authenticated");
+    await expect(
+      sql.query('SELECT * FROM "FinanceClientBalanceEvent"'),
+    ).rejects.toMatchObject({ code: "42501" });
+  } finally {
+    await sql.end();
+  }
+});

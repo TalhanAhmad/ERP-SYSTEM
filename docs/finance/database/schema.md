@@ -42,3 +42,8 @@ Invoice numbering uses a private bounded NO CYCLE sequence, not count+1. Its gap
 FinanceCustomerDocument stores typed receipt headers, exact cash/fee/settlement values, dates, retained numbers, state/version and frozen posted party snapshot. FinanceCustomerAllocation links one receipt to positive allocations over 1–100 distinct invoices. FinanceJournalEntry adds a constrained unique customerDocumentId source. FinanceReceivableEvent adds typed negative RECEIPT events linked to the document; initial positive INVOICE matching remains separately checked. No authoritative mutable balance is stored.
 
 Commit-time expected-line/event checks reject missing/extra/mismatched source effects and any negative dated invoice balance. Current active mapped bank/cash and ordinary expense accounts are rechecked at posting. Source/journal/events freeze after posting. The runtime can SELECT and call the checked customer command; private expected-line/emitter/capacity helpers and numbering sequence stay inaccessible. Ordinary ERP DTOs do not expose these relations.
+
+
+## F14 client advance pools
+
+FinanceCustomerDocument adds typed sourceDocumentId/advanceAccountId and exact advanceAmount. RECEIPT may issue a client-advance pool with unallocated/mixed cash; ADVANCE_APPLICATION references one original pool and one or more invoices. FinanceClientBalanceEvent binds each immutable signed event to its document, original source, party, liability account, journal and effective date. RECEIVED increases a pool; APPLIED reduces it. Expected GL/source/event and nonnegative dated balances are checked at commit. Pool usage never creates duplicate bank movement or revenue. Narrow SELECT/command privileges and Data API denial apply after runtime setup replay.

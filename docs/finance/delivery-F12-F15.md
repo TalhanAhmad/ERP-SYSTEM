@@ -20,7 +20,11 @@ Additive migration29 creates empty typed receipt sources/allocations and extends
 
 ## F14 — client advances and later application
 
-Pending.
+Receipts may now hold all or part of actual client money as a protected CLIENT_ADVANCE liability. Typed immutable client-balance events identify the original receipt pool. Advance applications transfer liability to eligible invoice receivables in one atomic source/journal/event transaction, with no second cash entry. Source/date/party/account and every later effective pool/invoice balance are checked; concurrent and backdated applications cannot overdraw. Private searchable source choices and versioned editor/register/detail expose the current available held balance.
+
+Full backend regression passed214 unit/322 integration tests. All11 finance Chromium journeys passed in36.3 seconds (new advance journey3.6 seconds), including prior invoice/PDF/receipt/access/ledger/setup regressions and mobile WCAG/overflow. Strict typing/lint and local production build passed; Supabase-mode production build also passed with synthetic configuration only. New focused source/application checks passed27 cases. F13 source1e8c8dc4e5d95ee6db36c950a59e71f06695bd40 passed CI43409706332 with the complete fresh-database suite.
+
+Additive migration32 introduces the empty typed client-balance event schema and extends source/command checks. First DDL attempt failed CASE-expression parsing and rolled back transactionally; corrected the unapplied SQL, validated all DDL in an explicitly rolled-back transaction, marked only that failed migration attempt rolled back and applied successfully. No reset or applied checksum rewrite. Test schema32 migrations; no hosted changes.
 
 ## F15 — credits, refunds and settlement reversals
 

@@ -17,7 +17,7 @@
 | [F11](days/F11.md) | Implement earned/deferred invoice schema and posting services | Complete |
 | [F12](days/F12.md) | Build invoice screens, lines, previews, and private printable invoice | Complete |
 | [F13](days/F13.md) | Implement receipts and partial/multiple invoice allocations | Complete |
-| [F14](days/F14.md) | Implement client advances and later application without duplicate cash | Pending |
+| [F14](days/F14.md) | Implement client advances and later application without duplicate cash | Complete |
 | [F15](days/F15.md) | Add customer credits, refunds, and settlement reversal tests | Pending |
 | [F16](days/F16.md) | Implement bills, immediate expenses, and category/project splits | Pending |
 | [F17](days/F17.md) | Implement supplier payments, advances, credits, and refunds | Pending |

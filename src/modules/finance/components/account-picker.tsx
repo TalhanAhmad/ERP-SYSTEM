@@ -24,7 +24,9 @@ export function AccountPicker({
     | "project"
     | "invoice"
     | "cash-account"
-    | "fee";
+    | "fee"
+    | "advance"
+    | "advance-source";
   label: string;
   value: string | null;
   onChange: (id: string | null) => void;
@@ -64,7 +66,13 @@ export function AccountPicker({
         });
         const response = await fetch(
           "/api/v1/finance/" +
-            (["party", "project", "invoice", "cash-account"].includes(kind)
+            ([
+              "party",
+              "project",
+              "invoice",
+              "cash-account",
+              "advance-source",
+            ].includes(kind)
               ? "invoice-options?"
               : "account-options?") +
             query,

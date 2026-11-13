@@ -2,7 +2,7 @@
 
 Updated: 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F13 complete: 13 of 48 finance milestones; 35 remain.** F12 adds invoice screens/private PDF and F13 receipts/partial/multiple allocations. Current user request authorizes F14 advances and F15 credits/refunds/reversals next, with a separate commit/push for each. See [current delivery record](delivery-F12-F15.md). F11 evidence below remains historical.
+**F01–F14 complete: 14 of 48 finance milestones; 34 remain.** F12 adds invoice screens/private PDF and F13 receipts/partial/multiple allocations. F14 adds client advances and later applications without duplicate cash. Current user request authorizes F15 credits/refunds/reversals next, with a separate commit/push for each. See [current delivery record](delivery-F12-F15.md). F11 evidence below remains historical.
 
 F11 introduces typed invoice/line sources, exact per-line discounts/rounding, nonreused server numbers and private create/edit/post/void/register/detail APIs. One private emitter now handles manual journals and invoices. Posting atomically writes AR debit and earned/deferred credits, frozen contact evidence, dated receivable/BILLED events, usage and restricted permanent receipt/audit. Posted sources/events are immutable; generic journals cannot bypass deferred recognition controls. See [F11 delivery](delivery-F11.md), [exact results](testing/F11-results.md) and [invoice design](accounting/invoices.md).
 

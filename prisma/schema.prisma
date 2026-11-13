@@ -190,6 +190,8 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ clientBalanceEvents FinanceClientBalanceEvent[]
+ customerAdvanceDocuments FinanceCustomerDocument[] @relation("CustomerAdvanceAccount")
  customerFeeDocuments FinanceCustomerDocument[] @relation("CustomerFeeAccount")
  id String @id @default(uuid()) @db.Uuid
  code String @unique
@@ -282,6 +284,7 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ clientBalanceEvents FinanceClientBalanceEvent[]
  customerDocumentId String? @unique @db.Uuid
  customerDocument FinanceCustomerDocument? @relation(fields:[customerDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
 
@@ -344,6 +347,7 @@ model FinanceLedgerReceipt {
 }
 
 model FinanceParty {
+ clientBalanceEvents FinanceClientBalanceEvent[]
  customerDocuments FinanceCustomerDocument[]
  id String @id @default(uuid()) @db.Uuid
  name String
@@ -988,6 +992,15 @@ model AppSession {
 }
 
 model FinanceCustomerDocument {
+ sourceDocumentId String? @db.Uuid
+ sourceDocument FinanceCustomerDocument? @relation("CustomerSource",fields:[sourceDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ applications FinanceCustomerDocument[] @relation("CustomerSource")
+ advanceAccountId String? @db.Uuid
+ advanceAccount FinanceAccount? @relation("CustomerAdvanceAccount",fields:[advanceAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ advanceAmount Decimal @default(0) @db.Decimal(20,2)
+ balanceEvents FinanceClientBalanceEvent[] @relation("CustomerBalanceEvent")
+ sourceBalanceEvents FinanceClientBalanceEvent[] @relation("CustomerBalanceSource")
+
  id String @id @default(uuid()) @db.Uuid
  number String @unique @default(dbgenerated("('RCP-'::text || lpad(nextval('public.finance_customer_number'::regclass)::text, 10, '0'::text))"))
  kind String
@@ -1031,4 +1044,23 @@ model FinanceCustomerAllocation {
  amount Decimal @db.Decimal(20,2)
  @@unique([documentId,invoiceId])
  @@unique([documentId,sequence])
+}
+
+model FinanceClientBalanceEvent {
+ id String @id @default(uuid()) @db.Uuid
+ documentId String @unique @db.Uuid
+ document FinanceCustomerDocument @relation("CustomerBalanceEvent",fields:[documentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sourceDocumentId String @db.Uuid
+ sourceDocument FinanceCustomerDocument @relation("CustomerBalanceSource",fields:[sourceDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ partyId String @db.Uuid
+ party FinanceParty @relation(fields:[partyId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ accountId String @db.Uuid
+ account FinanceAccount @relation(fields:[accountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalId String @db.Uuid
+ journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ effectiveDate DateTime @db.Date
+ kind String
+ amount Decimal @db.Decimal(20,2)
+ currency String @default("PKR")
+ @@index([sourceDocumentId,effectiveDate,id])
 }

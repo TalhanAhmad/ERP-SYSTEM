@@ -12,6 +12,10 @@ import {
   type CustomerResource,
 } from "./schemas";
 const errors: Record<string, string> = {
+  FINANCE_ADVANCE_UNAVAILABLE:
+    "The source advance is unavailable or has insufficient eligible dated balance.",
+  FINANCE_CLIENT_BALANCE_MISMATCH:
+    "Client advance history must match its source journal.",
   FINANCE_CUSTOMER_IMMUTABLE: "Only drafts can be edited or voided.",
   FINANCE_CUSTOMER_TOTALS: "Receipt totals and allocations must agree.",
   FINANCE_CUSTOMER_MAPPING:
@@ -131,6 +135,7 @@ function dto<
     feeAmount: Prisma.Decimal;
     allocationAmount: Prisma.Decimal;
     totalAmount: Prisma.Decimal;
+    advanceAmount: Prisma.Decimal;
     documentDate: Date;
     postingDate: Date;
   },
@@ -141,6 +146,7 @@ function dto<
     feeAmount: d.feeAmount.toFixed(2),
     allocationAmount: d.allocationAmount.toFixed(2),
     totalAmount: d.totalAmount.toFixed(2),
+    advanceAmount: d.advanceAmount.toFixed(2),
     documentDate: date(d.documentDate),
     postingDate: date(d.postingDate),
   };
@@ -156,6 +162,17 @@ export async function customerDetail(
     const d = await tx.financeCustomerDocument.findFirst({
       where: { id, kind: resource },
       include: {
+        sourceDocument: { select: { number: true } },
+        advanceAccount: { select: { code: true, name: true } },
+        balanceEvents: {
+          select: {
+            id: true,
+            sourceDocumentId: true,
+            effectiveDate: true,
+            kind: true,
+            amount: true,
+          },
+        },
         party: {
           select: {
             name: true,
@@ -200,9 +217,19 @@ export async function customerDetail(
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: 50,
     });
+    const available = await tx.financeClientBalanceEvent.aggregate({
+      where: { sourceDocumentId: d.sourceDocumentId ?? d.id },
+      _sum: { amount: true },
+    });
     return {
+      availableAdvance: available._sum.amount?.toFixed(2) ?? "0.00",
       item: {
         ...dto(d),
+        balanceEvents: d.balanceEvents.map((e) => ({
+          ...e,
+          amount: e.amount.toFixed(2),
+          effectiveDate: date(e.effectiveDate),
+        })),
         allocations: d.allocations.map((a) => ({
           ...a,
           amount: a.amount.toFixed(2),

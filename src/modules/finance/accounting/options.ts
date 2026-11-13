@@ -14,6 +14,7 @@ export const optionQuerySchema = z
       "revenue",
       "deferred",
       "fee",
+      "advance",
     ]),
     q: z.string().trim().max(100).default(""),
     page: z.coerce.number().int().min(1).max(10000).default(1),
@@ -45,6 +46,11 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           type: { in: ["INCOME", "OTHER_INCOME"] },
           isContra: false,
         },
+        advance: {
+          controlType: "CLIENT_ADVANCE",
+          type: "LIABILITY",
+          isContra: false,
+        },
         fee: {
           controlType: "NONE",
           type: { in: ["DIRECT_COST", "OPERATING_EXPENSE", "OTHER_EXPENSE"] },
@@ -55,7 +61,9 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           type: "LIABILITY",
           isContra: false,
         },
-      }[query.kind as "receivable" | "revenue" | "deferred" | "fee"] ?? {}),
+      }[
+        query.kind as "receivable" | "revenue" | "deferred" | "fee" | "advance"
+      ] ?? {}),
       ...(query.type ? { type: query.type } : {}),
       ...(query.group ? { reportGroup: query.group } : {}),
       ...(query.exclude ? { id: { not: query.exclude } } : {}),

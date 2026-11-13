@@ -37,6 +37,8 @@ for (const [username, role] of [
   ["e2e.finance.invoices", "SUPER_ADMIN"],
   ["e2e.finance.invoice.ui", "SUPER_ADMIN"],
   ["e2e.finance.receipt.ui", "SUPER_ADMIN"],
+  ["e2e.finance.advance.ui", "SUPER_ADMIN"],
+  ["e2e.finance.advance.writer", "SUPER_ADMIN"],
   ["e2e.finance.receipt.writer", "SUPER_ADMIN"],
   ["e2e.finance.invoice.writer", "SUPER_ADMIN"],
 ] as const) {
@@ -65,6 +67,7 @@ for (const username of [
   "e2e.finance.writer",
   "e2e.finance.invoice.writer",
   "e2e.finance.receipt.writer",
+  "e2e.finance.advance.writer",
 ]) {
   const financePerson = await db.person.findUniqueOrThrow({
     where: { username },

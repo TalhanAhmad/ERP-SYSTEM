@@ -1,4 +1,6 @@
 "use client";
+import { customerResources } from "../receivables/customer/resources";
+import type { CustomerResource } from "../receivables/customer/schemas";
 import { useState } from "react";
 import type { customerDetail } from "../receivables/customer/service";
 import { FinanceActionForm } from "./finance-action-form";
@@ -7,10 +9,19 @@ type Customer = Awaited<ReturnType<typeof customerDetail>>["item"];
 export function CustomerForm({
   item,
   hosted,
+  resource = "RECEIPT",
 }: {
   item?: Customer;
+  resource?: CustomerResource;
   hosted: boolean;
 }) {
+  const config = customerResources[resource];
+  const [source, setSource] = useState<string | null>(
+      item?.sourceDocumentId ?? null,
+    ),
+    [advance, setAdvance] = useState<string | null>(
+      item?.advanceAccountId ?? null,
+    );
   const [party, setParty] = useState<string | null>(item?.partyId ?? null),
     [cash, setCash] = useState<string | null>(item?.cashAccountId ?? null),
     [feeAccount, setFeeAccount] = useState<string | null>(
@@ -28,19 +39,15 @@ export function CustomerForm({
     );
   return (
     <FinanceActionForm
-      label={item ? "Save receipt draft" : "Create receipt draft"}
-      endpoint={"/api/v1/finance/receipts" + (item ? "/" + item.id : "")}
+      label={(item ? "Save " : "Create ") + config.singular + " draft"}
+      endpoint={"/api/v1/finance/" + config.path + (item ? "/" + item.id : "")}
       method={item ? "PATCH" : "POST"}
-      redirectPrefix={item ? undefined : "/finance/receipts/"}
+      redirectPrefix={item ? undefined : "/finance/" + config.path + "/"}
       hosted={hosted}
       business={(f) => ({
         reference: String(f.get("reference")),
         partyId: party,
-        cashAccountId: cash,
         projectId: project,
-        feeAccountId: /^0(?:\.0{1,2})?$/.test(fee) ? null : feeAccount,
-        cashAmount: String(f.get("cashAmount")),
-        feeAmount: fee,
         documentDate: String(f.get("documentDate")),
         postingDate: String(f.get("postingDate")),
         description: String(f.get("description")),
@@ -52,12 +59,21 @@ export function CustomerForm({
         })),
         reason: String(f.get("reason")),
         ...(item ? { expectedVersion: item.version } : {}),
+        ...(resource === "RECEIPT"
+          ? {
+              cashAccountId: cash,
+              advanceAccountId: advance,
+              feeAccountId: /^0(?:\.0{1,2})?$/.test(fee) ? null : feeAccount,
+              cashAmount: String(f.get("cashAmount")),
+              feeAmount: fee,
+            }
+          : { sourceDocumentId: source }),
       })}
     >
       <div className="form-grid">
         <AccountPicker
           kind="party"
-          label="Receipt client"
+          label={config.clientLabel}
           value={party}
           onChange={(id) => {
             setParty(id);
@@ -68,24 +84,47 @@ export function CustomerForm({
             item ? [{ id: item.partyId, code: "", name: item.party.name }] : []
           }
         />
-        <AccountPicker
-          kind="cash-account"
-          label="Received into"
-          value={cash}
-          onChange={setCash}
-          required
-          initial={
-            item?.cashAccountId
-              ? [
-                  {
-                    id: item.cashAccountId,
-                    code: "",
-                    name: item.cashAccount?.name ?? "Current cash account",
-                  },
-                ]
-              : []
-          }
-        />
+        {resource === "RECEIPT" && (
+          <AccountPicker
+            kind="cash-account"
+            label="Received into"
+            value={cash}
+            onChange={setCash}
+            required
+            initial={
+              item?.cashAccountId
+                ? [
+                    {
+                      id: item.cashAccountId,
+                      code: "",
+                      name: item.cashAccount?.name ?? "Current cash account",
+                    },
+                  ]
+                : []
+            }
+          />
+        )}
+        {resource === "ADVANCE_APPLICATION" && (
+          <AccountPicker
+            kind="advance-source"
+            label="Source advance"
+            partyId={party ?? undefined}
+            value={source}
+            onChange={setSource}
+            required
+            initial={
+              item?.sourceDocumentId
+                ? [
+                    {
+                      id: item.sourceDocumentId,
+                      code: item.sourceDocument?.number ?? "",
+                      name: "Current source",
+                    },
+                  ]
+                : []
+            }
+          />
+        )}
         <AccountPicker
           kind="project"
           label="Receipt project"
@@ -104,7 +143,7 @@ export function CustomerForm({
       </label>
       <div className="form-grid">
         <label>
-          Receipt date
+          {config.dateLabel}
           <input
             name="documentDate"
             type="date"
@@ -121,26 +160,30 @@ export function CustomerForm({
             defaultValue={item?.postingDate}
           />
         </label>
-        <label>
-          Cash received (PKR)
-          <input
-            name="cashAmount"
-            required
-            inputMode="decimal"
-            defaultValue={item?.cashAmount}
-          />
-        </label>
-        <label>
-          Explicit fee (PKR)
-          <input
-            value={fee}
-            required
-            inputMode="decimal"
-            onChange={(e) => setFee(e.target.value)}
-          />
-        </label>
+        {resource === "RECEIPT" && (
+          <>
+            <label>
+              Cash received (PKR)
+              <input
+                name="cashAmount"
+                required
+                inputMode="decimal"
+                defaultValue={item?.cashAmount}
+              />
+            </label>
+            <label>
+              Explicit fee (PKR)
+              <input
+                value={fee}
+                required
+                inputMode="decimal"
+                onChange={(e) => setFee(e.target.value)}
+              />
+            </label>
+          </>
+        )}
       </div>
-      {!/^0(?:\.0{1,2})?$/.test(fee) && (
+      {resource === "RECEIPT" && !/^0(?:\.0{1,2})?$/.test(fee) && (
         <AccountPicker
           kind="fee"
           label="Fee expense account"
@@ -154,8 +197,21 @@ export function CustomerForm({
           }
         />
       )}
+      {resource === "RECEIPT" && (
+        <AccountPicker
+          kind="advance"
+          label="Client advance account"
+          value={advance}
+          onChange={setAdvance}
+          initial={
+            item?.advanceAccountId && item.advanceAccount
+              ? [{ id: item.advanceAccountId, ...item.advanceAccount }]
+              : []
+          }
+        />
+      )}
       <label>
-        Receipt description
+        Document description
         <textarea
           name="description"
           defaultValue={item?.description}
@@ -241,8 +297,9 @@ export function CustomerForm({
         Add invoice allocation
       </button>
       <p>
-        Invoice settlements must equal cash received plus explicit fees.
-        Withholding needs its own reviewed mapping.
+        Unallocated cash is held as a client advance. Select a client advance
+        account when money remains. Applying an advance records no additional
+        cash. Withholding needs its own reviewed mapping.
       </p>
     </FinanceActionForm>
   );
@@ -251,16 +308,28 @@ export function CustomerAction({
   item,
   action,
   hosted,
+  resource = "RECEIPT",
 }: {
   item: Customer;
   action: "POST" | "VOID";
+  resource?: CustomerResource;
   hosted: boolean;
 }) {
+  const config = customerResources[resource];
   return (
     <FinanceActionForm
-      label={action === "POST" ? "Post receipt" : "Void receipt draft"}
+      label={
+        (action === "POST" ? "Post " : "Void ") +
+        config.singular +
+        (action === "VOID" ? " draft" : "")
+      }
       endpoint={
-        "/api/v1/finance/receipts/" + item.id + "/" + action.toLowerCase()
+        "/api/v1/finance/" +
+        config.path +
+        "/" +
+        item.id +
+        "/" +
+        action.toLowerCase()
       }
       hosted={hosted}
       business={(f) => ({

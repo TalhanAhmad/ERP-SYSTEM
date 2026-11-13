@@ -59,3 +59,58 @@ it("rejects forged identity/totals/currency and date coercions", () => {
   ])
     expect(receiptSchema.safeParse({ ...base, ...patch }).success).toBe(false);
 });
+it("permits unallocated and mixed receipts only with a mapped advance account", () => {
+  const advanceAccountId = crypto.randomUUID();
+  expect(
+    receiptSchema.safeParse({
+      ...base,
+      cashAmount: "10000",
+      feeAmount: "0",
+      feeAccountId: null,
+      allocations: [],
+      advanceAccountId,
+    }).success,
+  ).toBe(true);
+  expect(
+    receiptSchema.safeParse({
+      ...base,
+      cashAmount: "10000",
+      feeAmount: "0",
+      feeAccountId: null,
+      allocations: [{ invoiceId, amount: "6000" }],
+      advanceAccountId,
+    }).success,
+  ).toBe(true);
+  expect(receiptSchema.safeParse({ ...base, advanceAccountId }).success).toBe(
+    false,
+  );
+  expect(
+    receiptSchema.safeParse({ ...base, advanceAmount: "999" }).success,
+  ).toBe(false);
+});
+it("requires positive unique advance applications and rejects any cash or actor override", async () => {
+  const { applicationSchema } =
+      await import("@/modules/finance/receivables/customer/schemas"),
+    input = {
+      reference: "AAP",
+      partyId: base.partyId,
+      sourceDocumentId: crypto.randomUUID(),
+      documentDate: base.documentDate,
+      postingDate: base.postingDate,
+      description: base.description,
+      evidence: base.evidence,
+      allocations: base.allocations,
+      reason: base.reason,
+    };
+  expect(applicationSchema.safeParse(input).success).toBe(true);
+  for (const patch of [
+    { cashAmount: "100" },
+    { feeAmount: "0" },
+    { actorId: crypto.randomUUID() },
+    { allocations: [] },
+    { allocations: [{ invoiceId, amount: "0" }] },
+  ])
+    expect(applicationSchema.safeParse({ ...input, ...patch }).success).toBe(
+      false,
+    );
+});

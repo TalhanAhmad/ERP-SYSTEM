@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { customerResources } from "../receivables/customer/resources";
+import type { CustomerResource } from "../receivables/customer/schemas";
 import { env } from "@/server/env";
 import { financePageData } from "../accounting/page-data";
 import { financeStatus } from "../access/policy";
@@ -10,31 +12,37 @@ import { CustomerForm, CustomerAction } from "./customer-forms";
 import { MoneyCell } from "./money-cell";
 export async function ReceiptRegister({
   searchParams,
+  resource = "RECEIPT",
 }: {
+  resource?: CustomerResource;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const config = customerResources[resource];
   const raw = await searchParams,
     { d, invalid } = await financePageData(async (a) => {
       const p = customerQuerySchema.safeParse(raw);
       return {
-        d: await customers(a, "RECEIPT", p.success ? p.data : {}),
+        d: await customers(a, resource, p.success ? p.data : {}),
         invalid: !p.success,
       };
     });
   return (
     <section>
       <FinanceNavigation />
-      <h1>Receipts</h1>
+      <h1>{config.plural}</h1>
       <p>Actual cash received and dated invoice settlements.</p>
-      <Link className="button primary" href="/finance/receipts/new">
-        New receipt draft
+      <Link
+        className="button primary"
+        href={"/finance/" + config.path + "/new"}
+      >
+        New {config.singular} draft
       </Link>
       {invalid && (
         <p role="alert">Invalid filters. Showing the default view.</p>
       )}
       <FinanceRegister
         drawer={false}
-        label="Receipt"
+        label={resource === "RECEIPT" ? "Receipt" : "Advance application"}
         columns={[
           "Receipt",
           "Date",
@@ -46,8 +54,8 @@ export async function ReceiptRegister({
         rows={d.items.map((i) => ({
           id: i.id,
           name: i.number,
-          href: "/finance/receipts/" + i.id,
-          endpoint: "/api/v1/finance/receipts/" + i.id,
+          href: "/finance/" + config.path + "/" + i.id,
+          endpoint: "/api/v1/finance/" + config.path + "/" + i.id,
           cells: [
             i.postingDate,
             (i.partySnapshot as { name?: string } | null)?.name ?? i.party.name,
@@ -60,7 +68,9 @@ export async function ReceiptRegister({
         page={d.page}
         pages={d.pages}
         href={(page) =>
-          "/finance/receipts?" +
+          "/finance/" +
+          config.path +
+          "?" +
           new URLSearchParams(
             Object.entries({ ...d.filters, page })
               .filter(([, v]) => v !== undefined)
@@ -93,23 +103,33 @@ export async function ReceiptRegister({
     </section>
   );
 }
-export async function NewReceipt() {
+export async function NewReceipt({
+  resource = "RECEIPT",
+}: { resource?: CustomerResource } = {}) {
+  const config = customerResources[resource];
   await financePageData(financeStatus);
   return (
     <section>
       <FinanceNavigation />
-      <h1>New receipt draft</h1>
-      <CustomerForm hosted={env.AUTH_PROVIDER === "supabase"} />
+      <h1>New {config.singular} draft</h1>
+      <CustomerForm
+        resource={resource}
+        hosted={env.AUTH_PROVIDER === "supabase"}
+      />
     </section>
   );
 }
 export async function ReceiptDetail({
   params,
+  resource = "RECEIPT",
 }: {
   params: Promise<{ id: string }>;
+  resource?: CustomerResource;
 }) {
+  const config = customerResources[resource],
+    title = config.singular.charAt(0).toUpperCase() + config.singular.slice(1);
   const { id } = await params,
-    d = await financePageData((a) => customerDetail(a, "RECEIPT", id)),
+    d = await financePageData((a) => customerDetail(a, resource, id)),
     i = d.item,
     hosted = env.AUTH_PROVIDER === "supabase",
     party = (i.state === "POSTED" ? i.partySnapshot : i.party) as {
@@ -123,8 +143,8 @@ export async function ReceiptDetail({
       <p>
         {i.state} · version {i.version} · {i.postingDate}
       </p>
-      <section className="panel" aria-label="Receipt preview">
-        <h2>Receipt preview</h2>
+      <section className="panel" aria-label={title + " preview"}>
+        <h2>{title} preview</h2>
         <p>
           {party.legalName} · {party.name}
         </p>
@@ -167,24 +187,54 @@ export async function ReceiptDetail({
           </table>
         </div>
       </section>
+      {(i.advanceAmount !== "0.00" || resource === "ADVANCE_APPLICATION") && (
+        <section className="panel" aria-label="Client advance">
+          <h2>Client advance</h2>
+          <p>
+            Held from this receipt: <MoneyCell value={i.advanceAmount} /> ·
+            Available from source: <MoneyCell value={d.availableAdvance} />
+          </p>
+          {i.sourceDocument && <p>Source {i.sourceDocument.number}</p>}
+          <Link href="/finance/advance-applications/new">
+            Apply held client money
+          </Link>
+        </section>
+      )}
       {i.state === "DRAFT" && (
         <>
-          <section className="panel" aria-label="Edit receipt draft">
-            <h2>Edit receipt draft</h2>
-            <CustomerForm key={i.version} item={i} hosted={hosted} />
+          <section
+            className="panel"
+            aria-label={"Edit " + config.singular + " draft"}
+          >
+            <h2>Edit {config.singular} draft</h2>
+            <CustomerForm
+              resource={resource}
+              key={i.version}
+              item={i}
+              hosted={hosted}
+            />
           </section>
           {(["POST", "VOID"] as const).map((action) => (
             <section
               className="panel"
               aria-label={
-                action === "POST" ? "Post receipt" : "Void receipt draft"
+                action === "POST"
+                  ? "Post " + config.singular
+                  : "Void " + config.singular + " draft"
               }
               key={action}
             >
               <h2>
-                {action === "POST" ? "Post receipt" : "Void receipt draft"}
+                {action === "POST"
+                  ? "Post " + config.singular
+                  : "Void " + config.singular + " draft"}
               </h2>
-              <CustomerAction item={i} action={action} hosted={hosted} />
+              <CustomerAction
+                resource={resource}
+                item={i}
+                action={action}
+                hosted={hosted}
+              />
             </section>
           ))}
         </>

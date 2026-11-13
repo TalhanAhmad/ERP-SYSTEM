@@ -36,3 +36,8 @@ Applied successfully on its first deployment only to encova_test; no earlier app
 ## F13 — 13 November 2026
 
 29 (20261113010000_finance_receipts) creates empty typed customer document/allocation sources, extends shared journal/dated AR source integrity and checked receipt commands, and reserves dated invoice capacity. 30 (20261113020000_finance_receipt_validation) removes a PL/pgSQL record/alias collision. 31 (20261113030000_finance_receipt_cash_usage) uses the existing GL usage marker rather than a nonexistent cash-master marker. Applied checksums are unchanged; no reset. All31 migrations apply only to encova_test; no live financial seed/grant/migration.
+
+
+## F14 — 13 November 2026
+
+32 (20261113040000_finance_client_advances) adds typed source-pool references, advance account/amount fields and immutable FinanceClientBalanceEvent, signed dated AR/application effects, private historical capacity and checked receipt/application commands. Initial DDL CASE parsing failed transactionally; corrected before successful application after isolated ROLLBACK validation and resolving only the failed attempt. Earlier applied migrations unchanged; no reset or hosted change.
