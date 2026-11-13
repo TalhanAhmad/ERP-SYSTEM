@@ -3,7 +3,7 @@
 Requested scope: continue from merged F15 through F25; test and push each milestone separately. Branch finance/f16-f25 starts at main c56cc78. This tracker records actual completed work and pending work without treating the specification as an instruction to launch finance.
 
 ## Status
-F16–F18 implemented and locally verified. F19–F25 pending implementation. Hosted finance remains disabled, without hosted schema changes, owner grants or financial seeds. No real tax, funding, investment or depreciation policy has been selected.
+F16–F19 implemented and locally verified. F20–F25 pending implementation. Hosted finance remains disabled, without hosted schema changes, owner grants or financial seeds. No real tax, funding, investment or depreciation policy has been selected.
 
 ## F16 evidence
 Bills and immediate paid expenses, exact cost/project splits, duplicate supplier reference protection and explicit same-amount review, versioned fresh-auth commands, immutable source/journal/AP events, supplier snapshots, current access and private audit. See [F16](planning/days/F16.md).
@@ -11,7 +11,7 @@ Bills and immediate paid expenses, exact cost/project splits, duplicate supplier
 DDL rollback rehearsal and additive migration34 passed on isolated synthetic encova_test. Focused bill/invoice/customer80 passed; dedicated bill9 plus schema3 and one Chromium journey passed. Earlier unchanged unit suite216 passed. Type/lint/local production build and concrete64-path API documentation checks passed. Full backend regression passed355 cases; existing unit216 plus bill unit3 passed219 distinct unit cases. Focused browser bill journey passed1; prior34 browser cases will be rerun in final regression. Supabase-mode production build also passed using configuration fixtures only. Publication/CI evidence follows when observed.
 
 ## Pending milestones
-F19 private quarantine attachments; F20 cash/transfers; F21 capital/distributions/founder costs; F22 loans; F23 investment holdings/acquisition lots; F24 disposals/returns/adjustments; F25 asset purchase links without duplicate GL. F26 and later remain outside this request.
+F20 cash/transfers; F21 capital/distributions/founder costs; F22 loans; F23 investment holdings/acquisition lots; F24 disposals/returns/adjustments; F25 asset purchase links without duplicate GL. F26 and later remain outside this request.
 
 ## F16 publication
 Source68afc4b was committed/pushed separately. Fresh-runner [CI43445524244](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43445524244) passed, including all34 additive migrations,219 unit/355 integration/35 browser cases, typing/lint, both builds and docs. Draft [PR #3](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/3) tracks this new scope; no merge requested for this branch.
@@ -27,3 +27,12 @@ See [F18](planning/days/F18.md) and [tax accounting rules](accounting/taxes.md).
 
 ## F18 publication and CI correction
 Sourceb96f38d8a3c0b83a6ca6b16fcb729ea9d16dff6f was separately committed/pushed. CI43451766113 passed fresh43 migrations,225 unit and380 backend checks, then36 of37 browser cases. The existing invoice UI test expected the old “Invoice total” preview label; the accurate tax-aware label is “Rounded lines less discounts.” Updated that assertion without changing the amount expectation. The full invoice edit/lost-response/post/private-download journey then passed locally4.0s. Publishing this targeted test/report correction before F19; exact-source CI is pending.
+
+## F18 final CI
+Corrected head42f9ebb3a8ebe5359e77d05aacc776b488b9c838 passed [CI43455396870](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43455396870):43 fresh migrations,225 unit/380 integration/37 Chromium cases (642 distinct), both builds, type/lint and docs. This confirms the updated preview assertion and all prior browser flows.
+
+## F19 evidence
+See [F19](planning/days/F19.md) and [private evidence/runbook](accounting/evidence.md). Fourteen source/security/operator checks plus three validation/CSP cases passed;6MiB real browser upload-to-signed-scan-to-private-download journey passed5.6s. Fake scanner/storage exist only in isolated tests; no production clean fallback. Test schema47,97 finance API paths. Full regression/publication evidence follows after observation.
+
+## F19 final local verification
+All660 distinct checks passed:228 unit,394 PostgreSQL integration (118.48s),38 Chromium browser (2.3m). Type/lint, local and Supabase-mode production builds,97-path API/local links, Word XML/relationships/private-value scan and all47 applied migration checksums passed. The full browser run preserved original ERP/finance journeys alongside private evidence. Publishing F19 separately; fresh-runner CI follows.

@@ -80,6 +80,9 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ financeFiles FinanceFile[] @relation("FileUploader")
+ financeScanAuthorities FinanceScanAuthority[]
+ financeFileIntents FinanceFile[] @relation("FileIntentActor")
  financeTaxCodes FinanceTaxCode[]
  supplierDocuments FinanceSupplierDocument[]
  financeBills FinanceBill[]
@@ -270,6 +273,7 @@ model FinanceSetupReceipt {
 }
 
 model FinanceJournalDraft {
+ evidenceFiles FinanceFile[]
  id String @id @default(uuid()) @db.Uuid
  reference String @unique
  description String
@@ -420,6 +424,7 @@ model FinanceCashAccount {
 }
 
 model FinanceInvoice {
+ evidenceFiles FinanceFile[]
  customerCreditDocuments FinanceCustomerDocument[] @relation("CustomerCreditInvoice")
  customerAllocations FinanceCustomerAllocation[]
  id String @id @default(uuid()) @db.Uuid
@@ -1041,6 +1046,7 @@ model AppSession {
 }
 
 model FinanceCustomerDocument {
+ evidenceFiles FinanceFile[]
  withholdingCodeId String? @db.Uuid
  withholdingCode FinanceTaxCode? @relation(fields:[withholdingCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  withholdingSnapshot Json?
@@ -1168,6 +1174,7 @@ model FinanceInvoiceCreditEvent {
 }
 
 model FinanceBill {
+ evidenceFiles FinanceFile[]
  supplierCreditDocuments FinanceSupplierDocument[] @relation("SupplierCreditBill")
  supplierAllocations FinanceSupplierAllocation[]
  id String @id @default(uuid()) @db.Uuid
@@ -1256,6 +1263,7 @@ model FinancePayableEvent {
 }
 
 model FinanceSupplierDocument {
+ evidenceFiles FinanceFile[]
  withholdingCodeId String? @db.Uuid
  withholdingCode FinanceTaxCode? @relation(fields:[withholdingCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  withholdingSnapshot Json?
@@ -1416,4 +1424,49 @@ model FinanceCreditTaxSplit {
  taxAmount Decimal @db.Decimal(20,2)
  taxAccountId String? @db.Uuid
  taxAccount FinanceAccount? @relation(fields:[taxAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+}
+
+model FinanceFile {
+ id String @id @default(uuid()) @db.Uuid
+ invoiceId String? @db.Uuid
+ invoice FinanceInvoice? @relation(fields:[invoiceId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ billId String? @db.Uuid
+ bill FinanceBill? @relation(fields:[billId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ customerDocumentId String? @db.Uuid
+ customerDocument FinanceCustomerDocument? @relation(fields:[customerDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ supplierDocumentId String? @db.Uuid
+ supplierDocument FinanceSupplierDocument? @relation(fields:[supplierDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalDraftId String? @db.Uuid
+ journalDraft FinanceJournalDraft? @relation(fields:[journalDraftId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ fileName String
+ mimeType String
+ byteSize Int
+ sha256 String
+ objectKey String @unique
+ state String @default("RESERVED")
+ version Int @default(1)
+ uploaderId String @db.Uuid
+ uploader Person @relation("FileUploader",fields:[uploaderId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ intentActorId String @db.Uuid
+ intentActor Person @relation("FileIntentActor",fields:[intentActorId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ blobDeletedAt DateTime? @db.Timestamptz
+ intentHash String
+ intentProvider String
+ intentSessionId String
+ intentVerifiedAt DateTime @db.Timestamptz
+ scanResult Json?
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([state,createdAt,id])
+}
+
+model FinanceScanAuthority {
+ id String @id @db.Uuid
+ name String
+ secret Bytes
+ active Boolean @default(true)
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reason String
+ createdAt DateTime @default(now()) @db.Timestamptz
 }

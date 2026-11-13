@@ -2,7 +2,7 @@
 
 Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F18 complete: 18 of 48 finance milestones; 30 remain.** Current authorized scope continues through F25 on finance/f16-f25, with separate milestone commits/pushes. F16 adds bills/immediate paid expenses and cost/project splits. Latest observed checks: 219 distinct unit cases,355 PostgreSQL integration cases, one new Chromium bill journey, typing/lint and both production builds passed. Prior34 browser journeys will be rerun with the final scope. See [current delivery tracker](delivery-F16-F25.md). Current test schema34 additive migrations; live finance remains disabled.
+**F01–F19 complete: 19 of 48 finance milestones; 29 remain.** Current authorized scope continues through F25 on finance/f16-f25, with separate milestone commits/pushes. F16 adds bills/immediate paid expenses and cost/project splits. Latest observed checks: 219 distinct unit cases,355 PostgreSQL integration cases, one new Chromium bill journey, typing/lint and both production builds passed. Prior34 browser journeys will be rerun with the final scope. See [current delivery tracker](delivery-F16-F25.md). Current test schema34 additive migrations; live finance remains disabled.
 
 The following records describe the previously completed and merged F15 release:
 
@@ -33,3 +33,6 @@ Supplier payments, advances, original-cost credits/refunds and dated corrections
 
 ## F18 development
 Reviewed policy setup, inclusive/exclusive source taxes, original net/tax credits and evidenced settlement withholding implemented; all remain explicit and optional. No real rates or live enablement. Test schema43 and API91 paths;12 tax integration and225 unit checks passed. New browser policy/source/PDF/withholding journey passed5.5s. F19 next. F17 exact-source CI43447137270 passed626 tests on a fresh runner.
+
+## F19 development
+Typed private evidence, signed malware quarantine, strict current-access bounded download, immutable posted retention and explicit operator setup/cleanup implemented. Fourteen backend and three unit checks passed;6MiB browser journey passed5.6s. Schema47, API97 paths. Live finance/scanner remain disabled/unconfigured. F18 corrected exact-source CI43455396870 passed642 cases. F20 next.

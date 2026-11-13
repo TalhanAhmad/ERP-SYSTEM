@@ -1,3 +1,4 @@
+import {EvidenceSection} from "./evidence-section";
 import Link from "next/link";
 import { env } from "@/server/env";
 import { supplierResources } from "../payables/supplier/resources";
@@ -456,6 +457,7 @@ export async function PaymentDetail({
           </div>
         </section>
       )}
+      <EvidenceSection sourceType="SUPPLIER_DOCUMENT" sourceId={i.id} state={i.storedState}/>
       <SetupHistory events={d.history} />
     </section>
   );

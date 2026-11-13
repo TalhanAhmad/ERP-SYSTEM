@@ -1,3 +1,4 @@
+import {EvidenceSection} from "@/modules/finance/components/evidence-section";
 import { env } from "@/server/env";
 import { financePageData } from "@/modules/finance/accounting/page-data";
 import { billDetail } from "@/modules/finance/payables/service";
@@ -139,6 +140,7 @@ export default async function Bill({
           Posted journal: {i.entry.reference} · {i.entry.postingDate}
         </p>
       )}
+      <EvidenceSection sourceType="BILL" sourceId={i.id} state={i.state}/>
       <SetupHistory events={data.history} />
     </section>
   );

@@ -1,3 +1,4 @@
+import { EvidenceSection } from "@/modules/finance/components/evidence-section";
 import { env } from "@/server/env";
 import { financePageData } from "@/modules/finance/accounting/page-data";
 import {
@@ -142,6 +143,11 @@ export default async function Journal({
           )}
         </section>
       )}
+      <EvidenceSection
+        sourceType="JOURNAL_DRAFT"
+        sourceId={item.id}
+        state={item.state}
+      />
       <SetupHistory events={data.history} />
     </section>
   );
