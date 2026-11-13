@@ -122,3 +122,8 @@ F12 invoice screens/private PDF, F13 receipts, F14 client advances and F15 credi
 
 
 [CI 43419008430](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43419008430) passed on exact source **b5a424bc42121a185da4d44d857e5ad59040107b**: all 33 migrations on fresh PostgreSQL, 216 unit +346 integration +34 Chromium tests (**596**), strict typing/lint, local and Supabase-mode production builds and documentation/API verification. Each requested milestone was committed/pushed separately; [draft PR #2](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/2) now covers F11–F15 on finance/invoices-f11. No merge or hosted finance release occurred.
+
+
+## PR #2 merge — 13 November 2026
+
+[PR #2](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/2) was merged into main at 18:43:40 Pakistan time on 13 November 2026 (13:43:40 UTC), following Talha’s explicit request. Merge commit: **32964e847ccef43f6152a4e406239a9c657da4be**. A merge commit preserved the separate milestone commits. Exact PR head86c0cd2aebcdf28e7c9535789b8fec4ede4bb1b8 passed [CI43423801209](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43423801209) before merge. Local main was fast-forwarded to the merged result; application/schema/test/script content is identical to that verified head. No manual hosted finance migration or activation was performed.
