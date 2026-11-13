@@ -10,6 +10,7 @@ export function AccountPicker({
   group,
   exclude,
   partyId,
+  invoiceId,
   initial = [],
   required = false,
 }: {
@@ -26,7 +27,9 @@ export function AccountPicker({
     | "cash-account"
     | "fee"
     | "advance"
-    | "advance-source";
+    | "advance-source"
+    | "credit-invoice"
+    | "invoice-line";
   label: string;
   value: string | null;
   onChange: (id: string | null) => void;
@@ -34,6 +37,7 @@ export function AccountPicker({
   group?: string;
   exclude?: string;
   partyId?: string;
+  invoiceId?: string;
   initial?: Option[];
   required?: boolean;
 }) {
@@ -52,6 +56,16 @@ export function AccountPicker({
   useEffect(() => {
     const abort = new AbortController();
     const timer = setTimeout(async () => {
+      if (
+        (["invoice", "advance-source", "credit-invoice"].includes(kind) &&
+          !partyId) ||
+        (kind === "invoice-line" && !invoiceId)
+      ) {
+        setResult({ items: [], total: 0, page: 1, pages: 1 });
+        setError("");
+        setPending(false);
+        return;
+      }
       setPending(true);
       setError("");
       try {
@@ -63,6 +77,7 @@ export function AccountPicker({
           ...(group ? { group } : {}),
           ...(exclude ? { exclude } : {}),
           ...(partyId ? { partyId } : {}),
+          ...(invoiceId ? { invoiceId } : {}),
         });
         const response = await fetch(
           "/api/v1/finance/" +
@@ -72,6 +87,8 @@ export function AccountPicker({
               "invoice",
               "cash-account",
               "advance-source",
+              "credit-invoice",
+              "invoice-line",
             ].includes(kind)
               ? "invoice-options?"
               : "account-options?") +
@@ -83,7 +100,7 @@ export function AccountPicker({
         setResult(body.data);
       } catch (e) {
         if (!abort.signal.aborted)
-          setError(e instanceof Error ? e.message : "Unable to load accounts.");
+          setError(e instanceof Error ? e.message : "Unable to load choices.");
       } finally {
         if (!abort.signal.aborted) setPending(false);
       }
@@ -92,7 +109,7 @@ export function AccountPicker({
       clearTimeout(timer);
       abort.abort();
     };
-  }, [kind, q, page, type, group, exclude, partyId, retry]);
+  }, [kind, q, page, type, group, exclude, partyId, invoiceId, retry]);
   const selected =
     result.items.find((i) => i.id === value) ??
     initial.find((i) => i.id === value);
@@ -137,7 +154,7 @@ export function AccountPicker({
         {pending
           ? "Searching…"
           : result.total +
-            " matching accounts · page " +
+            " matching choices · page " +
             result.page +
             " of " +
             result.pages}
@@ -146,7 +163,7 @@ export function AccountPicker({
         <p role="alert">
           {error}{" "}
           <button type="button" onClick={() => setRetry((x) => x + 1)}>
-            Retry account search
+            Retry search
           </button>
         </p>
       )}

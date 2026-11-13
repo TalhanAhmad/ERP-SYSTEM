@@ -5,7 +5,12 @@ import {
   versionSchema,
 } from "../../accounting/schemas";
 import { pkrAmountSchema, sumPkrLines } from "../../accounting/money";
-export type CustomerResource = "RECEIPT" | "ADVANCE_APPLICATION";
+export type CustomerResource =
+  | "RECEIPT"
+  | "ADVANCE_APPLICATION"
+  | "CUSTOMER_CREDIT"
+  | "CUSTOMER_REFUND"
+  | "UNALLOCATION";
 export const allocationSchema = z
   .object({
     invoiceId: z.uuid(),
@@ -119,23 +124,110 @@ export const applicationSchema = z
       });
     }
   });
+const commercialBase = {
+  reference: z.string().trim().min(1).max(80),
+  partyId: z.uuid(),
+  projectId: z.uuid().nullable().default(null),
+  documentDate: accountingDateSchema,
+  postingDate: accountingDateSchema,
+  description: z.string().trim().min(1).max(1000),
+  evidence: z.string().trim().min(3).max(1000),
+  currency: z.literal("PKR").default("PKR"),
+  reason: reasonSchema,
+};
+export const creditLineSchema = z
+  .object({
+    invoiceLineId: z.uuid(),
+    amount: pkrAmountSchema.refine(
+      (v) => v !== "0.00",
+      "Credit must be positive.",
+    ),
+  })
+  .strict();
+export const creditSchema = z
+  .object({
+    ...commercialBase,
+    invoiceId: z.uuid(),
+    advanceAccountId: z.uuid(),
+    creditLines: z.array(creditLineSchema).min(1).max(100),
+  })
+  .strict()
+  .superRefine((d, c) => {
+    if (d.postingDate < d.documentDate)
+      c.addIssue({
+        code: "custom",
+        path: ["postingDate"],
+        message: "Posting cannot precede the credit date.",
+      });
+    if (
+      new Set(d.creditLines.map((l) => l.invoiceLineId)).size !==
+      d.creditLines.length
+    )
+      c.addIssue({
+        code: "custom",
+        path: ["creditLines"],
+        message: "Combine credits to the same invoice line.",
+      });
+    try {
+      sumPkrLines(d.creditLines.map((l) => l.amount));
+    } catch {
+      c.addIssue({
+        code: "custom",
+        path: ["creditLines"],
+        message: "Credit total exceeds the supported range.",
+      });
+    }
+  });
+export const refundSchema = z
+  .object({
+    ...commercialBase,
+    sourceDocumentId: z.uuid(),
+    cashAccountId: z.uuid(),
+    cashAmount: pkrAmountSchema.refine(
+      (v) => v !== "0.00",
+      "Refund must be positive.",
+    ),
+  })
+  .strict()
+  .superRefine((d, c) => {
+    if (d.postingDate < d.documentDate)
+      c.addIssue({
+        code: "custom",
+        path: ["postingDate"],
+        message: "Posting cannot precede refund date.",
+      });
+  });
 const actionSchema = z
   .object({ expectedVersion: versionSchema, reason: reasonSchema })
   .strict();
 export const customerSchemas = (resource: CustomerResource) => {
-  const schema = resource === "RECEIPT" ? receiptSchema : applicationSchema;
+  const schema =
+    resource === "RECEIPT"
+      ? receiptSchema
+      : resource === "CUSTOMER_CREDIT"
+        ? creditSchema
+        : resource === "CUSTOMER_REFUND"
+          ? refundSchema
+          : applicationSchema;
   return {
     CREATE: schema,
     UPDATE: schema.safeExtend({ expectedVersion: versionSchema }),
     POST: actionSchema,
     VOID: actionSchema,
+    REVERSE: actionSchema.safeExtend({ postingDate: accountingDateSchema }),
+    UNALLOCATE: actionSchema.safeExtend({
+      postingDate: accountingDateSchema,
+      advanceAccountId: z.uuid(),
+    }),
   };
 };
 export type CustomerAction = keyof ReturnType<typeof customerSchemas>;
 export const customerQuerySchema = z
   .object({
     q: z.string().trim().max(100).default(""),
-    state: z.enum(["ALL", "DRAFT", "POSTED", "VOIDED"]).default("ALL"),
+    state: z
+      .enum(["ALL", "DRAFT", "POSTED", "VOIDED", "REVERSED"])
+      .default("ALL"),
     partyId: z.uuid().optional(),
     from: accountingDateSchema.optional(),
     to: accountingDateSchema.optional(),

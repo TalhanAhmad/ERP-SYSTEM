@@ -38,6 +38,10 @@ for (const [username, role] of [
   ["e2e.finance.invoice.ui", "SUPER_ADMIN"],
   ["e2e.finance.receipt.ui", "SUPER_ADMIN"],
   ["e2e.finance.advance.ui", "SUPER_ADMIN"],
+  ["e2e.finance.credit.ui", "SUPER_ADMIN"],
+  ["e2e.finance.credit.writer", "SUPER_ADMIN"],
+  ["e2e.finance.release.ui", "SUPER_ADMIN"],
+  ["e2e.finance.release.writer", "SUPER_ADMIN"],
   ["e2e.finance.advance.writer", "SUPER_ADMIN"],
   ["e2e.finance.receipt.writer", "SUPER_ADMIN"],
   ["e2e.finance.invoice.writer", "SUPER_ADMIN"],
@@ -68,6 +72,8 @@ for (const username of [
   "e2e.finance.invoice.writer",
   "e2e.finance.receipt.writer",
   "e2e.finance.advance.writer",
+  "e2e.finance.credit.writer",
+  "e2e.finance.release.writer",
 ]) {
   const financePerson = await db.person.findUniqueOrThrow({
     where: { username },

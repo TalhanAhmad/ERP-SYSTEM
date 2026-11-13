@@ -41,3 +41,9 @@ Applied successfully on its first deployment only to encova_test; no earlier app
 ## F14 — 13 November 2026
 
 32 (20261113040000_finance_client_advances) adds typed source-pool references, advance account/amount fields and immutable FinanceClientBalanceEvent, signed dated AR/application effects, private historical capacity and checked receipt/application commands. Initial DDL CASE parsing failed transactionally; corrected before successful application after isolated ROLLBACK validation and resolving only the failed attempt. Earlier applied migrations unchanged; no reset or hosted change.
+
+## F15 — 13 November 2026
+
+33 (20261113050000_finance_customer_credits_refunds) adds empty typed credit lines/posting splits/credit eligibility events, retained credit/correction/release references and stricter source-specific signed-event/check constraints. Existing shared engine/commands extend earned/deferred credits, refunds and dated opposite/released settlement effects. All new finance tables use RLS and runtime SELECT plus checked command only; private helpers/sequences/Data API writes remain denied after setup replay.
+
+The whole DDL first passed an explicit ROLLBACK rehearsal, then its first guarded additive deployment to encova_test. No prior applied checksum edit/reset/hosted migration. Total33 migrations; exact fresh-runner evidence belongs to the final F15 source CI, not prior milestone runs.

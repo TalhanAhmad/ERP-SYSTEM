@@ -284,6 +284,7 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ invoiceCreditEvents FinanceInvoiceCreditEvent[]
  clientBalanceEvents FinanceClientBalanceEvent[]
  customerDocumentId String? @unique @db.Uuid
  customerDocument FinanceCustomerDocument? @relation(fields:[customerDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -385,6 +386,7 @@ model FinanceCashAccount {
 }
 
 model FinanceInvoice {
+ customerCreditDocuments FinanceCustomerDocument[] @relation("CustomerCreditInvoice")
  customerAllocations FinanceCustomerAllocation[]
  id String @id @default(uuid()) @db.Uuid
  number String @unique @default(dbgenerated("('INV-'::text || lpad(nextval('public.finance_invoice_number'::regclass)::text, 10, '0'::text))"))
@@ -420,6 +422,8 @@ model FinanceInvoice {
  @@index([state,postingDate,id])
 }
 model FinanceInvoiceLine {
+ customerCreditLines FinanceCustomerCreditLine[]
+ creditEvents FinanceInvoiceCreditEvent[]
  id String @id @default(uuid()) @db.Uuid
  invoiceId String @db.Uuid
  invoice FinanceInvoice @relation(fields:[invoiceId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -464,6 +468,9 @@ model FinanceReceivableEvent {
  @@index([partyId,effectiveDate,id])
 }
 model FinanceDeferredRevenueEvent {
+ customerDocumentId String? @db.Uuid
+ customerDocument FinanceCustomerDocument? @relation(fields:[customerDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+
  id String @id @default(uuid()) @db.Uuid
  invoiceLineId String @db.Uuid
  invoiceLine FinanceInvoiceLine @relation(fields:[invoiceLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -992,6 +999,19 @@ model AppSession {
 }
 
 model FinanceCustomerDocument {
+ creditInvoiceId String? @db.Uuid
+ creditInvoice FinanceInvoice? @relation("CustomerCreditInvoice",fields:[creditInvoiceId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reversalOfId String? @unique @db.Uuid
+ reversalOf FinanceCustomerDocument? @relation("CustomerReversal",fields:[reversalOfId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reversedBy FinanceCustomerDocument? @relation("CustomerReversal")
+ unallocationOfId String? @unique @db.Uuid
+ unallocationOf FinanceCustomerDocument? @relation("CustomerUnallocation",fields:[unallocationOfId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ unallocatedBy FinanceCustomerDocument? @relation("CustomerUnallocation")
+ creditLines FinanceCustomerCreditLine[]
+ creditSplit FinanceCustomerCreditSplit?
+ invoiceCreditEvents FinanceInvoiceCreditEvent[]
+ deferredEvents FinanceDeferredRevenueEvent[]
+
  sourceDocumentId String? @db.Uuid
  sourceDocument FinanceCustomerDocument? @relation("CustomerSource",fields:[sourceDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  applications FinanceCustomerDocument[] @relation("CustomerSource")
@@ -1063,4 +1083,37 @@ model FinanceClientBalanceEvent {
  amount Decimal @db.Decimal(20,2)
  currency String @default("PKR")
  @@index([sourceDocumentId,effectiveDate,id])
+}
+
+model FinanceCustomerCreditLine {
+ id String @id @default(uuid()) @db.Uuid
+ documentId String @db.Uuid
+ document FinanceCustomerDocument @relation(fields:[documentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ invoiceLineId String @db.Uuid
+ invoiceLine FinanceInvoiceLine @relation(fields:[invoiceLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ amount Decimal @db.Decimal(20,2)
+ @@unique([documentId,invoiceLineId])
+ @@unique([documentId,sequence])
+}
+model FinanceCustomerCreditSplit {
+ documentId String @id @db.Uuid
+ document FinanceCustomerDocument @relation(fields:[documentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ arAmount Decimal @db.Decimal(20,2)
+ balanceAmount Decimal @db.Decimal(20,2)
+}
+model FinanceInvoiceCreditEvent {
+ id String @id @default(uuid()) @db.Uuid
+ invoiceLineId String @db.Uuid
+ invoiceLine FinanceInvoiceLine @relation(fields:[invoiceLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ customerDocumentId String @db.Uuid
+ customerDocument FinanceCustomerDocument @relation(fields:[customerDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalId String @db.Uuid
+ journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ effectiveDate DateTime @db.Date
+ kind String
+ amount Decimal @db.Decimal(20,2)
+ currency String @default("PKR")
+ @@unique([customerDocumentId,invoiceLineId])
+ @@index([invoiceLineId,effectiveDate,id])
 }

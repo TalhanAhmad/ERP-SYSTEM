@@ -12,6 +12,12 @@ import {
   type CustomerResource,
 } from "./schemas";
 const errors: Record<string, string> = {
+  FINANCE_CREDIT_UNAVAILABLE:
+    "Credit lines must belong to the invoice and remain within the eligible original amounts.",
+  FINANCE_SETTLEMENT_ORDER:
+    "A later invoice settlement reserves this balance. Reverse that settlement before posting this backdated credit.",
+  FINANCE_SETTLEMENT_UNAVAILABLE:
+    "The source is already corrected, has an active release, or is unavailable for this correction date.",
   FINANCE_ADVANCE_UNAVAILABLE:
     "The source advance is unavailable or has insufficient eligible dated balance.",
   FINANCE_CLIENT_BALANCE_MISMATCH:
@@ -162,7 +168,46 @@ export async function customerDetail(
     const d = await tx.financeCustomerDocument.findFirst({
       where: { id, kind: resource },
       include: {
-        sourceDocument: { select: { number: true } },
+        creditInvoice: { select: { number: true } },
+        creditLines: {
+          orderBy: { sequence: "asc" },
+          include: {
+            invoiceLine: {
+              select: {
+                description: true,
+                recognition: true,
+                totalAmount: true,
+              },
+            },
+          },
+        },
+        creditSplit: true,
+        reversedBy: {
+          select: {
+            id: true,
+            number: true,
+            postingDate: true,
+            entry: {
+              select: {
+                reference: true,
+                postingDate: true,
+                lines: {
+                  orderBy: { sequence: "asc" },
+                  include: { account: { select: { code: true, name: true } } },
+                },
+              },
+            },
+          },
+        },
+        unallocatedBy: {
+          select: {
+            id: true,
+            number: true,
+            postingDate: true,
+            reversedBy: { select: { id: true } },
+          },
+        },
+        sourceDocument: { select: { number: true, kind: true } },
         advanceAccount: { select: { code: true, name: true } },
         balanceEvents: {
           select: {
@@ -218,13 +263,76 @@ export async function customerDetail(
       take: 50,
     });
     const available = await tx.financeClientBalanceEvent.aggregate({
-      where: { sourceDocumentId: d.sourceDocumentId ?? d.id },
+      where: {
+        sourceDocumentId: ["ADVANCE_APPLICATION", "CUSTOMER_REFUND"].includes(
+          d.kind,
+        )
+          ? (d.sourceDocumentId ?? d.id)
+          : d.id,
+      },
       _sum: { amount: true },
+    });
+    const sourceEvents = await tx.financeClientBalanceEvent.findMany({
+      where: {
+        sourceDocumentId: ["ADVANCE_APPLICATION", "CUSTOMER_REFUND"].includes(
+          d.kind,
+        )
+          ? (d.sourceDocumentId ?? d.id)
+          : d.id,
+      },
+      include: { document: { select: { id: true, number: true, kind: true } } },
+      orderBy: [{ effectiveDate: "asc" }, { id: "asc" }],
+      take: 100,
     });
     return {
       availableAdvance: available._sum.amount?.toFixed(2) ?? "0.00",
+      sourceEvents: sourceEvents.map((e) => ({
+        ...e,
+        amount: e.amount.toFixed(2),
+        effectiveDate: date(e.effectiveDate),
+      })),
       item: {
         ...dto(d),
+        state: d.reversedBy ? "REVERSED" : d.state,
+        storedState: d.state,
+        reversedBy: d.reversedBy
+          ? {
+              ...d.reversedBy,
+              postingDate: date(d.reversedBy.postingDate),
+              entry: d.reversedBy.entry
+                ? {
+                    ...d.reversedBy.entry,
+                    postingDate: date(d.reversedBy.entry.postingDate),
+                    lines: d.reversedBy.entry.lines.map((l) => ({
+                      ...l,
+                      debit: l.debit.toFixed(2),
+                      credit: l.credit.toFixed(2),
+                    })),
+                  }
+                : null,
+            }
+          : null,
+        unallocatedBy: d.unallocatedBy
+          ? {
+              ...d.unallocatedBy,
+              postingDate: date(d.unallocatedBy.postingDate),
+            }
+          : null,
+        creditLines: d.creditLines.map((c) => ({
+          ...c,
+          amount: c.amount.toFixed(2),
+          invoiceLine: {
+            ...c.invoiceLine,
+            totalAmount: c.invoiceLine.totalAmount.toFixed(2),
+          },
+        })),
+        creditSplit: d.creditSplit
+          ? {
+              ...d.creditSplit,
+              arAmount: d.creditSplit.arAmount.toFixed(2),
+              balanceAmount: d.creditSplit.balanceAmount.toFixed(2),
+            }
+          : null,
         balanceEvents: d.balanceEvents.map((e) => ({
           ...e,
           amount: e.amount.toFixed(2),
@@ -267,7 +375,13 @@ export async function customers(
     await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock_shared(629815)`;
     const where: Prisma.FinanceCustomerDocumentWhereInput = {
       kind: resource,
-      ...(q.state !== "ALL" ? { state: q.state } : {}),
+      ...(q.state === "REVERSED"
+        ? { reversedBy: { isNot: null } }
+        : q.state === "POSTED"
+          ? { state: "POSTED", reversedBy: null }
+          : q.state !== "ALL"
+            ? { state: q.state }
+            : {}),
       ...(q.partyId ? { partyId: q.partyId } : {}),
       ...(q.from || q.to
         ? {
@@ -292,7 +406,10 @@ export async function customers(
       page = Math.min(q.page, pages);
     const items = await tx.financeCustomerDocument.findMany({
       where,
-      include: { party: { select: { name: true } } },
+      include: {
+        party: { select: { name: true } },
+        reversedBy: { select: { id: true } },
+      },
       orderBy: [{ postingDate: "desc" }, { id: "asc" }],
       take: q.pageSize,
       skip: (page - 1) * q.pageSize,
@@ -307,7 +424,10 @@ export async function customers(
       },
     });
     return {
-      items: items.map(dto),
+      items: items.map((i) => ({
+        ...dto(i),
+        state: i.reversedBy ? "REVERSED" : i.state,
+      })),
       total,
       pages,
       page,

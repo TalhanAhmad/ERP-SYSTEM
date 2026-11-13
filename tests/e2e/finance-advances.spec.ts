@@ -113,7 +113,7 @@ test("held client advance applies through the UI without receiving cash twice", 
       .getByLabel("Source advance", { exact: true })
       .selectOption(receipt.id);
     await form
-      .getByLabel("Bank or cash reference")
+      .getByLabel("Application reference")
       .fill(prefix + " application");
     await form
       .getByLabel("Application date", { exact: true })

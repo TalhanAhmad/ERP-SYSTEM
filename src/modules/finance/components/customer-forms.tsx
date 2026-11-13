@@ -1,7 +1,7 @@
 "use client";
+import { useState } from "react";
 import { customerResources } from "../receivables/customer/resources";
 import type { CustomerResource } from "../receivables/customer/schemas";
-import { useState } from "react";
 import type { customerDetail } from "../receivables/customer/service";
 import { FinanceActionForm } from "./finance-action-form";
 import { AccountPicker } from "./account-picker";
@@ -12,29 +12,46 @@ export function CustomerForm({
   resource = "RECEIPT",
 }: {
   item?: Customer;
-  resource?: CustomerResource;
   hosted: boolean;
+  resource?: CustomerResource;
 }) {
-  const config = customerResources[resource];
-  const [source, setSource] = useState<string | null>(
+  const config = customerResources[resource],
+    isReceipt = resource === "RECEIPT",
+    isCredit = resource === "CUSTOMER_CREDIT",
+    isRefund = resource === "CUSTOMER_REFUND",
+    isApplication = resource === "ADVANCE_APPLICATION";
+  const [project, setProject] = useState<string | null>(
+    item?.projectId ?? null,
+  );
+  const [party, setParty] = useState<string | null>(item?.partyId ?? null),
+    [cash, setCash] = useState<string | null>(item?.cashAccountId ?? null),
+    [source, setSource] = useState<string | null>(
       item?.sourceDocumentId ?? null,
     ),
     [advance, setAdvance] = useState<string | null>(
       item?.advanceAccountId ?? null,
-    );
-  const [party, setParty] = useState<string | null>(item?.partyId ?? null),
-    [cash, setCash] = useState<string | null>(item?.cashAccountId ?? null),
+    ),
+    [invoice, setInvoice] = useState<string | null>(
+      item?.creditInvoiceId ?? null,
+    ),
     [feeAccount, setFeeAccount] = useState<string | null>(
       item?.feeAccountId ?? null,
     ),
-    [fee, setFee] = useState(item?.feeAmount ?? "0.00"),
-    [project, setProject] = useState<string | null>(item?.projectId ?? null),
-    [allocations, setAllocations] = useState(
+    [fee, setFee] = useState(item?.feeAmount ?? "0.00");
+  const [allocations, setAllocations] = useState(
       () =>
         item?.allocations.map((a) => ({
           key: a.id,
           invoiceId: a.invoiceId,
           amount: a.amount,
+        })) ?? [],
+    ),
+    [credits, setCredits] = useState(
+      () =>
+        item?.creditLines.map((c) => ({
+          key: c.id,
+          invoiceLineId: c.invoiceLineId,
+          amount: c.amount,
         })) ?? [],
     );
   return (
@@ -53,21 +70,42 @@ export function CustomerForm({
         description: String(f.get("description")),
         evidence: String(f.get("evidence")),
         currency: "PKR",
-        allocations: allocations.map((a) => ({
-          invoiceId: a.invoiceId,
-          amount: a.amount,
-        })),
         reason: String(f.get("reason")),
         ...(item ? { expectedVersion: item.version } : {}),
-        ...(resource === "RECEIPT"
+        ...(isReceipt
           ? {
               cashAccountId: cash,
               advanceAccountId: advance,
               feeAccountId: /^0(?:\.0{1,2})?$/.test(fee) ? null : feeAccount,
               cashAmount: String(f.get("cashAmount")),
               feeAmount: fee,
+              allocations: allocations.map((a) => ({
+                invoiceId: a.invoiceId,
+                amount: a.amount,
+              })),
             }
-          : { sourceDocumentId: source }),
+          : isApplication
+            ? {
+                sourceDocumentId: source,
+                allocations: allocations.map((a) => ({
+                  invoiceId: a.invoiceId,
+                  amount: a.amount,
+                })),
+              }
+            : isCredit
+              ? {
+                  invoiceId: invoice,
+                  advanceAccountId: advance,
+                  creditLines: credits.map((c) => ({
+                    invoiceLineId: c.invoiceLineId,
+                    amount: c.amount,
+                  })),
+                }
+              : {
+                  sourceDocumentId: source,
+                  cashAccountId: cash,
+                  cashAmount: String(f.get("cashAmount")),
+                }),
       })}
     >
       <div className="form-grid">
@@ -75,19 +113,22 @@ export function CustomerForm({
           kind="party"
           label={config.clientLabel}
           value={party}
+          required
           onChange={(id) => {
             setParty(id);
+            setSource(null);
+            setInvoice(null);
             setAllocations([]);
+            setCredits([]);
           }}
-          required
           initial={
             item ? [{ id: item.partyId, code: "", name: item.party.name }] : []
           }
         />
-        {resource === "RECEIPT" && (
+        {(isReceipt || isRefund) && (
           <AccountPicker
             kind="cash-account"
-            label="Received into"
+            label={isRefund ? "Refund from" : "Received into"}
             value={cash}
             onChange={setCash}
             required
@@ -104,10 +145,10 @@ export function CustomerForm({
             }
           />
         )}
-        {resource === "ADVANCE_APPLICATION" && (
+        {(isApplication || isRefund) && (
           <AccountPicker
             kind="advance-source"
-            label="Source advance"
+            label={isRefund ? "Refund source funds" : "Source advance"}
             partyId={party ?? undefined}
             value={source}
             onChange={setSource}
@@ -125,15 +166,39 @@ export function CustomerForm({
             }
           />
         )}
-        <AccountPicker
-          kind="project"
-          label="Receipt project"
-          value={project}
-          onChange={setProject}
-        />
+        {isCredit && (
+          <AccountPicker
+            kind="credit-invoice"
+            label="Credited invoice"
+            partyId={party ?? undefined}
+            value={invoice}
+            onChange={(id) => {
+              setInvoice(id);
+              setCredits([]);
+            }}
+            required
+            initial={
+              item?.creditInvoiceId
+                ? [
+                    {
+                      id: item.creditInvoiceId,
+                      code: item.creditInvoice?.number ?? "",
+                      name: "Original invoice",
+                    },
+                  ]
+                : []
+            }
+          />
+        )}
       </div>
       <label>
-        Bank or cash reference
+        {isReceipt
+          ? "Bank or cash reference"
+          : isApplication
+            ? "Application reference"
+            : isCredit
+              ? "Credit reference"
+              : "Refund reference"}
         <input
           name="reference"
           required
@@ -141,6 +206,12 @@ export function CustomerForm({
           defaultValue={item?.reference}
         />
       </label>
+      <AccountPicker
+        kind="project"
+        label="Document project"
+        value={project}
+        onChange={setProject}
+      />
       <div className="form-grid">
         <label>
           {config.dateLabel}
@@ -160,30 +231,30 @@ export function CustomerForm({
             defaultValue={item?.postingDate}
           />
         </label>
-        {resource === "RECEIPT" && (
-          <>
-            <label>
-              Cash received (PKR)
-              <input
-                name="cashAmount"
-                required
-                inputMode="decimal"
-                defaultValue={item?.cashAmount}
-              />
-            </label>
-            <label>
-              Explicit fee (PKR)
-              <input
-                value={fee}
-                required
-                inputMode="decimal"
-                onChange={(e) => setFee(e.target.value)}
-              />
-            </label>
-          </>
+        {(isReceipt || isRefund) && (
+          <label>
+            {isRefund ? "Refund amount (PKR)" : "Cash received (PKR)"}
+            <input
+              name="cashAmount"
+              required
+              inputMode="decimal"
+              defaultValue={item?.cashAmount}
+            />
+          </label>
+        )}
+        {isReceipt && (
+          <label>
+            Explicit fee (PKR)
+            <input
+              value={fee}
+              required
+              inputMode="decimal"
+              onChange={(e) => setFee(e.target.value)}
+            />
+          </label>
         )}
       </div>
-      {resource === "RECEIPT" && !/^0(?:\.0{1,2})?$/.test(fee) && (
+      {isReceipt && !/^0(?:\.0{1,2})?$/.test(fee) && (
         <AccountPicker
           kind="fee"
           label="Fee expense account"
@@ -197,12 +268,15 @@ export function CustomerForm({
           }
         />
       )}
-      {resource === "RECEIPT" && (
+      {(isReceipt || isCredit) && (
         <AccountPicker
           kind="advance"
-          label="Client advance account"
+          label={
+            isCredit ? "Customer credit liability" : "Client advance account"
+          }
           value={advance}
           onChange={setAdvance}
+          required={isCredit}
           initial={
             item?.advanceAccountId && item.advanceAccount
               ? [{ id: item.advanceAccountId, ...item.advanceAccount }]
@@ -223,84 +297,175 @@ export function CustomerForm({
         Supporting evidence reference
         <textarea
           name="evidence"
+          defaultValue={item?.evidence}
           required
           minLength={3}
           maxLength={1000}
-          defaultValue={item?.evidence}
         />
       </label>
-      {allocations.map((a, i) => (
-        <fieldset className="panel" key={a.key}>
-          <legend>Allocation {i + 1}</legend>
-          <AccountPicker
-            kind="invoice"
-            label={"Invoice for allocation " + (i + 1)}
-            partyId={party ?? undefined}
-            value={a.invoiceId}
-            required
-            onChange={(id) =>
-              setAllocations(
-                allocations.map((x) =>
-                  x.key === a.key ? { ...x, invoiceId: id ?? "" } : x,
-                ),
-              )
-            }
-            initial={
-              item?.allocations.find((x) => x.invoiceId === a.invoiceId)
-                ? [
-                    {
-                      id: a.invoiceId,
-                      code: item.allocations.find(
-                        (x) => x.invoiceId === a.invoiceId,
-                      )!.invoice.number,
-                      name: "Current invoice",
-                    },
-                  ]
-                : []
-            }
-          />
-          <label>
-            Allocation {i + 1} amount (PKR)
-            <input
-              required
-              inputMode="decimal"
-              value={a.amount}
-              onChange={(e) =>
-                setAllocations(
-                  allocations.map((x) =>
-                    x.key === a.key ? { ...x, amount: e.target.value } : x,
-                  ),
-                )
-              }
-            />
-          </label>
+      {(isReceipt || isApplication) && (
+        <>
+          {allocations.map((a, i) => (
+            <fieldset key={a.key} className="panel">
+              <legend>Allocation {i + 1}</legend>
+              <AccountPicker
+                kind="invoice"
+                label={"Invoice for allocation " + (i + 1)}
+                partyId={party ?? undefined}
+                value={a.invoiceId}
+                required
+                onChange={(id) =>
+                  setAllocations(
+                    allocations.map((x) =>
+                      x.key === a.key ? { ...x, invoiceId: id ?? "" } : x,
+                    ),
+                  )
+                }
+                initial={
+                  item?.allocations.find((x) => x.invoiceId === a.invoiceId)
+                    ? [
+                        {
+                          id: a.invoiceId,
+                          code: item.allocations.find(
+                            (x) => x.invoiceId === a.invoiceId,
+                          )!.invoice.number,
+                          name: "Current invoice",
+                        },
+                      ]
+                    : []
+                }
+              />
+              <label>
+                Allocation {i + 1} amount (PKR)
+                <input
+                  required
+                  inputMode="decimal"
+                  value={a.amount}
+                  onChange={(e) =>
+                    setAllocations(
+                      allocations.map((x) =>
+                        x.key === a.key ? { ...x, amount: e.target.value } : x,
+                      ),
+                    )
+                  }
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() =>
+                  setAllocations(allocations.filter((x) => x.key !== a.key))
+                }
+              >
+                Remove allocation {i + 1}
+              </button>
+            </fieldset>
+          ))}
           <button
             type="button"
+            disabled={!party || allocations.length >= 100}
             onClick={() =>
-              setAllocations(allocations.filter((x) => x.key !== a.key))
+              setAllocations([
+                ...allocations,
+                { key: crypto.randomUUID(), invoiceId: "", amount: "0.00" },
+              ])
             }
           >
-            Remove allocation {i + 1}
+            Add invoice allocation
           </button>
-        </fieldset>
-      ))}
-      <button
-        type="button"
-        disabled={!party || allocations.length >= 100}
-        onClick={() =>
-          setAllocations([
-            ...allocations,
-            { key: crypto.randomUUID(), invoiceId: "", amount: "0.00" },
-          ])
-        }
-      >
-        Add invoice allocation
-      </button>
-      <p>
-        Unallocated cash is held as a client advance. Select a client advance
-        account when money remains. Applying an advance records no additional
-        cash. Withholding needs its own reviewed mapping.
-      </p>
+        </>
+      )}
+      {isCredit && (
+        <>
+          {credits.map((c, i) => (
+            <fieldset key={c.key} className="panel">
+              <legend>Credit line {i + 1}</legend>
+              <AccountPicker
+                kind="invoice-line"
+                label={"Invoice line for credit " + (i + 1)}
+                invoiceId={invoice ?? undefined}
+                value={c.invoiceLineId}
+                required
+                onChange={(id) =>
+                  setCredits(
+                    credits.map((x) =>
+                      x.key === c.key ? { ...x, invoiceLineId: id ?? "" } : x,
+                    ),
+                  )
+                }
+                initial={
+                  item?.creditLines.find(
+                    (x) => x.invoiceLineId === c.invoiceLineId,
+                  )
+                    ? [
+                        {
+                          id: c.invoiceLineId,
+                          code: "Invoice line",
+                          name: item.creditLines.find(
+                            (x) => x.invoiceLineId === c.invoiceLineId,
+                          )!.invoiceLine.description,
+                        },
+                      ]
+                    : []
+                }
+              />
+              <label>
+                Credit line {i + 1} amount (PKR)
+                <input
+                  required
+                  inputMode="decimal"
+                  value={c.amount}
+                  onChange={(e) =>
+                    setCredits(
+                      credits.map((x) =>
+                        x.key === c.key ? { ...x, amount: e.target.value } : x,
+                      ),
+                    )
+                  }
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() =>
+                  setCredits(credits.filter((x) => x.key !== c.key))
+                }
+              >
+                Remove credit line {i + 1}
+              </button>
+            </fieldset>
+          ))}
+          <button
+            type="button"
+            disabled={!invoice || credits.length >= 100}
+            onClick={() =>
+              setCredits([
+                ...credits,
+                { key: crypto.randomUUID(), invoiceLineId: "", amount: "0.00" },
+              ])
+            }
+          >
+            Add credit line
+          </button>
+          <p>
+            Posting reduces eligible receivables first. A paid portion becomes
+            held customer credit, available for application or refund.
+          </p>
+        </>
+      )}
+      {isReceipt && (
+        <p>
+          Unallocated money needs a client advance account. Fees are explicit
+          expenses; withholding needs a separate reviewed mapping.
+        </p>
+      )}
+      {isApplication && (
+        <p>Applying held funds records no additional cash or revenue.</p>
+      )}
+      {isRefund && (
+        <p>
+          This returns available client funds from the selected bank or cash
+          account. A refund is not an expense.
+        </p>
+      )}
     </FinanceActionForm>
   );
 }
@@ -311,18 +476,25 @@ export function CustomerAction({
   resource = "RECEIPT",
 }: {
   item: Customer;
-  action: "POST" | "VOID";
-  resource?: CustomerResource;
+  action: "POST" | "VOID" | "REVERSE" | "UNALLOCATE";
   hosted: boolean;
+  resource?: CustomerResource;
 }) {
-  const config = customerResources[resource];
+  const config = customerResources[resource],
+    [advance, setAdvance] = useState<string | null>(item.advanceAccountId),
+    label =
+      action === "UNALLOCATE"
+        ? "Release invoice settlements"
+        : (action === "POST"
+            ? "Post "
+            : action === "REVERSE"
+              ? "Reverse "
+              : "Void ") +
+          config.singular +
+          (action === "VOID" ? " draft" : "");
   return (
     <FinanceActionForm
-      label={
-        (action === "POST" ? "Post " : "Void ") +
-        config.singular +
-        (action === "VOID" ? " draft" : "")
-      }
+      label={label}
       endpoint={
         "/api/v1/finance/" +
         config.path +
@@ -332,14 +504,48 @@ export function CustomerAction({
         action.toLowerCase()
       }
       hosted={hosted}
+      redirectPrefix={
+        action === "UNALLOCATE" ? "/finance/receipt-unallocations/" : undefined
+      }
       business={(f) => ({
         expectedVersion: item.version,
         reason: String(f.get("reason")),
+        ...(["REVERSE", "UNALLOCATE"].includes(action)
+          ? { postingDate: String(f.get("postingDate")) }
+          : {}),
+        ...(action === "UNALLOCATE" ? { advanceAccountId: advance } : {}),
       })}
     >
+      {["REVERSE", "UNALLOCATE"].includes(action) && (
+        <label>
+          Correction posting date
+          <input
+            name="postingDate"
+            type="date"
+            min={item.postingDate}
+            required
+          />
+        </label>
+      )}
+      {action === "UNALLOCATE" && (
+        <>
+          <AccountPicker
+            kind="advance"
+            label="Released client funds account"
+            value={advance}
+            onChange={setAdvance}
+            required
+          />
+          <p>
+            Release every invoice allocation from this receipt into held client
+            funds. Cash stays in the company account. This release can be
+            recorded once.
+          </p>
+        </>
+      )}
       <label className="check-label">
-        <input type="checkbox" required />I checked the actual cash, fees,
-        invoices and posting date.
+        <input type="checkbox" required />I reviewed the client, amounts,
+        evidence and posting date.
       </label>
     </FinanceActionForm>
   );

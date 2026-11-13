@@ -1,6 +1,6 @@
 # Finance backlog
 
-F01–F11 engineering acceptance is complete: 11/48, 37 remain. Exact current evidence is in [F11 results](../testing/F11-results.md). Next F12 builds invoice editing/preview/private printable document; F13 receipts/allocations follows. Protected controls stay blocked in generic manual journals. F11 posting includes dated AR/BILLED events but no recognition/settlement/credit workflow.
+F01–F15 local engineering acceptance is complete:15/48, 33 remain. See [current results](../testing/F12-F15-results.md). Next F16 builds bills/immediate expenses and category/project splits. Customer billing/receipts/advances/credits/refunds/corrections now use typed GL/subledger sources; no generic protected-control bypass is allowed.
 
 F14–F42 continue advances/credits/payables/taxes, attachments, cash/funding/assets/investments/projects/budgets/reconciliation, financial statements/exports/closing/opening books/jobs. F43–F48 complete full fixture/security/ERP/browser/recovery/accountant acceptance and request a separate launch decision. The ordinary-account F08 subset does not complete those groups.
 

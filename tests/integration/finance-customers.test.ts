@@ -947,3 +947,724 @@ it("denies runtime direct balance mutation and private capacity helper after set
     await sql.end();
   }
 });
+async function documentCommand(
+  resource: Parameters<typeof customerCommand>[2],
+  action: Parameters<typeof customerCommand>[3],
+  input: unknown,
+  key = crypto.randomUUID(),
+  who = "owner",
+) {
+  const v = await proof(who);
+  return customerCommand(v.actor, v.proof, resource, action, input, key);
+}
+async function creditInput(
+  invoiceId: string,
+  amount: string,
+  patch: Record<string, unknown> = {},
+) {
+  const i = await invoiceDetail(people.owner, invoiceId);
+  return {
+    reference: prefix + ".CN" + ++count,
+    partyId: client,
+    invoiceId,
+    advanceAccountId: await advanceAccount(),
+    documentDate: period.start,
+    postingDate: period.start,
+    description: "Synthetic customer credit",
+    evidence: "Reviewed source correction",
+    currency: "PKR",
+    creditLines: [{ invoiceLineId: i.item.lines[0].id, amount }],
+    reason: "Review eligible original credit",
+    ...patch,
+  };
+}
+async function postCredit(input: unknown) {
+  const d = await documentCommand("CUSTOMER_CREDIT", "CREATE", input);
+  await documentCommand("CUSTOMER_CREDIT", "POST", {
+    id: d.id,
+    expectedVersion: 1,
+    reason: "Post eligible customer credit",
+  });
+  return customerDetail(people.owner, "CUSTOMER_CREDIT", d.id);
+}
+const refundInput = (
+  sourceDocumentId: string,
+  cashAmount: string,
+  patch: Record<string, unknown> = {},
+) => ({
+  reference: prefix + ".RFN" + ++count,
+  partyId: client,
+  sourceDocumentId,
+  cashAccountId: bank,
+  cashAmount,
+  documentDate: period.start,
+  postingDate: period.start,
+  description: "Return held client money",
+  evidence: "Approved synthetic refund",
+  reason: "Reviewed client refund",
+  ...patch,
+});
+async function postRefund(input: unknown) {
+  const d = await documentCommand("CUSTOMER_REFUND", "CREATE", input);
+  await documentCommand("CUSTOMER_REFUND", "POST", {
+    id: d.id,
+    expectedVersion: 1,
+    reason: "Return actual held funds",
+  });
+  return customerDetail(people.owner, "CUSTOMER_REFUND", d.id);
+}
+const nextDate = (n = 1) =>
+  new Date(new Date(period.start).getTime() + n * 86400000)
+    .toISOString()
+    .slice(0, 10);
+async function reverse(
+  resource: Parameters<typeof customerCommand>[2],
+  id: string,
+  patch: Record<string, unknown> = {},
+  key = crypto.randomUUID(),
+) {
+  return documentCommand(
+    resource,
+    "REVERSE",
+    {
+      id,
+      expectedVersion: 2,
+      postingDate: nextDate(),
+      reason: "Dated reviewed correction",
+      ...patch,
+    },
+    key,
+  );
+}
+it("credits an unpaid earned invoice against receivables without cash or expense", async () => {
+  const i = await invoice("100"),
+    c = await postCredit(await creditInput(i.id, "40"));
+  expect(c.item.creditSplit).toMatchObject({
+    arAmount: "40.00",
+    balanceAmount: "0.00",
+  });
+  expect(await outstanding(i.id)).toBe("60.00");
+  expect(
+    c.item.entry!.lines.map((l) => [l.accountId, l.debit, l.credit]),
+  ).toEqual([
+    [ar, "0.00", "40.00"],
+    [revenue, "40.00", "0.00"],
+  ]);
+  expect(c.item.creditLines[0].amount).toBe("40.00");
+});
+it("turns paid invoice credits into refundable client liability, never a refund expense", async () => {
+  const i = await invoice("100");
+  await postReceipt(receipt([{ invoiceId: i.id, amount: "100" }], "100"));
+  const input = await creditInput(i.id, "40"),
+    c = await postCredit(input),
+    r = await postRefund(refundInput(c.item.id, "25"));
+  expect(c.item.creditSplit).toMatchObject({
+    arAmount: "0.00",
+    balanceAmount: "40.00",
+  });
+  expect(c.availableAdvance).toBe("40.00");
+  expect(
+    r.item.entry!.lines.map((l) => [l.accountId, l.debit, l.credit]),
+  ).toEqual([
+    [input.advanceAccountId, "25.00", "0.00"],
+    [cash, "0.00", "25.00"],
+  ]);
+  expect(
+    (await customerDetail(people.owner, "CUSTOMER_CREDIT", c.item.id))
+      .availableAdvance,
+  ).toBe("15.00");
+  expect(await outstanding(i.id)).toBe("0.00");
+});
+it("splits partially-paid invoice credits between AR and customer balance at posting", async () => {
+  const i = await invoice("100");
+  await postReceipt(receipt([{ invoiceId: i.id, amount: "60" }], "60"));
+  const c = await postCredit(await creditInput(i.id, "70"));
+  expect(c.item.creditSplit).toMatchObject({
+    arAmount: "40.00",
+    balanceAmount: "30.00",
+  });
+  expect(await outstanding(i.id)).toBe("0.00");
+  expect(c.item.entry!.lines.map((l) => [l.debit, l.credit])).toEqual([
+    ["0.00", "40.00"],
+    ["0.00", "30.00"],
+    ["70.00", "0.00"],
+  ]);
+});
+it("recomputes a draft credit's settlement split when the invoice is paid before credit posting", async () => {
+  const i = await invoice("100"),
+    c = await documentCommand(
+      "CUSTOMER_CREDIT",
+      "CREATE",
+      await creditInput(i.id, "40"),
+    );
+  await postReceipt(receipt([{ invoiceId: i.id, amount: "100" }], "100"));
+  await documentCommand("CUSTOMER_CREDIT", "POST", {
+    id: c.id,
+    expectedVersion: 1,
+    reason: "Recheck current paid balance",
+  });
+  expect(
+    (await customerDetail(people.owner, "CUSTOMER_CREDIT", c.id)).item
+      .creditSplit,
+  ).toMatchObject({ arAmount: "0.00", balanceAmount: "40.00" });
+});
+it("cancels deferred billing through its liability without recognizing revenue", async () => {
+  const def = await account({
+      type: "LIABILITY",
+      normalSide: "CREDIT",
+      reportGroup: "CURRENT_LIABILITIES",
+      controlType: "DEFERRED_REVENUE",
+    }),
+    d = await command(
+      "CREATE",
+      body({
+        lines: [
+          line({
+            unitRate: "100",
+            recognition: "DEFERRED",
+            deferredAccountId: def,
+          }),
+        ],
+      }),
+    );
+  await command("POST", {
+    id: d.id,
+    expectedVersion: 1,
+    reason: "Bill unearned service",
+  });
+  const c = await postCredit(await creditInput(d.id, "30"));
+  expect(c.item.entry!.lines.map((l) => l.accountId)).toEqual([ar, def]);
+  const balance = await db.financeDeferredRevenueEvent.aggregate({
+    where: { invoiceLine: { invoiceId: d.id } },
+    _sum: { amount: true },
+  });
+  expect(balance._sum.amount!.toFixed(2)).toBe("70.00");
+});
+it("caps cumulative credit notes and concurrent credit posting at original eligible line amounts", async () => {
+  const i = await invoice("100"),
+    input = await creditInput(i.id, "60"),
+    a = await documentCommand("CUSTOMER_CREDIT", "CREATE", input),
+    b = await documentCommand("CUSTOMER_CREDIT", "CREATE", {
+      ...input,
+      reference: prefix + " competing",
+    });
+  const results = await Promise.allSettled(
+    [a, b].map((d) =>
+      documentCommand("CUSTOMER_CREDIT", "POST", {
+        id: d.id,
+        expectedVersion: 1,
+        reason: "Concurrent eligible credit",
+      }),
+    ),
+  );
+  expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+  expect(await outstanding(i.id)).toBe("40.00");
+  const extra = await documentCommand(
+    "CUSTOMER_CREDIT",
+    "CREATE",
+    await creditInput(i.id, "41"),
+  );
+  await expect(
+    documentCommand("CUSTOMER_CREDIT", "POST", {
+      id: extra.id,
+      expectedVersion: 1,
+      reason: "Cumulative cap check",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_CREDIT_UNAVAILABLE" });
+});
+it("rejects cross-invoice credit lines and backdated credit that would invalidate future settlement", async () => {
+  const i = await invoice("100"),
+    other = await invoice("100"),
+    input = await creditInput(i.id, "20"),
+    wrong = (await invoiceDetail(people.owner, other.id)).item.lines[0].id;
+  await expect(
+    documentCommand("CUSTOMER_CREDIT", "CREATE", {
+      ...input,
+      creditLines: [{ invoiceLineId: wrong, amount: "20" }],
+    }),
+  ).rejects.toThrow();
+  await postReceipt(
+    receipt([{ invoiceId: i.id, amount: "100" }], "100", {
+      postingDate: nextDate(5),
+    }),
+  );
+  const c = await documentCommand("CUSTOMER_CREDIT", "CREATE", input);
+  await expect(
+    documentCommand("CUSTOMER_CREDIT", "POST", {
+      id: c.id,
+      expectedVersion: 1,
+      reason: "Backdated settlement ordering",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_SETTLEMENT_ORDER" });
+  expect(await outstanding(i.id)).toBe("0.00");
+});
+it("prevents concurrent refunds from overdrawing dated client funds", async () => {
+  const liability = await advanceAccount(),
+    r = await postReceipt(receipt([], "100", { advanceAccountId: liability })),
+    a = await documentCommand(
+      "CUSTOMER_REFUND",
+      "CREATE",
+      refundInput(r.item.id, "60"),
+    ),
+    b = await documentCommand(
+      "CUSTOMER_REFUND",
+      "CREATE",
+      refundInput(r.item.id, "60"),
+    );
+  const results = await Promise.allSettled(
+    [a, b].map((d) =>
+      documentCommand("CUSTOMER_REFUND", "POST", {
+        id: d.id,
+        expectedVersion: 1,
+        reason: "Concurrent refund cap",
+      }),
+    ),
+  );
+  expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+  expect(
+    (await customerDetail(people.owner, "RECEIPT", r.item.id)).availableAdvance,
+  ).toBe("40.00");
+});
+it("applies paid customer credit to another invoice without moving cash twice", async () => {
+  const a = await invoice("100"),
+    b = await invoice("100");
+  await postReceipt(receipt([{ invoiceId: a.id, amount: "100" }], "100"));
+  const c = await postCredit(await creditInput(a.id, "40")),
+    app = await application(
+      "CREATE",
+      applicationBody(c.item.id, [{ invoiceId: b.id, amount: "25" }]),
+    );
+  await application("POST", {
+    id: app.id,
+    expectedVersion: 1,
+    reason: "Apply client credit to other invoice",
+  });
+  expect(await outstanding(b.id)).toBe("75.00");
+  expect(
+    (await customerDetail(people.owner, "CUSTOMER_CREDIT", c.item.id))
+      .availableAdvance,
+  ).toBe("15.00");
+  expect(
+    (
+      await customerDetail(people.owner, "ADVANCE_APPLICATION", app.id)
+    ).item.entry!.lines.some((l) => l.accountId === cash),
+  ).toBe(false);
+});
+it("reverses receipts with opposite dated events while preserving earlier AR history", async () => {
+  const i = await invoice("100"),
+    r = await postReceipt(receipt([{ invoiceId: i.id, amount: "60" }], "60")),
+    key = crypto.randomUUID(),
+    input = {
+      id: r.item.id,
+      expectedVersion: 2,
+      postingDate: nextDate(),
+      reason: "Correct receipt on next date",
+    };
+  const a = await documentCommand("RECEIPT", "REVERSE", input, key),
+    b = await documentCommand("RECEIPT", "REVERSE", input, key);
+  expect(a).toEqual(b);
+  expect(await outstanding(i.id)).toBe("100.00");
+  const before = await db.financeReceivableEvent.aggregate({
+    where: { invoiceId: i.id, effectiveDate: { lte: new Date(period.start) } },
+    _sum: { amount: true },
+  });
+  expect(before._sum.amount!.toFixed(2)).toBe("40.00");
+  expect(
+    (await customerDetail(people.owner, "RECEIPT", r.item.id)).item.state,
+  ).toBe("REVERSED");
+  await expect(reverse("RECEIPT", r.item.id)).rejects.toMatchObject({
+    code: "FINANCE_SETTLEMENT_UNAVAILABLE",
+  });
+});
+it("requires reversing applications before undoing their source advance receipt", async () => {
+  const liability = await advanceAccount(),
+    r = await postReceipt(receipt([], "100", { advanceAccountId: liability })),
+    i = await invoice("100"),
+    a = await application(
+      "CREATE",
+      applicationBody(r.item.id, [{ invoiceId: i.id, amount: "40" }]),
+    );
+  await application("POST", {
+    id: a.id,
+    expectedVersion: 1,
+    reason: "Apply held funds",
+  });
+  await expect(reverse("RECEIPT", r.item.id)).rejects.toMatchObject({
+    code: "FINANCE_ADVANCE_UNAVAILABLE",
+  });
+  await reverse("ADVANCE_APPLICATION", a.id);
+  await reverse("RECEIPT", r.item.id);
+  expect(
+    (await customerDetail(people.owner, "RECEIPT", r.item.id)).availableAdvance,
+  ).toBe("0.00");
+  expect(await outstanding(i.id)).toBe("100.00");
+});
+it("requires refund reversal before undoing a consumed paid credit note", async () => {
+  const i = await invoice("100");
+  await postReceipt(receipt([{ invoiceId: i.id, amount: "100" }], "100"));
+  const c = await postCredit(await creditInput(i.id, "40")),
+    r = await postRefund(refundInput(c.item.id, "25"));
+  await expect(reverse("CUSTOMER_CREDIT", c.item.id)).rejects.toMatchObject({
+    code: "FINANCE_ADVANCE_UNAVAILABLE",
+  });
+  await reverse("CUSTOMER_REFUND", r.item.id);
+  await reverse("CUSTOMER_CREDIT", c.item.id);
+  expect(
+    (await customerDetail(people.owner, "CUSTOMER_CREDIT", c.item.id))
+      .availableAdvance,
+  ).toBe("0.00");
+  expect(await outstanding(i.id)).toBe("0.00");
+});
+it("restores deferred billing and credit eligibility only on the dated credit reversal", async () => {
+  const def = await account({
+      type: "LIABILITY",
+      normalSide: "CREDIT",
+      reportGroup: "CURRENT_LIABILITIES",
+      controlType: "DEFERRED_REVENUE",
+    }),
+    i = await command(
+      "CREATE",
+      body({
+        lines: [
+          line({
+            unitRate: "100",
+            recognition: "DEFERRED",
+            deferredAccountId: def,
+          }),
+        ],
+      }),
+    );
+  await command("POST", {
+    id: i.id,
+    expectedVersion: 1,
+    reason: "Deferred source",
+  });
+  const c = await postCredit(await creditInput(i.id, "40"));
+  await reverse("CUSTOMER_CREDIT", c.item.id);
+  const all = await db.financeDeferredRevenueEvent.aggregate({
+      where: { invoiceLine: { invoiceId: i.id } },
+      _sum: { amount: true },
+    }),
+    earlier = await db.financeDeferredRevenueEvent.aggregate({
+      where: {
+        invoiceLine: { invoiceId: i.id },
+        effectiveDate: { lte: new Date(period.start) },
+      },
+      _sum: { amount: true },
+    });
+  expect(all._sum.amount!.toFixed(2)).toBe("100.00");
+  expect(earlier._sum.amount!.toFixed(2)).toBe("60.00");
+  const next = await creditInput(i.id, "100", {
+    documentDate: nextDate(),
+    postingDate: nextDate(),
+  });
+  await postCredit(next);
+  expect(await outstanding(i.id)).toBe("0.00");
+});
+it("releases invoice settlement into held funds without returning cash and supports a dated undo", async () => {
+  const i = await invoice("100"),
+    r = await postReceipt(receipt([{ invoiceId: i.id, amount: "100" }], "100")),
+    liability = await advanceAccount(),
+    released = await documentCommand("RECEIPT", "UNALLOCATE", {
+      id: r.item.id,
+      expectedVersion: 2,
+      postingDate: nextDate(),
+      advanceAccountId: liability,
+      reason: "Keep cash but release invoice settlement",
+    }),
+    u = await customerDetail(people.owner, "UNALLOCATION", released.id);
+  expect(u.availableAdvance).toBe("100.00");
+  expect(await outstanding(i.id)).toBe("100.00");
+  expect(u.item.entry!.lines.some((l) => l.accountId === cash)).toBe(false);
+  await expect(
+    reverse("RECEIPT", r.item.id, { postingDate: nextDate(2) }),
+  ).rejects.toMatchObject({ code: "FINANCE_SETTLEMENT_UNAVAILABLE" });
+  await reverse("UNALLOCATION", u.item.id, { postingDate: nextDate(2) });
+  expect(await outstanding(i.id)).toBe("0.00");
+  await reverse("RECEIPT", r.item.id, { postingDate: nextDate(3) });
+  expect(await outstanding(i.id)).toBe("100.00");
+});
+it("blocks release reversal after its held funds are consumed or invoice is resettled", async () => {
+  const i = await invoice("100"),
+    r = await postReceipt(receipt([{ invoiceId: i.id, amount: "100" }], "100")),
+    u = await documentCommand("RECEIPT", "UNALLOCATE", {
+      id: r.item.id,
+      expectedVersion: 2,
+      postingDate: nextDate(),
+      advanceAccountId: await advanceAccount(),
+      reason: "Release original settlement",
+    });
+  await postRefund(
+    refundInput(u.id, "10", {
+      documentDate: nextDate(),
+      postingDate: nextDate(),
+    }),
+  );
+  await expect(
+    reverse("UNALLOCATION", u.id, { postingDate: nextDate(2) }),
+  ).rejects.toMatchObject({ code: "FINANCE_ADVANCE_UNAVAILABLE" });
+});
+it("keeps credit/split/dated events immutable and rejects forged direct runtime effects", async () => {
+  const i = await invoice("100"),
+    c = await postCredit(await creditInput(i.id, "10"));
+  await expect(
+    db.financeCustomerCreditLine.updateMany({
+      where: { documentId: c.item.id },
+      data: { amount: "1" },
+    }),
+  ).rejects.toThrow();
+  await expect(
+    db.financeCustomerCreditSplit.update({
+      where: { documentId: c.item.id },
+      data: { arAmount: "1" },
+    }),
+  ).rejects.toThrow();
+  await expect(
+    db.financeInvoiceCreditEvent.deleteMany({
+      where: { customerDocumentId: c.item.id },
+    }),
+  ).rejects.toThrow();
+  const sql = new pg.Client({ connectionString: url });
+  await sql.connect();
+  try {
+    await sql.query(await readFile("supabase/setup.sql", "utf8"));
+    await sql.query("SET ROLE encova_app");
+    for (const statement of [
+      'DELETE FROM "FinanceCustomerCreditSplit"',
+      `SELECT encova_finance_customer_fund('${c.item.id}')`,
+      `SELECT encova_finance_credit_capacity('${c.item.creditLines[0].invoiceLineId}',DATE '${period.start}')`,
+    ])
+      await expect(sql.query(statement)).rejects.toMatchObject({
+        code: "42501",
+      });
+  } finally {
+    await sql.end();
+  }
+});
+it("rejects release undo when another receipt has already resettled the invoice", async () => {
+  const i = await invoice("100"),
+    r = await postReceipt(receipt([{ invoiceId: i.id, amount: "100" }], "100")),
+    u = await documentCommand("RECEIPT", "UNALLOCATE", {
+      id: r.item.id,
+      expectedVersion: 2,
+      postingDate: nextDate(),
+      advanceAccountId: await advanceAccount(),
+      reason: "Release settlement without cash return",
+    });
+  await postReceipt(
+    receipt([{ invoiceId: i.id, amount: "100" }], "100", {
+      documentDate: nextDate(),
+      postingDate: nextDate(),
+    }),
+  );
+  await expect(
+    reverse("UNALLOCATION", u.id, { postingDate: nextDate(2) }),
+  ).rejects.toMatchObject({ code: "FINANCE_ALLOCATION_UNAVAILABLE" });
+  expect(await outstanding(i.id)).toBe("0.00");
+  expect(
+    (await customerDetail(people.owner, "UNALLOCATION", u.id)).availableAdvance,
+  ).toBe("100.00");
+});
+it("rolls back credit split preparation on a rejected future posting date", async () => {
+  const i = await invoice("100"),
+    future = await newPeriod(true),
+    c = await documentCommand(
+      "CUSTOMER_CREDIT",
+      "CREATE",
+      await creditInput(i.id, "10", { postingDate: future.start }),
+    );
+  await expect(
+    documentCommand("CUSTOMER_CREDIT", "POST", {
+      id: c.id,
+      expectedVersion: 1,
+      reason: "Future credit cannot post",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_FUTURE_DATE" });
+  const view = await customerDetail(people.owner, "CUSTOMER_CREDIT", c.id);
+  expect(view.item).toMatchObject({
+    state: "DRAFT",
+    version: 1,
+    creditSplit: null,
+    entry: null,
+  });
+});
+it("rejects a forged paid-credit split even when its raw GL and fund events balance", async () => {
+  const i = await invoice("100"),
+    c = await documentCommand(
+      "CUSTOMER_CREDIT",
+      "CREATE",
+      await creditInput(i.id, "10"),
+    ),
+    entry = crypto.randomUUID();
+  await expect(
+    db.$transaction(async (tx) => {
+      const d = await tx.financeCustomerDocument.findUniqueOrThrow({
+        where: { id: c.id },
+      });
+      await tx.financeCustomerCreditSplit.create({
+        data: { documentId: d.id, arAmount: "0", balanceAmount: "10" },
+      });
+      await tx.financeJournalEntry.create({
+        data: {
+          id: entry,
+          reference: "JRN-" + entry,
+          sourceType: "CUSTOMER_DOCUMENT",
+          sourceId: d.id,
+          sourceAction: "POST",
+          customerDocumentId: d.id,
+          postingDate: d.postingDate,
+          periodId: period.id,
+          description: d.description,
+          evidence: d.evidence,
+          postedById: people.owner.id,
+        },
+      });
+      await tx.$executeRaw`INSERT INTO "FinanceJournalLine"(id,"journalId",sequence,"accountId",description,debit,credit,"projectId","partyId","invoiceLineId") SELECT gen_random_uuid(),${entry}::uuid,x.* FROM encova_finance_customer_lines(${d.id}::uuid)x`;
+      await tx.$executeRaw`SELECT encova_finance_customer_effects(${people.owner.id}::uuid,${d.id}::uuid,${entry}::uuid)`;
+    }),
+  ).rejects.toThrow();
+  expect(
+    (await customerDetail(people.owner, "CUSTOMER_CREDIT", c.id)).item,
+  ).toMatchObject({ state: "DRAFT", creditSplit: null, entry: null });
+  expect(await outstanding(i.id)).toBe("100.00");
+});
+it("denies cross-party refunds and refunds against future-reserved client funds", async () => {
+  const liability = await advanceAccount(),
+    r = await postReceipt(receipt([], "100", { advanceAccountId: liability })),
+    other = await party(),
+    bad = await documentCommand(
+      "CUSTOMER_REFUND",
+      "CREATE",
+      refundInput(r.item.id, "10", { partyId: other }),
+    );
+  await expect(
+    documentCommand("CUSTOMER_REFUND", "POST", {
+      id: bad.id,
+      expectedVersion: 1,
+      reason: "Wrong party cannot refund",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_ADVANCE_UNAVAILABLE" });
+  await postRefund(
+    refundInput(r.item.id, "40", {
+      documentDate: nextDate(5),
+      postingDate: nextDate(5),
+    }),
+  );
+  const backdated = await documentCommand(
+    "CUSTOMER_REFUND",
+    "CREATE",
+    refundInput(r.item.id, "80", {
+      documentDate: nextDate(),
+      postingDate: nextDate(),
+    }),
+  );
+  await expect(
+    documentCommand("CUSTOMER_REFUND", "POST", {
+      id: backdated.id,
+      expectedVersion: 1,
+      reason: "Future refund reserves balance",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_ADVANCE_UNAVAILABLE" });
+});
+it("freezes credit-note contacts and privately renders posted PDF while denying drafts and unselected roles", async () => {
+  const { creditPdf } = await import("@/modules/finance/documents/credit-pdf"),
+    original = partyBody(),
+    p = (await master("PARTY_CREATE", original)).id,
+    i = await invoice("100", { partyId: p }),
+    c = await documentCommand(
+      "CUSTOMER_CREDIT",
+      "CREATE",
+      await creditInput(i.id, "10", { partyId: p }),
+    );
+  await expect(creditPdf(people.owner, c.id)).rejects.toMatchObject({
+    code: "FINANCE_CREDIT_UNPOSTED",
+  });
+  await documentCommand("CUSTOMER_CREDIT", "POST", {
+    id: c.id,
+    expectedVersion: 1,
+    reason: "Freeze posted credit evidence",
+  });
+  await master("PARTY_UPDATE", {
+    ...original,
+    id: p,
+    expectedVersion: 1,
+    address: "Changed current contact",
+  });
+  expect(
+    (await customerDetail(people.owner, "CUSTOMER_CREDIT", c.id)).item
+      .partySnapshot,
+  ).toMatchObject({ address: original.address });
+  const bytes = await creditPdf(people.selected, c.id);
+  expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
+  await expect(creditPdf(people.member, c.id)).rejects.toMatchObject({
+    code: "FINANCE_FORBIDDEN",
+  });
+});
+it("rechecks selected access after fresh proof for credit creation", async () => {
+  const i = await invoice("100"),
+    input = await creditInput(i.id, "10"),
+    v = await proof("selected");
+  await db.financeGrant.updateMany({
+    where: { userId: people.selected.id },
+    data: { revokedAt: new Date(), revokedById: people.owner.id },
+  });
+  try {
+    await expect(
+      customerCommand(
+        v.actor,
+        v.proof,
+        "CUSTOMER_CREDIT",
+        "CREATE",
+        input,
+        crypto.randomUUID(),
+      ),
+    ).rejects.toMatchObject({ code: "FINANCE_FORBIDDEN" });
+  } finally {
+    await db.financeGrant.updateMany({
+      where: { userId: people.selected.id },
+      data: { revokedAt: null, revokedById: null },
+    });
+  }
+});
+it("caps credits at the discounted net line amount rather than its gross selling price", async () => {
+  const i = await command(
+    "CREATE",
+    body({
+      lines: [line({ quantity: "2", unitRate: "100", discountAmount: "50" })],
+    }),
+  );
+  await command("POST", {
+    id: i.id,
+    expectedVersion: 1,
+    reason: "Bill explicit discounted line",
+  });
+  const excessive = await documentCommand(
+    "CUSTOMER_CREDIT",
+    "CREATE",
+    await creditInput(i.id, "151"),
+  );
+  await expect(
+    documentCommand("CUSTOMER_CREDIT", "POST", {
+      id: excessive.id,
+      expectedVersion: 1,
+      reason: "Cannot credit original discount twice",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_CREDIT_UNAVAILABLE" });
+  await postCredit(await creditInput(i.id, "150"));
+  expect(await outstanding(i.id)).toBe("0.00");
+});
+it("serializes competing receipt reversal keys into one dated correction", async () => {
+  const i = await invoice("100"),
+    r = await postReceipt(receipt([{ invoiceId: i.id, amount: "100" }], "100"));
+  const results = await Promise.allSettled([
+    reverse("RECEIPT", r.item.id),
+    reverse("RECEIPT", r.item.id),
+  ]);
+  expect(results.filter((v) => v.status === "fulfilled")).toHaveLength(1);
+  expect(
+    await db.financeCustomerDocument.count({
+      where: { reversalOfId: r.item.id },
+    }),
+  ).toBe(1);
+  expect(await outstanding(i.id)).toBe("100.00");
+});

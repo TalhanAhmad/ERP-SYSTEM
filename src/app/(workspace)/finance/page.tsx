@@ -30,7 +30,15 @@ export default async function FinancePage() {
           <Link href="/finance/periods">Accounting periods</Link>
         </p>
         <p>
-          Ordinary journal adjustments are available. Invoices, payments and financial reports follow in later milestones.
+          Review invoices, record client receipts, apply held funds and manage
+          credit notes or refunds.
+        </p>
+        <p>
+          <Link href="/finance/invoices">Invoices</Link> ·{" "}
+          <Link href="/finance/receipts">Client receipts</Link> ·{" "}
+          <Link href="/finance/advance-applications">Apply client funds</Link> ·{" "}
+          <Link href="/finance/customer-credits">Credit notes</Link> ·{" "}
+          <Link href="/finance/customer-refunds">Client refunds</Link>
         </p>
         <Link href="/dashboard" className="button secondary">
           Back to workspace

@@ -205,7 +205,27 @@ export async function invoiceDetail(actor: Pick<Actor, "id">, id: string) {
       where: { invoiceId: id },
       _sum: { amount: true },
     });
+    const credits = await tx.financeCustomerDocument.findMany({
+      where: { creditInvoiceId: id, kind: "CUSTOMER_CREDIT", state: "POSTED" },
+      select: {
+        id: true,
+        number: true,
+        postingDate: true,
+        totalAmount: true,
+        reversedBy: { select: { postingDate: true } },
+      },
+      orderBy: [{ postingDate: "desc" }, { id: "asc" }],
+      take: 100,
+    });
     return {
+      credits: credits.map((c) => ({
+        ...c,
+        totalAmount: c.totalAmount.toFixed(2),
+        postingDate: date(c.postingDate),
+        reversedBy: c.reversedBy
+          ? { postingDate: date(c.reversedBy.postingDate) }
+          : null,
+      })),
       receivableBalance: balance._sum.amount?.toFixed(2) ?? "0.00",
       item: {
         ...amounts(invoice),

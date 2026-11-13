@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { env } from "@/server/env";
 import { financePageData } from "@/modules/finance/accounting/page-data";
 import { invoiceDetail } from "@/modules/finance/receivables/service";
@@ -131,6 +132,18 @@ export default async function Invoice({
             <p key={e.id}>
               {e.effectiveDate} · {e.customerDocument?.number ?? i.number} ·{" "}
               {e.kind} · <MoneyCell value={e.amount} />
+            </p>
+          ))}
+        </section>
+      )}
+      {!!data.credits.length && (
+        <section className="panel" aria-label="Invoice credit notes">
+          <h2>Credit notes</h2>
+          {data.credits.map((c) => (
+            <p key={c.id}>
+              <Link href={"/finance/customer-credits/" + c.id}>{c.number}</Link>{" "}
+              · {c.postingDate} · <MoneyCell value={c.totalAmount} />
+              {c.reversedBy && " · Reversed " + c.reversedBy.postingDate}
             </p>
           ))}
         </section>
