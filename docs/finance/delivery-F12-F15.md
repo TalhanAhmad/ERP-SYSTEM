@@ -1,6 +1,6 @@
 # Encova Finance F12–F15 delivery report
 
-Completed local engineering acceptance on 13 November 2026 (Asia/Karachi). Talha explicitly requested completing through F15 and committing/pushing each milestone separately. This is an extension of the existing Next.js/Supabase/Vercel architecture. No effort hours, learner demonstration or accountant approval is invented.
+Completed engineering acceptance on 13 November 2026 (Asia/Karachi). Talha explicitly requested completing through F15 and committing/pushing each milestone separately. This is an extension of the existing Next.js/Supabase/Vercel architecture. No effort hours, learner demonstration or accountant approval is invented.
 
 ## Delivered by milestone
 
@@ -9,7 +9,7 @@ Completed local engineering acceptance on 13 November 2026 (Asia/Karachi). Talha
 | F12 | Invoice register/editor/line preview and private posted PDF | abf7c6ccc0492414aeb9db8635f8eab7ae9652f5; CI 43407757976 passed |
 | F13 | Partial/multiple receipt allocations and explicit fees | 1e8c8dc4e5d95ee6db36c950a59e71f06695bd40; CI 43409706332 passed |
 | F14 | Unallocated/mixed client advances and later application without duplicate cash | b141833be6fd1d21f363c3f1cbbac9edff09ec10; CI 43412224862 passed |
-| F15 | Capped customer credits, refunds, dated reversals and settlement release | Exact final source/CI recorded after publication below |
+| F15 | Capped customer credits, refunds, dated reversals and settlement release | b5a424bc42121a185da4d44d857e5ad59040107b; CI 43419008430 passed |
 
 ## F12 — invoice screens and private PDF
 
@@ -55,6 +55,6 @@ Company chart/fiscal year/cutover/policies, live owner/MFA setup and a separate 
 
 ## Publication
 
-Pending exact F15 source commit/push and final fresh-runner CI; prior milestone CI is not substituted for it. The review remains in PR #2 on finance/invoices-f11.
+[CI 43419008430](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43419008430) passed on exact source **b5a424bc42121a185da4d44d857e5ad59040107b**: all 33 migrations on fresh PostgreSQL, 216 unit + 346 integration + 34 Chromium tests (**596**), strict typing/lint, local and Supabase-mode production builds and documentation/API verification. Each requested milestone was committed/pushed separately; [draft PR #2](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/2) now covers F11–F15 on finance/invoices-f11. No merge or hosted finance release occurred.
 
 [Focused Word report](Encova_F12-F15_Report.docx) · [Full progress Word report](../Encova_Progress_Report.docx).

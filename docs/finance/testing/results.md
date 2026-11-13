@@ -91,3 +91,6 @@ F11 earned/deferred invoice backend is locally accepted: typed exact sources, pr
 ## Finance completion through F15 — 13 November 2026
 
 F12 invoice screens/private PDF, F13 receipts, F14 client advances and F15 credits/refunds/dated corrections are locally accepted and separately committed/pushed as requested. Final **596 tests** passed (216 unit +346 PostgreSQL integration +34 Chromium), strict typing/lint, both production builds and all60 concrete API paths/verbs/references. [Exact current results](F12-F15-results.md) record the separate source commits and final F15 CI after publication. Original ERP learning acceptance remains separate.33 test migrations; no hosted finance migration/grant/enablement, real financial seed, deployment, client email or merge.
+
+
+[CI 43419008430](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43419008430) passed on exact source **b5a424bc42121a185da4d44d857e5ad59040107b**: all 33 migrations on fresh PostgreSQL, 216 unit +346 integration +34 Chromium tests (**596**), strict typing/lint, local and Supabase-mode production builds and documentation/API verification. Each requested milestone was committed/pushed separately; [draft PR #2](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/2) now covers F11–F15 on finance/invoices-f11. No merge or hosted finance release occurred.

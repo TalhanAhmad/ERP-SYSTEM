@@ -9,7 +9,7 @@
 | F12 | abf7c6ccc0492414aeb9db8635f8eab7ae9652f5 | 208 unit + 301 PostgreSQL integration locally; invoice UI/PDF journey; both builds; [CI 43407757976](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43407757976) passed complete 30-browser suite and fresh 28-migration chain |
 | F13 | 1e8c8dc4e5d95ee6db36c950a59e71f06695bd40 | 212 unit + 314 integration locally; receipt browser/fees/multi-allocation; both builds; [CI 43409706332](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43409706332) passed complete 31-browser suite and fresh 31-migration chain |
 | F14 | b141833be6fd1d21f363c3f1cbbac9edff09ec10 | 214 unit + 322 integration, all 11 finance browser journeys locally; both builds; [CI 43412224862](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43412224862) passed complete 32-browser suite and fresh 32-migration chain |
-| F15 | Pending exact source publication | Final local regression and source CI below |
+| F15 | b5a424bc42121a185da4d44d857e5ad59040107b | CI 43419008430 passed final 596 tests, both builds, fresh 33 migrations and all required checks |
 
 ## Final local acceptance
 
@@ -39,4 +39,6 @@ Test schema has33 additive migrations; hosted ERP's last verified17-migration sc
 
 ## Publication
 
-Pending exact F15 source commit, push and fresh-runner result. Prior milestone CI is not substituted for final-source CI.
+[CI 43419008430](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43419008430) passed on exact source **b5a424bc42121a185da4d44d857e5ad59040107b**: all 33 migrations on fresh PostgreSQL, 216 unit + 346 integration + 34 Chromium tests (**596**), strict typing/lint, local and Supabase-mode production builds and documentation/API verification. Each requested milestone was committed/pushed separately; [draft PR #2](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/2) now covers F11–F15 on finance/invoices-f11. No merge or hosted finance release occurred.
+
+The final tracking update changes documentation/Word evidence only. Application/schema/tests/scripts remain unchanged from this passing source. Word ZIP/XML/relationships, configured-private-value scan, all 60 API paths/verbs/references and local links are checked again before that push.
