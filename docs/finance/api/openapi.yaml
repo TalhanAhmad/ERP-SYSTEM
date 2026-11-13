@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Encova Finance Ledger, Setup and Invoices",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "Implemented F01\u2013F11: access/ownership, accounts/periods, manual journals, masters and earned/deferred invoice backend. Finance defaults off. All responses including errors private/no-store, Vary Cookie. Invoice editor/private PDF is F12; receipts/recognition/credit notes/taxes/reports remain later milestones. Current verified sessions; no public bootstrap/recovery."
   },
   "security": [
@@ -4239,6 +4239,56 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/invoice-options": {
+      "get": {
+        "operationId": "invoiceOptions",
+        "description": "Selected current finance access; kind party/project, q<=100, page1..10000; active CLIENT/BOTH or active projects; stable bounded25/page, clamped pages. Private/no-store, Vary Cookie.",
+        "responses": {
+          "200": {
+            "description": "data:{items:[{id,code,name}],total,page,pages}"
+          },
+          "403": {
+            "description": "Current selected access required"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/invoices/{id}/pdf": {
+      "get": {
+        "operationId": "invoicePdf",
+        "description": "Only posted invoice, current selected access held throughout PDF generation. Frozen commercial snapshot; no auth material, public URLs or automatic email. Private/no-store, nosniff, attachment download.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authenticated PDF attachment",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current selected access required"
+          },
+          "409": {
+            "description": "Draft/voided invoice is not printable"
           }
         }
       }

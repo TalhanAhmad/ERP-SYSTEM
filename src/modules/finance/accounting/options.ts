@@ -6,7 +6,14 @@ import { withFinanceAccess } from "../access/policy";
 import { accountTypes, reportGroups } from "./catalog";
 export const optionQuerySchema = z
   .object({
-    kind: z.enum(["parent", "journal", "cash"]),
+    kind: z.enum([
+      "parent",
+      "journal",
+      "cash",
+      "receivable",
+      "revenue",
+      "deferred",
+    ]),
     q: z.string().trim().max(100).default(""),
     page: z.coerce.number().int().min(1).max(10000).default(1),
     type: z.enum(accountTypes).optional(),
@@ -26,6 +33,23 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
         : query.kind === "cash"
           ? { controlType: "CASH", type: "ASSET", isContra: false }
           : {}),
+      ...({
+        receivable: {
+          controlType: "RECEIVABLES",
+          type: "ASSET",
+          isContra: false,
+        },
+        revenue: {
+          controlType: "NONE",
+          type: { in: ["INCOME", "OTHER_INCOME"] },
+          isContra: false,
+        },
+        deferred: {
+          controlType: "DEFERRED_REVENUE",
+          type: "LIABILITY",
+          isContra: false,
+        },
+      }[query.kind as "receivable" | "revenue" | "deferred"] ?? {}),
       ...(query.type ? { type: query.type } : {}),
       ...(query.group ? { reportGroup: query.group } : {}),
       ...(query.exclude ? { id: { not: query.exclude } } : {}),

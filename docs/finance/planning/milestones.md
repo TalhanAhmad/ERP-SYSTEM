@@ -15,7 +15,7 @@
 | [F09](days/F09.md) | Build shared finance register, filters, pagination, drawer, error states | Complete |
 | [F10](days/F10.md) | Add parties, cash accounts, chart of accounts UI and validation | Complete |
 | [F11](days/F11.md) | Implement earned/deferred invoice schema and posting services | Complete |
-| [F12](days/F12.md) | Build invoice screens, lines, previews, and private printable invoice | Pending |
+| [F12](days/F12.md) | Build invoice screens, lines, previews, and private printable invoice | Complete |
 | [F13](days/F13.md) | Implement receipts and partial/multiple invoice allocations | Pending |
 | [F14](days/F14.md) | Implement client advances and later application without duplicate cash | Pending |
 | [F15](days/F15.md) | Add customer credits, refunds, and settlement reversal tests | Pending |

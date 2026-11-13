@@ -1016,3 +1016,57 @@ it("posts through the real restricted runtime command with dated AR and no cash 
     await sql.end();
   }
 });
+it("searches only active client and invoice-compatible account mappings", async () => {
+  const { invoiceOptions } =
+      await import("@/modules/finance/receivables/options"),
+    { accountOptions } = await import("@/modules/finance/accounting/options");
+  const choices = await invoiceOptions(people.owner, {
+    kind: "party",
+    q: prefix,
+  });
+  expect(choices.items.some((p) => p.id === client)).toBe(true);
+  const mapped = await accountOptions(people.owner, {
+    kind: "receivable",
+    q: prefix,
+  });
+  expect(mapped.items.map((a) => a.id)).toContain(ar);
+  expect(mapped.items.map((a) => a.id)).not.toContain(cash);
+  expect(
+    (
+      await accountOptions(people.owner, { kind: "deferred", q: prefix })
+    ).items.map((a) => a.id),
+  ).toContain(deferred);
+  await expect(
+    invoiceOptions(people.member, { kind: "party" }),
+  ).rejects.toMatchObject({ code: "FINANCE_FORBIDDEN" });
+});
+it("creates a private real paginated PDF from frozen posted contacts and denies drafts or revoked access", async () => {
+  const { invoicePdf } =
+    await import("@/modules/finance/documents/invoice-pdf");
+  const d = await command(
+    "CREATE",
+    body({
+      lines: Array.from({ length: 30 }, () =>
+        line({
+          description:
+            "Synthetic café invoice line with long supporting commercial text repeated for pagination",
+          unitRate: "10",
+        }),
+      ),
+    }),
+  );
+  await expect(invoicePdf(people.owner, d.id)).rejects.toMatchObject({
+    code: "FINANCE_INVOICE_UNPOSTED",
+  });
+  await command("POST", {
+    id: d.id,
+    expectedVersion: 1,
+    reason: "Printable posted evidence",
+  });
+  const pdf = await invoicePdf(people.owner, d.id);
+  expect(pdf.subarray(0, 5).toString()).toBe("%PDF-");
+  expect(pdf.length).toBeGreaterThan(10000);
+  await expect(invoicePdf(people.other, d.id)).rejects.toMatchObject({
+    code: "FINANCE_FORBIDDEN",
+  });
+});

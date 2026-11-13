@@ -35,6 +35,7 @@ for (const [username, role] of [
   ["e2e.finance.writer", "SUPER_ADMIN"],
   ["e2e.finance.masters", "SUPER_ADMIN"],
   ["e2e.finance.invoices", "SUPER_ADMIN"],
+  ["e2e.finance.invoice.ui", "SUPER_ADMIN"],
   ["e2e.finance.invoice.writer", "SUPER_ADMIN"],
 ] as const) {
   const email = `${username}@example.test`;

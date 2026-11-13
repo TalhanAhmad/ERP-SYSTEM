@@ -161,3 +161,32 @@ it("leaves Prisma's global Decimal precision unchanged", () => {
   calculateInvoice([line]);
   expect(Prisma.Decimal.precision).toBe(precision);
 });
+
+it("matches the independent browser BigInt preview to server line rounding and bounds", async () => {
+  const { invoicePreview } =
+    await import("@/modules/finance/receivables/preview");
+  const vectors = [
+    [
+      { quantity: "2", unitRate: "100.005", discountAmount: "0.01" },
+      { quantity: "1", unitRate: "50.005", discountAmount: "0.01" },
+    ],
+    Array.from({ length: 100 }, () => ({
+      quantity: "1",
+      unitRate: "0.005",
+      discountAmount: "0.00",
+    })),
+  ];
+  for (const lines of vectors)
+    expect(invoicePreview(lines)).toBe(calculateInvoice(lines).totalAmount);
+  for (const patch of [
+    { quantity: "0" },
+    { unitRate: "1e3" },
+    { discountAmount: "2.00" },
+    { quantity: "99999999999999", unitRate: "99999999999999" },
+  ])
+    expect(() =>
+      invoicePreview([
+        { quantity: "1", unitRate: "1", discountAmount: "0", ...patch },
+      ]),
+    ).toThrow();
+});

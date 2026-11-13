@@ -12,7 +12,15 @@ export function AccountPicker({
   initial = [],
   required = false,
 }: {
-  kind: "parent" | "journal" | "cash";
+  kind:
+    | "parent"
+    | "journal"
+    | "cash"
+    | "receivable"
+    | "revenue"
+    | "deferred"
+    | "party"
+    | "project";
   label: string;
   value: string | null;
   onChange: (id: string | null) => void;
@@ -49,7 +57,11 @@ export function AccountPicker({
           ...(exclude ? { exclude } : {}),
         });
         const response = await fetch(
-          "/api/v1/finance/account-options?" + query,
+          "/api/v1/finance/" +
+            (["party", "project"].includes(kind)
+              ? "invoice-options?"
+              : "account-options?") +
+            query,
           { signal: abort.signal, cache: "no-store" },
         );
         const body = await response.json();
@@ -93,9 +105,7 @@ export function AccountPicker({
         required={required}
         aria-busy={pending}
       >
-        <option value="">
-          {required ? "Choose an account" : "No parent group"}
-        </option>
+        <option value="">{required ? "Choose an account" : "None"}</option>
         {value && !result.items.some((i) => i.id === value) && (
           <option value={value}>
             {selected
@@ -105,7 +115,7 @@ export function AccountPicker({
         )}
         {result.items.map((i) => (
           <option key={i.id} value={i.id}>
-            {i.code} · {i.name}
+            {[i.code, i.name].filter(Boolean).join(" · ")}
           </option>
         ))}
       </select>

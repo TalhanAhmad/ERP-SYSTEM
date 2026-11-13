@@ -11,6 +11,7 @@ export function FinanceRegister({
   href,
   children,
   totals,
+  drawer = true,
 }: {
   label: string;
   columns: string[];
@@ -27,6 +28,7 @@ export function FinanceRegister({
   href: (page: number) => string;
   children: React.ReactNode;
   totals?: React.ReactNode;
+  drawer?: boolean;
 }) {
   const plural = label === "Party" ? "parties" : label.toLowerCase() + "s";
   return (
@@ -56,13 +58,17 @@ export function FinanceRegister({
             {rows.map((r) => (
               <tr key={r.id}>
                 <td>
-                  <DetailDrawerLink
-                    href={r.href}
-                    endpoint={r.endpoint}
-                    hosted={env.AUTH_PROVIDER === "supabase"}
-                  >
-                    {r.name}
-                  </DetailDrawerLink>
+                  {drawer ? (
+                    <DetailDrawerLink
+                      href={r.href}
+                      endpoint={r.endpoint}
+                      hosted={env.AUTH_PROVIDER === "supabase"}
+                    >
+                      {r.name}
+                    </DetailDrawerLink>
+                  ) : (
+                    <Link href={r.href}>{r.name}</Link>
+                  )}
                 </td>
                 {r.cells.map((c, i) => (
                   <td key={i}>{c}</td>
