@@ -2,7 +2,7 @@
 
 Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F16 complete: 16 of 48 finance milestones; 32 remain.** Current authorized scope continues through F25 on finance/f16-f25, with separate milestone commits/pushes. F16 adds bills/immediate paid expenses and cost/project splits. Latest observed checks: 219 distinct unit cases,355 PostgreSQL integration cases, one new Chromium bill journey, typing/lint and both production builds passed. Prior34 browser journeys will be rerun with the final scope. See [current delivery tracker](delivery-F16-F25.md). Current test schema34 additive migrations; live finance remains disabled.
+**F01–F17 complete: 17 of 48 finance milestones; 31 remain.** Current authorized scope continues through F25 on finance/f16-f25, with separate milestone commits/pushes. F16 adds bills/immediate paid expenses and cost/project splits. Latest observed checks: 219 distinct unit cases,355 PostgreSQL integration cases, one new Chromium bill journey, typing/lint and both production builds passed. Prior34 browser journeys will be rerun with the final scope. See [current delivery tracker](delivery-F16-F25.md). Current test schema34 additive migrations; live finance remains disabled.
 
 The following records describe the previously completed and merged F15 release:
 
@@ -27,3 +27,6 @@ Historical F01–F10 was merged through PR #1 at7d9ca2e on 12 November 2026. F11
 ## PR #2 merge — 13 November 2026
 
 [PR #2](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/2) was merged into main at 18:43:40 Pakistan time on 13 November 2026 (13:43:40 UTC), following Talha’s explicit request. Merge commit: **32964e847ccef43f6152a4e406239a9c657da4be**. A merge commit preserved the separate milestone commits. Exact PR head86c0cd2aebcdf28e7c9535789b8fec4ede4bb1b8 passed [CI43423801209](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43423801209) before merge. Local main was fast-forwarded to the merged result; application/schema/test/script content is identical to that verified head. No manual hosted finance migration or activation was performed.
+
+## F17 development
+Supplier payments, advances, original-cost credits/refunds and dated corrections implemented. Latest focused regression96 and new Chromium journey passed. Current source test schema36, API89 paths. F18 next; no live financial migration or activation. F16 source68afc4b passed fresh-runner CI43445524244 with609 distinct tests (219unit+355integration+35browser).

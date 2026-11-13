@@ -7,6 +7,7 @@ import { accountTypes, reportGroups } from "./catalog";
 export const optionQuerySchema = z
   .object({
     kind: z.enum([
+      "supplier-advance",
       "payable",
       "cost",
       "prepayment",
@@ -40,6 +41,11 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           ? { controlType: "CASH", type: "ASSET", isContra: false }
           : {}),
       ...({
+        "supplier-advance": {
+          controlType: "SUPPLIER_ADVANCE",
+          type: "ASSET",
+          isContra: false,
+        },
         payable: {
           controlType: "PAYABLES",
           type: "LIABILITY",
@@ -83,6 +89,7 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
         },
       }[
         query.kind as
+          | "supplier-advance"
           | "payable"
           | "cost"
           | "prepayment"

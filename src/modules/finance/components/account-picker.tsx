@@ -11,6 +11,7 @@ export function AccountPicker({
   exclude,
   partyId,
   invoiceId,
+  billId,
   initial = [],
   required = false,
 }: {
@@ -20,6 +21,11 @@ export function AccountPicker({
     | "prepayment"
     | "fixed-asset"
     | "supplier"
+    | "supplier-advance"
+    | "bill"
+    | "credit-bill"
+    | "bill-line"
+    | "supplier-advance-source"
     | "parent"
     | "journal"
     | "cash"
@@ -43,6 +49,7 @@ export function AccountPicker({
   exclude?: string;
   partyId?: string;
   invoiceId?: string;
+  billId?: string;
   initial?: Option[];
   required?: boolean;
 }) {
@@ -62,9 +69,17 @@ export function AccountPicker({
     const abort = new AbortController();
     const timer = setTimeout(async () => {
       if (
-        (["invoice", "advance-source", "credit-invoice"].includes(kind) &&
+        ([
+          "invoice",
+          "advance-source",
+          "credit-invoice",
+          "bill",
+          "credit-bill",
+          "supplier-advance-source",
+        ].includes(kind) &&
           !partyId) ||
-        (kind === "invoice-line" && !invoiceId)
+        (kind === "invoice-line" && !invoiceId) ||
+        (kind === "bill-line" && !billId)
       ) {
         setResult({ items: [], total: 0, page: 1, pages: 1 });
         setError("");
@@ -83,21 +98,29 @@ export function AccountPicker({
           ...(exclude ? { exclude } : {}),
           ...(partyId ? { partyId } : {}),
           ...(invoiceId ? { invoiceId } : {}),
+          ...(billId ? { billId } : {}),
         });
         const response = await fetch(
           "/api/v1/finance/" +
             ([
-              "party",
-              "supplier",
-              "project",
-              "invoice",
-              "cash-account",
-              "advance-source",
-              "credit-invoice",
-              "invoice-line",
+              "bill",
+              "credit-bill",
+              "bill-line",
+              "supplier-advance-source",
             ].includes(kind)
-              ? "invoice-options?"
-              : "account-options?") +
+              ? "supplier-options?"
+              : [
+                    "party",
+                    "supplier",
+                    "project",
+                    "invoice",
+                    "cash-account",
+                    "advance-source",
+                    "credit-invoice",
+                    "invoice-line",
+                  ].includes(kind)
+                ? "invoice-options?"
+                : "account-options?") +
             query,
           { signal: abort.signal, cache: "no-store" },
         );
@@ -115,7 +138,7 @@ export function AccountPicker({
       clearTimeout(timer);
       abort.abort();
     };
-  }, [kind, q, page, type, group, exclude, partyId, invoiceId, retry]);
+  }, [billId, kind, q, page, type, group, exclude, partyId, invoiceId, retry]);
   const selected =
     result.items.find((i) => i.id === value) ??
     initial.find((i) => i.id === value);

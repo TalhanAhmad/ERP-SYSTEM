@@ -8,6 +8,11 @@ export function FinanceNavigation() {
       <Link href="/finance/receipt-unallocations">Settlement releases</Link>
       <Link href="/finance/advance-applications">Apply advances</Link>
       <Link href="/finance/receipts">Receipts</Link>
+      <Link href="/finance/supplier-payments">Supplier payments</Link>
+      <Link href="/finance/supplier-applications">Supplier advances</Link>
+      <Link href="/finance/supplier-credits">Supplier credits</Link>
+      <Link href="/finance/supplier-refunds">Supplier refunds</Link>
+      <Link href="/finance/supplier-releases">Payment releases</Link>
       <Link href="/finance/bills">Bills &amp; expenses</Link>
       <Link href="/finance/invoices">Invoices</Link>
       <Link href="/finance/journals">Journals</Link>
