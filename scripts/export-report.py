@@ -21,7 +21,7 @@ f16_f25_sources = ['docs/finance/delivery-F16-F25.md'] + [f'docs/finance/plannin
 f16_f25_sources += ['docs/finance/accounting/taxes.md','docs/finance/accounting/evidence.md','docs/finance/accounting/investments.md','docs/finance/accounting/assets.md','docs/finance/testing/F16-F25-results.md']
 main_sources += f16_f25_sources
 f26_f48_sources = ['docs/finance/delivery-F26-F48.md','docs/finance/testing/F26-F48-results.md','docs/finance/review/owner-review-pack.md'] + [f'docs/finance/planning/days/F{n:02}.md' for n in range(26,49)]
-f26_f48_sources += ['docs/finance/accounting/assets.md','docs/finance/accounting/projects.md']
+f26_f48_sources += ['docs/finance/accounting/assets.md','docs/finance/accounting/projects.md','docs/finance/accounting/cost-allocation.md']
 main_sources += f26_f48_sources
 
 def report_xml(sources):

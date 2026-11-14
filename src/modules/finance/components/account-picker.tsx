@@ -18,6 +18,8 @@ export function AccountPicker({
   required = false,
 }: {
   kind:
+    | "cost-source"
+    | "cost-project"
     | "commercial-project"
     | "commercial-client"
     | "commercial-invoice-line"
@@ -153,12 +155,18 @@ export function AccountPicker({
           ...(projectId ? { projectId } : {}),
         });
         const response = await fetch(
-          kind === "investment-lot"
-            ? "/api/v1/finance/holdings/" +
+          kind === "cost-source" || kind === "cost-project"
+            ? "/api/v1/finance/" +
+                (kind === "cost-source"
+                  ? "cost-sources?"
+                  : "cost-project-options?") +
+                new URLSearchParams({ q, page: String(page) })
+            : kind === "investment-lot"
+              ? "/api/v1/finance/holdings/" +
                 holdingId +
                 "/lots?" +
                 new URLSearchParams({ q, page: String(page) })
-            : "/api/v1/finance/" +
+              : "/api/v1/finance/" +
                 ([
                   "commercial-project",
                   "commercial-client",

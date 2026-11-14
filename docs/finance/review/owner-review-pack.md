@@ -4,7 +4,7 @@ Prepared for Talha Ahmad, as requested on 14 November 2026. Intended Finance Own
 
 ## Current evidence and scope
 
-F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 commercial project engineering is locally verified on finance/f26-f48 with798 tests; publication is recorded in the continuation tracker. F28–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
+F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
 
 The final pack will include tested representative statements, source-to-ledger links, dated balances, exception cases, migration/recovery evidence and outstanding decisions. No company figures, legal compliance or accountant approval are inferred from synthetic fixtures.
 
@@ -38,4 +38,14 @@ A completed engineering test does not fill these human decision fields. The pack
 
 ## Commercial review example through F27
 
-A synthetic signed agreement100.01 plus a separately approved increase20.02 gives a current commercial value120.03. Confirming a50.00 billing plan creates no revenue/receivable/cash. A later real posted invoice line10.01 can be linked for traceability; release preserves its original net/snapshot and changes no GL. Original linked net is labelled before subsequent credits. Actual earned revenue and project costs are based on posted accounting activity, with F28 result calculations still pending. No actual company agreement or approval is asserted.
+A synthetic signed agreement100.01 plus a separately approved increase20.02 gives a current commercial value120.03. Confirming a50.00 billing plan creates no revenue/receivable/cash. A later real posted invoice line10.01 can be linked for traceability; release preserves its original net/snapshot and changes no GL. Original linked net is labelled before subsequent credits. Actual earned revenue and project costs are based on posted accounting activity, with F28 result calculations now based on actual posted GL. No actual company agreement or approval is asserted.
+
+
+F27 separate publication verified: source9e23dfc36b472ac540617245df753cb9292445de passed [fresh CI43604433797](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43604433797), including60 fresh migrations, all798 tests, both builds/type/lint/142-path docs. F28 engineering and final verification are in progress; [cost-allocation rules](../accounting/cost-allocation.md) describe the implemented boundary.
+
+
+## Reviewed project-cost example through F28
+
+A synthetic unpaid supplier bill120.00 recognizes cost before cash payment. A reviewed70.00/20.00/30.00 project/project/shared split debits the same expense account on targets and credits its original dimension; company expense and payable remain120.00. A subsequent credit first requires compatible allocation correction, including historical dates. Three paisa split50/50 preview0.02 and0.01 deterministically. An earned project invoice300.00 and assigned direct cost120.00 give contribution180.00; advance billing100.01 is net invoiced but zero earned income. Shared company overhead is shown separately, not deducted twice.
+
+These are verification fixtures, not company figures or accepted policy. 818 distinct local checks passed:256 unit (3.05s),515 PostgreSQL integration (209.95s),47 Chromium (2.8m). Both production builds, strict typing/lint,152 concrete finance API paths/verbs/references and all61 applied migration checksums passed. Final Word/private-value verification accompanies separate publication; fresh F28 CI will be observed after push. Budget plans, attributed cash, statements, cutover/closing and final recovery evidence remain later milestones. Review/acceptance fields remain pending for the user.

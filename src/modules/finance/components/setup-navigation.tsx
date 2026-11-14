@@ -4,6 +4,7 @@ export function FinanceNavigation() {
     <nav aria-label="Finance navigation" className="form-actions">
       <Link href="/finance">Finance</Link>
       <Link href="/finance/projects">Commercial projects</Link>
+      <Link href="/finance/cost-allocations">Cost allocations</Link>
       <Link href="/finance/customer-credits">Credits</Link>
       <Link href="/finance/customer-refunds">Refunds</Link>
       <Link href="/finance/receipt-unallocations">Settlement releases</Link>

@@ -28,6 +28,9 @@ export default async function Detail({
       <section>
         <FinanceNavigation />
         <h1>{c.name} · Commercial profile</h1>
+        <Link href={"/finance/project-results/" + id}>
+          Project financial results
+        </Link>
         <section className="panel">
           <h2>Create commercial draft</h2>
           <CommercialProfileForm
@@ -48,6 +51,9 @@ export default async function Detail({
         {i.state} · version {i.version} · {i.billingModel.replaceAll("_", " ")}
       </p>
       <Link href={"/projects/" + i.projectId}>Workspace project</Link>
+      <Link href={"/finance/project-results/" + id}>
+        Project financial results
+      </Link>
       <section className="panel" aria-label="Commercial agreement">
         <h2>Commercial agreement</h2>
         <p>Client {i.client.name}</p>

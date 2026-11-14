@@ -1,3 +1,4 @@
+import { costErrors } from "../../projects/costs/errors";
 import "server-only";
 import { z } from "zod";
 import { Prisma } from "@/generated/prisma/client";
@@ -13,6 +14,7 @@ import {
 } from "./schemas";
 import { assetErrors } from "../errors";
 const errors: Record<string, string> = {
+  ...costErrors,
   ...assetErrors,
   FINANCE_APPROVAL_REQUIRED: "Record explicit authorization evidence.",
   FINANCE_FUNDING_CAPACITY:

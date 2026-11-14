@@ -1,3 +1,4 @@
+import { costErrors } from "../projects/costs/errors";
 import "server-only";
 import { z } from "zod";
 import { db } from "@/server/db";
@@ -14,6 +15,7 @@ import {
 } from "./schemas";
 
 const messages: Record<string, string> = {
+  ...costErrors,
   FINANCE_FORBIDDEN: "Finance access is unavailable.",
   FINANCE_REAUTH_REQUIRED: "Verify your password and authenticator again.",
   FINANCE_INVALID_INPUT: "Check the journal values.",

@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova private finance through F27",
-    "version": "0.22.0",
+    "title": "Encova private finance through F28",
+    "version": "0.23.0",
     "description": "Implemented F01\u2013F18: private selected-admin accounting with owner-reviewed tax policy, net/tax invoice and purchase posting, capped original-tax credits and evidenced customer/supplier withholding in gross settlements. Default disabled, no hosted financial launch, real tax rates or legal compliance claims. See source-bound accounting and progress evidence. F19 adds private typed evidence, direct upload, quarantine, signed malware attestation, current-access bounded proxy downloads and auditable draft cleanup. Scanner configuration is operator-only; no clean fallback or live signing secrets seeded."
   },
   "security": [
@@ -16148,6 +16148,916 @@
           }
         }
       }
+    },
+    "/api/v1/finance/cost-sources": {
+      "get": {
+        "operationId": "cost_cost-sources_get",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Bounded searchable25-row stable pages; eligible original expense source IDs are actual journal-line IDs. Source detail includes current full net/basis hash and latest activity. Allocated/reversal-generated lines are not new sources.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Lists/options include items,total,page,pages; source includes item,basisHash; allocation includes item,currentSource,basisStale,history. Money exactstrings."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cost-sources/{id}": {
+      "get": {
+        "operationId": "cost_cost-sources_ById_get",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Bounded searchable25-row stable pages; eligible original expense source IDs are actual journal-line IDs. Source detail includes current full net/basis hash and latest activity. Allocated/reversal-generated lines are not new sources.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Lists/options include items,total,page,pages; source includes item,basisHash; allocation includes item,currentSource,basisStale,history. Money exactstrings."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cost-project-options": {
+      "get": {
+        "operationId": "cost_cost-project-options_get",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Bounded searchable25-row stable pages; eligible original expense source IDs are actual journal-line IDs. Source detail includes current full net/basis hash and latest activity. Allocated/reversal-generated lines are not new sources.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Lists/options include items,total,page,pages; source includes item,basisHash; allocation includes item,currentSource,basisStale,history. Money exactstrings."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cost-allocations": {
+      "get": {
+        "operationId": "cost_cost-allocations_get",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Bounded searchable25-row stable pages; eligible original expense source IDs are actual journal-line IDs. Source detail includes current full net/basis hash and latest activity. Allocated/reversal-generated lines are not new sources.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "POSTED",
+                "VOIDED",
+                "REVERSED"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Lists/options include items,total,page,pages; source includes item,basisHash; allocation includes item,currentSource,basisStale,history. Money exactstrings."
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "cost_cost-allocations_post",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Fresh current password/hosted TOTP, permanent key, version and open dated period. Exact expense project reclassification preserves original account/party and company profit. Full net basis must be current. Underlying credits/reversals cannot overallocate any historical date; correct allocations first. Posted sources immutable; reverse creates opposite retained lines.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "201": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CostCREATE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cost-allocations/{id}": {
+      "get": {
+        "operationId": "cost_cost-allocations_ById_get",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Bounded searchable25-row stable pages; eligible original expense source IDs are actual journal-line IDs. Source detail includes current full net/basis hash and latest activity. Allocated/reversal-generated lines are not new sources.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Lists/options include items,total,page,pages; source includes item,basisHash; allocation includes item,currentSource,basisStale,history. Money exactstrings."
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "cost_cost-allocations_ById_patch",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Fresh current password/hosted TOTP, permanent key, version and open dated period. Exact expense project reclassification preserves original account/party and company profit. Full net basis must be current. Underlying credits/reversals cannot overallocate any historical date; correct allocations first. Posted sources immutable; reverse creates opposite retained lines.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CostUPDATE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cost-allocations/{id}/post": {
+      "post": {
+        "operationId": "cost_cost-allocations_ById_post_post",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Fresh current password/hosted TOTP, permanent key, version and open dated period. Exact expense project reclassification preserves original account/party and company profit. Full net basis must be current. Underlying credits/reversals cannot overallocate any historical date; correct allocations first. Posted sources immutable; reverse creates opposite retained lines.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CostPOST"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cost-allocations/{id}/void": {
+      "post": {
+        "operationId": "cost_cost-allocations_ById_void_post",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Fresh current password/hosted TOTP, permanent key, version and open dated period. Exact expense project reclassification preserves original account/party and company profit. Full net basis must be current. Underlying credits/reversals cannot overallocate any historical date; correct allocations first. Posted sources immutable; reverse creates opposite retained lines.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CostVOID"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cost-allocations/{id}/reverse": {
+      "post": {
+        "operationId": "cost_cost-allocations_ById_reverse_post",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Fresh current password/hosted TOTP, permanent key, version and open dated period. Exact expense project reclassification preserves original account/party and company profit. Full net basis must be current. Underlying credits/reversals cannot overallocate any historical date; correct allocations first. Posted sources immutable; reverse creates opposite retained lines.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CostREVERSE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cost-allocations/preview": {
+      "post": {
+        "operationId": "cost_cost-allocations_preview_post",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Read-only current-basis percentage preview requires Origin/CSRF; does not consume a posting proof, issue a write receipt or post GL.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Lists/options include items,total,page,pages; source includes item,basisHash; allocation includes item,currentSource,basisStale,history. Money exactstrings."
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CostPreview"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/project-results/{id}": {
+      "get": {
+        "operationId": "cost_project-results_ById_get",
+        "description": "Current ACTIVE selected Super Admin only; private/no-store. Strict bodies and exact decimal-string money. Actual posted dated GL only; tax-excluded invoiced and earned income separate. Unpaid cost included; assigned overhead deducted once. Company unassigned costs displayed separately; no cash attribution or forecast inference.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Real Gregorian date 0001\u20139999, YYYY-MM-DD.",
+              "default": "0001-01-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Real Gregorian date 0001\u20139999, YYYY-MM-DD.",
+              "default": "9999-12-31"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "project": {
+                          "type": "object"
+                        },
+                        "filters": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "from": {
+                              "type": "string",
+                              "format": "date",
+                              "description": "Real Gregorian date 0001\u20139999, YYYY-MM-DD."
+                            },
+                            "to": {
+                              "type": "string",
+                              "format": "date",
+                              "description": "Real Gregorian date 0001\u20139999, YYYY-MM-DD."
+                            }
+                          },
+                          "required": [
+                            "from",
+                            "to"
+                          ]
+                        },
+                        "values": {
+                          "$ref": "#/components/schemas/ProjectResultValues"
+                        }
+                      },
+                      "required": [
+                        "project",
+                        "filters",
+                        "values"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -22247,6 +23157,361 @@
               "pattern": "^0(?:\\.0{1,2})?$"
             }
           }
+        ]
+      },
+      "CostTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "projectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "amount": {
+            "$ref": "#/components/schemas/PkrAmount"
+          }
+        },
+        "required": [
+          "projectId",
+          "amount"
+        ]
+      },
+      "CostCREATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "postingDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real Gregorian date 0001\u20139999, YYYY-MM-DD."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "basisHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "targets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CostTarget"
+            },
+            "description": "One row per unique project/null shared dimension; exact sum equals current full source net. Positive change to at least one different project dimension."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "sourceLineId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "postingDate",
+          "description",
+          "evidence",
+          "basisHash",
+          "targets",
+          "reason",
+          "reauth",
+          "sourceLineId"
+        ]
+      },
+      "CostUPDATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "postingDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real Gregorian date 0001\u20139999, YYYY-MM-DD."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "basisHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "targets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CostTarget"
+            },
+            "description": "One row per unique project/null shared dimension; exact sum equals current full source net. Positive change to at least one different project dimension."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "postingDate",
+          "description",
+          "evidence",
+          "basisHash",
+          "targets",
+          "reason",
+          "reauth",
+          "expectedVersion"
+        ]
+      },
+      "CostPOST": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "CostVOID": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "CostREVERSE": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real Gregorian date 0001\u20139999, YYYY-MM-DD."
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth",
+          "postingDate"
+        ]
+      },
+      "CostPreview": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sourceLineId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "basisHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "targets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "projectId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "percentage": {
+                  "type": "string",
+                  "pattern": "^(?:0|[1-9][0-9]{0,2})(?:\\.[0-9]{1,6})?$"
+                }
+              },
+              "required": [
+                "projectId",
+                "percentage"
+              ]
+            },
+            "description": "Unique project/null rows, sum exactly100%. BigInt largest remainder; ties in supplied sequence."
+          }
+        },
+        "required": [
+          "sourceLineId",
+          "basisHash",
+          "targets"
+        ]
+      },
+      "CostCommandResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "number": {
+                "type": "string"
+              },
+              "journalId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "reversalId": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "id",
+              "version",
+              "number",
+              "journalId"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ProjectResultValues": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "netInvoiced": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "recognizedIncome": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "directCosts": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "assignedOverhead": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "contribution": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "fullyAllocatedResult": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "companyUnallocatedOverhead": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "companyUnassignedDirectCosts": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          }
+        },
+        "required": [
+          "netInvoiced",
+          "recognizedIncome",
+          "directCosts",
+          "assignedOverhead",
+          "contribution",
+          "fullyAllocatedResult",
+          "companyUnallocatedOverhead",
+          "companyUnassignedDirectCosts"
         ]
       }
     }

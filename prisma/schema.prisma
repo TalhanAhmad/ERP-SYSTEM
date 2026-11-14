@@ -80,6 +80,8 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ costAllocations FinanceCostAllocation[]
+
  financeProjectProfiles FinanceProjectProfile[]
  financeProjectVariations FinanceProjectVariation[] @relation("CommercialVariationCreator")
  approvedProjectVariations FinanceProjectVariation[] @relation("CommercialVariationApprover")
@@ -340,6 +342,9 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ costAllocationId String? @unique @db.Uuid
+ costAllocation FinanceCostAllocation? @relation(fields:[costAllocationId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+
  assetMovementId String? @unique @db.Uuid
  assetMovement FinanceAssetMovement? @relation(fields:[assetMovementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  assetEvent FinanceAssetEvent?
@@ -391,6 +396,8 @@ model FinanceJournalEntry {
  @@index([postingDate,id])
 }
 model FinanceJournalLine {
+ costAllocations FinanceCostAllocation[]
+
  billLineId String? @db.Uuid
  billLine FinanceBillLine? @relation(fields:[billLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
 
@@ -584,6 +591,8 @@ model FinanceDeferredRevenueEvent {
  @@index([effectiveDate,id])
 }
 model Project {
+ costAllocationLines FinanceCostAllocationLine[]
+
  financeProfile FinanceProjectProfile?
 
  financeMovements FinanceMovement[]
@@ -1953,4 +1962,42 @@ model FinanceMilestoneInvoiceLink {
  createdAt DateTime @default(now()) @db.Timestamptz
  updatedAt DateTime @default(now()) @db.Timestamptz
  @@index([milestoneId,createdAt,id])
+}
+
+model FinanceCostAllocation {
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique
+ kind String
+ sourceLineId String @db.Uuid
+ sourceLine FinanceJournalLine @relation(fields:[sourceLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ postingDate DateTime @db.Date
+ description String
+ evidence String
+ amount Decimal @db.Decimal(20,2)
+ basisHash String
+ basisSnapshot Json
+ sourceSnapshot Json?
+ state String @default("DRAFT")
+ version Int @default(1)
+ reversalOfId String? @unique @db.Uuid
+ reversalOf FinanceCostAllocation? @relation("CostAllocationReversal",fields:[reversalOfId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reversedBy FinanceCostAllocation? @relation("CostAllocationReversal")
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ targets FinanceCostAllocationLine[]
+ entry FinanceJournalEntry?
+ @@index([sourceLineId,postingDate,id])
+ @@index([state,postingDate,id])
+}
+model FinanceCostAllocationLine {
+ id String @id @default(uuid()) @db.Uuid
+ allocationId String @db.Uuid
+ allocation FinanceCostAllocation @relation(fields:[allocationId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ projectId String? @db.Uuid
+ project Project? @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ amount Decimal @db.Decimal(20,2)
+ @@unique([allocationId,sequence])
 }
