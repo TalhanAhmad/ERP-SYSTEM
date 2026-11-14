@@ -37,6 +37,7 @@ for (const [username, role] of [
   ["e2e.finance.files", "SUPER_ADMIN"],
   ["e2e.finance.transfers", "SUPER_ADMIN"],
   ["e2e.finance.funding", "SUPER_ADMIN"],
+  ["e2e.finance.loans", "SUPER_ADMIN"],
   ["e2e.finance.taxes", "SUPER_ADMIN"],
   ["e2e.finance.tax.writer", "SUPER_ADMIN"],
   ["e2e.finance.suppliers", "SUPER_ADMIN"],

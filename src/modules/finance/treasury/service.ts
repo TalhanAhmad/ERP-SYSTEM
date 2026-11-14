@@ -1,4 +1,6 @@
 import "server-only";
+import { loanErrors } from "../funding/loans/service";
+import { loanKinds } from "./kinds";
 import { z } from "zod";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "@/server/db";
@@ -14,6 +16,7 @@ import {
   fundingKinds,
 } from "./schemas";
 const errors: Record<string, string> = {
+  ...loanErrors,
   FINANCE_APPROVAL_REQUIRED: "Record explicit authorization evidence.",
   FINANCE_FUNDING_CAPACITY:
     "This would exceed the contributor’s posted balance at this date or a later event.",
@@ -126,6 +129,15 @@ export async function movementDetail(actor: Pick<Actor, "id">, id: string) {
         fromCash: { select: { name: true } },
         toCash: { select: { name: true } },
         party: { select: { name: true } },
+        loan: {
+          select: {
+            id: true,
+            number: true,
+            name: true,
+            direction: true,
+            partyId: true,
+          },
+        },
         bill: { select: { id: true, number: true } },
         controlAccount: { select: { code: true, name: true } },
         counterAccount: { select: { code: true, name: true } },
@@ -216,7 +228,9 @@ export async function movements(actor: Pick<Actor, "id">, input: unknown = {}) {
                       in:
                         q.family === "TRANSFERS"
                           ? ["TRANSFER"]
-                          : [...fundingKinds],
+                          : q.family === "LOANS"
+                            ? [...loanKinds]
+                            : [...fundingKinds],
                     },
                   },
                   {
@@ -226,7 +240,9 @@ export async function movements(actor: Pick<Actor, "id">, input: unknown = {}) {
                         in:
                           q.family === "TRANSFERS"
                             ? ["TRANSFER"]
-                            : [...fundingKinds],
+                            : q.family === "LOANS"
+                              ? [...loanKinds]
+                              : [...fundingKinds],
                       },
                     },
                   },

@@ -7,6 +7,10 @@ import { accountTypes, reportGroups } from "./catalog";
 export const optionQuerySchema = z
   .object({
     kind: z.enum([
+      "loan-receivable",
+      "loan-payable",
+      "interest-receivable",
+      "interest-payable",
       "funding-cost",
       "funding-asset",
       "capital",
@@ -50,6 +54,26 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           ? { controlType: "CASH", type: "ASSET", isContra: false }
           : {}),
       ...({
+        "loan-receivable": {
+          controlType: "LOAN_RECEIVABLE",
+          type: "ASSET",
+          isContra: false,
+        },
+        "loan-payable": {
+          controlType: "LOAN_PAYABLE",
+          type: "LIABILITY",
+          isContra: false,
+        },
+        "interest-receivable": {
+          controlType: "INTEREST_RECEIVABLE",
+          type: "ASSET",
+          isContra: false,
+        },
+        "interest-payable": {
+          controlType: "INTEREST_PAYABLE",
+          type: "LIABILITY",
+          isContra: false,
+        },
         "funding-cost": {
           controlType: { in: ["NONE", "FIXED_ASSET"] },
           type: {
@@ -141,6 +165,10 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
         },
       }[
         query.kind as
+          | "loan-receivable"
+          | "loan-payable"
+          | "interest-receivable"
+          | "interest-payable"
           | "funding-cost"
           | "funding-asset"
           | "capital"

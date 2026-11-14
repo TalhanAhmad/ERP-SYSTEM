@@ -16,6 +16,10 @@ export function AccountPicker({
   required = false,
 }: {
   kind:
+    | "loan-receivable"
+    | "loan-payable"
+    | "interest-receivable"
+    | "interest-payable"
     | "contributor"
     | "funding-cost"
     | "funding-asset"

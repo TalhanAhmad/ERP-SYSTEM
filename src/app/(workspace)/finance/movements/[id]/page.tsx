@@ -1,3 +1,4 @@
+import { LoanMovementForm } from "@/modules/finance/components/loan-forms";
 import { FundingForm } from "@/modules/finance/components/funding-form";
 import Link from "next/link";
 import { env } from "@/server/env";
@@ -49,6 +50,11 @@ export default async function Movement({
           Amount <MoneyCell value={i.amount} />
         </p>
         <p>Evidence: {i.evidence}</p>
+        {i.loan && (
+          <Link href={"/finance/loans/" + i.loan.id}>
+            Loan {i.loan.number} · {i.loan.direction}
+          </Link>
+        )}
         <p>
           Contributor: {i.party?.name ?? "—"} · Control:{" "}
           {i.controlAccount?.code ?? "—"}
@@ -71,6 +77,8 @@ export default async function Movement({
             <h2>Edit movement draft</h2>
             {i.kind === "TRANSFER" ? (
               <MovementForm key={i.version} item={i} hosted={hosted} />
+            ) : i.loan ? (
+              <LoanMovementForm item={i} loan={i.loan} hosted={hosted} />
             ) : (
               <FundingForm key={i.version} item={i} hosted={hosted} />
             )}

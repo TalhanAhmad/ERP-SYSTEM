@@ -34,6 +34,7 @@ export const movementDraftSchema = z
       .nullable()
       .default(null),
     billId: z.uuid().nullable().default(null),
+    loanId: z.uuid().nullable().default(null),
     reason: reasonSchema,
   })
   .strict()
@@ -48,14 +49,21 @@ export const movementDraftSchema = z
         d.counterAccountId ||
         d.projectId ||
         d.approvalEvidence ||
-        d.billId)
+        d.billId ||
+        d.loanId)
     )
       c.addIssue({
         code: "custom",
         path: ["toCashId"],
         message: "Choose two different bank/cash accounts.",
       });
-    if (d.kind !== "TRANSFER") {
+    if (d.kind !== "TRANSFER" && !d.kind.startsWith("LOAN_")) {
+      if (d.loanId)
+        c.addIssue({
+          code: "custom",
+          path: ["loanId"],
+          message: "Choose the loan workflow.",
+        });
       const incoming = d.kind === "CAPITAL_CONTRIBUTION",
         outgoing = [
           "CAPITAL_RETURN",
@@ -89,6 +97,53 @@ export const movementDraftSchema = z
             "Record the explicit authorization or reviewed noncash evidence.",
         });
     }
+    if (d.kind.startsWith("LOAN_")) {
+      if (
+        !d.loanId ||
+        d.partyId ||
+        d.controlAccountId ||
+        d.billId ||
+        d.projectId
+      )
+        c.addIssue({
+          code: "custom",
+          message:
+            "Choose a loan; contributor and controls come from its reviewed terms.",
+        });
+      const adjustment = [
+        "LOAN_PRINCIPAL_INCREASE",
+        "LOAN_PRINCIPAL_DECREASE",
+      ].includes(d.kind);
+      if (
+        !!d.counterAccountId !== adjustment ||
+        (adjustment && !d.approvalEvidence)
+      )
+        c.addIssue({
+          code: "custom",
+          message:
+            "Principal adjustments require an approved ordinary counter account.",
+        });
+      if (d.kind === "LOAN_INTEREST_ACCRUAL" && (d.fromCashId || d.toCashId))
+        c.addIssue({
+          code: "custom",
+          message: "Interest accrual has no cash leg.",
+        });
+      if (
+        !adjustment &&
+        d.kind !== "LOAN_INTEREST_ACCRUAL" &&
+        !d.fromCashId === !d.toCashId
+      )
+        c.addIssue({
+          code: "custom",
+          message:
+            "Choose exactly one cash leg for settlement or disbursement.",
+        });
+      if (adjustment && (d.fromCashId || d.toCashId))
+        c.addIssue({
+          code: "custom",
+          message: "Noncash principal adjustments do not use cash legs.",
+        });
+    }
     if (d.postingDate < d.documentDate)
       c.addIssue({
         code: "custom",
@@ -111,7 +166,7 @@ export const movementQuerySchema = z
   .object({
     q: z.string().trim().max(100).default(""),
     kind: z.enum(["ALL", ...movementKinds, "REVERSAL"]).default("ALL"),
-    family: z.enum(["ALL", "TRANSFERS", "FUNDING"]).default("ALL"),
+    family: z.enum(["ALL", "TRANSFERS", "FUNDING", "LOANS"]).default("ALL"),
     state: z
       .enum(["ALL", "DRAFT", "POSTED", "REVERSED", "VOIDED"])
       .default("ALL"),
