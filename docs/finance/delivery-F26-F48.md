@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F29 engineering is implemented and locally verified. Separate F26, F27 and F28 sources passed fresh CI. F29 adds approved monthly budget revisions, incurred variance and independent future cash forecasts; plans do not post GL. F30–F46 remain pending, with F30 CSV statement preview/import next. The requested F47 review pack is prepared for the user as evidence grows. Actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
+F01–F30 engineering is implemented and locally verified. Separate F26–F29 sources passed fresh CI. F30 adds explicit bounded CSV evidence, exact source totals, duplicate review/reuse and retained corrections without GL or automatic matching. F31–F46 remain pending, with F31 cash matching/unmatch next. The requested F47 pack is prepared for the user as evidence grows. Actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
 
 ## F26 delivered
 
@@ -40,3 +40,13 @@ F28 source2c3b0031e87fab2a63e0445118e216e7f61718ca passed [fresh CI43609969834](
 Approved plans retain immutable month/project/shared scope and exact account lines; a replacement is explicitly reviewed before atomically superseding the current approval. Prior snapshots/voided revisions/reasons remain visible. Same-basis actuals include unpaid expense, dated credits/reclassification and unbudgeted accounts. Advisory warnings never block required recognition. Future receipt/payment expectations retain separate dates/likelihood/evidence and edit/cancel/reopen history without GL or cash settlement.
 
 838 distinct local checks passed:259 unit (3.35s),531 PostgreSQL integration (214.90s),48 Chromium (2.9m). The new budget/revision/variance/selected-forecast journey passed4.7s, including manager denial, mobile and WCAG. Strict typing/lint, both production builds,162 concrete API paths/verbs/references and all63 applied migration checksums passed. Word/private-value verification accompanies separate F29 publication; fresh CI will be observed after push. See [rules](accounting/budgets-forecasts.md) and [F29 record](planning/days/F29.md).
+
+
+F29 sourcea6b014b9f03ad70e62c8cff3733a4e6070ad3bec passed [fresh CI43612791776](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43612791776):63 migrations, all838 tests, both builds/type/lint/162-path documentation checks. F30 local acceptance is complete; source publication/fresh CI are recorded separately.
+
+
+## F30 delivered and verified
+
+A maximum5,000,000-byte/5,000-record UTF-8 CSV transfers through bounded current-uploader capabilities, then explicit date/direction/amount mapping and source equation review. Server-derived rows and checked SQL preserve the actual file hash, original bank/GL identity, key, dates, balances, row fingerprint/digest and duplicate evidence. Exact re-import/races reuse prior sources; different interpretations conflict. Reviewed duplicates remain separate rows; immutable void/replacement chains retain history. Responses/choices/previews/detail pages stay current-private and bounded. These source records never post, execute cash or declare bank reconciliation.
+
+865 distinct local checks passed:267 unit,549 actual PostgreSQL integration (216.85s),49 Chromium (2.8m). The statement journey passed6.8s and6.3s in full regression, including balance-error recovery, exact re-import, duplicate review, retained replacement, selected writer, employee denial, mobile and WCAG, without GL. Both production builds, strict typing/lint,173 concrete API paths/verbs/references and all64 applied migration checksums passed. Word/private-value checks accompany separate F30 publication; fresh CI is observed after push. See [rules](accounting/statement-imports.md) and [F30 record](planning/days/F30.md).

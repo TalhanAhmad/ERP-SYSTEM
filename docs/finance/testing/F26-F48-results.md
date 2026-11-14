@@ -12,7 +12,7 @@ All45 Chromium journeys passed2.6m, including the new actual generation/post/dis
 
 ## Remaining milestones
 
-F30–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
+F31–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
 
 
 ## Final lifecycle edge cases
@@ -48,3 +48,15 @@ Additive62 passed rollback rehearsal/guarded isolated apply;63 separately tighte
 First browser execution passed budget lifecycle/variance and stalled on a wrapped forecast select label. Direction/likelihood labels now explicitly target their selects. Its timed-out cleanup left an owned synthetic writer grant; the next attempt detected the duplicate. The fixture now removes only that exact owned test grant and settles context closures before financial-fixture cleanup. Neither failure is counted as acceptance, and no ledger/source/audit history was deleted.
 
 838 distinct local checks passed:259 unit (3.35s),531 PostgreSQL integration (214.90s),48 Chromium (2.9m). The new budget/revision/variance/selected-forecast journey passed4.7s, including manager denial, mobile and WCAG. Strict typing/lint, both production builds,162 concrete API paths/verbs/references and all63 applied migration checksums passed. Word/private-value verification accompanies separate F29 publication; fresh CI will be observed after push. Synthetic browser auth fixtures were renewed after all backend tests. Finance stays disabled live; no hosted schema/grant/plan or real transaction was created.
+
+
+F29 sourcea6b014b9f03ad70e62c8cff3733a4e6070ad3bec passed [fresh CI43612791776](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43612791776):63 migrations, all838 tests, both builds/type/lint/162-path documentation checks. F30 local acceptance is complete; separate publication/fresh CI are recorded in the continuation tracker.
+
+
+## F30 local verification
+
+64 passed syntax and actual reserve/transport/preview/import/exact-reuse/void/replacement rollback rehearsals, including deferred source checks and zero GL. The rehearsal caught one ambiguous SQL alias; corrected before guarded isolated apply. First13 cases stopped at a shared fixture display-mask mistake; changed it to the required last-four digits without widening validation. Eight unit and18 PostgreSQL cases passed26 (9.78s): strict bounded CSV/money/dates, private actual-file derivation, immutable hashing/source rows, exact/concurrent re-imports, conflicting interpretations, cross-file/within-file candidates and stale review, source equation/range, capability expiry/rotation/replay/uploader scope/no plaintext receipt, retained corrections, role/Origin/flag, unchanged normal256KiB limit and runtime/Data API boundaries.
+
+A4,780,034-byte file transferred through three bounded actual HTTP requests and imported all5,000 records. Last page200 returned record5,000; preview stayed below250,000 bytes. No GL was created. Browser auth fixtures were renewed after the backend suite. The actual statement journey passed6.8s before full regression and6.3s again, including mobile/WCAG/private denial and actual user form recovery/duplicate/correction steps.
+
+865 distinct local checks passed:267 unit,549 actual PostgreSQL integration (216.85s),49 Chromium (2.8m). The statement journey passed6.8s and6.3s in full regression, including balance-error recovery, exact re-import, duplicate review, retained replacement, selected writer, employee denial, mobile and WCAG, without GL. Both production builds, strict typing/lint,173 concrete API paths/verbs/references and all64 applied migration checksums passed. Word/private-value checks accompany separate F30 publication; fresh CI is observed after push. No immutable source/ledger/audit history was deleted to pass tests. No hosted schema, finance activation, real CSV or bank transaction occurred.

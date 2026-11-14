@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova private finance through F29",
-    "version": "0.24.0",
+    "title": "Encova private finance through F30",
+    "version": "0.25.0",
     "description": "Implemented F01\u2013F18: private selected-admin accounting with owner-reviewed tax policy, net/tax invoice and purchase posting, capped original-tax credits and evidenced customer/supplier withholding in gross settlements. Default disabled, no hosted financial launch, real tax rates or legal compliance claims. See source-bound accounting and progress evidence. F19 adds private typed evidence, direct upload, quarantine, signed malware attestation, current-access bounded proxy downloads and auditable draft cleanup. Scanner configuration is operator-only; no clean fallback or live signing secrets seeded."
   },
   "security": [
@@ -18266,6 +18266,921 @@
           }
         }
       }
+    },
+    "/api/v1/finance/statement-uploads": {
+      "post": {
+        "operationId": "statement_statement-uploads_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Fresh password/hosted TOTP, canonical Origin/CSRF, permanent scoped key and current version where relevant. Reserve immutable file/account/hash metadata;5-minute byte-only capability in this response, never in receipts/audits. Same-key authenticated retry rotates it. Exact retained file/account returns previous batch; a voided source requires explicit latest-source replacement rather than silent new import.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Reserve {upload,batch,intent,reused,retainedVoided}; completed/reused returns batch and no intent. Stage public metadata/chunks only. Grid headers/sample/dataRows. Preview summaries,basisHash,uploadVersion,25 rows,duplicateCount/candidate record numbers/bounded samples. Register items,total,page,pages,filters; batch item,25 lines,page,pages,history. Money is exact strings."
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Retained/reused existing source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Reserve {upload,batch,intent,reused,retainedVoided}; completed/reused returns batch and no intent. Stage public metadata/chunks only. Grid headers/sample/dataRows. Preview summaries,basisHash,uploadVersion,25 rows,duplicateCount/candidate record numbers/bounded samples. Register items,total,page,pages,filters; batch item,25 lines,page,pages,history. Money is exact strings."
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementReserveInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-uploads/{id}": {
+      "get": {
+        "operationId": "statement_statement-uploads_ById_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Current uploader-only public stage metadata, received chunk indices/hashes and authorized-until time; no raw bytes or intent hash.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Reserve {upload,batch,intent,reused,retainedVoided}; completed/reused returns batch and no intent. Stage public metadata/chunks only. Grid headers/sample/dataRows. Preview summaries,basisHash,uploadVersion,25 rows,duplicateCount/candidate record numbers/bounded samples. Register items,total,page,pages,filters; batch item,25 lines,page,pages,history. Money is exact strings."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-uploads/{id}/grid": {
+      "get": {
+        "operationId": "statement_statement-uploads_ById_grid_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Current uploader-only original parsed sample:20 records/cell200 characters/header100 characters. Header/preamble selection is explicit; source records count nonempty CSV records, not quoted physical newlines.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skipRows",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 25,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Reserve {upload,batch,intent,reused,retainedVoided}; completed/reused returns batch and no intent. Stage public metadata/chunks only. Grid headers/sample/dataRows. Preview summaries,basisHash,uploadVersion,25 rows,duplicateCount/candidate record numbers/bounded samples. Register items,total,page,pages,filters; batch item,25 lines,page,pages,history. Money is exact strings."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-uploads/{id}/chunks": {
+      "post": {
+        "operationId": "statement_statement-uploads_ById_chunks_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Current uploader plus scoped capability/expiry and Origin/CSRF; no repeated password/TOTP for byte transport. Up to3 immutable chunks of at most2MiB. Index+SHA replay is idempotent.30/minute upload bucket; no change to six/minute sensitive-write limit.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Reserve {upload,batch,intent,reused,retainedVoided}; completed/reused returns batch and no intent. Stage public metadata/chunks only. Grid headers/sample/dataRows. Preview summaries,basisHash,uploadVersion,25 rows,duplicateCount/candidate record numbers/bounded samples. Register items,total,page,pages,filters; batch item,25 lines,page,pages,history. Money is exact strings."
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementChunkInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-uploads/{id}/preview": {
+      "post": {
+        "operationId": "statement_statement-uploads_ById_preview_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Read-only current-basis preview, Origin/CSRF required; no fresh write proof or receipt. Server reconstructs actual retained bytes and derives rows. SQL checks actual hash, normalized schema, totals, value-date scope and current duplicate evidence. Returns25 mapped rows and bounded duplicate samples plus all candidate record numbers and basis hash. No client-provided rows/fingerprints accepted.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Reserve {upload,batch,intent,reused,retainedVoided}; completed/reused returns batch and no intent. Stage public metadata/chunks only. Grid headers/sample/dataRows. Preview summaries,basisHash,uploadVersion,25 rows,duplicateCount/candidate record numbers/bounded samples. Register items,total,page,pages,filters; batch item,25 lines,page,pages,history. Money is exact strings."
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementPreviewInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-uploads/{id}/import": {
+      "post": {
+        "operationId": "statement_statement-uploads_ById_import_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Fresh password/hosted TOTP, canonical Origin/CSRF, permanent scoped key and current version where relevant. Reconstruct/map actual retained bytes again; verify current version/basis, original cash mapping and full opening+in-out=closing equation. Every potential duplicate must be acknowledged with review; all legitimate equal rows are retained. Same-file races return prior exact import; different reviewed mapping/totals conflict. Immutable batch/rows/source snapshots; bank value dates remain distinct from GL posting dates.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementCommandResult"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Retained/reused existing source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementImportInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-uploads/{id}/cancel": {
+      "post": {
+        "operationId": "statement_statement-uploads_ById_cancel_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Fresh password/hosted TOTP, canonical Origin/CSRF, permanent scoped key and current version where relevant. Cancel own pending upload, retaining history; authorization cannot transfer more data.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementActionInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statements": {
+      "get": {
+        "operationId": "statement_statements_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Private immutable batch metadata and25-row page; whole internal source/duplicate JSON is deliberately excluded from responses. Stable register pages and retained original/replacement links.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "cashAccountId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ALL",
+                "IMPORTED",
+                "VOIDED"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Reserve {upload,batch,intent,reused,retainedVoided}; completed/reused returns batch and no intent. Stage public metadata/chunks only. Grid headers/sample/dataRows. Preview summaries,basisHash,uploadVersion,25 rows,duplicateCount/candidate record numbers/bounded samples. Register items,total,page,pages,filters; batch item,25 lines,page,pages,history. Money is exact strings."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statements/{id}": {
+      "get": {
+        "operationId": "statement_statements_ById_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Private immutable batch metadata and25-row page; whole internal source/duplicate JSON is deliberately excluded from responses. Stable register pages and retained original/replacement links.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Reserve {upload,batch,intent,reused,retainedVoided}; completed/reused returns batch and no intent. Stage public metadata/chunks only. Grid headers/sample/dataRows. Preview summaries,basisHash,uploadVersion,25 rows,duplicateCount/candidate record numbers/bounded samples. Register items,total,page,pages,filters; batch item,25 lines,page,pages,history. Money is exact strings."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statements/{id}/void": {
+      "post": {
+        "operationId": "statement_statements_ById_void_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Fresh password/hosted TOTP, canonical Origin/CSRF, permanent scoped key and current version where relevant. Retain imported file/rows and record reason. Explicit reviewed replacement links to latest voided same-file/account source; no forks or overwritten history. Matching/reconciliation guards follow in their own milestones.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatementCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementActionInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-bank-options": {
+      "get": {
+        "operationId": "statement_statement-bank-options_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; every response private/no-store. UTF-8 CSV5,000,000 bytes/5,000 records,50 columns,4,096-character raw fields. No GL, cash execution, automatic matching or reconciliation. Active PKR bank/cash choices with active cash controls.25-row stable searchable pages; only masked/last-four reference metadata.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Statement source/transport/preview result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Reserve {upload,batch,intent,reused,retainedVoided}; completed/reused returns batch and no intent. Stage public metadata/chunks only. Grid headers/sample/dataRows. Preview summaries,basisHash,uploadVersion,25 rows,duplicateCount/candidate record numbers/bounded samples. Register items,total,page,pages,filters; batch item,25 lines,page,pages,history. Money is exact strings."
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -25225,6 +26140,450 @@
           "remaining",
           "unbudgeted",
           "exceeded"
+        ]
+      },
+      "StatementMapping": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "skipRows": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 25,
+                "default": 0
+              },
+              "dateColumn": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 49
+              },
+              "dateFormat": {
+                "enum": [
+                  "ISO",
+                  "DMY",
+                  "MDY"
+                ]
+              },
+              "descriptionColumn": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 49
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "referenceColumn": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 49
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "mode": {
+                "const": "SIGNED"
+              },
+              "amountColumn": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 49
+              },
+              "positiveMeans": {
+                "enum": [
+                  "RECEIPT",
+                  "PAYMENT"
+                ]
+              }
+            },
+            "required": [
+              "mode",
+              "dateColumn",
+              "dateFormat",
+              "amountColumn",
+              "positiveMeans"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "skipRows": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 25,
+                "default": 0
+              },
+              "dateColumn": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 49
+              },
+              "dateFormat": {
+                "enum": [
+                  "ISO",
+                  "DMY",
+                  "MDY"
+                ]
+              },
+              "descriptionColumn": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 49
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "referenceColumn": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 49
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "mode": {
+                "const": "DEBIT_CREDIT"
+              },
+              "debitColumn": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 49
+              },
+              "creditColumn": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 49
+              }
+            },
+            "required": [
+              "mode",
+              "dateColumn",
+              "dateFormat",
+              "debitColumn",
+              "creditColumn"
+            ]
+          }
+        ],
+        "description": "All selected columns are distinct, zero-based, and inside the chosen CSV header. Explicit format; no date/amount guessing."
+      },
+      "StatementPreviewInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mapping": {
+            "$ref": "#/components/schemas/StatementMapping"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real Gregorian YYYY-MM-DD0001\u20139999; bank value date is distinct from accounting posting date."
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real Gregorian YYYY-MM-DD0001\u20139999; bank value date is distinct from accounting posting date."
+          },
+          "openingBalance": {
+            "type": "string",
+            "pattern": "^-?(?:0|[1-9][0-9]{0,17})(?:\\.[0-9]{1,2})?$"
+          },
+          "closingBalance": {
+            "type": "string",
+            "pattern": "^-?(?:0|[1-9][0-9]{0,17})(?:\\.[0-9]{1,2})?$"
+          },
+          "currency": {
+            "const": "PKR",
+            "default": "PKR"
+          }
+        },
+        "required": [
+          "mapping",
+          "startDate",
+          "endDate",
+          "openingBalance",
+          "closingBalance"
+        ]
+      },
+      "StatementReserveInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cashAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fileName": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 180,
+            "description": ".csv basename only; no slash/backslash/control characters."
+          },
+          "byteSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000000
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "replacesId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "cashAccountId",
+          "fileName",
+          "byteSize",
+          "sha256",
+          "reason",
+          "reauth"
+        ]
+      },
+      "StatementChunkInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "content": {
+            "type": "string",
+            "format": "byte",
+            "minLength": 4,
+            "maxLength": 2796204,
+            "description": "Canonical base64 of at most2MiB; exact indexed size and SHA are checked. Only this transport route has a3,000,000-byte JSON limit; ordinary APIs remain256KiB."
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "intent": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "Scoped5-minute transport capability returned only after fresh reserve verification. Requires current uploader/selection and Origin. No read/import permission; never stored plaintext in audits/receipts."
+          }
+        },
+        "required": [
+          "index",
+          "content",
+          "sha256",
+          "intent"
+        ]
+      },
+      "StatementImportInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mapping": {
+            "$ref": "#/components/schemas/StatementMapping"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real Gregorian YYYY-MM-DD0001\u20139999; bank value date is distinct from accounting posting date."
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real Gregorian YYYY-MM-DD0001\u20139999; bank value date is distinct from accounting posting date."
+          },
+          "openingBalance": {
+            "type": "string",
+            "pattern": "^-?(?:0|[1-9][0-9]{0,17})(?:\\.[0-9]{1,2})?$"
+          },
+          "closingBalance": {
+            "type": "string",
+            "pattern": "^-?(?:0|[1-9][0-9]{0,17})(?:\\.[0-9]{1,2})?$"
+          },
+          "currency": {
+            "const": "PKR",
+            "default": "PKR"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "basisHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "acknowledgedRows": {
+            "type": "array",
+            "maxItems": 5000,
+            "uniqueItems": true,
+            "default": [],
+            "items": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 5026
+            }
+          },
+          "duplicateReview": {
+            "type": "string",
+            "maxLength": 1000,
+            "default": "",
+            "description": "Required nonempty review exactly when duplicate rows exist."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "mapping",
+          "startDate",
+          "endDate",
+          "openingBalance",
+          "closingBalance",
+          "expectedVersion",
+          "basisHash",
+          "reason",
+          "reauth"
+        ]
+      },
+      "StatementActionInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "StatementCommandResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "number": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "uploadId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "reused": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "version",
+              "reused"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "StatementRow": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sequence": {
+            "type": "integer"
+          },
+          "sourceRow": {
+            "type": "integer"
+          },
+          "valueDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real Gregorian YYYY-MM-DD0001\u20139999; bank value date is distinct from accounting posting date."
+          },
+          "direction": {
+            "enum": [
+              "RECEIPT",
+              "PAYMENT"
+            ]
+          },
+          "amount": {
+            "$ref": "#/components/schemas/PkrAmount"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "bankReference": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "sequence",
+          "sourceRow",
+          "valueDate",
+          "direction",
+          "amount",
+          "description",
+          "bankReference"
         ]
       }
     }

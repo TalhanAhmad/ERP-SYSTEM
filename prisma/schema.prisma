@@ -80,6 +80,9 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ statementUploads FinanceStatementUpload[]
+ statementBatches FinanceStatementBatch[]
+
  financeBudgets FinanceBudget[] @relation("BudgetCreator")
  approvedFinanceBudgets FinanceBudget[] @relation("BudgetApprover")
  financeForecasts FinanceForecast[]
@@ -216,6 +219,8 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ statementUploads FinanceStatementUpload[]
+ statementBatches FinanceStatementBatch[]
  budgetLines FinanceBudgetLine[]
 
  expenseAssetMovements FinanceAssetMovement[] @relation("AssetMovementExpense")
@@ -472,6 +477,9 @@ model FinanceParty {
  @@index([active,kind,name,id])
 }
 model FinanceCashAccount {
+ statementUploads FinanceStatementUpload[]
+ statementBatches FinanceStatementBatch[]
+
  assetMovements FinanceAssetMovement[]
  movementsFrom FinanceMovement[] @relation("MovementFromCash")
  movementsTo FinanceMovement[] @relation("MovementToCash")
@@ -2072,4 +2080,93 @@ model FinanceForecast {
  updatedAt DateTime @default(now()) @db.Timestamptz
  @@index([expectedDate,state,kind,id])
  @@index([projectId,expectedDate,id])
+}
+
+model FinanceStatementUpload {
+ id String @id @default(uuid()) @db.Uuid
+ glAccountId String @db.Uuid
+ glAccount FinanceAccount @relation(fields:[glAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ cashAccountId String @db.Uuid
+ cashAccount FinanceCashAccount @relation(fields:[cashAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ fileName String
+ byteSize Int
+ sha256 String
+ replacesId String? @db.Uuid
+ replaces FinanceStatementBatch? @relation("StatementReplacementUpload",fields:[replacesId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ resultBatchId String? @db.Uuid
+ resultBatch FinanceStatementBatch? @relation("StatementUploadResult",fields:[resultBatchId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ state String @default("UPLOADING")
+ version Int @default(1)
+ intentHash String
+ intentVerifiedAt DateTime @db.Timestamptz
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ chunks FinanceStatementChunk[]
+ batch FinanceStatementBatch? @relation("StatementImportedUpload")
+ @@index([createdById,state,createdAt,id])
+}
+model FinanceStatementChunk {
+ uploadId String @db.Uuid
+ upload FinanceStatementUpload @relation(fields:[uploadId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ index Int
+ bytes Bytes @db.ByteA
+ sha256 String
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@id([uploadId,index])
+}
+model FinanceStatementBatch {
+ resultUploads FinanceStatementUpload[] @relation("StatementUploadResult")
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique
+ uploadId String @unique @db.Uuid
+ upload FinanceStatementUpload @relation("StatementImportedUpload",fields:[uploadId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ glAccountId String @db.Uuid
+ glAccount FinanceAccount @relation(fields:[glAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ cashAccountId String @db.Uuid
+ cashAccount FinanceCashAccount @relation(fields:[cashAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sha256 String
+ importKey String
+ parserVersion String
+ mapping Json
+ startDate DateTime @db.Date
+ endDate DateTime @db.Date
+ openingBalance Decimal @db.Decimal(20,2)
+ closingBalance Decimal @db.Decimal(20,2)
+ receipts Decimal @db.Decimal(24,2)
+ payments Decimal @db.Decimal(24,2)
+ rowCount Int
+ rowDigest String
+ sourceSnapshot Json
+ duplicateReview String
+ duplicateSnapshot Json
+ replacesId String? @unique @db.Uuid
+ replaces FinanceStatementBatch? @relation("StatementReplacement",fields:[replacesId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ replacedBy FinanceStatementBatch? @relation("StatementReplacement")
+ replacementUploads FinanceStatementUpload[] @relation("StatementReplacementUpload")
+ state String @default("DRAFT")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ lines FinanceStatementLine[]
+ @@index([cashAccountId,startDate,endDate,id])
+}
+model FinanceStatementLine {
+ id String @id @default(uuid()) @db.Uuid
+ batchId String @db.Uuid
+ batch FinanceStatementBatch @relation(fields:[batchId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ sourceRow Int
+ valueDate DateTime @db.Date
+ direction String
+ amount Decimal @db.Decimal(20,2)
+ description String
+ bankReference String
+ fingerprint String
+ @@unique([batchId,sequence])
+ @@index([fingerprint,batchId,id])
+ @@index([valueDate,batchId,id])
 }

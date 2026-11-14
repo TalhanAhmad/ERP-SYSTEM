@@ -4,7 +4,7 @@ Prepared for Talha Ahmad, as requested on 14 November 2026. Intended Finance Own
 
 ## Current evidence and scope
 
-F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29 is now locally accepted with838 checks; F30–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
+F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29 is now locally accepted with838 checks; F30 is now locally accepted with865 checks; F31–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
 
 The final pack will include tested representative statements, source-to-ledger links, dated balances, exception cases, migration/recovery evidence and outstanding decisions. No company figures, legal compliance or accountant approval are inferred from synthetic fixtures.
 
@@ -59,3 +59,13 @@ F28 source2c3b0031e87fab2a63e0445118e216e7f61718ca passed [fresh CI43609969834](
 A synthetic approved monthly expense budget100.01 and actual unpaid incurred cost120.00 show remaining−19.99, with an advisory warning; the actual expense is still recognized. Drafting a130.03 revision leaves100.01 current until explicit approval, then retains the old plan as superseded. A separate expected payment200.02 dated2099-12-31 can be edited/cancelled/reopened with likelihood notes and creates no cash or GL event. These are verification fixtures, not company budgets or payment commitments.
 
 838 distinct local checks passed:259 unit (3.35s),531 PostgreSQL integration (214.90s),48 Chromium (2.9m). The new budget/revision/variance/selected-forecast journey passed4.7s, including manager denial, mobile and WCAG. Strict typing/lint, both production builds,162 concrete API paths/verbs/references and all63 applied migration checksums passed. Word/private-value verification accompanies separate F29 publication; fresh CI will be observed after push. Statement imports, matching/reconciliation, statements/exports, closing/cutover and final recovery evidence remain later milestones. Review/acceptance fields stay unfilled for the user.
+
+
+F29 sourcea6b014b9f03ad70e62c8cff3733a4e6070ad3bec passed [fresh CI43612791776](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43612791776):63 migrations, all838 tests, both builds/type/lint/162-path documentation checks. F30 local acceptance is complete; separate publication/fresh CI are recorded in the continuation tracker.
+
+
+## Statement-source example through F30
+
+A synthetic CSV with one money-in record10.01, opening0.00 and closing10.01 validates its source totals. Closing10.00 yields−0.01 and cannot be confirmed. Exact re-import returns its original source; a different file with the same possible transaction requires explicit review and retains both records. Void/replacement keeps the original file and row identities. None of these actions creates a journal or establishes that the posted bank balance is reconciled. Matching and reconciliation remain F31/F32 work.
+
+A4,780,034-byte/5,000-record file was actually transferred and retained through bounded requests, with exact50.00 total and record5,000 verified. CSV bytes remain private structured input in PostgreSQL; they are not public downloadable attachments. Retention/archival and actual bank master metadata remain owner review decisions. 865 distinct local checks passed:267 unit,549 actual PostgreSQL integration (216.85s),49 Chromium (2.8m). The statement journey passed6.8s and6.3s in full regression, including balance-error recovery, exact re-import, duplicate review, retained replacement, selected writer, employee denial, mobile and WCAG, without GL. Both production builds, strict typing/lint,173 concrete API paths/verbs/references and all64 applied migration checksums passed. Word/private-value checks accompany separate F30 publication; fresh CI is observed after push. Review/acceptance fields remain unfilled for the user.
