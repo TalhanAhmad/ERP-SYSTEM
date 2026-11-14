@@ -1,3 +1,4 @@
+import { InvestmentAcquisitionForm } from "@/modules/finance/components/investment-forms";
 import { LoanMovementForm } from "@/modules/finance/components/loan-forms";
 import { FundingForm } from "@/modules/finance/components/funding-form";
 import Link from "next/link";
@@ -50,6 +51,14 @@ export default async function Movement({
           Amount <MoneyCell value={i.amount} />
         </p>
         <p>Evidence: {i.evidence}</p>
+        {i.holding && (
+          <p>
+            <Link href={"/finance/investments/" + i.holding.id}>
+              Holding {i.holding.number}
+            </Link>{" "}
+            · Units {i.units ?? "Amount based"}
+          </p>
+        )}
         {i.loan && (
           <Link href={"/finance/loans/" + i.loan.id}>
             Loan {i.loan.number} · {i.loan.direction}
@@ -77,6 +86,12 @@ export default async function Movement({
             <h2>Edit movement draft</h2>
             {i.kind === "TRANSFER" ? (
               <MovementForm key={i.version} item={i} hosted={hosted} />
+            ) : i.holding ? (
+              <InvestmentAcquisitionForm
+                item={i}
+                holding={i.holding}
+                hosted={hosted}
+              />
             ) : i.loan ? (
               <LoanMovementForm item={i} loan={i.loan} hosted={hosted} />
             ) : (

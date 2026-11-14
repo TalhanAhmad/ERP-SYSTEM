@@ -16,6 +16,8 @@ export function AccountPicker({
   required = false,
 }: {
   kind:
+    | "investment"
+    | "investment-income-receivable"
     | "loan-receivable"
     | "loan-payable"
     | "interest-receivable"

@@ -80,6 +80,7 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ financeInvestmentHoldings FinanceInvestmentHolding[]
  financeLoans FinanceLoan[]
  financeMovements FinanceMovement[]
  financeFiles FinanceFile[] @relation("FileUploader")
@@ -198,6 +199,14 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ investmentHoldings FinanceInvestmentHolding[] @relation("HoldingInvestment")
+gainHoldings FinanceInvestmentHolding[] @relation("HoldingGain")
+lossHoldings FinanceInvestmentHolding[] @relation("HoldingLoss")
+feeHoldings FinanceInvestmentHolding[] @relation("HoldingFee")
+incomeHoldings FinanceInvestmentHolding[] @relation("HoldingIncome")
+incomeControlHoldings FinanceInvestmentHolding[] @relation("HoldingIncomecontrol")
+valuationOffsetHoldings FinanceInvestmentHolding[] @relation("HoldingValuationoffset")
+impairmentHoldings FinanceInvestmentHolding[] @relation("HoldingImpairment")
  principalLoans FinanceLoan[] @relation("LoanPrincipal")
  interestLoans FinanceLoan[] @relation("LoanInterest")
  resultLoans FinanceLoan[] @relation("LoanResult")
@@ -313,6 +322,7 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ investmentEvents FinanceInvestmentEvent[]
  loanEvent FinanceLoanEvent?
  fundingEvent FinanceFundingEvent?
  movementId String? @unique @db.Uuid
@@ -392,6 +402,7 @@ model FinanceLedgerReceipt {
 }
 
 model FinanceParty {
+ investmentHoldings FinanceInvestmentHolding[]
  loans FinanceLoan[]
  fundingEvents FinanceFundingEvent[]
  movements FinanceMovement[]
@@ -1495,6 +1506,11 @@ model FinanceScanAuthority {
 }
 
 model FinanceMovement {
+ holdingId String? @db.Uuid
+ holding FinanceInvestmentHolding? @relation(fields:[holdingId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ units Decimal? @db.Decimal(20,6)
+ investmentLot FinanceInvestmentLot?
+ investmentEvents FinanceInvestmentEvent[]
  loanId String? @db.Uuid
  loan FinanceLoan? @relation(fields:[loanId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  loanEvent FinanceLoanEvent?
@@ -1598,4 +1614,76 @@ model FinanceLoanEvent {
  bucket String
  amount Decimal @db.Decimal(20,2)
  @@index([loanId,effectiveDate])
+}
+
+model FinanceInvestmentHolding {
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique
+ name String
+ partyId String @db.Uuid
+ party FinanceParty @relation(fields:[partyId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ investmentType String
+ unitMode String
+ classification String
+ policyStatus String
+ measurementMode String
+ valuationTreatment String
+ policy String
+ evidence String
+ investmentAccountId String @db.Uuid
+ investmentAccount FinanceAccount @relation("HoldingInvestment",fields:[investmentAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ gainAccountId String? @db.Uuid
+ gainAccount FinanceAccount? @relation("HoldingGain",fields:[gainAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ lossAccountId String? @db.Uuid
+ lossAccount FinanceAccount? @relation("HoldingLoss",fields:[lossAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ feeAccountId String? @db.Uuid
+ feeAccount FinanceAccount? @relation("HoldingFee",fields:[feeAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ incomeAccountId String? @db.Uuid
+ incomeAccount FinanceAccount? @relation("HoldingIncome",fields:[incomeAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ incomeControlAccountId String? @db.Uuid
+ incomeControlAccount FinanceAccount? @relation("HoldingIncomecontrol",fields:[incomeControlAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ valuationOffsetAccountId String? @db.Uuid
+ valuationOffsetAccount FinanceAccount? @relation("HoldingValuationoffset",fields:[valuationOffsetAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ impairmentAccountId String? @db.Uuid
+ impairmentAccount FinanceAccount? @relation("HoldingImpairment",fields:[impairmentAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ active Boolean @default(true)
+ version Int @default(1)
+ usedAt DateTime? @db.Timestamptz
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ movements FinanceMovement[]
+ lots FinanceInvestmentLot[]
+ events FinanceInvestmentEvent[]
+}
+model FinanceInvestmentLot {
+ id String @id @default(uuid()) @db.Uuid
+ holdingId String @db.Uuid
+ holding FinanceInvestmentHolding @relation(fields:[holdingId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ movementId String @unique @db.Uuid
+ movement FinanceMovement @relation(fields:[movementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ acquisitionDate DateTime @db.Date
+ cost Decimal @db.Decimal(20,2)
+ units Decimal? @db.Decimal(20,6)
+ events FinanceInvestmentEvent[]
+ @@index([holdingId,acquisitionDate])
+}
+model FinanceInvestmentEvent {
+ id String @id @default(uuid()) @db.Uuid
+ holdingId String @db.Uuid
+ holding FinanceInvestmentHolding @relation(fields:[holdingId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ lotId String @db.Uuid
+ lot FinanceInvestmentLot @relation(fields:[lotId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ movementId String @db.Uuid
+ movement FinanceMovement @relation(fields:[movementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalId String @db.Uuid
+ journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ effectiveDate DateTime @db.Date
+ costDelta Decimal @db.Decimal(20,2)
+ carryingDelta Decimal @db.Decimal(20,2)
+ unitsDelta Decimal? @db.Decimal(20,6)
+ @@unique([movementId,lotId])
+ @@index([holdingId,effectiveDate])
+ @@index([lotId,effectiveDate])
 }

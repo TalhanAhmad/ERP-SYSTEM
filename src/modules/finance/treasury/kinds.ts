@@ -15,8 +15,10 @@ export const loanKinds = [
   "LOAN_PRINCIPAL_INCREASE",
   "LOAN_PRINCIPAL_DECREASE",
 ] as const;
+export const investmentKinds = ["INVESTMENT_ACQUISITION"] as const;
 export const movementKinds = [
   "TRANSFER",
   ...fundingKinds,
   ...loanKinds,
+  ...investmentKinds,
 ] as const;

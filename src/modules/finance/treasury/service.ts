@@ -1,4 +1,6 @@
 import "server-only";
+import { holdingErrors } from "../investments/service";
+import { investmentKinds } from "./kinds";
 import { loanErrors } from "../funding/loans/service";
 import { loanKinds } from "./kinds";
 import { z } from "zod";
@@ -17,6 +19,7 @@ import {
 } from "./schemas";
 const errors: Record<string, string> = {
   ...loanErrors,
+  ...holdingErrors,
   FINANCE_APPROVAL_REQUIRED: "Record explicit authorization evidence.",
   FINANCE_FUNDING_CAPACITY:
     "This would exceed the contributor’s posted balance at this date or a later event.",
@@ -129,6 +132,15 @@ export async function movementDetail(actor: Pick<Actor, "id">, id: string) {
         fromCash: { select: { name: true } },
         toCash: { select: { name: true } },
         party: { select: { name: true } },
+        holding: {
+          select: {
+            id: true,
+            number: true,
+            name: true,
+            unitMode: true,
+            policyStatus: true,
+          },
+        },
         loan: {
           select: {
             id: true,
@@ -196,6 +208,7 @@ export async function movementDetail(actor: Pick<Actor, "id">, id: string) {
       item: {
         ...item,
         amount: item.amount.toFixed(2),
+        units: item.units?.toFixed(6) ?? null,
         documentDate: date(item.documentDate),
         postingDate: date(item.postingDate),
         state: item.reversedBy ? "REVERSED" : item.state,
@@ -230,7 +243,9 @@ export async function movements(actor: Pick<Actor, "id">, input: unknown = {}) {
                           ? ["TRANSFER"]
                           : q.family === "LOANS"
                             ? [...loanKinds]
-                            : [...fundingKinds],
+                            : q.family === "INVESTMENTS"
+                              ? [...investmentKinds]
+                              : [...fundingKinds],
                     },
                   },
                   {
@@ -242,7 +257,9 @@ export async function movements(actor: Pick<Actor, "id">, input: unknown = {}) {
                             ? ["TRANSFER"]
                             : q.family === "LOANS"
                               ? [...loanKinds]
-                              : [...fundingKinds],
+                              : q.family === "INVESTMENTS"
+                                ? [...investmentKinds]
+                                : [...fundingKinds],
                       },
                     },
                   },
@@ -291,6 +308,7 @@ export async function movements(actor: Pick<Actor, "id">, input: unknown = {}) {
       items: items.map((i) => ({
         ...i,
         amount: i.amount.toFixed(2),
+        units: i.units?.toFixed(6) ?? null,
         postingDate: date(i.postingDate),
         state: i.reversedBy ? "REVERSED" : i.state,
       })),

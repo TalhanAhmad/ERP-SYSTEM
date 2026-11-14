@@ -35,6 +35,13 @@ export const movementDraftSchema = z
       .default(null),
     billId: z.uuid().nullable().default(null),
     loanId: z.uuid().nullable().default(null),
+    holdingId: z.uuid().nullable().default(null),
+    units: z
+      .string()
+      .regex(/^(?:0|[1-9]\d{0,13})(?:\.\d{1,6})?(?![\s\S])/)
+      .refine((v) => /[1-9]/.test(v), "Units must be positive.")
+      .nullable()
+      .default(null),
     reason: reasonSchema,
   })
   .strict()
@@ -50,14 +57,25 @@ export const movementDraftSchema = z
         d.projectId ||
         d.approvalEvidence ||
         d.billId ||
-        d.loanId)
+        d.loanId ||
+        d.holdingId ||
+        d.units)
     )
       c.addIssue({
         code: "custom",
         path: ["toCashId"],
         message: "Choose two different bank/cash accounts.",
       });
-    if (d.kind !== "TRANSFER" && !d.kind.startsWith("LOAN_")) {
+    if (
+      d.kind !== "TRANSFER" &&
+      !d.kind.startsWith("LOAN_") &&
+      !d.kind.startsWith("INVESTMENT_")
+    ) {
+      if (d.holdingId || d.units)
+        c.addIssue({
+          code: "custom",
+          message: "Choose the investment workflow.",
+        });
       if (d.loanId)
         c.addIssue({
           code: "custom",
@@ -98,6 +116,11 @@ export const movementDraftSchema = z
         });
     }
     if (d.kind.startsWith("LOAN_")) {
+      if (d.holdingId || d.units)
+        c.addIssue({
+          code: "custom",
+          message: "Loan sources cannot reference holdings.",
+        });
       if (
         !d.loanId ||
         d.partyId ||
@@ -144,6 +167,24 @@ export const movementDraftSchema = z
           message: "Noncash principal adjustments do not use cash legs.",
         });
     }
+    if (
+      d.kind === "INVESTMENT_ACQUISITION" &&
+      (!d.holdingId ||
+        !d.fromCashId ||
+        d.toCashId ||
+        d.partyId ||
+        d.controlAccountId ||
+        d.counterAccountId ||
+        d.loanId ||
+        d.billId ||
+        d.projectId ||
+        d.approvalEvidence)
+    )
+      c.addIssue({
+        code: "custom",
+        message:
+          "Choose the holding and paying bank; issuer and investment control come from its reviewed policy.",
+      });
     if (d.postingDate < d.documentDate)
       c.addIssue({
         code: "custom",
@@ -166,7 +207,9 @@ export const movementQuerySchema = z
   .object({
     q: z.string().trim().max(100).default(""),
     kind: z.enum(["ALL", ...movementKinds, "REVERSAL"]).default("ALL"),
-    family: z.enum(["ALL", "TRANSFERS", "FUNDING", "LOANS"]).default("ALL"),
+    family: z
+      .enum(["ALL", "TRANSFERS", "FUNDING", "LOANS", "INVESTMENTS"])
+      .default("ALL"),
     state: z
       .enum(["ALL", "DRAFT", "POSTED", "REVERSED", "VOIDED"])
       .default("ALL"),
