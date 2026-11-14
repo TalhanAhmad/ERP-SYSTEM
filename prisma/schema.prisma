@@ -80,6 +80,8 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ createdFinanceAssets FinanceAsset[] @relation("FinanceAssetCreator")
+ custodyFinanceAssets FinanceAsset[] @relation("FinanceAssetCustodian")
  financeInvestmentHoldings FinanceInvestmentHolding[]
  financeLoans FinanceLoan[]
  financeMovements FinanceMovement[]
@@ -199,6 +201,7 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ registeredAssets FinanceAsset[]
  investmentHoldings FinanceInvestmentHolding[] @relation("HoldingInvestment")
 gainHoldings FinanceInvestmentHolding[] @relation("HoldingGain")
 lossHoldings FinanceInvestmentHolding[] @relation("HoldingLoss")
@@ -322,6 +325,7 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ assetDisposals FinanceAsset[]
  investmentIncomeEvent FinanceInvestmentIncomeEvent?
  investmentEvents FinanceInvestmentEvent[]
  loanEvent FinanceLoanEvent?
@@ -1246,6 +1250,7 @@ model FinanceBill {
  @@index([partyId,postingDate,id])
 }
 model FinanceBillLine {
+ registeredAssets FinanceAsset[]
  taxCodeId String? @db.Uuid
  taxCode FinanceTaxCode? @relation(fields:[taxCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  taxSnapshot Json?
@@ -1507,6 +1512,7 @@ model FinanceScanAuthority {
 }
 
 model FinanceMovement {
+ registeredAssets FinanceAsset[]
  feeAmount Decimal @default(0) @db.Decimal(20,2)
  investmentAllocations FinanceInvestmentAllocation[]
  investmentIncomeEvent FinanceInvestmentIncomeEvent?
@@ -1724,4 +1730,45 @@ model FinanceInvestmentIncomeEvent {
  effectiveDate DateTime @db.Date
  amount Decimal @db.Decimal(20,2)
  @@index([holdingId,effectiveDate])
+}
+
+model FinanceAsset {
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique
+ tag String
+ description String
+ location String
+ custodianId String? @db.Uuid
+ custodian Person? @relation("FinanceAssetCustodian",fields:[custodianId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ billLineId String? @db.Uuid
+ billLine FinanceBillLine? @relation(fields:[billLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ fundingMovementId String? @db.Uuid
+ fundingMovement FinanceMovement? @relation(fields:[fundingMovementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ accountId String @db.Uuid
+ account FinanceAccount @relation(fields:[accountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ cost Decimal @db.Decimal(20,2)
+ purchaseDate DateTime @db.Date
+ sourcePostingDate DateTime @db.Date
+ sourceSnapshot Json
+ inServiceDate DateTime @db.Date
+ usefulLifeMonths Int
+ residualValue Decimal @default(0) @db.Decimal(20,2)
+ depreciationMethod String @default("STRAIGHT_LINE")
+ convention String @default("PENDING")
+ firstDepMonth String?
+ policyEvidence String?
+ accumulatedDepreciation Decimal @default(0) @db.Decimal(20,2)
+ disposalDate DateTime? @db.Date
+ disposalJournalId String? @db.Uuid
+ disposalJournal FinanceJournalEntry? @relation(fields:[disposalJournalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ usedAt DateTime? @db.Timestamptz
+ state String @default("REGISTERED")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation("FinanceAssetCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([tag])
+ @@index([billLineId])
+ @@index([fundingMovementId])
 }

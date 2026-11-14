@@ -3,15 +3,15 @@
 Requested scope: continue from merged F15 through F25; test and push each milestone separately. Branch finance/f16-f25 starts at main c56cc78. This tracker records actual completed work and pending work without treating the specification as an instruction to launch finance.
 
 ## Status
-F16–F24 implemented and locally verified. F25 pending implementation. Hosted finance remains disabled, without hosted schema changes, owner grants or financial seeds. No real tax, funding, investment or depreciation policy has been selected.
+F16–F25 implemented and locally verified. The requested source-development scope is complete; final publication/CI evidence follows after observation. Hosted finance remains disabled, without hosted schema changes, owner grants or financial seeds. No real tax, funding, investment or depreciation policy has been selected.
 
 ## F16 evidence
 Bills and immediate paid expenses, exact cost/project splits, duplicate supplier reference protection and explicit same-amount review, versioned fresh-auth commands, immutable source/journal/AP events, supplier snapshots, current access and private audit. See [F16](planning/days/F16.md).
 
 DDL rollback rehearsal and additive migration34 passed on isolated synthetic encova_test. Focused bill/invoice/customer80 passed; dedicated bill9 plus schema3 and one Chromium journey passed. Earlier unchanged unit suite216 passed. Type/lint/local production build and concrete64-path API documentation checks passed. Full backend regression passed355 cases; existing unit216 plus bill unit3 passed219 distinct unit cases. Focused browser bill journey passed1; prior34 browser cases will be rerun in final regression. Supabase-mode production build also passed using configuration fixtures only. Publication/CI evidence follows when observed.
 
-## Pending milestones
-F25 asset purchase links without duplicate GL. F26 and later remain outside this request.
+## Remaining scope
+F26–F48 remain outside this request. In particular, F25 records planned policy and existing purchase cost; F26 depreciation/disposal posting is not claimed. Company/accountant policy adoption and controlled hosted release remain separate.
 
 ## F16 publication
 Source68afc4b was committed/pushed separately. Fresh-runner [CI43445524244](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43445524244) passed, including all34 additive migrations,219 unit/355 integration/35 browser cases, typing/lint, both builds and docs. Draft [PR #3](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/3) tracks this new scope; no merge requested for this branch.
@@ -66,3 +66,9 @@ Source840dc531775cfc714b729d0cf17032015c2afcd7 passed [CI43574210433](https://gi
 
 ## F24 verification
 See [F24](planning/days/F24.md) and [investment rules](accounting/investments.md). Sixteen movement backend cases plus prior acquisition/loan/schema42 focused checks passed. Full455 PostgreSQL (180.07s),243 unit, actual lot-disposal/fees/reversal Chromium4.8s, type/lint and both builds passed. Test schema54;112 API paths. Publishing separately before F25; hosted finance stays disabled.
+
+## F24 publication
+Sourcecaa5d2b11bcdab44c77975999e320d4f5fac88c1 passed [CI43576472332](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43576472332):54 fresh migrations,243 unit/455 integration/43 browser cases (741 distinct), both builds/type/lint/docs.
+
+## Final F25 local acceptance
+See [F25](planning/days/F25.md), [exact verification table](testing/F16-F25-results.md) and [asset rules](accounting/assets.md). All759 distinct checks passed (246 unit/469 integration/44 Chromium), typing/lint and both builds,116-path contracts and55 applied SQL checksums. Fourteen asset cases prove original net-cost links, no duplicate GL and source-credit/reversal protection. Actual browser/mobile WCAG/HR-denial/unused-VOID journey passed; full suite2.5m. Full and focused Word reports include every milestone and the step log. Publishing F25 separately; exact-source CI will be added only after observed success. Hosted finance remains disabled.

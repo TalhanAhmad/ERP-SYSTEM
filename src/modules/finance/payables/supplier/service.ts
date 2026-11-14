@@ -1,4 +1,5 @@
 import "server-only";
+import {assetErrors} from "../../assets/errors";
 import { z } from "zod";
 import { db } from "@/server/db";
 import { AppError, invariant } from "@/server/errors";
@@ -11,7 +12,7 @@ import {
   type SupplierAction,
   type SupplierResource,
 } from "./schemas";
-const errors: Record<string, string> = {
+const errors: Record<string, string> = {...assetErrors,
  FINANCE_TAX_POLICY:"Choose an applicable reviewed tax/withholding policy for the posting date.",
  FINANCE_TAX_MAPPING:"The tax policy or mapped accounts are inactive or invalid. Review the draft before posting.",
  FINANCE_TAX_MISMATCH:"Tax snapshots, amounts and mapped journal must agree.",

@@ -23,12 +23,12 @@
 | [F17](days/F17.md) | Implement supplier payments, advances, credits, and refunds | Complete |
 | [F18](days/F18.md) | Add configurable tax and withholding mappings with reviewed fixtures | Complete |
 | [F19](days/F19.md) | Build private attachment upload, quarantine, download, and access tests | Complete |
-| [F20](days/F20.md) | Build cash register and transfers; verify internal-transfer exclusion | Pending |
-| [F21](days/F21.md) | Implement capital, distributions, and founder-funded company costs | Pending |
-| [F22](days/F22.md) | Implement loan directions, principal/interest movements, and register | Pending |
-| [F23](days/F23.md) | Build investment holdings, acquisition lots, and movement services | Pending |
-| [F24](days/F24.md) | Build investment disposals, returns, adjustments, and over-disposal tests | Pending |
-| [F25](days/F25.md) | Build fixed asset register linked to purchases without duplicate postings | Pending |
+| [F20](days/F20.md) | Build cash register and transfers; verify internal-transfer exclusion | Complete |
+| [F21](days/F21.md) | Implement capital, distributions, and founder-funded company costs | Complete |
+| [F22](days/F22.md) | Implement loan directions, principal/interest movements, and register | Complete |
+| [F23](days/F23.md) | Build investment holdings, acquisition lots, and movement services | Complete |
+| [F24](days/F24.md) | Build investment disposals, returns, adjustments, and over-disposal tests | Complete |
+| [F25](days/F25.md) | Build fixed asset register linked to purchases without duplicate postings | Complete |
 | [F26](days/F26.md) | Implement depreciation drafts, exact rounding, disposal, and reversals | Pending |
 | [F27](days/F27.md) | Add private project contracts, variations, and billing milestones | Pending |
 | [F28](days/F28.md) | Build cost allocation/reclassification and project result calculations | Pending |

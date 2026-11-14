@@ -47,3 +47,9 @@ Applied successfully on its first deployment only to encova_test; no earlier app
 33 (20261113050000_finance_customer_credits_refunds) adds empty typed credit lines/posting splits/credit eligibility events, retained credit/correction/release references and stricter source-specific signed-event/check constraints. Existing shared engine/commands extend earned/deferred credits, refunds and dated opposite/released settlement effects. All new finance tables use RLS and runtime SELECT plus checked command only; private helpers/sequences/Data API writes remain denied after setup replay.
 
 The whole DDL first passed an explicit ROLLBACK rehearsal, then its first guarded additive deployment to encova_test. No prior applied checksum edit/reset/hosted migration. Total33 migrations; exact fresh-runner evidence belongs to the final F15 source CI, not prior milestone runs.
+
+## F16–F25 additive migrations
+
+34 bills/immediate expenses;35–36 supplier cycle/credit split;37–43 reviewed source tax, withholding and permanent replay compatibility;44–47 private evidence/quarantine/signed scan/retention;48 cash transfers;49–50 founder funding and SQL alias correction;51 loan agreements/events;52 investment holdings/acquisition lots;53–54 explicit lot disposal/income/value movements, register-only retirement and basis/use guards;55 asset registration with source-GL cost-cap protection.
+
+Each DDL addition was rehearsed with ROLLBACK and deployed only to encova_test. Applied successful checksums were retained; corrections use later additive migrations. No reset, hosted finance migration, real seed or owner grant is performed. Final source-specific checksum/fresh-runner results are recorded in the [delivery tracker](../delivery-F16-F25.md).

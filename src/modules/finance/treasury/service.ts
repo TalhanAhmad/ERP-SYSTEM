@@ -1,4 +1,5 @@
 import "server-only";
+import { assetErrors } from "../assets/errors";
 import { holdingErrors } from "../investments/service";
 import { investmentKinds } from "./kinds";
 import { loanErrors } from "../funding/loans/service";
@@ -18,6 +19,7 @@ import {
   fundingKinds,
 } from "./schemas";
 const errors: Record<string, string> = {
+  ...assetErrors,
   ...loanErrors,
   ...holdingErrors,
   FINANCE_APPROVAL_REQUIRED: "Record explicit authorization evidence.",

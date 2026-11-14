@@ -177,3 +177,7 @@ F12 invoice screens/private PDF, F13 receipts, F14 client advances and F15 credi
 
 
 [CI 43419008430](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43419008430) passed on exact source **b5a424bc42121a185da4d44d857e5ad59040107b**: all 33 migrations on fresh PostgreSQL, 216 unit +346 integration +34 Chromium tests (**596**), strict typing/lint, local and Supabase-mode production builds and documentation/API verification. Each requested milestone was committed/pushed separately; [draft PR #2](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/2) now covers F11–F15 on finance/invoices-f11. No merge or hosted finance release occurred.
+
+## Finance extension through F25 — 14 November 2026
+
+The separate F16–F25 branch adds purchase/supplier cycles, reviewed tax/private evidence, cash/funding/loans, investments and a purchase-linked asset register. Final local759 tests, both builds/type/lint,116 concrete contracts and55 applied test checksums passed. See [delivery](finance/delivery-F16-F25.md), [verification](finance/testing/F16-F25-results.md) and [Word report](finance/Encova_F16-F25_Report.docx). Separate source publication/CI is recorded there; no hosted financial migration/grant/activation or F26–F48 completion is inferred.

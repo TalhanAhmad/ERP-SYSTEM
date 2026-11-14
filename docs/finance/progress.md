@@ -2,7 +2,7 @@
 
 Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F24 complete: 24 of 48 finance milestones; 24 remain.** Updated14 November2026. Authorized scope continues through F25 on finance/f16-f25 with separate milestone commits/pushes. F23 source840dc53 passed CI43574210433. F24 adds explicit lot disposals, exact fees/results, capped separate investment income, reviewed adjustments and retained corrections: full243 unit/455 backend and new Chromium journey passed with type/lint and both builds. Test schema54;112 API paths. See [current delivery tracker](delivery-F16-F25.md). Hosted finance remains disabled.
+**F01–F25 complete: 25 of 48 finance engineering milestones; 23 remain outside this request.** Updated14 November2026. The requested F16–F25 scope is implemented and locally verified on finance/f16-f25, with separate milestone commits/pushes. Final759 tests passed:246 unit,469 PostgreSQL integration,44 Chromium (2.5m), plus type/lint, both production builds,116-path API,55 applied checksums and Word/private-value checks. F24 sourcecaa5d2b passed fresh CI43576472332 (741 tests). F25 publication/fresh CI follows and is recorded after observation. See [delivery tracker](delivery-F16-F25.md), [verification](testing/F16-F25-results.md) and [Word report](Encova_F16-F25_Report.docx). Hosted finance remains disabled; company policies/real data and controlled release are not inferred.
 
 The following records describe the previously completed and merged F15 release:
 

@@ -1,10 +1,8 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-12 (Asia/Karachi)
+Last updated: 2026-11-14 (Asia/Karachi)
 
-Finance extension: started from the newly supplied specification. Its assessment,
-access foundation and separate 48-milestone tracker are in [finance progress](finance/progress.md).
-This does not replace or complete the original ERP learning roadmap below.
+Finance extension: engineering acceptance through F25 is separately tracked in [finance progress](finance/progress.md) and the [F16–F25 Word report](finance/Encova_F16-F25_Report.docx). Final local759 checks passed; hosted finance stays disabled. This does not replace or complete the original ERP learning roadmap below.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded

@@ -29,4 +29,4 @@ Email setup and the restricted personal-demo sender are documented in [email ope
 
 Super Admin can search/filter People and select Manage to edit a basic profile, change a role, deactivate or restore a linked account. See [account management](docs/operations/people-management.md).
 
-Finance is being developed as a separate restricted PKR accounting extension. Start with [finance progress](docs/finance/progress.md), [the repository assessment](docs/finance/repository-assessment.md) and [the finance plan](docs/finance/planning/milestones.md). The initial access foundation is disabled by default; no ledger or live finance launch is claimed.
+Finance is being developed as a separate restricted PKR accounting extension. Start with [finance progress](docs/finance/progress.md), [the repository assessment](docs/finance/repository-assessment.md) and [the finance plan](docs/finance/planning/milestones.md). F01–F25 implements the private ledger and typed commercial/funding/investment sources plus purchase-linked assets; see [current delivery and verification](docs/finance/delivery-F16-F25.md). Hosted finance remains disabled; live financial setup is a separate release.
