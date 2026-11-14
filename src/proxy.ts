@@ -1,3 +1,4 @@
+import { financeUploadCsp } from "@/lib/finance-upload-csp";
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 export async function proxy(request: NextRequest) {
@@ -18,7 +19,7 @@ export async function proxy(request: NextRequest) {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data:",
     "font-src 'self'",
-    `connect-src 'self'${process.env.NODE_ENV === "development" ? " ws: wss:" : ""}`,
+    `connect-src 'self'${financeUploadCsp(process.env.FINANCE_ENABLED === "true", financePath, process.env.SUPABASE_URL)}${process.env.NODE_ENV === "development" ? " ws: wss:" : ""}`,
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

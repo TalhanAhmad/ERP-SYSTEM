@@ -22,6 +22,16 @@ export const reportGroups = [
   "OTHER_EXPENSES",
 ] as const;
 export const controlTypes = [
+  "INVESTMENT_INCOME_RECEIVABLE",
+  "INTEREST_RECEIVABLE",
+  "INTEREST_PAYABLE",
+  "CAPITAL",
+  "DISTRIBUTION",
+  "FOUNDER_PAYABLE",
+  "TAX_INPUT",
+  "TAX_OUTPUT",
+  "WITHHOLDING_RECEIVABLE",
+  "WITHHOLDING_PAYABLE",
   "NONE",
   "CASH",
   "RECEIVABLES",

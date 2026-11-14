@@ -1,3 +1,4 @@
+import {EvidenceSection} from "./evidence-section";
 import Link from "next/link";
 import { env } from "@/server/env";
 import { customerResources } from "../receivables/customer/resources";
@@ -168,7 +169,8 @@ export async function ReceiptDetail({
         {resource === "RECEIPT" && (
           <p>
             Cash received <MoneyCell value={i.cashAmount} /> · Fees{" "}
-            <MoneyCell value={i.feeAmount} /> · Invoice settlements{" "}
+            <MoneyCell value={i.feeAmount} /> · Withholding{" "}
+            <MoneyCell value={i.withholdingAmount} /> · Invoice settlements{" "}
             <MoneyCell value={i.allocationAmount} /> · Held advance{" "}
             <MoneyCell value={i.advanceAmount} />
           </p>
@@ -463,6 +465,7 @@ export async function ReceiptDetail({
           </div>
         </section>
       )}
+      <EvidenceSection sourceType="CUSTOMER_DOCUMENT" sourceId={i.id} state={i.storedState}/>
       <SetupHistory events={d.history} />
     </section>
   );

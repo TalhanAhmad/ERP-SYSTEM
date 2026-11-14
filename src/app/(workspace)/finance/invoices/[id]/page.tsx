@@ -1,3 +1,4 @@
+import {EvidenceSection} from "@/modules/finance/components/evidence-section";
 import Link from "next/link";
 import { env } from "@/server/env";
 import { financePageData } from "@/modules/finance/accounting/page-data";
@@ -81,7 +82,17 @@ export default async function Invoice({
                   <td>
                     <MoneyCell value={l.discountAmount} />
                   </td>
-                  <td>{l.recognition}</td>
+                  <td>
+                    {l.recognition}
+                    {l.taxSnapshot && (
+                      <small>
+                        {" "}
+                        · Tax {(l.taxSnapshot as { code: string }).code} ·{" "}
+                        {(l.taxSnapshot as { rate: string }).rate}% ·{" "}
+                        {(l.taxSnapshot as { mode: string }).mode}
+                      </small>
+                    )}
+                  </td>
                   <td>
                     <MoneyCell value={l.totalAmount} />
                   </td>
@@ -153,6 +164,7 @@ export default async function Invoice({
           Posted journal: {i.entry.reference} · {i.entry.postingDate}
         </p>
       )}
+      <EvidenceSection sourceType="INVOICE" sourceId={i.id} state={i.state}/>
       <SetupHistory events={data.history} />
     </section>
   );

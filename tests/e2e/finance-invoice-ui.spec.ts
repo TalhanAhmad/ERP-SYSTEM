@@ -60,7 +60,9 @@ test("invoice editor recovers a lost create response, previews, posts and privat
     await form
       .getByLabel("Revenue account for line 1", { exact: true })
       .selectOption(revenue.id);
-    await expect(form.getByText(/Invoice total:/)).toContainText("200.00");
+    await expect(form.getByText(/Rounded lines less discounts:/)).toContainText(
+      "200.00",
+    );
     const submit = async (target: typeof form, label: string) => {
       await target
         .getByLabel("Reason", { exact: true })

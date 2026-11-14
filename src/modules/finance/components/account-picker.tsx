@@ -11,10 +11,45 @@ export function AccountPicker({
   exclude,
   partyId,
   invoiceId,
+  billId,
+  holdingId,
   initial = [],
   required = false,
 }: {
   kind:
+    | "asset-bill-line"
+    | "asset-funding-source"
+    | "asset-custodian"
+    | "investment-lot"
+    | "investment"
+    | "investment-income-receivable"
+    | "loan-receivable"
+    | "loan-payable"
+    | "interest-receivable"
+    | "interest-payable"
+    | "contributor"
+    | "funding-cost"
+    | "funding-asset"
+    | "funding-bill"
+    | "capital"
+    | "distribution"
+    | "founder-payable"
+    | "payable"
+    | "cost"
+    | "prepayment"
+    | "fixed-asset"
+    | "tax-code"
+    | "withholding-code"
+    | "tax-input"
+    | "tax-output"
+    | "withholding-receivable"
+    | "withholding-payable"
+    | "supplier"
+    | "supplier-advance"
+    | "bill"
+    | "credit-bill"
+    | "bill-line"
+    | "supplier-advance-source"
     | "parent"
     | "journal"
     | "cash"
@@ -38,6 +73,8 @@ export function AccountPicker({
   exclude?: string;
   partyId?: string;
   invoiceId?: string;
+  billId?: string;
+  holdingId?: string;
   initial?: Option[];
   required?: boolean;
 }) {
@@ -57,9 +94,18 @@ export function AccountPicker({
     const abort = new AbortController();
     const timer = setTimeout(async () => {
       if (
-        (["invoice", "advance-source", "credit-invoice"].includes(kind) &&
+        ([
+          "invoice",
+          "advance-source",
+          "credit-invoice",
+          "bill",
+          "credit-bill",
+          "supplier-advance-source",
+        ].includes(kind) &&
           !partyId) ||
-        (kind === "invoice-line" && !invoiceId)
+        (kind === "invoice-line" && !invoiceId) ||
+        (kind === "bill-line" && !billId) ||
+        (kind === "investment-lot" && !holdingId)
       ) {
         setResult({ items: [], total: 0, page: 1, pages: 1 });
         setError("");
@@ -70,7 +116,18 @@ export function AccountPicker({
       setError("");
       try {
         const query = new URLSearchParams({
-          kind,
+          kind:
+            kind === "asset-bill-line"
+              ? "BILL_LINE"
+              : kind === "asset-funding-source"
+                ? "FUNDING_MOVEMENT"
+                : kind === "asset-custodian"
+                  ? "CUSTODIAN"
+                  : kind === "tax-code"
+                    ? "INDIRECT"
+                    : kind === "withholding-code"
+                      ? "WITHHOLDING"
+                      : kind,
           q,
           page: String(page),
           ...(type ? { type } : {}),
@@ -78,25 +135,94 @@ export function AccountPicker({
           ...(exclude ? { exclude } : {}),
           ...(partyId ? { partyId } : {}),
           ...(invoiceId ? { invoiceId } : {}),
+          ...(billId ? { billId } : {}),
         });
         const response = await fetch(
-          "/api/v1/finance/" +
-            ([
-              "party",
-              "project",
-              "invoice",
-              "cash-account",
-              "advance-source",
-              "credit-invoice",
-              "invoice-line",
-            ].includes(kind)
-              ? "invoice-options?"
-              : "account-options?") +
-            query,
+          kind === "investment-lot"
+            ? "/api/v1/finance/holdings/" +
+                holdingId +
+                "/lots?" +
+                new URLSearchParams({ q, page: String(page) })
+            : "/api/v1/finance/" +
+                ([
+                  "asset-bill-line",
+                  "asset-funding-source",
+                  "asset-custodian",
+                ].includes(kind)
+                  ? "asset-options?"
+                  : ["tax-code", "withholding-code"].includes(kind)
+                    ? "tax-codes?"
+                    : [
+                          "bill",
+                          "credit-bill",
+                          "bill-line",
+                          "funding-bill",
+                          "supplier-advance-source",
+                        ].includes(kind)
+                      ? "supplier-options?"
+                      : [
+                            "party",
+                            "contributor",
+                            "supplier",
+                            "project",
+                            "invoice",
+                            "cash-account",
+                            "advance-source",
+                            "credit-invoice",
+                            "invoice-line",
+                          ].includes(kind)
+                        ? "invoice-options?"
+                        : "account-options?") +
+                query,
           { signal: abort.signal, cache: "no-store" },
         );
         const body = await response.json();
         if (!response.ok) throw new Error(body.error.message);
+        if (["tax-code", "withholding-code"].includes(kind))
+          body.data.items = body.data.items.map(
+            (i: {
+              id: string;
+              code: string;
+              name: string;
+              rate: string;
+              effectiveFrom: string;
+              effectiveTo: string | null;
+              mode: string;
+            }) => ({
+              ...i,
+              name:
+                i.name +
+                " · " +
+                i.rate +
+                "% · " +
+                i.mode +
+                " · " +
+                i.effectiveFrom +
+                " to " +
+                (i.effectiveTo ?? "open end"),
+            }),
+          );
+        if (kind === "investment-lot")
+          body.data.items = body.data.items.map(
+            (i: {
+              id: string;
+              number: string;
+              remainingCost: string;
+              carryingValue: string;
+              remainingUnits: string | null;
+            }) => ({
+              id: i.id,
+              code: i.number,
+              name:
+                "Cost PKR " +
+                i.remainingCost +
+                " · carrying PKR " +
+                i.carryingValue +
+                (i.remainingUnits === null
+                  ? ""
+                  : " · units " + i.remainingUnits),
+            }),
+          );
         setResult(body.data);
       } catch (e) {
         if (!abort.signal.aborted)
@@ -109,7 +235,19 @@ export function AccountPicker({
       clearTimeout(timer);
       abort.abort();
     };
-  }, [kind, q, page, type, group, exclude, partyId, invoiceId, retry]);
+  }, [
+    holdingId,
+    billId,
+    kind,
+    q,
+    page,
+    type,
+    group,
+    exclude,
+    partyId,
+    invoiceId,
+    retry,
+  ]);
   const selected =
     result.items.find((i) => i.id === value) ??
     initial.find((i) => i.id === value);

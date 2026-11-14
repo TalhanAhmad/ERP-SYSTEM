@@ -55,6 +55,10 @@ export const accountSchema = z
           "Group accounts cannot be controls, contra accounts or cash equivalents.",
       });
     const assetControls = [
+      "INVESTMENT_INCOME_RECEIVABLE",
+      "INTEREST_RECEIVABLE",
+      "TAX_INPUT",
+      "WITHHOLDING_RECEIVABLE",
       "CASH",
       "RECEIVABLES",
       "SUPPLIER_ADVANCE",
@@ -64,12 +68,18 @@ export const accountSchema = z
       "LOAN_RECEIVABLE",
     ];
     const liabilityControls = [
+      "INTEREST_PAYABLE",
+      "FOUNDER_PAYABLE",
+      "TAX_OUTPUT",
+      "WITHHOLDING_PAYABLE",
       "PAYABLES",
       "CLIENT_ADVANCE",
       "LOAN_PAYABLE",
       "DEFERRED_REVENUE",
     ];
     if (
+      (["CAPITAL", "DISTRIBUTION"].includes(a.controlType) &&
+        a.type !== "EQUITY") ||
       (assetControls.includes(a.controlType) && a.type !== "ASSET") ||
       (liabilityControls.includes(a.controlType) && a.type !== "LIABILITY")
     )

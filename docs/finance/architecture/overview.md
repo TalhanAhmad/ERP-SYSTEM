@@ -8,14 +8,20 @@ Grant rows remain SELECT-only to encova_app: PostgreSQL row locking would requir
 
 FINANCE_ENABLED is server-only and false by default. No actor or grant result is persisted in a client/shared cache. Finance pages/API routes use private/no-store cache headers including denied responses. Infrastructure owners remain privileged.
 
-The future ledger/posting/worker architecture is in [editable Mermaid source](system.mmd); arrows beyond access are planned, not implemented.
+The complete target architecture (including later reporting/workers) is in [editable Mermaid source](system.mmd); the diagram is a target, while implemented scope is tracked below and in progress.md.
 
 F04 adds owner-checked access commands and operator-only setup/recovery, with shared administration locking and provider-verified process-local proof. See [ownership operations](../operations/ownership.md) for the exact trust boundary, lock order and recovery procedure.
 
 ## Ledger core and setup now implemented
 
-F06–F10 adds the real manual-journal adapter and shared PostgreSQL balance/source/immutability safeguards, permanent identities and master/register modules. See [ledger core](../accounting/ledger-core.md) for current locks, exact scope and re-estimate. All initial financial/config writers serialize on admin then structural lock before row locks. Future typed subledger adapters must extend that private engine and source/control checks atomically; they cannot bypass it with table CRUD. Reports/cash registers/subledger jobs shown beyond this boundary in the architecture diagram remain planned.
+F06–F10 adds the real manual-journal adapter and shared PostgreSQL balance/source/immutability safeguards, permanent identities and master/register modules. See [ledger core](../accounting/ledger-core.md) for current locks, exact scope and re-estimate. All initial financial/config writers serialize on admin then structural lock before row locks. Future typed subledger adapters must extend that private engine and source/control checks atomically; they cannot bypass it with table CRUD. The later reporting/reconciliation/worker parts of the architecture diagram remain planned; the implemented typed sources and cash register are described in current delivery.
 
 F11 extends that shared emitter with typed earned/deferred invoice sources and synchronous dated AR/BILLED events. It does not introduce a second ledger or put commercial fields into ordinary ERP DTOs. No email/asynchronous document job is queued; the existing email-only outbox is not a financial event transport. See [invoice design](../accounting/invoices.md).
 
 F12–F15 completes the typed customer cycle: invoice UI/private PDF, receipt allocations, source advance pools, credits/refunds and dated source/released-settlement corrections. All effects remain synchronous in one private emitter transaction; no finance email/job is queued. Typed event capacity supports historical balances without authoritative mutable balance columns. See [customer source/effect rules](../accounting/customer-cycle.md) and [current acceptance](../testing/F12-F15-results.md).
+
+## Implemented through F25
+
+The same emitter now handles invoice/customer, purchase/supplier, cash transfer, contributor funding, loan principal/interest and investment adapters. Exact source/event constraints, current grants, versioning, permanent replay and dated capacities remain shared; no second ledger or arbitrary manual control posting is introduced. Source-bound private evidence uses a separate bucket, signed scanner attestation and bounded current-access downloads.
+
+Asset registration allocates existing posted purchase GL cost without emitting another entry. Deferred source-cap checks coordinate later credits/corrections. A zero-carrying investment retirement records immutable register facts without an invented monetary journal; the emitter still validates its authorization/date/period. Financial fields stay outside ordinary employee/project DTOs. Reporting/depreciation/reconciliation after F25 remain separately planned, and hosted finance stays disabled.

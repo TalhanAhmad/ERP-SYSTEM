@@ -51,7 +51,20 @@ export function invoicePdf(actor: Pick<Actor, "id">, id: string) {
       text(
         `${l.quantity} × PKR ${l.unitRate}    Discount PKR ${l.discountAmount}`,
       );
-      text(`${l.recognition}    Total PKR ${l.totalAmount}`);
+      text(
+        `${l.recognition}    Net PKR ${l.netAmount}    Tax PKR ${l.taxAmount}    Total PKR ${l.totalAmount}`,
+      );
+      if (l.taxSnapshot) {
+        const tax = l.taxSnapshot as {
+          code: string;
+          rate: string;
+          mode: string;
+          rounding: string;
+        };
+        text(
+          `Tax policy ${tax.code} · ${tax.rate}% · ${tax.mode} · ${tax.rounding}`,
+        );
+      }
     }
     text(
       `Gross PKR ${i.lineAmount}    Discount PKR ${i.discountAmount}    Tax PKR ${i.taxAmount}`,

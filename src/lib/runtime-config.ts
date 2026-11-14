@@ -18,6 +18,8 @@ export const runtimeSchema = z
     DIRECT_URL: postgres.optional(),
     DATABASE_SSL_CA: z.string().min(1).optional(),
     APP_URL: z.url().optional(),
+    FINANCE_SCANNER_URL: z.url().optional(),
+    FINANCE_SCANNER_SECRET: z.string().min(32).optional(),
     FINANCE_ENABLED: z
       .enum(["true", "false"])
       .default("false")
@@ -41,6 +43,18 @@ export const runtimeSchema = z
     VERCEL_ENV: z.string().optional(),
   })
   .superRefine((v, c) => {
+    if (v.FINANCE_SCANNER_URL) {
+      const url = new URL(v.FINANCE_SCANNER_URL);
+      const local =
+        ["localhost", "127.0.0.1"].includes(url.hostname) && !v.VERCEL_ENV;
+      if (url.username || url.password || (url.protocol !== "https:" && !local))
+        c.addIssue({
+          code: "custom",
+          path: ["FINANCE_SCANNER_URL"],
+          message:
+            "Use a configured HTTPS scanner endpoint without embedded credentials.",
+        });
+    }
     if (!v.APP_URL && !v.BETTER_AUTH_URL)
       c.addIssue({
         code: "custom",

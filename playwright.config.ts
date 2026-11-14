@@ -33,6 +33,8 @@ export default defineConfig({
         // Application deployments still default to FINANCE_ENABLED=false.
         FINANCE_ENABLED: "true",
         SUPABASE_URL: `http://127.0.0.1:${storagePort}`,
+        FINANCE_SCANNER_URL: `http://127.0.0.1:${storagePort}/finance-scan`,
+        FINANCE_SCANNER_SECRET: "Synthetic-scanner-bearer-only-32-characters",
         SUPABASE_PUBLISHABLE_KEY: "synthetic-publishable-key",
         SUPABASE_SECRET_KEY: "synthetic-storage-server-key",
       },

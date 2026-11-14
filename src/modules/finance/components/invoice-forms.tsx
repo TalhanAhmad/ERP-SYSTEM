@@ -8,6 +8,7 @@ import { formatPkr } from "./money-cell";
 type Invoice = Awaited<ReturnType<typeof invoiceDetail>>["item"];
 type Line = {
   key: string;
+  taxCodeId: string | null;
   description: string;
   quantity: string;
   unitRate: string;
@@ -40,7 +41,7 @@ export function InvoiceForm({
   let preview = "Add lines to preview totals.";
   try {
     if (lines.length)
-      preview = "Invoice total: " + formatPkr(invoicePreview(lines));
+      preview = "Rounded lines less discounts: " + formatPkr(invoicePreview(lines));
   } catch {
     preview = "Check quantities, rates and discounts to preview totals.";
   }
@@ -64,6 +65,7 @@ export function InvoiceForm({
         currency: "PKR",
         lines: lines.map((l) => ({
           description: l.description,
+          taxCodeId: l.taxCodeId,
           quantity: l.quantity,
           unitRate: l.unitRate,
           discountAmount: l.discountAmount,
@@ -206,6 +208,12 @@ export function InvoiceForm({
             />
           )}
           <AccountPicker
+            kind="tax-code"
+            label={"Tax policy for line " + (i + 1)}
+            value={l.taxCodeId}
+            onChange={(id) => edit(l.key, { taxCodeId: id })}
+          />
+          <AccountPicker
             kind="project"
             label={"Project for line " + (i + 1)}
             value={l.projectId}
@@ -227,6 +235,7 @@ export function InvoiceForm({
             ...lines,
             {
               key: crypto.randomUUID(),
+              taxCodeId: null,
               description: "",
               quantity: "1",
               unitRate: "0.00",
@@ -243,7 +252,9 @@ export function InvoiceForm({
       </button>
       <p aria-live="polite">{preview}</p>
       <p>
-        PKR. Discounts subtract from each rounded line. No tax code configured.
+        PKR. Discounts apply before the selected tax calculation. The saved
+        draft shows authoritative net, tax and total amounts. No tax applies
+        when the policy is blank.
       </p>
     </FinanceActionForm>
   );

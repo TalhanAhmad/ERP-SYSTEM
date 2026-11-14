@@ -94,7 +94,7 @@ it("bounds discounts and summed totals while retaining valid free lines", () => 
     ]).totalAmount,
   ).toBe("0.00");
 });
-it("requires explicit deferred mappings and denies tax/actor overrides on lines", () => {
+it("requires explicit deferred mappings and denies computed-tax/actor overrides on lines", () => {
   expect(
     invoiceLineSchema.safeParse({ ...line, recognition: "DEFERRED" }).success,
   ).toBe(false);
@@ -107,7 +107,6 @@ it("requires explicit deferred mappings and denies tax/actor overrides on lines"
   ).toBe(true);
   for (const patch of [
     { deferredAccountId: crypto.randomUUID() },
-    { taxCodeId: crypto.randomUUID() },
     { credit: "100.00" },
   ])
     expect(invoiceLineSchema.safeParse({ ...line, ...patch }).success).toBe(

@@ -33,16 +33,28 @@ export const receiptSchema = z
     description: z.string().trim().min(1).max(1000),
     evidence: z.string().trim().min(3).max(1000),
     currency: z.literal("PKR").default("PKR"),
-    cashAmount: pkrAmountSchema.refine(
-      (v) => v !== "0.00",
-      "Cash received must be positive.",
-    ),
+    cashAmount: pkrAmountSchema,
+    withholdingAmount: pkrAmountSchema.default("0.00"),
+    withholdingCodeId: z.uuid().nullable().default(null),
     feeAmount: pkrAmountSchema.default("0.00"),
     allocations: z.array(allocationSchema).max(100),
     reason: reasonSchema,
   })
   .strict()
   .superRefine((d, c) => {
+    if ((d.withholdingAmount !== "0.00") !== (d.withholdingCodeId !== null))
+      c.addIssue({
+        code: "custom",
+        path: ["withholdingCodeId"],
+        message:
+          "Choose a withholding code exactly when a supported withholding amount is recorded.",
+      });
+    if (d.cashAmount === "0.00" && d.withholdingAmount === "0.00")
+      c.addIssue({
+        code: "custom",
+        path: ["cashAmount"],
+        message: "Cash or evidenced withholding must be positive.",
+      });
     if (d.postingDate < d.documentDate)
       c.addIssue({
         code: "custom",
@@ -65,7 +77,11 @@ export const receiptSchema = z
         message: "Combine allocations to the same invoice.",
       });
     try {
-      const total = sumPkrLines([d.cashAmount, d.feeAmount]),
+      const total = sumPkrLines([
+          d.cashAmount,
+          d.feeAmount,
+          d.withholdingAmount,
+        ]),
         applied = sumPkrLines(d.allocations.map((a) => a.amount));
       const cashCents = BigInt(total.replace(".", "")),
         appliedCents = BigInt(applied.replace(".", ""));
@@ -79,7 +95,7 @@ export const receiptSchema = z
         code: "custom",
         path: ["allocations"],
         message:
-          "Settlements cannot exceed cash plus fees. Select a client advance account exactly when money remains unallocated.",
+          "Settlements cannot exceed cash plus fees and withholding and withholding. Select a client advance account exactly when money remains unallocated.",
       });
     }
   });

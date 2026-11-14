@@ -30,7 +30,9 @@
     "verify:deployment": "tsx --conditions=react-server scripts/verify-deployment.ts",
     "verify:recovery": "tsx scripts/verify-recovery.ts",
     "verify:performance": "tsx --conditions=react-server scripts/verify-performance.ts",
-    "verify:hosted-recovery": "tsx scripts/verify-hosted-recovery.ts"
+    "verify:hosted-recovery": "tsx scripts/verify-hosted-recovery.ts",
+    "finance:scanner": "tsx --conditions=react-server scripts/finance/configure-scanner.ts",
+    "finance:evidence:cleanup": "tsx --conditions=react-server scripts/finance/cleanup-evidence.ts"
   },
   "keywords": [],
   "author": "",

@@ -36,3 +36,9 @@ Direct user request authorizes completion through F15 and separate source commit
 Credit AR/paid-liability split is computed atomically at posting, because payments can change after drafting; use an immutable typed split rather than changing posted header amounts. Credit limits are the original discounted net, with dated cumulative event capacity. Refunds reduce held liability/cash, never expenses. Distinguish returning cash (whole source reversal/refund) from releasing all original invoice allocations once while cash remains (a typed release pool). Correction identities stay reserved; original stored POSTED/version stays immutable and current REVERSED is derived.
 
 Current and later effective balances must all remain nonnegative. Backdated credits cannot invalidate a later reserved receipt; consumed pools/active releases must be restored before source undo. Shared engine checks source/GL/events/split and original invoice mapping at commit, independently of UI. Company/accountant tax/chart/year/cutover/recognition/launch decisions remain open. Evidence and explicit whole-release limits are in accounting/customer-cycle.md and testing/F12-F15-results.md.
+
+## Implemented choices through F25
+
+Typed source adapters share the existing engine/current-access/period/receipt boundary. Funding, principal/interest and investment basis/results are separate. Explicit investment lots capture reproducible basis and reject stale drafts/earlier lot dates; zero-carrying retirements retain audited register facts without an invented GL. Purchase-linked assets allocate existing net GL cost and block later source understatement.
+
+Default asset convention remains PENDING. A selectable reviewed full-month policy is implemented for future scheduling, but no company adoption or depreciation charge is inferred. F26–F48 and live financial migration/grants/policy/scanner/retention/real-data acceptance remain outside this delivery.

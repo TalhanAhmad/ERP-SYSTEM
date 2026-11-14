@@ -7,6 +7,26 @@ import { accountTypes, reportGroups } from "./catalog";
 export const optionQuerySchema = z
   .object({
     kind: z.enum([
+      "investment",
+      "investment-income-receivable",
+      "loan-receivable",
+      "loan-payable",
+      "interest-receivable",
+      "interest-payable",
+      "funding-cost",
+      "funding-asset",
+      "capital",
+      "distribution",
+      "founder-payable",
+      "tax-input",
+      "tax-output",
+      "withholding-receivable",
+      "withholding-payable",
+      "supplier-advance",
+      "payable",
+      "cost",
+      "prepayment",
+      "fixed-asset",
       "parent",
       "journal",
       "cash",
@@ -36,6 +56,100 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           ? { controlType: "CASH", type: "ASSET", isContra: false }
           : {}),
       ...({
+        investment: {
+          controlType: "INVESTMENT",
+          type: "ASSET",
+          isContra: false,
+        },
+        "investment-income-receivable": {
+          controlType: "INVESTMENT_INCOME_RECEIVABLE",
+          type: "ASSET",
+          isContra: false,
+        },
+        "loan-receivable": {
+          controlType: "LOAN_RECEIVABLE",
+          type: "ASSET",
+          isContra: false,
+        },
+        "loan-payable": {
+          controlType: "LOAN_PAYABLE",
+          type: "LIABILITY",
+          isContra: false,
+        },
+        "interest-receivable": {
+          controlType: "INTEREST_RECEIVABLE",
+          type: "ASSET",
+          isContra: false,
+        },
+        "interest-payable": {
+          controlType: "INTEREST_PAYABLE",
+          type: "LIABILITY",
+          isContra: false,
+        },
+        "funding-cost": {
+          controlType: { in: ["NONE", "FIXED_ASSET"] },
+          type: {
+            in: ["ASSET", "DIRECT_COST", "OPERATING_EXPENSE", "OTHER_EXPENSE"],
+          },
+          isContra: false,
+        },
+        "funding-asset": {
+          controlType: { in: ["NONE", "FIXED_ASSET"] },
+          type: "ASSET",
+          isContra: false,
+        },
+        capital: { controlType: "CAPITAL", type: "EQUITY", isContra: false },
+        distribution: {
+          controlType: "DISTRIBUTION",
+          type: "EQUITY",
+          isContra: false,
+        },
+        "founder-payable": {
+          controlType: "FOUNDER_PAYABLE",
+          type: "LIABILITY",
+          isContra: false,
+        },
+        "tax-input": {
+          controlType: "TAX_INPUT",
+          type: "ASSET",
+          isContra: false,
+        },
+        "tax-output": {
+          controlType: "TAX_OUTPUT",
+          type: "LIABILITY",
+          isContra: false,
+        },
+        "withholding-receivable": {
+          controlType: "WITHHOLDING_RECEIVABLE",
+          type: "ASSET",
+          isContra: false,
+        },
+        "withholding-payable": {
+          controlType: "WITHHOLDING_PAYABLE",
+          type: "LIABILITY",
+          isContra: false,
+        },
+        "supplier-advance": {
+          controlType: "SUPPLIER_ADVANCE",
+          type: "ASSET",
+          isContra: false,
+        },
+        payable: {
+          controlType: "PAYABLES",
+          type: "LIABILITY",
+          isContra: false,
+        },
+        cost: {
+          controlType: "NONE",
+          type: { in: ["DIRECT_COST", "OPERATING_EXPENSE", "OTHER_EXPENSE"] },
+          isContra: false,
+        },
+        prepayment: { controlType: "NONE", type: "ASSET", isContra: false },
+        "fixed-asset": {
+          controlType: "FIXED_ASSET",
+          type: "ASSET",
+          isContra: false,
+        },
         receivable: {
           controlType: "RECEIVABLES",
           type: "ASSET",
@@ -62,7 +176,32 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           isContra: false,
         },
       }[
-        query.kind as "receivable" | "revenue" | "deferred" | "fee" | "advance"
+        query.kind as
+          | "investment"
+          | "investment-income-receivable"
+          | "loan-receivable"
+          | "loan-payable"
+          | "interest-receivable"
+          | "interest-payable"
+          | "funding-cost"
+          | "funding-asset"
+          | "capital"
+          | "distribution"
+          | "founder-payable"
+          | "tax-input"
+          | "tax-output"
+          | "withholding-receivable"
+          | "withholding-payable"
+          | "supplier-advance"
+          | "payable"
+          | "cost"
+          | "prepayment"
+          | "fixed-asset"
+          | "receivable"
+          | "revenue"
+          | "deferred"
+          | "fee"
+          | "advance"
       ] ?? {}),
       ...(query.type ? { type: query.type } : {}),
       ...(query.group ? { reportGroup: query.group } : {}),

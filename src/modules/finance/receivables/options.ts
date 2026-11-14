@@ -8,6 +8,8 @@ export async function invoiceOptions(actor: Pick<Actor, "id">, input: unknown) {
       .object({
         kind: z.enum([
           "party",
+          "supplier",
+          "contributor",
           "project",
           "invoice",
           "cash-account",
@@ -149,15 +151,24 @@ export async function invoiceOptions(actor: Pick<Actor, "id">, input: unknown) {
       };
     }
     const where = {
-      ...(q.kind === "party"
-        ? { active: true, kind: { in: ["CLIENT", "BOTH"] } }
+      ...(["party", "supplier", "contributor"].includes(q.kind)
+        ? {
+            active: true,
+            kind: {
+              in:
+                q.kind === "supplier"
+                  ? ["SUPPLIER", "BOTH", "EMPLOYEE"]
+                  : q.kind === "contributor"
+                    ? ["CLIENT", "SUPPLIER", "BOTH", "EMPLOYEE", "OTHER"]
+                    : ["CLIENT", "BOTH"],
+            },
+          }
         : { archivedAt: null }),
       name: { contains: q.q, mode: "insensitive" as const },
     };
-    const total =
-      q.kind === "party"
-        ? await tx.financeParty.count({ where })
-        : await tx.project.count({ where });
+    const total = ["party", "supplier", "contributor"].includes(q.kind)
+      ? await tx.financeParty.count({ where })
+      : await tx.project.count({ where });
     const pages = Math.max(1, Math.ceil(total / 25)),
       page = Math.min(q.page, pages),
       opts = {
@@ -167,10 +178,9 @@ export async function invoiceOptions(actor: Pick<Actor, "id">, input: unknown) {
         skip: (page - 1) * 25,
         take: 25,
       };
-    const items =
-      q.kind === "party"
-        ? await tx.financeParty.findMany(opts)
-        : await tx.project.findMany(opts);
+    const items = ["party", "supplier", "contributor"].includes(q.kind)
+      ? await tx.financeParty.findMany(opts)
+      : await tx.project.findMany(opts);
     return {
       items: items.map((i) => ({ ...i, code: "" })),
       total,
