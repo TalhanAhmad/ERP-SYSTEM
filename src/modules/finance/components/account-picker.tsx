@@ -13,10 +13,20 @@ export function AccountPicker({
   invoiceId,
   billId,
   holdingId,
+  projectId,
   initial = [],
   required = false,
 }: {
   kind:
+    | "budget-account"
+    | "forecast-party"
+    | "cost-source"
+    | "cost-project"
+    | "commercial-project"
+    | "commercial-client"
+    | "commercial-invoice-line"
+    | "asset-expense"
+    | "accumulated-depreciation"
     | "asset-bill-line"
     | "asset-funding-source"
     | "asset-custodian"
@@ -75,6 +85,7 @@ export function AccountPicker({
   invoiceId?: string;
   billId?: string;
   holdingId?: string;
+  projectId?: string;
   initial?: Option[];
   required?: boolean;
 }) {
@@ -105,7 +116,8 @@ export function AccountPicker({
           !partyId) ||
         (kind === "invoice-line" && !invoiceId) ||
         (kind === "bill-line" && !billId) ||
-        (kind === "investment-lot" && !holdingId)
+        (kind === "investment-lot" && !holdingId) ||
+        (kind === "commercial-invoice-line" && !projectId)
       ) {
         setResult({ items: [], total: 0, page: 1, pages: 1 });
         setError("");
@@ -117,17 +129,23 @@ export function AccountPicker({
       try {
         const query = new URLSearchParams({
           kind:
-            kind === "asset-bill-line"
-              ? "BILL_LINE"
-              : kind === "asset-funding-source"
-                ? "FUNDING_MOVEMENT"
-                : kind === "asset-custodian"
-                  ? "CUSTODIAN"
-                  : kind === "tax-code"
-                    ? "INDIRECT"
-                    : kind === "withholding-code"
-                      ? "WITHHOLDING"
-                      : kind,
+            kind === "commercial-project"
+              ? "PROJECT"
+              : kind === "commercial-client"
+                ? "CLIENT"
+                : kind === "commercial-invoice-line"
+                  ? "INVOICE_LINE"
+                  : kind === "asset-bill-line"
+                    ? "BILL_LINE"
+                    : kind === "asset-funding-source"
+                      ? "FUNDING_MOVEMENT"
+                      : kind === "asset-custodian"
+                        ? "CUSTODIAN"
+                        : kind === "tax-code"
+                          ? "INDIRECT"
+                          : kind === "withholding-code"
+                            ? "WITHHOLDING"
+                            : kind,
           q,
           page: String(page),
           ...(type ? { type } : {}),
@@ -136,44 +154,64 @@ export function AccountPicker({
           ...(partyId ? { partyId } : {}),
           ...(invoiceId ? { invoiceId } : {}),
           ...(billId ? { billId } : {}),
+          ...(projectId ? { projectId } : {}),
         });
         const response = await fetch(
-          kind === "investment-lot"
-            ? "/api/v1/finance/holdings/" +
-                holdingId +
-                "/lots?" +
+          kind === "budget-account" || kind === "forecast-party"
+            ? "/api/v1/finance/planning-options?" +
+                new URLSearchParams({
+                  kind: kind === "budget-account" ? "BUDGET_ACCOUNT" : "PARTY",
+                  q,
+                  page: String(page),
+                })
+            : kind === "cost-source" || kind === "cost-project"
+              ? "/api/v1/finance/" +
+                (kind === "cost-source"
+                  ? "cost-sources?"
+                  : "cost-project-options?") +
                 new URLSearchParams({ q, page: String(page) })
-            : "/api/v1/finance/" +
-                ([
-                  "asset-bill-line",
-                  "asset-funding-source",
-                  "asset-custodian",
-                ].includes(kind)
-                  ? "asset-options?"
-                  : ["tax-code", "withholding-code"].includes(kind)
-                    ? "tax-codes?"
+              : kind === "investment-lot"
+                ? "/api/v1/finance/holdings/" +
+                  holdingId +
+                  "/lots?" +
+                  new URLSearchParams({ q, page: String(page) })
+                : "/api/v1/finance/" +
+                  ([
+                    "commercial-project",
+                    "commercial-client",
+                    "commercial-invoice-line",
+                  ].includes(kind)
+                    ? "project-options?"
                     : [
-                          "bill",
-                          "credit-bill",
-                          "bill-line",
-                          "funding-bill",
-                          "supplier-advance-source",
+                          "asset-bill-line",
+                          "asset-funding-source",
+                          "asset-custodian",
                         ].includes(kind)
-                      ? "supplier-options?"
-                      : [
-                            "party",
-                            "contributor",
-                            "supplier",
-                            "project",
-                            "invoice",
-                            "cash-account",
-                            "advance-source",
-                            "credit-invoice",
-                            "invoice-line",
-                          ].includes(kind)
-                        ? "invoice-options?"
-                        : "account-options?") +
-                query,
+                      ? "asset-options?"
+                      : ["tax-code", "withholding-code"].includes(kind)
+                        ? "tax-codes?"
+                        : [
+                              "bill",
+                              "credit-bill",
+                              "bill-line",
+                              "funding-bill",
+                              "supplier-advance-source",
+                            ].includes(kind)
+                          ? "supplier-options?"
+                          : [
+                                "party",
+                                "contributor",
+                                "supplier",
+                                "project",
+                                "invoice",
+                                "cash-account",
+                                "advance-source",
+                                "credit-invoice",
+                                "invoice-line",
+                              ].includes(kind)
+                            ? "invoice-options?"
+                            : "account-options?") +
+                  query,
           { signal: abort.signal, cache: "no-store" },
         );
         const body = await response.json();
@@ -237,6 +275,7 @@ export function AccountPicker({
     };
   }, [
     holdingId,
+    projectId,
     billId,
     kind,
     q,

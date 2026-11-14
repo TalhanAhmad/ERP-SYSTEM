@@ -84,7 +84,9 @@ export type AssetAction = keyof typeof assetSchemas;
 export const assetQuerySchema = z
   .object({
     q: z.string().trim().max(100).default(""),
-    state: z.enum(["REGISTERED", "VOIDED", "ALL"]).default("REGISTERED"),
+    state: z
+      .enum(["REGISTERED", "DISPOSED", "VOIDED", "ALL"])
+      .default("REGISTERED"),
     custodianId: z.uuid().optional(),
     page: z.coerce.number().int().min(1).max(10000).default(1),
   })

@@ -1,8 +1,10 @@
 # Finance progress
 
-Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
+Updated 14 November2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F25 complete: 25 of 48 finance engineering milestones; 23 remain outside this request.** Updated14 November2026. The requested F16–F25 scope is implemented and locally verified on finance/f16-f25, with separate milestone commits/pushes. Final759 tests passed:246 unit,469 PostgreSQL integration,44 Chromium (2.5m), plus type/lint, both production builds,116-path API,55 applied checksums and Word/private-value checks. F24 sourcecaa5d2b passed fresh CI43576472332 (741 tests). F25 source7e27443 is separately pushed and [CI43583420594](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43583420594) passed all759 checks and55 migrations on a fresh runner. See [delivery tracker](delivery-F16-F25.md), [verification](testing/F16-F25-results.md) and [Word report](Encova_F16-F25_Report.docx). Hosted finance remains disabled; company policies/real data and controlled release are not inferred.
+**F01–F29 locally complete:29 of48 finance milestones;19 remain.** PR3 merged atb83951d after exact-head CI43584464377. Separate F26 source4b0e4a6 passed CI43599585247; F27 source9e23dfc passed CI43604433797; F28 source2c3b003 passed CI43609969834 (61 migrations/all818 checks). F29 adds approved monthly expense-plan revisions, same-basis incurred variance and independent dated cash forecasts without GL. 838 distinct local checks passed:259 unit (3.35s),531 PostgreSQL integration (214.90s),48 Chromium (2.9m). The new budget/revision/variance/selected-forecast journey passed4.7s, including manager denial, mobile and WCAG. Strict typing/lint, both production builds,162 concrete API paths/verbs/references and all63 applied migration checksums passed. Word/private-value verification accompanies separate F29 publication; fresh CI will be observed after push. See [continuation tracker](delivery-F26-F48.md), [verification](testing/F26-F48-results.md), [Word report](Encova_F26-F48_Report.docx) and [your review pack](review/owner-review-pack.md). F30 statement import preview/validation/retained duplicates is next. F47 human review and F48 release remain separate. Finance stays disabled live; no hosted schema/grants or real company books/policy are adopted.
+
+Prior F16–F25 evidence remains in [delivery](delivery-F16-F25.md), [verification](testing/F16-F25-results.md) and its [historical Word report](Encova_F16-F25_Report.docx). F25 exact source7e27443 passed CI43583420594 with759 checks and55 fresh migrations.
 
 The following records describe the previously completed and merged F15 release:
 
@@ -36,3 +38,9 @@ Reviewed policy setup, inclusive/exclusive source taxes, original net/tax credit
 
 ## F19 development
 Typed private evidence, signed malware quarantine, strict current-access bounded download, immutable posted retention and explicit operator setup/cleanup implemented. Fourteen backend and three unit checks passed;6MiB browser journey passed5.6s. Schema47, API97 paths. Live finance/scanner remain disabled/unconfigured. F18 corrected exact-source CI43455396870 passed642 cases. F20 next.
+
+
+F27 separate publication verified: source9e23dfc36b472ac540617245df753cb9292445de passed [fresh CI43604433797](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43604433797), including60 fresh migrations, all798 tests, both builds/type/lint/142-path docs. F28 engineering and final verification are in progress; [cost-allocation rules](accounting/cost-allocation.md) describe the implemented boundary.
+
+
+F28 source2c3b0031e87fab2a63e0445118e216e7f61718ca passed [fresh CI43609969834](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43609969834):61 migrations, all818 tests, both builds/type/lint/152-path API verification. F29 local acceptance is complete; source publication/fresh CI are recorded separately.

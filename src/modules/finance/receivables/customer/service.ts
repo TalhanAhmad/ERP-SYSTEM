@@ -1,3 +1,4 @@
+import { costErrors } from "../../projects/costs/errors";
 import "server-only";
 import { z } from "zod";
 import { db } from "@/server/db";
@@ -12,6 +13,7 @@ import {
   type CustomerResource,
 } from "./schemas";
 const errors: Record<string, string> = {
+  ...costErrors,
  FINANCE_TAX_POLICY:"Choose an applicable reviewed tax/withholding policy for the posting date.",
  FINANCE_TAX_MAPPING:"The tax policy or mapped accounts are inactive or invalid. Review the draft before posting.",
  FINANCE_TAX_MISMATCH:"Tax snapshots, amounts and mapped journal must agree.",
