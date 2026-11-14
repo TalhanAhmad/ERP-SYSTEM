@@ -32,7 +32,7 @@
 | [F26](days/F26.md) | Implement depreciation drafts, exact rounding, disposal, and reversals | Complete |
 | [F27](days/F27.md) | Add private project contracts, variations, and billing milestones | Complete |
 | [F28](days/F28.md) | Build cost allocation/reclassification and project result calculations | Complete |
-| [F29](days/F29.md) | Add versioned budgets, variance views, and separate forecasts | Pending |
+| [F29](days/F29.md) | Add versioned budgets, variance views, and separate forecasts | Complete |
 | [F30](days/F30.md) | Implement statement CSV preview/commit and duplicate protection | Pending |
 | [F31](days/F31.md) | Implement match/unmatch with partial and combined transactions | Pending |
 | [F32](days/F32.md) | Build reconciliation UI and statement-to-GL proof | Pending |

@@ -27,6 +27,10 @@ export default async function Detail({
     return (
       <section>
         <FinanceNavigation />
+        <Link href={"/finance/budgets?projectId=" + id}>Project budgets</Link>
+        <Link href={"/finance/forecasts?projectId=" + id}>
+          Project cash forecasts
+        </Link>
         <h1>{c.name} · Commercial profile</h1>
         <Link href={"/finance/project-results/" + id}>
           Project financial results
@@ -46,6 +50,10 @@ export default async function Detail({
   return (
     <section>
       <FinanceNavigation />
+      <Link href={"/finance/budgets?projectId=" + id}>Project budgets</Link>
+      <Link href={"/finance/forecasts?projectId=" + id}>
+        Project cash forecasts
+      </Link>
       <h1>{i.project.name} · Commercial profile</h1>
       <p>
         {i.state} · version {i.version} · {i.billingModel.replaceAll("_", " ")}

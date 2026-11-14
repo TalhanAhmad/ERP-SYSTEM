@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F28 engineering is implemented and locally verified. F26 and F27 each passed fresh CI on their separate published source. F28 adds reviewed exact cost splits and posted project actual results. F29–F46 remain pending; F29 budgets and separate forecasts is next. The requested F47 review pack is prepared for the user as engineering evidence grows. Actual human review and F48 release decisions remain unfilled. Hosted finance remains disabled without hosted migrations, grants or real financial seeds.
+F01–F29 engineering is implemented and locally verified. Separate F26, F27 and F28 sources passed fresh CI. F29 adds approved monthly budget revisions, incurred variance and independent future cash forecasts; plans do not post GL. F30–F46 remain pending, with F30 CSV statement preview/import next. The requested F47 review pack is prepared for the user as evidence grows. Actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
 
 ## F26 delivered
 
@@ -30,3 +30,13 @@ F27 separate publication verified: source9e23dfc36b472ac540617245df753cb9292445d
 Canonical original expense pools and current full net/hash, reviewed exact project/shared targets, deterministic percentage preview and the shared balanced expense-dimension emitter prevent duplicate costs. Historical end-of-day capacity also protects earlier allocated intervals when a later reversal exists. Underlying credits/reversals receive actionable conflicts. Private sources/register/detail/edit/history and posted result dates separate earned/deferred billing, unpaid incurred costs, assigned overhead and unassigned company totals. No cash metrics or budget plans are fabricated.
 
 818 distinct local checks passed:256 unit (3.05s),515 PostgreSQL integration (209.95s),47 Chromium (2.8m). Both production builds, strict typing/lint,152 concrete finance API paths/verbs/references and all61 applied migration checksums passed. Final Word/private-value verification accompanies separate publication; fresh F28 CI will be observed after push. See [rules](accounting/cost-allocation.md) and [F28 record](planning/days/F28.md).
+
+
+F28 source2c3b0031e87fab2a63e0445118e216e7f61718ca passed [fresh CI43609969834](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43609969834):61 migrations, all818 tests, both builds/type/lint/152-path API verification. F29 local acceptance is complete; source publication/fresh CI are recorded separately.
+
+
+## F29 delivered and verified
+
+Approved plans retain immutable month/project/shared scope and exact account lines; a replacement is explicitly reviewed before atomically superseding the current approval. Prior snapshots/voided revisions/reasons remain visible. Same-basis actuals include unpaid expense, dated credits/reclassification and unbudgeted accounts. Advisory warnings never block required recognition. Future receipt/payment expectations retain separate dates/likelihood/evidence and edit/cancel/reopen history without GL or cash settlement.
+
+838 distinct local checks passed:259 unit (3.35s),531 PostgreSQL integration (214.90s),48 Chromium (2.9m). The new budget/revision/variance/selected-forecast journey passed4.7s, including manager denial, mobile and WCAG. Strict typing/lint, both production builds,162 concrete API paths/verbs/references and all63 applied migration checksums passed. Word/private-value verification accompanies separate F29 publication; fresh CI will be observed after push. See [rules](accounting/budgets-forecasts.md) and [F29 record](planning/days/F29.md).

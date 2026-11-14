@@ -12,7 +12,7 @@ All45 Chromium journeys passed2.6m, including the new actual generation/post/dis
 
 ## Remaining milestones
 
-F29–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
+F30–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
 
 
 ## Final lifecycle edge cases
@@ -36,3 +36,15 @@ Additive61 passed DDL rollback rehearsal and a real synthetic source-capture que
 Initial supplier-credit test inputs used obsolete field names; corrected to the actual schema. Valid date/version validation precedence required more precise fixtures; no accounting invariant changed. The first browser assertion included Next’s route announcer; scoped the form alert. A rerun reused the commercial tester’s durable rate bucket; the cost journey now uses a dedicated synthetic account, preserving the production limit. Failed attempts do not count as acceptance.
 
 818 distinct local checks passed:256 unit (3.05s),515 PostgreSQL integration (209.95s),47 Chromium (2.8m). Both production builds, strict typing/lint,152 concrete finance API paths/verbs/references and all61 applied migration checksums passed. Final Word/private-value verification accompanies separate publication; fresh F28 CI will be observed after push. The new browser journey passed4.4s before full regression and includes invalid-split recovery/password clearing, largest-remainder preview, draft-no-GL, post-once, dated reversal link, current private project result, manager denial, mobile and WCAG. Browser auth fixtures were renewed after the backend suite. No immutable history was deleted. No hosted schema/grants/finance activation, bank transfer or trade occurred.
+
+
+F28 source2c3b0031e87fab2a63e0445118e216e7f61718ca passed [fresh CI43609969834](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43609969834):61 migrations, all818 tests, both builds/type/lint/152-path API verification. F29 local acceptance is complete; source publication/fresh CI are recorded separately.
+
+
+## F29 local verification
+
+Additive62 passed rollback rehearsal/guarded isolated apply;63 separately tightens direct checked-SQL forecast text shapes, preserving applied62. Three schema and16 PostgreSQL cases passed19 (6.08s): retained exact revisions/current-plan switch, void/no-number-reuse, approval races/replay, maximum money/future months/zero plans, ordinary account mappings, unpaid/unbudgeted actuals, actual project reclassification and archived work, future forecast versions/cancellation/reopening, private role/HTTP flag/Origin controls, forged snapshot/empty source checks, direct SQL field typing and runtime/Data API restrictions.
+
+First browser execution passed budget lifecycle/variance and stalled on a wrapped forecast select label. Direction/likelihood labels now explicitly target their selects. Its timed-out cleanup left an owned synthetic writer grant; the next attempt detected the duplicate. The fixture now removes only that exact owned test grant and settles context closures before financial-fixture cleanup. Neither failure is counted as acceptance, and no ledger/source/audit history was deleted.
+
+838 distinct local checks passed:259 unit (3.35s),531 PostgreSQL integration (214.90s),48 Chromium (2.9m). The new budget/revision/variance/selected-forecast journey passed4.7s, including manager denial, mobile and WCAG. Strict typing/lint, both production builds,162 concrete API paths/verbs/references and all63 applied migration checksums passed. Word/private-value verification accompanies separate F29 publication; fresh CI will be observed after push. Synthetic browser auth fixtures were renewed after all backend tests. Finance stays disabled live; no hosted schema/grant/plan or real transaction was created.

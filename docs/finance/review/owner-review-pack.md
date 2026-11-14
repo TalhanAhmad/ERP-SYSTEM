@@ -4,7 +4,7 @@ Prepared for Talha Ahmad, as requested on 14 November 2026. Intended Finance Own
 
 ## Current evidence and scope
 
-F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
+F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29 is now locally accepted with838 checks; F30–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
 
 The final pack will include tested representative statements, source-to-ledger links, dated balances, exception cases, migration/recovery evidence and outstanding decisions. No company figures, legal compliance or accountant approval are inferred from synthetic fixtures.
 
@@ -49,3 +49,13 @@ F27 separate publication verified: source9e23dfc36b472ac540617245df753cb9292445d
 A synthetic unpaid supplier bill120.00 recognizes cost before cash payment. A reviewed70.00/20.00/30.00 project/project/shared split debits the same expense account on targets and credits its original dimension; company expense and payable remain120.00. A subsequent credit first requires compatible allocation correction, including historical dates. Three paisa split50/50 preview0.02 and0.01 deterministically. An earned project invoice300.00 and assigned direct cost120.00 give contribution180.00; advance billing100.01 is net invoiced but zero earned income. Shared company overhead is shown separately, not deducted twice.
 
 These are verification fixtures, not company figures or accepted policy. 818 distinct local checks passed:256 unit (3.05s),515 PostgreSQL integration (209.95s),47 Chromium (2.8m). Both production builds, strict typing/lint,152 concrete finance API paths/verbs/references and all61 applied migration checksums passed. Final Word/private-value verification accompanies separate publication; fresh F28 CI will be observed after push. Budget plans, attributed cash, statements, cutover/closing and final recovery evidence remain later milestones. Review/acceptance fields remain pending for the user.
+
+
+F28 source2c3b0031e87fab2a63e0445118e216e7f61718ca passed [fresh CI43609969834](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43609969834):61 migrations, all818 tests, both builds/type/lint/152-path API verification. F29 local acceptance is complete; source publication/fresh CI are recorded separately.
+
+
+## Budget and forecast example through F29
+
+A synthetic approved monthly expense budget100.01 and actual unpaid incurred cost120.00 show remaining−19.99, with an advisory warning; the actual expense is still recognized. Drafting a130.03 revision leaves100.01 current until explicit approval, then retains the old plan as superseded. A separate expected payment200.02 dated2099-12-31 can be edited/cancelled/reopened with likelihood notes and creates no cash or GL event. These are verification fixtures, not company budgets or payment commitments.
+
+838 distinct local checks passed:259 unit (3.35s),531 PostgreSQL integration (214.90s),48 Chromium (2.9m). The new budget/revision/variance/selected-forecast journey passed4.7s, including manager denial, mobile and WCAG. Strict typing/lint, both production builds,162 concrete API paths/verbs/references and all63 applied migration checksums passed. Word/private-value verification accompanies separate F29 publication; fresh CI will be observed after push. Statement imports, matching/reconciliation, statements/exports, closing/cutover and final recovery evidence remain later milestones. Review/acceptance fields stay unfilled for the user.

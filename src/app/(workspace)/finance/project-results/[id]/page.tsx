@@ -27,6 +27,10 @@ export default async function Result({
   return (
     <section>
       <FinanceNavigation />
+      <Link href={"/finance/budgets?projectId=" + id}>Project budgets</Link>
+      <Link href={"/finance/forecasts?projectId=" + id}>
+        Project cash forecasts
+      </Link>
       <h1>{d.project.name} · Project results</h1>
       <Link href={"/finance/projects/" + id}>Commercial profile</Link>
       <form method="get" className="form-grid">

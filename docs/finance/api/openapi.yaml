@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova private finance through F28",
-    "version": "0.23.0",
+    "title": "Encova private finance through F29",
+    "version": "0.24.0",
     "description": "Implemented F01\u2013F18: private selected-admin accounting with owner-reviewed tax policy, net/tax invoice and purchase posting, capped original-tax credits and evidenced customer/supplier withholding in gross settlements. Default disabled, no hosted financial launch, real tax rates or legal compliance claims. See source-bound accounting and progress evidence. F19 adds private typed evidence, direct upload, quarantine, signed malware attestation, current-access bounded proxy downloads and auditable draft cleanup. Scanner configuration is operator-only; no clean fallback or live signing secrets seeded."
   },
   "security": [
@@ -17058,6 +17058,1214 @@
           }
         }
       }
+    },
+    "/api/v1/finance/budgets": {
+      "get": {
+        "operationId": "planning_budgets_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Immutable monthly/project scope; explicit revision of current approved ID/version. One draft/current approval per scope. Prior approval remains current during review, then is atomically superseded with retained lines/snapshot/audit. Approved history cannot be edited or deleted; void unused drafts.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "const": "SHARED"
+                }
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "APPROVED",
+                "SUPERSEDED",
+                "VOIDED"
+              ],
+              "default": "ALL"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])$",
+              "description": "Optional month; blank string also means all months."
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Register/options items,total,page,pages; record detail item,history. Budget detail includes exact lines,total,previous,revisions,snapshot; forecast detail keeps dates/amount/likelihood and retained actions."
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "planning_budgets_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Canonical Origin/CSRF, current password/hosted TOTP, current version and permanent scoped key required. Plans create no GL, source cash, recognition or settlement event. Immutable monthly/project scope; explicit revision of current approved ID/version. One draft/current approval per scope. Prior approval remains current during review, then is atomically superseded with retained lines/snapshot/audit. Approved history cannot be edited or deleted; void unused drafts.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "201": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningBUDGET_CREATE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/budgets/{id}": {
+      "get": {
+        "operationId": "planning_budgets_ById_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Immutable monthly/project scope; explicit revision of current approved ID/version. One draft/current approval per scope. Prior approval remains current during review, then is atomically superseded with retained lines/snapshot/audit. Approved history cannot be edited or deleted; void unused drafts.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Register/options items,total,page,pages; record detail item,history. Budget detail includes exact lines,total,previous,revisions,snapshot; forecast detail keeps dates/amount/likelihood and retained actions."
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "planning_budgets_ById_patch",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Canonical Origin/CSRF, current password/hosted TOTP, current version and permanent scoped key required. Plans create no GL, source cash, recognition or settlement event. Immutable monthly/project scope; explicit revision of current approved ID/version. One draft/current approval per scope. Prior approval remains current during review, then is atomically superseded with retained lines/snapshot/audit. Approved history cannot be edited or deleted; void unused drafts.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningBUDGET_UPDATE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/budgets/{id}/approve": {
+      "post": {
+        "operationId": "planning_budgets_ById_approve_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Canonical Origin/CSRF, current password/hosted TOTP, current version and permanent scoped key required. Plans create no GL, source cash, recognition or settlement event. Immutable monthly/project scope; explicit revision of current approved ID/version. One draft/current approval per scope. Prior approval remains current during review, then is atomically superseded with retained lines/snapshot/audit. Approved history cannot be edited or deleted; void unused drafts.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningBUDGET_APPROVE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/budgets/{id}/void": {
+      "post": {
+        "operationId": "planning_budgets_ById_void_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Canonical Origin/CSRF, current password/hosted TOTP, current version and permanent scoped key required. Plans create no GL, source cash, recognition or settlement event. Immutable monthly/project scope; explicit revision of current approved ID/version. One draft/current approval per scope. Prior approval remains current during review, then is atomically superseded with retained lines/snapshot/audit. Approved history cannot be edited or deleted; void unused drafts.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningBUDGET_VOID"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/budget-variance": {
+      "get": {
+        "operationId": "planning_budget-variance_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Current approved monthly/project/account plan versus actual posted expense on identical accounting dates/dimensions, including unpaid bills, credits/reversals/reclassification. Unbudgeted accounts are included. Remaining=budget-actual. Warnings are advisory; required expense posting is never blocked. Company shared scope is explicit SHARED.",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])$"
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "const": "SHARED"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "filters": {
+                          "type": "object"
+                        },
+                        "project": {
+                          "type": [
+                            "object",
+                            "null"
+                          ]
+                        },
+                        "budget": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "description": "Current approved ID/number/revision/version or null."
+                        },
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/BudgetVarianceRow"
+                          }
+                        },
+                        "totals": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "budget": {
+                              "type": "string",
+                              "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+                            },
+                            "actual": {
+                              "type": "string",
+                              "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+                            },
+                            "remaining": {
+                              "type": "string",
+                              "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+                            }
+                          },
+                          "required": [
+                            "budget",
+                            "actual",
+                            "remaining"
+                          ]
+                        },
+                        "advisoryOnly": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "filters",
+                        "project",
+                        "budget",
+                        "items",
+                        "totals",
+                        "advisoryOnly"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/forecasts": {
+      "get": {
+        "operationId": "planning_forecasts_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Expected receipt/payment date, positive amount and likelihood note are independent cash plans, including future dates. Current ACTIVE records may be edited/cancelled; reopen preserves prior history before further editing. Cancellation never reverses real cash.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "const": "SHARED"
+                }
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ALL",
+                "ACTIVE",
+                "CANCELLED"
+              ],
+              "default": "ACTIVE"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Real YYYY-MM-DD Gregorian date0001\u20139999. Forecasts may be future dates and create no ledger entry.",
+              "default": "0001-01-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Real YYYY-MM-DD Gregorian date0001\u20139999. Forecasts may be future dates and create no ledger entry.",
+              "default": "9999-12-31"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ALL",
+                "RECEIPT",
+                "PAYMENT"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Register/options items,total,page,pages; record detail item,history. Budget detail includes exact lines,total,previous,revisions,snapshot; forecast detail keeps dates/amount/likelihood and retained actions."
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "planning_forecasts_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Canonical Origin/CSRF, current password/hosted TOTP, current version and permanent scoped key required. Plans create no GL, source cash, recognition or settlement event. Expected receipt/payment date, positive amount and likelihood note are independent cash plans, including future dates. Current ACTIVE records may be edited/cancelled; reopen preserves prior history before further editing. Cancellation never reverses real cash.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "201": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningFORECAST_CREATE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/forecasts/{id}": {
+      "get": {
+        "operationId": "planning_forecasts_ById_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Expected receipt/payment date, positive amount and likelihood note are independent cash plans, including future dates. Current ACTIVE records may be edited/cancelled; reopen preserves prior history before further editing. Cancellation never reverses real cash.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Register/options items,total,page,pages; record detail item,history. Budget detail includes exact lines,total,previous,revisions,snapshot; forecast detail keeps dates/amount/likelihood and retained actions."
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "planning_forecasts_ById_patch",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Canonical Origin/CSRF, current password/hosted TOTP, current version and permanent scoped key required. Plans create no GL, source cash, recognition or settlement event. Expected receipt/payment date, positive amount and likelihood note are independent cash plans, including future dates. Current ACTIVE records may be edited/cancelled; reopen preserves prior history before further editing. Cancellation never reverses real cash.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningFORECAST_UPDATE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/forecasts/{id}/cancel": {
+      "post": {
+        "operationId": "planning_forecasts_ById_cancel_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Canonical Origin/CSRF, current password/hosted TOTP, current version and permanent scoped key required. Plans create no GL, source cash, recognition or settlement event. Expected receipt/payment date, positive amount and likelihood note are independent cash plans, including future dates. Current ACTIVE records may be edited/cancelled; reopen preserves prior history before further editing. Cancellation never reverses real cash.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningFORECAST_CANCEL"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/forecasts/{id}/reopen": {
+      "post": {
+        "operationId": "planning_forecasts_ById_reopen_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. Canonical Origin/CSRF, current password/hosted TOTP, current version and permanent scoped key required. Plans create no GL, source cash, recognition or settlement event. Expected receipt/payment date, positive amount and likelihood note are independent cash plans, including future dates. Current ACTIVE records may be edited/cancelled; reopen preserves prior history before further editing. Cancellation never reverses real cash.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningCommandResult"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningFORECAST_REOPEN"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/planning-options": {
+      "get": {
+        "operationId": "planning_planning-options_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only. Private/no-store; strict bodies; exact decimal-string money. 25-row stable searchable options: active ordinary PKR expense accounts or active private finance parties. No project-management capability inference.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BUDGET_ACCOUNT",
+                "PARTY"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private planning command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Private {data}. Register/options items,total,page,pages; record detail item,history. Budget detail includes exact lines,total,previous,revisions,snapshot; forecast detail keeps dates/amount/likelihood and retained actions."
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -23512,6 +24720,511 @@
           "fullyAllocatedResult",
           "companyUnallocatedOverhead",
           "companyUnassignedDirectCosts"
+        ]
+      },
+      "BudgetLineInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/PkrAmount"
+          }
+        },
+        "required": [
+          "accountId",
+          "amount"
+        ]
+      },
+      "PlanningBUDGET_CREATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "lines": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/BudgetLineInput"
+            },
+            "description": "Unique ordinary expense accounts. Exact total must fit PKR20,2. Zero plans are valid advisory baselines."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previousId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previousVersion": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "description",
+          "evidence",
+          "lines",
+          "reason",
+          "reauth",
+          "month",
+          "projectId"
+        ]
+      },
+      "PlanningBUDGET_UPDATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "lines": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/BudgetLineInput"
+            },
+            "description": "Unique ordinary expense accounts. Exact total must fit PKR20,2. Zero plans are valid advisory baselines."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "description",
+          "evidence",
+          "lines",
+          "reason",
+          "reauth",
+          "expectedVersion"
+        ]
+      },
+      "PlanningBUDGET_APPROVE": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "approvalEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth",
+          "approvalEvidence"
+        ]
+      },
+      "PlanningBUDGET_VOID": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PlanningFORECAST_CANCEL": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PlanningFORECAST_REOPEN": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PlanningPositiveAmount": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PkrAmount"
+          },
+          {
+            "not": {
+              "pattern": "^0(?:\\.0{1,2})?$"
+            }
+          }
+        ]
+      },
+      "PlanningFORECAST_CREATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "RECEIPT",
+              "PAYMENT"
+            ]
+          },
+          "expectedDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real YYYY-MM-DD Gregorian date0001\u20139999. Forecasts may be future dates and create no ledger entry."
+          },
+          "amount": {
+            "$ref": "#/components/schemas/PlanningPositiveAmount"
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "partyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "likelihood": {
+            "enum": [
+              "POSSIBLE",
+              "LIKELY",
+              "COMMITTED"
+            ]
+          },
+          "likelihoodNote": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "kind",
+          "expectedDate",
+          "amount",
+          "projectId",
+          "partyId",
+          "likelihood",
+          "likelihoodNote",
+          "description",
+          "evidence",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PlanningFORECAST_UPDATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "RECEIPT",
+              "PAYMENT"
+            ]
+          },
+          "expectedDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Real YYYY-MM-DD Gregorian date0001\u20139999. Forecasts may be future dates and create no ledger entry."
+          },
+          "amount": {
+            "$ref": "#/components/schemas/PlanningPositiveAmount"
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "partyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "likelihood": {
+            "enum": [
+              "POSSIBLE",
+              "LIKELY",
+              "COMMITTED"
+            ]
+          },
+          "likelihoodNote": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "kind",
+          "expectedDate",
+          "amount",
+          "projectId",
+          "partyId",
+          "likelihood",
+          "likelihoodNote",
+          "description",
+          "evidence",
+          "reason",
+          "reauth",
+          "expectedVersion"
+        ]
+      },
+      "PlanningCommandResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "number": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "id",
+              "number",
+              "version"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "BudgetVarianceRow": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "mappingAvailable": {
+            "type": "boolean"
+          },
+          "budget": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "actual": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "remaining": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "unbudgeted": {
+            "type": "boolean"
+          },
+          "exceeded": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accountId",
+          "code",
+          "name",
+          "mappingAvailable",
+          "budget",
+          "actual",
+          "remaining",
+          "unbudgeted",
+          "exceeded"
         ]
       }
     }
