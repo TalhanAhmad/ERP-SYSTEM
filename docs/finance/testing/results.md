@@ -110,3 +110,8 @@ Final F25 source7e274434c2bedaa4f638d29f06de7a964a110873 is pushed and [CI435834
 ## F26 continuation — 14 November2026
 
 PR3/F16–F25 is merged atb83951d. Current F26 local acceptance:779 distinct checks (249 unit,485 PostgreSQL,45 Chromium) with all16 lifecycle cases additionally passing final audit-precision59. See [exact continuation evidence](F26-F48-results.md) and [delivery](../delivery-F26-F48.md). Current124 API paths and59 applied checksums pass; no hosted finance release or human policy acceptance is implied.
+
+
+## F27 local acceptance —14 November2026
+
+Private commercial projects and source-retained billing links passed798 distinct tests (252 unit/500 backend/46 Chromium), both builds/type/lint/142-path docs/60 applied checksums. F26 exact source4b0e4a6 passed fresh CI43599585247. F27 publication/fresh CI follows in [continuation evidence](F26-F48-results.md). No hosted finance change or real commercial agreement.

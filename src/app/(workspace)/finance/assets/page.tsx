@@ -42,6 +42,7 @@ export default async function Assets({
         drawer={false}
         label="Asset"
         columns={[
+          "Asset",
           "Description",
           "Location / custodian",
           "State",

@@ -4,7 +4,7 @@ Prepared for Talha Ahmad, as requested on 14 November 2026. Intended Finance Own
 
 ## Current evidence and scope
 
-F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 engineering is locally verified on finance/f26-f48; final publication/build evidence is in the continuation tracker. F27–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
+F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 commercial project engineering is locally verified on finance/f26-f48 with798 tests; publication is recorded in the continuation tracker. F28–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
 
 The final pack will include tested representative statements, source-to-ledger links, dated balances, exception cases, migration/recovery evidence and outstanding decisions. No company figures, legal compliance or accountant approval are inferred from synthetic fixtures.
 
@@ -34,3 +34,8 @@ These are verification values only, not company policy or real transactions. [F2
 Reviewer: pending. Review date: pending. Reviewed source commit and report snapshot: pending. Accepted policies: pending. Questions/gaps and responsible person: pending. Decision to accept engineering: pending. Separate decision to enable live finance/import real books: pending.
 
 A completed engineering test does not fill these human decision fields. The pack is prepared for the user; an accountant’s involvement or sign-off is not claimed.
+
+
+## Commercial review example through F27
+
+A synthetic signed agreement100.01 plus a separately approved increase20.02 gives a current commercial value120.03. Confirming a50.00 billing plan creates no revenue/receivable/cash. A later real posted invoice line10.01 can be linked for traceability; release preserves its original net/snapshot and changes no GL. Original linked net is labelled before subsequent credits. Actual earned revenue and project costs are based on posted accounting activity, with F28 result calculations still pending. No actual company agreement or approval is asserted.

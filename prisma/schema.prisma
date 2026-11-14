@@ -80,6 +80,14 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ financeProjectProfiles FinanceProjectProfile[]
+ financeProjectVariations FinanceProjectVariation[] @relation("CommercialVariationCreator")
+ approvedProjectVariations FinanceProjectVariation[] @relation("CommercialVariationApprover")
+ financeBillingMilestones FinanceBillingMilestone[] @relation("CommercialMilestoneCreator")
+ confirmedBillingMilestones FinanceBillingMilestone[] @relation("CommercialMilestoneConfirmer")
+ financeMilestoneLinks FinanceMilestoneInvoiceLink[] @relation("CommercialLinkCreator")
+ releasedMilestoneLinks FinanceMilestoneInvoiceLink[] @relation("CommercialLinkReleaser")
+
  financeAssetMovements FinanceAssetMovement[]
  createdFinanceAssets FinanceAsset[] @relation("FinanceAssetCreator")
  custodyFinanceAssets FinanceAsset[] @relation("FinanceAssetCustodian")
@@ -417,6 +425,8 @@ model FinanceLedgerReceipt {
 }
 
 model FinanceParty {
+ projectProfiles FinanceProjectProfile[]
+
  investmentHoldings FinanceInvestmentHolding[]
  loans FinanceLoan[]
  fundingEvents FinanceFundingEvent[]
@@ -505,6 +515,8 @@ model FinanceInvoice {
  @@index([state,postingDate,id])
 }
 model FinanceInvoiceLine {
+ milestoneLinks FinanceMilestoneInvoiceLink[]
+
  taxCodeId String? @db.Uuid
  taxCode FinanceTaxCode? @relation(fields:[taxCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  taxSnapshot Json?
@@ -572,6 +584,8 @@ model FinanceDeferredRevenueEvent {
  @@index([effectiveDate,id])
 }
 model Project {
+ financeProfile FinanceProjectProfile?
+
  financeMovements FinanceMovement[]
  supplierDocuments FinanceSupplierDocument[]
  financeBills FinanceBill[]
@@ -1848,4 +1862,95 @@ model FinanceAssetEvent {
  policy Json?
  recordedAt DateTime @default(dbgenerated("clock_timestamp()")) @db.Timestamptz
  @@index([assetId,effectiveDate])
+}
+
+model FinanceProjectProfile {
+ id String @id @default(uuid()) @db.Uuid
+ projectId String @unique @db.Uuid
+ project Project @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ clientId String @db.Uuid
+ client FinanceParty @relation(fields:[clientId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ originalContract Decimal @db.Decimal(20,2)
+ currency String @default("PKR")
+ billingModel String
+ terms String
+ evidence String
+ signedDate DateTime? @db.Date
+ approvalEvidence String?
+ contractSnapshot Json?
+ state String @default("DRAFT")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ variations FinanceProjectVariation[]
+ milestones FinanceBillingMilestone[]
+ @@index([state,projectId])
+}
+model FinanceProjectVariation {
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique
+ profileId String @db.Uuid
+ profile FinanceProjectProfile @relation(fields:[profileId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ direction String
+ amount Decimal @db.Decimal(20,2)
+ reference String
+ description String
+ signedDate DateTime @db.Date
+ evidence String
+ approvalEvidence String?
+ approvedAt DateTime? @db.Timestamptz
+ approvedById String? @db.Uuid
+ approvedBy Person? @relation("CommercialVariationApprover",fields:[approvedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ state String @default("DRAFT")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation("CommercialVariationCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([profileId,createdAt,id])
+}
+model FinanceBillingMilestone {
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique
+ profileId String @db.Uuid
+ profile FinanceProjectProfile @relation(fields:[profileId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ description String
+ amount Decimal @db.Decimal(20,2)
+ expectedDate DateTime @db.Date
+ dueDate DateTime @db.Date
+ evidence String
+ approvalEvidence String?
+ confirmedAt DateTime? @db.Timestamptz
+ confirmedById String? @db.Uuid
+ confirmedBy Person? @relation("CommercialMilestoneConfirmer",fields:[confirmedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ state String @default("DRAFT")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation("CommercialMilestoneCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ invoiceLinks FinanceMilestoneInvoiceLink[]
+ @@index([profileId,expectedDate,id])
+}
+model FinanceMilestoneInvoiceLink {
+ id String @id @default(uuid()) @db.Uuid
+ milestoneId String @db.Uuid
+ milestone FinanceBillingMilestone @relation(fields:[milestoneId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ invoiceLineId String @db.Uuid
+ invoiceLine FinanceInvoiceLine @relation(fields:[invoiceLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ originalNet Decimal @db.Decimal(20,2)
+ snapshot Json
+ state String @default("ACTIVE")
+ version Int @default(1)
+ releasedAt DateTime? @db.Timestamptz
+ releasedById String? @db.Uuid
+ releasedBy Person? @relation("CommercialLinkReleaser",fields:[releasedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ releaseReason String?
+ createdById String @db.Uuid
+ createdBy Person @relation("CommercialLinkCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([milestoneId,createdAt,id])
 }

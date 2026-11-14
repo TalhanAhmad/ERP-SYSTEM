@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova private finance through F26",
-    "version": "0.21.0",
+    "title": "Encova private finance through F27",
+    "version": "0.22.0",
     "description": "Implemented F01\u2013F18: private selected-admin accounting with owner-reviewed tax policy, net/tax invoice and purchase posting, capped original-tax credits and evidenced customer/supplier withholding in gross settlements. Default disabled, no hosted financial launch, real tax rates or legal compliance claims. See source-bound accounting and progress evidence. F19 adds private typed evidence, direct upload, quarantine, signed malware attestation, current-access bounded proxy downloads and auditable draft cleanup. Scanner configuration is operator-only; no clean fallback or live signing secrets seeded."
   },
   "security": [
@@ -14150,6 +14150,2004 @@
           }
         }
       }
+    },
+    "/api/v1/finance/projects": {
+      "get": {
+        "operationId": "commercial_projects_get",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "required": false
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            },
+            "required": false
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "ACTIVE",
+                "CLOSED",
+                "CANCELLED"
+              ]
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private detail {item,history} plus profile totals or milestone links/pagination; lists {items,total,page,pages,filters}; options {items,total,page,pages}. All financial values are exact decimal strings.",
+                      "properties": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      },
+      "post": {
+        "operationId": "commercial_projects_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialPROFILE_CREATE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/projects/{id}": {
+      "get": {
+        "operationId": "commercial_projects_ById_get",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private detail {item,history} plus profile totals or milestone links/pagination; lists {items,total,page,pages,filters}; options {items,total,page,pages}. All financial values are exact decimal strings.",
+                      "properties": {
+                        "item": {
+                          "$ref": "#/components/schemas/CommercialProfileDTO"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "commercial_projects_ById_patch",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialPROFILE_UPDATE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/projects/{id}/activate": {
+      "post": {
+        "operationId": "commercial_projects_ById_activate_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialPROFILE_ACTIVATE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/projects/{id}/close": {
+      "post": {
+        "operationId": "commercial_projects_ById_close_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialPROFILE_CLOSE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/projects/{id}/reopen": {
+      "post": {
+        "operationId": "commercial_projects_ById_reopen_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialPROFILE_REOPEN"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/projects/{id}/cancel": {
+      "post": {
+        "operationId": "commercial_projects_ById_cancel_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialPROFILE_CANCEL"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/project-variations": {
+      "get": {
+        "operationId": "commercial_project-variations_get",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "required": false
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            },
+            "required": false
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "APPROVED",
+                "VOIDED",
+                "CONFIRMED",
+                "CANCELLED"
+              ]
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private detail {item,history} plus profile totals or milestone links/pagination; lists {items,total,page,pages,filters}; options {items,total,page,pages}. All financial values are exact decimal strings.",
+                      "properties": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      },
+      "post": {
+        "operationId": "commercial_project-variations_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialVARIATION_CREATE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/project-variations/{id}": {
+      "get": {
+        "operationId": "commercial_project-variations_ById_get",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private detail {item,history} plus profile totals or milestone links/pagination; lists {items,total,page,pages,filters}; options {items,total,page,pages}. All financial values are exact decimal strings.",
+                      "properties": {
+                        "item": {
+                          "$ref": "#/components/schemas/CommercialVariationDTO"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "commercial_project-variations_ById_patch",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialVARIATION_UPDATE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/project-variations/{id}/approve": {
+      "post": {
+        "operationId": "commercial_project-variations_ById_approve_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialVARIATION_APPROVE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/project-variations/{id}/void": {
+      "post": {
+        "operationId": "commercial_project-variations_ById_void_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialVARIATION_VOID"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/billing-milestones": {
+      "get": {
+        "operationId": "commercial_billing-milestones_get",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "required": false
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            },
+            "required": false
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "APPROVED",
+                "VOIDED",
+                "CONFIRMED",
+                "CANCELLED"
+              ]
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private detail {item,history} plus profile totals or milestone links/pagination; lists {items,total,page,pages,filters}; options {items,total,page,pages}. All financial values are exact decimal strings.",
+                      "properties": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      },
+      "post": {
+        "operationId": "commercial_billing-milestones_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialMILESTONE_CREATE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/billing-milestones/{id}": {
+      "get": {
+        "operationId": "commercial_billing-milestones_ById_get",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            },
+            "description": "Retained invoice relationship page,25 rows."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private detail {item,history} plus profile totals or milestone links/pagination; lists {items,total,page,pages,filters}; options {items,total,page,pages}. All financial values are exact decimal strings.",
+                      "properties": {
+                        "item": {
+                          "$ref": "#/components/schemas/CommercialMilestoneDTO"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "commercial_billing-milestones_ById_patch",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialMILESTONE_UPDATE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/billing-milestones/{id}/confirm": {
+      "post": {
+        "operationId": "commercial_billing-milestones_ById_confirm_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialMILESTONE_CONFIRM"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/billing-milestones/{id}/cancel": {
+      "post": {
+        "operationId": "commercial_billing-milestones_ById_cancel_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialMILESTONE_CANCEL"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/project-options": {
+      "get": {
+        "operationId": "commercial_project-options_get",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries. Invoice-line options require projectId and a matching commercial client/project; only posted positive-net unlinked original lines are eligible.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "required": false
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            },
+            "required": false
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PROJECT",
+                "CLIENT",
+                "INVOICE_LINE"
+              ]
+            },
+            "required": true
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private detail {item,history} plus profile totals or milestone links/pagination; lists {items,total,page,pages,filters}; options {items,total,page,pages}. All financial values are exact decimal strings.",
+                      "properties": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/milestone-links": {
+      "post": {
+        "operationId": "commercial_milestone-links_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialLINK_CREATE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/milestone-links/{id}": {
+      "get": {
+        "operationId": "commercial_milestone-links_ById_get",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private detail {item,history} plus profile totals or milestone links/pagination; lists {items,total,page,pages,filters}; options {items,total,page,pages}. All financial values are exact decimal strings.",
+                      "properties": {
+                        "item": {
+                          "$ref": "#/components/schemas/CommercialInvoiceLinkDTO"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/milestone-links/{id}/release": {
+      "post": {
+        "operationId": "commercial_milestone-links_ById_release_post",
+        "description": "Current selected ACTIVE Super Admin only. All responses are private/no-store. Mutations require canonical Origin/CSRF, permanent idempotency, current version where mutable, current password and fresh hosted TOTP. Commercial plans and invoice annotations never post or rewrite accounting entries.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommercialLINK_RELEASE"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing ERP project ID for /projects; source UUID for other resources."
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Commercial record result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialCommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -19344,6 +21342,912 @@
             "minimum": 1
           }
         }
+      },
+      "CommercialPROFILE_CREATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "clientId",
+          "originalContract",
+          "billingModel",
+          "terms",
+          "evidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originalContract": {
+            "$ref": "#/components/schemas/PkrAmount"
+          },
+          "billingModel": {
+            "type": "string",
+            "enum": [
+              "FIXED_PRICE",
+              "TIME_BASED",
+              "RETAINER",
+              "MILESTONE"
+            ]
+          },
+          "terms": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialPROFILE_ACTIVATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "signedDate",
+          "approvalEvidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "signedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "approvalEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialVARIATION_CREATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "direction",
+          "amount",
+          "reference",
+          "description",
+          "signedDate",
+          "evidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "INCREASE",
+              "DECREASE"
+            ]
+          },
+          "amount": {
+            "$ref": "#/components/schemas/CommercialPositiveAmount"
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "signedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialVARIATION_APPROVE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "approvalEvidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "approvalEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialMILESTONE_CREATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "description",
+          "amount",
+          "expectedDate",
+          "dueDate",
+          "evidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "amount": {
+            "$ref": "#/components/schemas/CommercialPositiveAmount"
+          },
+          "expectedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialMILESTONE_CONFIRM": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "approvalEvidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "approvalEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialLINK_CREATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "milestoneId",
+          "invoiceLineId",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "milestoneId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "invoiceLineId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialPROFILE_UPDATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "clientId",
+          "originalContract",
+          "billingModel",
+          "terms",
+          "evidence",
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originalContract": {
+            "$ref": "#/components/schemas/PkrAmount"
+          },
+          "billingModel": {
+            "type": "string",
+            "enum": [
+              "FIXED_PRICE",
+              "TIME_BASED",
+              "RETAINER",
+              "MILESTONE"
+            ]
+          },
+          "terms": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialVARIATION_UPDATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "direction",
+          "amount",
+          "reference",
+          "description",
+          "signedDate",
+          "evidence",
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "direction": {
+            "type": "string",
+            "enum": [
+              "INCREASE",
+              "DECREASE"
+            ]
+          },
+          "amount": {
+            "$ref": "#/components/schemas/CommercialPositiveAmount"
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "signedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialMILESTONE_UPDATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "description",
+          "amount",
+          "expectedDate",
+          "dueDate",
+          "evidence",
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "amount": {
+            "$ref": "#/components/schemas/CommercialPositiveAmount"
+          },
+          "expectedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialPROFILE_CLOSE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialPROFILE_REOPEN": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialPROFILE_CANCEL": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialVARIATION_VOID": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialMILESTONE_CANCEL": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialLINK_RELEASE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CommercialProfileDTO": {
+        "type": "object",
+        "description": "Private commercial agreement; id is finance profile ID, projectId is the immutable existing ERP project ID. Contract snapshot freezes the signed agreement; recent children and counts are included on detail. No revenue/receivable/cash balance is implied.",
+        "required": [
+          "id",
+          "projectId",
+          "clientId",
+          "originalContract",
+          "state",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originalContract": {
+            "$ref": "#/components/schemas/PkrAmount"
+          },
+          "billingModel": {
+            "type": "string",
+            "enum": [
+              "FIXED_PRICE",
+              "TIME_BASED",
+              "RETAINER",
+              "MILESTONE"
+            ]
+          },
+          "terms": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "currency": {
+            "const": "PKR"
+          },
+          "signedDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "contractSnapshot": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "approvalEvidence": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CommercialVariationDTO": {
+        "type": "object",
+        "description": "Signed commercial change. Only APPROVED rows change current contract value; an approved row cannot be edited or voided.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "number": {
+            "type": "string"
+          },
+          "profileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "INCREASE",
+              "DECREASE"
+            ]
+          },
+          "amount": {
+            "$ref": "#/components/schemas/PkrAmount"
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "signedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          }
+        }
+      },
+      "CommercialMilestoneDTO": {
+        "type": "object",
+        "description": "DRAFT/CONFIRMED/CANCELLED billing plan. Confirmation posts no GL; retained links reference real posted invoice lines.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "number": {
+            "type": "string"
+          },
+          "profileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "amount": {
+            "$ref": "#/components/schemas/PkrAmount"
+          },
+          "expectedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          }
+        }
+      },
+      "CommercialInvoiceLinkDTO": {
+        "type": "object",
+        "description": "ACTIVE/RELEASED retained whole-line commercial annotation. Original net is frozen before later credits; this is not settlement or revenue. One active milestone relationship per invoice line.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "milestoneId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "invoiceLineId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originalNet": {
+            "$ref": "#/components/schemas/PkrAmount"
+          },
+          "snapshot": {
+            "type": "object"
+          },
+          "releasedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "releasedById": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "releaseReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CommercialCommandResult": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "version"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "number": {
+                "type": "string"
+              },
+              "projectId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "financeId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "milestoneId": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        }
+      },
+      "CommercialPositiveAmount": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PkrAmount"
+          },
+          {
+            "not": {
+              "pattern": "^0(?:\\.0{1,2})?$"
+            }
+          }
+        ]
       }
     }
   }
