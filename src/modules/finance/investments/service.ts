@@ -13,6 +13,12 @@ import {
   type HoldingAction,
 } from "./schemas";
 export const holdingErrors: Record<string, string> = {
+  FINANCE_INVESTMENT_STALE_LOT:
+    "A selected lot changed. Save and review the draft again before posting.",
+  FINANCE_INVESTMENT_DATE_ORDER:
+    "Use a date on or after the selected lot’s latest posted movement.",
+  FINANCE_INVESTMENT_INCOME_CAPACITY:
+    "This exceeds accrued investment income at this or a later date.",
   FINANCE_INVESTMENT_MAPPING:
     "Choose an active issuer, reviewed investment mapping and cash master.",
   FINANCE_INVESTMENT_POLICY:
@@ -177,6 +183,7 @@ export async function holdingDetail(actor: Pick<Actor, "id">, id: string) {
       });
     return {
       item,
+      ...(await investmentResults(tx, id)),
       originalCost: totals._sum.costDelta?.toFixed(2) ?? "0.00",
       carryingValue: totals._sum.carryingDelta?.toFixed(2) ?? "0.00",
       units:
@@ -283,4 +290,19 @@ export async function investmentLots(
       );
     return { holding, items, total, page, pages, filters: q };
   });
+}
+
+async function investmentResults(tx: Prisma.TransactionClient, id: string) {
+  return (
+    await tx.$queryRaw<
+      {
+        realizedResult: string;
+        fees: string;
+        valuationChanges: string;
+        impairments: string;
+        incomeEarned: string;
+        incomeReceivable: string;
+      }[]
+    >`SELECT (SELECT round(coalesce(sum(CASE WHEN m.kind='REVERSAL' THEN -1 ELSE 1 END*(coalesce(o.amount,m.amount)-(SELECT coalesce(sum(a."carryingBasis"),0) FROM "FinanceInvestmentAllocation" a WHERE a."movementId"=coalesce(o.id,m.id)))),0),2)::text FROM "FinanceMovement" m LEFT JOIN "FinanceMovement" o ON o.id=m."reversalOfId" WHERE m."holdingId"=${id}::uuid AND m.state='POSTED' AND coalesce(o.kind,m.kind)='INVESTMENT_DISPOSAL') AS "realizedResult",(SELECT round(coalesce(sum(CASE WHEN m.kind='REVERSAL' THEN -m."feeAmount" ELSE m."feeAmount" END),0),2)::text FROM "FinanceMovement" m LEFT JOIN "FinanceMovement" o ON o.id=m."reversalOfId" WHERE m."holdingId"=${id}::uuid AND m.state='POSTED' AND coalesce(o.kind,m.kind)='INVESTMENT_DISPOSAL') AS fees,(SELECT round(coalesce(sum(e."carryingDelta"),0),2)::text FROM "FinanceInvestmentEvent" e JOIN "FinanceMovement" m ON m.id=e."movementId" LEFT JOIN "FinanceMovement" o ON o.id=m."reversalOfId" WHERE e."holdingId"=${id}::uuid AND coalesce(o.kind,m.kind) IN('INVESTMENT_VALUATION_UP','INVESTMENT_VALUATION_DOWN')) AS "valuationChanges",(SELECT round(-coalesce(sum(e."carryingDelta"),0),2)::text FROM "FinanceInvestmentEvent" e JOIN "FinanceMovement" m ON m.id=e."movementId" LEFT JOIN "FinanceMovement" o ON o.id=m."reversalOfId" WHERE e."holdingId"=${id}::uuid AND coalesce(o.kind,m.kind)='INVESTMENT_IMPAIRMENT') AS impairments,(SELECT round(coalesce(sum(CASE WHEN m.kind='REVERSAL' THEN -m.amount ELSE m.amount END),0),2)::text FROM "FinanceMovement" m LEFT JOIN "FinanceMovement" o ON o.id=m."reversalOfId" WHERE m."holdingId"=${id}::uuid AND m.state='POSTED' AND coalesce(o.kind,m.kind) IN('INVESTMENT_INCOME_RECEIPT','INVESTMENT_INCOME_ACCRUAL')) AS "incomeEarned",(SELECT round(coalesce(sum(amount),0),2)::text FROM "FinanceInvestmentIncomeEvent" WHERE "holdingId"=${id}::uuid) AS "incomeReceivable"`
+  )[0];
 }

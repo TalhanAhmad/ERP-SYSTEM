@@ -12,10 +12,12 @@ export function AccountPicker({
   partyId,
   invoiceId,
   billId,
+  holdingId,
   initial = [],
   required = false,
 }: {
   kind:
+    | "investment-lot"
     | "investment"
     | "investment-income-receivable"
     | "loan-receivable"
@@ -69,6 +71,7 @@ export function AccountPicker({
   partyId?: string;
   invoiceId?: string;
   billId?: string;
+  holdingId?: string;
   initial?: Option[];
   required?: boolean;
 }) {
@@ -98,7 +101,8 @@ export function AccountPicker({
         ].includes(kind) &&
           !partyId) ||
         (kind === "invoice-line" && !invoiceId) ||
-        (kind === "bill-line" && !billId)
+        (kind === "bill-line" && !billId) ||
+        (kind === "investment-lot" && !holdingId)
       ) {
         setResult({ items: [], total: 0, page: 1, pages: 1 });
         setError("");
@@ -125,31 +129,36 @@ export function AccountPicker({
           ...(billId ? { billId } : {}),
         });
         const response = await fetch(
-          "/api/v1/finance/" +
-            (["tax-code", "withholding-code"].includes(kind)
-              ? "tax-codes?"
-              : [
-                    "bill",
-                    "credit-bill",
-                    "bill-line",
-                    "funding-bill",
-                    "supplier-advance-source",
-                  ].includes(kind)
-                ? "supplier-options?"
-                : [
-                      "party",
-                      "contributor",
-                      "supplier",
-                      "project",
-                      "invoice",
-                      "cash-account",
-                      "advance-source",
-                      "credit-invoice",
-                      "invoice-line",
-                    ].includes(kind)
-                  ? "invoice-options?"
-                  : "account-options?") +
-            query,
+          kind === "investment-lot"
+            ? "/api/v1/finance/holdings/" +
+                holdingId +
+                "/lots?" +
+                new URLSearchParams({ q, page: String(page) })
+            : "/api/v1/finance/" +
+                (["tax-code", "withholding-code"].includes(kind)
+                  ? "tax-codes?"
+                  : [
+                        "bill",
+                        "credit-bill",
+                        "bill-line",
+                        "funding-bill",
+                        "supplier-advance-source",
+                      ].includes(kind)
+                    ? "supplier-options?"
+                    : [
+                          "party",
+                          "contributor",
+                          "supplier",
+                          "project",
+                          "invoice",
+                          "cash-account",
+                          "advance-source",
+                          "credit-invoice",
+                          "invoice-line",
+                        ].includes(kind)
+                      ? "invoice-options?"
+                      : "account-options?") +
+                query,
           { signal: abort.signal, cache: "no-store" },
         );
         const body = await response.json();
@@ -178,6 +187,27 @@ export function AccountPicker({
                 (i.effectiveTo ?? "open end"),
             }),
           );
+        if (kind === "investment-lot")
+          body.data.items = body.data.items.map(
+            (i: {
+              id: string;
+              number: string;
+              remainingCost: string;
+              carryingValue: string;
+              remainingUnits: string | null;
+            }) => ({
+              id: i.id,
+              code: i.number,
+              name:
+                "Cost PKR " +
+                i.remainingCost +
+                " · carrying PKR " +
+                i.carryingValue +
+                (i.remainingUnits === null
+                  ? ""
+                  : " · units " + i.remainingUnits),
+            }),
+          );
         setResult(body.data);
       } catch (e) {
         if (!abort.signal.aborted)
@@ -190,7 +220,19 @@ export function AccountPicker({
       clearTimeout(timer);
       abort.abort();
     };
-  }, [billId, kind, q, page, type, group, exclude, partyId, invoiceId, retry]);
+  }, [
+    holdingId,
+    billId,
+    kind,
+    q,
+    page,
+    type,
+    group,
+    exclude,
+    partyId,
+    invoiceId,
+    retry,
+  ]);
   const selected =
     result.items.find((i) => i.id === value) ??
     initial.find((i) => i.id === value);

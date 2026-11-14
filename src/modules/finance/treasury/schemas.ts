@@ -16,10 +16,29 @@ export const movementDraftSchema = z
     description: z.string().trim().min(1).max(1000),
     evidence: z.string().trim().min(3).max(1000),
     currency: z.literal("PKR").default("PKR"),
-    amount: pkrAmountSchema.refine(
-      (v) => v !== "0.00",
-      "Amount must be positive.",
-    ),
+    amount: pkrAmountSchema,
+    feeAmount: pkrAmountSchema.default("0.00"),
+    allocations: z
+      .array(
+        z
+          .object({
+            lotId: z.uuid(),
+            units: z
+              .string()
+              .regex(/^(?:0|[1-9]\d{0,13})(?:\.\d{1,6})?(?![\s\S])/)
+              .refine((v) => /[1-9]/.test(v))
+              .nullable()
+              .default(null),
+            carryingAmount: pkrAmountSchema
+              .refine((v) => v !== "0.00")
+              .nullable()
+              .default(null),
+            disposeAll: z.boolean().default(false),
+          })
+          .strict(),
+      )
+      .max(100)
+      .default([]),
     fromCashId: z.uuid().nullable().default(null),
     toCashId: z.uuid().nullable().default(null),
     partyId: z.uuid().nullable().default(null),
@@ -46,6 +65,35 @@ export const movementDraftSchema = z
   })
   .strict()
   .superRefine((d, c) => {
+    if (d.amount === "0.00" && d.kind !== "INVESTMENT_DISPOSAL")
+      c.addIssue({
+        code: "custom",
+        path: ["amount"],
+        message: "Amount must be positive.",
+      });
+    const lotKind = [
+      "INVESTMENT_DISPOSAL",
+      "INVESTMENT_IMPAIRMENT",
+      "INVESTMENT_VALUATION_UP",
+      "INVESTMENT_VALUATION_DOWN",
+    ].includes(d.kind);
+    if (
+      d.allocations.length > 0 !== lotKind ||
+      new Set(d.allocations.map((a) => a.lotId)).size !== d.allocations.length
+    )
+      c.addIssue({
+        code: "custom",
+        path: ["allocations"],
+        message:
+          "Choose distinct explicit lots for disposal or value adjustment.",
+      });
+    if (d.feeAmount !== "0.00" && d.kind !== "INVESTMENT_DISPOSAL")
+      c.addIssue({
+        code: "custom",
+        path: ["feeAmount"],
+        message: "Fees are recorded only on a disposal.",
+      });
+
     if (
       d.kind === "TRANSFER" &&
       (!d.fromCashId ||
@@ -185,6 +233,68 @@ export const movementDraftSchema = z
         message:
           "Choose the holding and paying bank; issuer and investment control come from its reviewed policy.",
       });
+    if (
+      d.kind.startsWith("INVESTMENT_") &&
+      d.kind !== "INVESTMENT_ACQUISITION"
+    ) {
+      if (
+        !d.holdingId ||
+        d.partyId ||
+        d.controlAccountId ||
+        d.counterAccountId ||
+        d.loanId ||
+        d.billId ||
+        d.projectId ||
+        d.units ||
+        d.fromCashId
+      )
+        c.addIssue({
+          code: "custom",
+          message: "Choose a holding without issuer/control overrides.",
+        });
+      const cash =
+        ["INVESTMENT_INCOME_RECEIPT", "INVESTMENT_INCOME_SETTLEMENT"].includes(
+          d.kind,
+        ) ||
+        (d.kind === "INVESTMENT_DISPOSAL" && d.amount !== d.feeAmount);
+      if (!!d.toCashId !== cash)
+        c.addIssue({
+          code: "custom",
+          path: ["toCashId"],
+          message: "Choose a settlement bank only for an actual cash leg.",
+        });
+      if (
+        [
+          "INVESTMENT_IMPAIRMENT",
+          "INVESTMENT_VALUATION_UP",
+          "INVESTMENT_VALUATION_DOWN",
+        ].includes(d.kind) &&
+        !d.approvalEvidence
+      )
+        c.addIssue({
+          code: "custom",
+          path: ["approvalEvidence"],
+          message: "Record explicit value-adjustment approval.",
+        });
+    }
+    if (
+      [
+        "INVESTMENT_IMPAIRMENT",
+        "INVESTMENT_VALUATION_UP",
+        "INVESTMENT_VALUATION_DOWN",
+      ].includes(d.kind)
+    ) {
+      const total = d.allocations.reduce(
+        (n, a) => n + BigInt((a.carryingAmount ?? "0.00").replace(".", "")),
+        0n,
+      );
+      if (total !== BigInt(d.amount.replace(".", "")))
+        c.addIssue({
+          code: "custom",
+          path: ["amount"],
+          message: "Reviewed value change must equal the selected lot changes.",
+        });
+    }
     if (d.postingDate < d.documentDate)
       c.addIssue({
         code: "custom",

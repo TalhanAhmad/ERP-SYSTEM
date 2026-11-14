@@ -1,3 +1,4 @@
+import { InvestmentMovementForm } from "@/modules/finance/components/investment-movement-form";
 import { InvestmentAcquisitionForm } from "@/modules/finance/components/investment-forms";
 import { LoanMovementForm } from "@/modules/finance/components/loan-forms";
 import { FundingForm } from "@/modules/finance/components/funding-form";
@@ -86,6 +87,12 @@ export default async function Movement({
             <h2>Edit movement draft</h2>
             {i.kind === "TRANSFER" ? (
               <MovementForm key={i.version} item={i} hosted={hosted} />
+            ) : i.holding && i.kind !== "INVESTMENT_ACQUISITION" ? (
+              <InvestmentMovementForm
+                item={i}
+                holding={i.holding}
+                hosted={hosted}
+              />
             ) : i.holding ? (
               <InvestmentAcquisitionForm
                 item={i}
@@ -119,6 +126,46 @@ export default async function Movement({
           <h2>Reverse movement</h2>
           <p>Create a dated opposite journal while preserving this source.</p>
           <MovementAction item={i} action="REVERSE" hosted={hosted} />
+        </section>
+      )}
+      {i.registerOnly && (
+        <p>
+          This is a register-only zero-carrying retirement or its correction.
+          Lot history changed; no zero-value journal was fabricated.
+        </p>
+      )}
+      {i.investmentAllocations.length > 0 && (
+        <section className="panel" aria-label="Reviewed lot basis">
+          <h2>Reviewed lot basis</h2>
+          <p>
+            Disposal fees <MoneyCell value={i.feeAmount} />
+          </p>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Lot source</th>
+                  <th>Original cost removed</th>
+                  <th>Carrying amount</th>
+                  <th>Units</th>
+                </tr>
+              </thead>
+              <tbody>
+                {i.investmentAllocations.map((a) => (
+                  <tr key={a.id}>
+                    <td>{a.lot.movement.number}</td>
+                    <td>
+                      <MoneyCell value={a.costBasis} />
+                    </td>
+                    <td>
+                      <MoneyCell value={a.carryingBasis} />
+                    </td>
+                    <td>{a.unitBasis ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
       {i.entry && (

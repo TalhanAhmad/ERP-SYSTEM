@@ -39,6 +39,8 @@ for (const [username, role] of [
   ["e2e.finance.funding", "SUPER_ADMIN"],
   ["e2e.finance.loans", "SUPER_ADMIN"],
   ["e2e.finance.investments", "SUPER_ADMIN"],
+  ["e2e.finance.inv.moves", "SUPER_ADMIN"],
+  ["e2e.finance.inv.writer", "SUPER_ADMIN"],
   ["e2e.finance.taxes", "SUPER_ADMIN"],
   ["e2e.finance.tax.writer", "SUPER_ADMIN"],
   ["e2e.finance.suppliers", "SUPER_ADMIN"],
@@ -79,6 +81,7 @@ for (const [username, role] of [
 for (const username of [
   "e2e.finance",
   "e2e.finance.writer",
+  "e2e.finance.inv.writer",
   "e2e.finance.tax.writer",
   "e2e.finance.supplier.writer",
   "e2e.finance.invoice.writer",

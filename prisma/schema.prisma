@@ -322,6 +322,7 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ investmentIncomeEvent FinanceInvestmentIncomeEvent?
  investmentEvents FinanceInvestmentEvent[]
  loanEvent FinanceLoanEvent?
  fundingEvent FinanceFundingEvent?
@@ -1506,6 +1507,9 @@ model FinanceScanAuthority {
 }
 
 model FinanceMovement {
+ feeAmount Decimal @default(0) @db.Decimal(20,2)
+ investmentAllocations FinanceInvestmentAllocation[]
+ investmentIncomeEvent FinanceInvestmentIncomeEvent?
  holdingId String? @db.Uuid
  holding FinanceInvestmentHolding? @relation(fields:[holdingId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  units Decimal? @db.Decimal(20,6)
@@ -1617,6 +1621,7 @@ model FinanceLoanEvent {
 }
 
 model FinanceInvestmentHolding {
+ incomeEvents FinanceInvestmentIncomeEvent[]
  id String @id @default(uuid()) @db.Uuid
  number String @unique
  name String
@@ -1658,6 +1663,7 @@ model FinanceInvestmentHolding {
  events FinanceInvestmentEvent[]
 }
 model FinanceInvestmentLot {
+ allocations FinanceInvestmentAllocation[]
  id String @id @default(uuid()) @db.Uuid
  holdingId String @db.Uuid
  holding FinanceInvestmentHolding @relation(fields:[holdingId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -1670,6 +1676,7 @@ model FinanceInvestmentLot {
  @@index([holdingId,acquisitionDate])
 }
 model FinanceInvestmentEvent {
+ recordedAt DateTime @default(dbgenerated("clock_timestamp()")) @db.Timestamptz
  id String @id @default(uuid()) @db.Uuid
  holdingId String @db.Uuid
  holding FinanceInvestmentHolding @relation(fields:[holdingId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -1677,8 +1684,8 @@ model FinanceInvestmentEvent {
  lot FinanceInvestmentLot @relation(fields:[lotId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  movementId String @db.Uuid
  movement FinanceMovement @relation(fields:[movementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
- journalId String @db.Uuid
- journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalId String? @db.Uuid
+ journal FinanceJournalEntry? @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  effectiveDate DateTime @db.Date
  costDelta Decimal @db.Decimal(20,2)
  carryingDelta Decimal @db.Decimal(20,2)
@@ -1686,4 +1693,35 @@ model FinanceInvestmentEvent {
  @@unique([movementId,lotId])
  @@index([holdingId,effectiveDate])
  @@index([lotId,effectiveDate])
+}
+
+model FinanceInvestmentAllocation {
+ id String @id @default(uuid()) @db.Uuid
+ movementId String @db.Uuid
+ movement FinanceMovement @relation(fields:[movementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ lotId String @db.Uuid
+ lot FinanceInvestmentLot @relation(fields:[lotId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ requestedUnits Decimal? @db.Decimal(20,6)
+ requestedCarrying Decimal? @db.Decimal(20,2)
+ disposeAll Boolean @default(false)
+ costBasis Decimal @db.Decimal(20,2)
+ carryingBasis Decimal @db.Decimal(20,2)
+ unitBasis Decimal? @db.Decimal(20,6)
+ basisCapturedAt DateTime @db.Timestamptz
+ balanceDigest String
+ @@unique([movementId,lotId])
+ @@unique([movementId,sequence])
+}
+model FinanceInvestmentIncomeEvent {
+ id String @id @default(uuid()) @db.Uuid
+ holdingId String @db.Uuid
+ holding FinanceInvestmentHolding @relation(fields:[holdingId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ movementId String @unique @db.Uuid
+ movement FinanceMovement @relation(fields:[movementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalId String @unique @db.Uuid
+ journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ effectiveDate DateTime @db.Date
+ amount Decimal @db.Decimal(20,2)
+ @@index([holdingId,effectiveDate])
 }

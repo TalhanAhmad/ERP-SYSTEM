@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova private finance through F23",
-    "version": "0.18.0",
+    "title": "Encova private finance through F24",
+    "version": "0.19.0",
     "description": "Implemented F01\u2013F18: private selected-admin accounting with owner-reviewed tax policy, net/tax invoice and purchase posting, capped original-tax credits and evidenced customer/supplier withholding in gross settlements. Default disabled, no hosted financial launch, real tax rates or legal compliance claims. See source-bound accounting and progress evidence. F19 adds private typed evidence, direct upload, quarantine, signed malware attestation, current-access bounded proxy downloads and auditable draft cleanup. Scanner configuration is operator-only; no clean fallback or live signing secrets seeded."
   },
   "security": [
@@ -16553,7 +16553,14 @@
               "LOAN_INTEREST_SETTLEMENT",
               "LOAN_PRINCIPAL_INCREASE",
               "LOAN_PRINCIPAL_DECREASE",
-              "INVESTMENT_ACQUISITION"
+              "INVESTMENT_ACQUISITION",
+              "INVESTMENT_DISPOSAL",
+              "INVESTMENT_INCOME_RECEIPT",
+              "INVESTMENT_INCOME_ACCRUAL",
+              "INVESTMENT_INCOME_SETTLEMENT",
+              "INVESTMENT_IMPAIRMENT",
+              "INVESTMENT_VALUATION_UP",
+              "INVESTMENT_VALUATION_DOWN"
             ]
           },
           "currency": {
@@ -16625,9 +16632,22 @@
               "null"
             ],
             "pattern": "^(0|[1-9][0-9]{0,13})(\\.[0-9]{1,6})?$"
+          },
+          "feeAmount": {
+            "type": "string",
+            "default": "0.00",
+            "description": "Paisa fee only on disposal; actual bank leg is gross proceeds less fees, including an outgoing leg if negative."
+          },
+          "allocations": {
+            "type": "array",
+            "maxItems": 100,
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/InvestmentLotSelection"
+            }
           }
         },
-        "description": "Strict typed classification: TRANSFER has distinct from/to bank masters and no party/control; funding requires contributor and reviewed CAPITAL/DISTRIBUTION/FOUNDER_PAYABLE control. Cash input/output, debit account, bill link and explicit approval depend on classification. Funding events and AP effects post atomically and retain dated capacity. No ownership/legal availability inference. Loan sources derive contributor and controls from loanId; explicit cash direction follows RECEIVED/ADVANCED. Principal adjustments require reviewed ordinary counter and authorization evidence. No cash on accrual/adjustment. Acquisition derives issuer/control from holdingId, requires a paying bank, and creates one immutable lot. UNIT needs positive six-decimal units; AMOUNT requires null units. Other source kinds reject investment fields."
+        "description": "Strict typed classification: TRANSFER has distinct from/to bank masters and no party/control; funding requires contributor and reviewed CAPITAL/DISTRIBUTION/FOUNDER_PAYABLE control. Cash input/output, debit account, bill link and explicit approval depend on classification. Funding events and AP effects post atomically and retain dated capacity. No ownership/legal availability inference. Loan sources derive contributor and controls from loanId; explicit cash direction follows RECEIVED/ADVANCED. Principal adjustments require reviewed ordinary counter and authorization evidence. No cash on accrual/adjustment. Acquisition derives issuer/control from holdingId, requires a paying bank, and creates one immutable lot. UNIT needs positive six-decimal units; AMOUNT requires null units. Other source kinds reject investment fields. Disposals support zero proceeds and exact original-cost/carrying/units removal. Income receipt/accrual/settlement are distinct with dated accrued-income caps. Reviewed impairment/manual valuation requires explicit approval and per-lot amounts equal to source amount. Unsupported valuation policy blocks posting. Permanent old receipt digests ignore new no-op defaults. Zero-carrying zero-cash retirement posts immutable lot/register events without fabricating a journal; detail marks registerOnly and journalId is null. Dated opposite corrections preserve actual GL and lot/income history."
       },
       "MovementUpdate": {
         "type": "object",
@@ -16696,7 +16716,14 @@
               "LOAN_INTEREST_SETTLEMENT",
               "LOAN_PRINCIPAL_INCREASE",
               "LOAN_PRINCIPAL_DECREASE",
-              "INVESTMENT_ACQUISITION"
+              "INVESTMENT_ACQUISITION",
+              "INVESTMENT_DISPOSAL",
+              "INVESTMENT_INCOME_RECEIPT",
+              "INVESTMENT_INCOME_ACCRUAL",
+              "INVESTMENT_INCOME_SETTLEMENT",
+              "INVESTMENT_IMPAIRMENT",
+              "INVESTMENT_VALUATION_UP",
+              "INVESTMENT_VALUATION_DOWN"
             ]
           },
           "currency": {
@@ -16772,9 +16799,22 @@
               "null"
             ],
             "pattern": "^(0|[1-9][0-9]{0,13})(\\.[0-9]{1,6})?$"
+          },
+          "feeAmount": {
+            "type": "string",
+            "default": "0.00",
+            "description": "Paisa fee only on disposal; actual bank leg is gross proceeds less fees, including an outgoing leg if negative."
+          },
+          "allocations": {
+            "type": "array",
+            "maxItems": 100,
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/InvestmentLotSelection"
+            }
           }
         },
-        "description": "Strict typed classification: TRANSFER has distinct from/to bank masters and no party/control; funding requires contributor and reviewed CAPITAL/DISTRIBUTION/FOUNDER_PAYABLE control. Cash input/output, debit account, bill link and explicit approval depend on classification. Funding events and AP effects post atomically and retain dated capacity. No ownership/legal availability inference. Loan sources derive contributor and controls from loanId; explicit cash direction follows RECEIVED/ADVANCED. Principal adjustments require reviewed ordinary counter and authorization evidence. No cash on accrual/adjustment. Acquisition derives issuer/control from holdingId, requires a paying bank, and creates one immutable lot. UNIT needs positive six-decimal units; AMOUNT requires null units. Other source kinds reject investment fields."
+        "description": "Strict typed classification: TRANSFER has distinct from/to bank masters and no party/control; funding requires contributor and reviewed CAPITAL/DISTRIBUTION/FOUNDER_PAYABLE control. Cash input/output, debit account, bill link and explicit approval depend on classification. Funding events and AP effects post atomically and retain dated capacity. No ownership/legal availability inference. Loan sources derive contributor and controls from loanId; explicit cash direction follows RECEIVED/ADVANCED. Principal adjustments require reviewed ordinary counter and authorization evidence. No cash on accrual/adjustment. Acquisition derives issuer/control from holdingId, requires a paying bank, and creates one immutable lot. UNIT needs positive six-decimal units; AMOUNT requires null units. Other source kinds reject investment fields. Disposals support zero proceeds and exact original-cost/carrying/units removal. Income receipt/accrual/settlement are distinct with dated accrued-income caps. Reviewed impairment/manual valuation requires explicit approval and per-lot amounts equal to source amount. Unsupported valuation policy blocks posting. Permanent old receipt digests ignore new no-op defaults. Zero-carrying zero-cash retirement posts immutable lot/register events without fabricating a journal; detail marks registerOnly and journalId is null. Dated opposite corrections preserve actual GL and lot/income history."
       },
       "LoanCreate": {
         "type": "object",
@@ -17245,6 +17285,38 @@
           }
         },
         "description": "Private PKR holding with explicit pending or reviewed measurement/income policy. Reviewed policy requires gain/loss/fee/income/receivable/impairment maps; manual valuation also requires the reviewed equity/profit-loss offset. Maps and policy freeze after first posted event; no automatic market data or compliance assertion."
+      },
+      "InvestmentLotSelection": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lotId"
+        ],
+        "properties": {
+          "lotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "units": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Positive six-decimal quantity for partial UNIT disposal."
+          },
+          "carryingAmount": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Positive paisa amount for partial AMOUNT disposal or per-lot value change."
+          },
+          "disposeAll": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "description": "Explicit lot choice. Full disposal omits units/carrying amount; partial UNIT uses units, partial AMOUNT uses carrying amount. Valuation/impairment rows use carrying amount and no units/full flag. Backend captures exact current proportional basis and rejects stale or earlier-than-latest lot changes."
       }
     }
   }

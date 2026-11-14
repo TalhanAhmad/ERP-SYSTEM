@@ -48,11 +48,32 @@ export default async function Holding({
           {d.units ?? "Amount based"}
         </p>
         <p>
+          Realized disposal result before fees{" "}
+          <MoneyCell value={d.realizedResult} /> · Disposal fees{" "}
+          <MoneyCell value={d.fees} />
+        </p>
+        <p>
+          Valuation changes <MoneyCell value={d.valuationChanges} /> ·
+          Impairments <MoneyCell value={d.impairments} />
+        </p>
+        <p>
+          Investment income earned <MoneyCell value={d.incomeEarned} /> · Income
+          receivable <MoneyCell value={d.incomeReceivable} />
+        </p>
+        <p>
           Recorded policy and book values do not assert regulatory compliance or
           current market value.
         </p>
       </section>
       <div className="form-actions">
+        {i.active && i.policyStatus === "REVIEWED" && (
+          <Link
+            className="button secondary"
+            href={"/finance/investments/" + id + "/movements/new"}
+          >
+            Record disposal, income or value change
+          </Link>
+        )}
         {i.active && i.policyStatus === "REVIEWED" && (
           <Link
             className="button primary"

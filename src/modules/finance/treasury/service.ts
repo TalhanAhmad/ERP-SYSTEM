@@ -129,6 +129,17 @@ export async function movementDetail(actor: Pick<Actor, "id">, id: string) {
     const item = await tx.financeMovement.findUnique({
       where: { id },
       include: {
+        investmentAllocations: {
+          orderBy: { sequence: "asc" },
+          include: {
+            lot: {
+              select: {
+                acquisitionDate: true,
+                movement: { select: { number: true } },
+              },
+            },
+          },
+        },
         fromCash: { select: { name: true } },
         toCash: { select: { name: true } },
         party: { select: { name: true } },
@@ -208,6 +219,16 @@ export async function movementDetail(actor: Pick<Actor, "id">, id: string) {
       item: {
         ...item,
         amount: item.amount.toFixed(2),
+        feeAmount: item.feeAmount.toFixed(2),
+        registerOnly: item.state === "POSTED" && !item.entry,
+        investmentAllocations: item.investmentAllocations.map((a) => ({
+          ...a,
+          requestedUnits: a.requestedUnits?.toFixed(6) ?? null,
+          requestedCarrying: a.requestedCarrying?.toFixed(2) ?? null,
+          costBasis: a.costBasis.toFixed(2),
+          carryingBasis: a.carryingBasis.toFixed(2),
+          unitBasis: a.unitBasis?.toFixed(6) ?? null,
+        })),
         units: item.units?.toFixed(6) ?? null,
         documentDate: date(item.documentDate),
         postingDate: date(item.postingDate),
@@ -308,6 +329,7 @@ export async function movements(actor: Pick<Actor, "id">, input: unknown = {}) {
       items: items.map((i) => ({
         ...i,
         amount: i.amount.toFixed(2),
+        feeAmount: i.feeAmount.toFixed(2),
         units: i.units?.toFixed(6) ?? null,
         postingDate: date(i.postingDate),
         state: i.reversedBy ? "REVERSED" : i.state,
