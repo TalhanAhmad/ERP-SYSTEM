@@ -53,3 +53,9 @@ The whole DDL first passed an explicit ROLLBACK rehearsal, then its first guarde
 34 bills/immediate expenses;35–36 supplier cycle/credit split;37–43 reviewed source tax, withholding and permanent replay compatibility;44–47 private evidence/quarantine/signed scan/retention;48 cash transfers;49–50 founder funding and SQL alias correction;51 loan agreements/events;52 investment holdings/acquisition lots;53–54 explicit lot disposal/income/value movements, register-only retirement and basis/use guards;55 asset registration with source-GL cost-cap protection.
 
 Each DDL addition was rehearsed with ROLLBACK and deployed only to encova_test. Applied successful checksums were retained; corrections use later additive migrations. No reset, hosted finance migration, real seed or owner grant is performed. Final source-specific checksum/fresh-runner results are recorded in the [delivery tracker](../delivery-F16-F25.md).
+
+## F26 isolated lifecycle migrations
+
+56 (20261114050000_finance_asset_lifecycle) introduces typed asset movements, immutable dated events, protected journal linkage, permanent asset/month identity, exact source/cached-position proof and the shared emitter adapter.57 (20261114051000_finance_asset_event_proof_fix) corrects a composite-row scalar proof and explicitly excludes contra gain/loss/fee mappings. Both passed transaction rollback rehearsal before guarded deployment to encova_test. Applied checksums are retained; no existing successful migration is rewritten. No hosted database change is part of this engineering milestone.
+
+58 (20261114052000_finance_asset_policy_draft_review) distinguishes permanent monthly source identity from policy consumption: unposted future drafts do not prevent a revised prospective plan, and refresh updates their charge on the same identity. Posted monthly history remains protected. Rehearsal/apply/checksum checks passed on the isolated test database; no applied SQL was rewritten.

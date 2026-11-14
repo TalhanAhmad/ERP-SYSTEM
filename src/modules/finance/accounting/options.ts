@@ -7,6 +7,8 @@ import { accountTypes, reportGroups } from "./catalog";
 export const optionQuerySchema = z
   .object({
     kind: z.enum([
+      "asset-expense",
+      "accumulated-depreciation",
       "investment",
       "investment-income-receivable",
       "loan-receivable",
@@ -56,6 +58,16 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           ? { controlType: "CASH", type: "ASSET", isContra: false }
           : {}),
       ...({
+        "asset-expense": {
+          controlType: "NONE",
+          type: { in: ["OPERATING_EXPENSE", "OTHER_EXPENSE"] },
+          isContra: false,
+        },
+        "accumulated-depreciation": {
+          controlType: "ACCUMULATED_DEPRECIATION",
+          type: "ASSET",
+          isContra: true,
+        },
         investment: {
           controlType: "INVESTMENT",
           type: "ASSET",
@@ -183,6 +195,8 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           | "loan-payable"
           | "interest-receivable"
           | "interest-payable"
+          | "asset-expense"
+          | "accumulated-depreciation"
           | "funding-cost"
           | "funding-asset"
           | "capital"

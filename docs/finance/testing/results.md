@@ -105,3 +105,8 @@ F12 invoice screens/private PDF, F13 receipts, F14 client advances and F15 credi
 [Exact F16–F25 results](F16-F25-results.md) distinguish each source/CI from prior releases. Final local759 tests (246 unit/469 PostgreSQL/44 Chromium), type/lint, both builds,116 paths,55 applied checksums and Word/private-value checks passed. The original ERP remains in regression; its learning/pilot acceptance is separate. Hosted finance remains disabled. Source F25 fresh CI follows publication, not inferred from earlier runs.
 
 Final F25 source7e274434c2bedaa4f638d29f06de7a964a110873 is pushed and [CI43583420594](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43583420594) passed55 fresh migrations and all759 tests, both builds, typing/lint and116-path docs. The final Word/tracking update changes documentation only, retaining the verified application source.
+
+
+## F26 continuation — 14 November2026
+
+PR3/F16–F25 is merged atb83951d. Current F26 local acceptance:779 distinct checks (249 unit,485 PostgreSQL,45 Chromium) with all16 lifecycle cases additionally passing final audit-precision59. See [exact continuation evidence](F26-F48-results.md) and [delivery](../delivery-F26-F48.md). Current124 API paths and59 applied checksums pass; no hosted finance release or human policy acceptance is implied.

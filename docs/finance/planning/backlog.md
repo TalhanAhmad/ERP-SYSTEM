@@ -1,7 +1,5 @@
 # Finance backlog
 
-F01–F15 engineering acceptance is complete:15/48, 33 remain. See [current results](../testing/F12-F15-results.md). Next F16 builds bills/immediate expenses and category/project splits. Customer billing/receipts/advances/credits/refunds/corrections now use typed GL/subledger sources; no generic protected-control bypass is allowed.
-
-F16–F42 continue payables/taxes, attachments, cash/funding/assets/investments/projects/budgets/reconciliation, financial statements/exports/closing/opening books/jobs. F43–F48 complete full fixture/security/ERP/browser/recovery/accountant acceptance and request a separate launch decision. The ordinary-account F08 subset does not complete those groups.
+F01–F26 are locally verified:26/48,22 remain. See [current delivery](../delivery-F26-F48.md) and [verification](../testing/F26-F48-results.md). F27 adds restricted project contracts, variations and billing milestones. F28–F42 cover exact cost allocation, budgets/forecasts, statement imports/reconciliation, statements/exports, closing/opening books and reviewed recurring drafts. F43–F46 consolidate full accounting/security/ERP/browser and recovery acceptance. The user wants F47 review-pack preparation for themselves; actual review and F48 live release decisions remain unfilled.
 
 Company chart/fiscal year/cutover, recognition, asset/investment/tax mappings, retention/scanner, representative dataset and owner MFA-device setup remain separate decisions. No hosted grant/finance migration, real seed or launch occurred. Working remaining planning range after F10 is 240–340 engineering hours, not actual time spent or a delivery promise.

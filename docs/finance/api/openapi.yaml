@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova private finance through F25",
-    "version": "0.20.0",
+    "title": "Encova private finance through F26",
+    "version": "0.21.0",
     "description": "Implemented F01\u2013F18: private selected-admin accounting with owner-reviewed tax policy, net/tax invoice and purchase posting, capped original-tax credits and evidenced customer/supplier withholding in gross settlements. Default disabled, no hosted financial launch, real tax rates or legal compliance claims. See source-bound accounting and progress evidence. F19 adds private typed evidence, direct upload, quarantine, signed malware attestation, current-access bounded proxy downloads and auditable draft cleanup. Scanner configuration is operator-only; no clean fallback or live signing secrets seeded."
   },
   "security": [
@@ -3643,6 +3643,28 @@
             "schema": {
               "type": "string",
               "enum": [
+                "asset-expense",
+                "accumulated-depreciation",
+                "investment",
+                "investment-income-receivable",
+                "loan-receivable",
+                "loan-payable",
+                "interest-receivable",
+                "interest-payable",
+                "funding-cost",
+                "funding-asset",
+                "capital",
+                "distribution",
+                "founder-payable",
+                "tax-input",
+                "tax-output",
+                "withholding-receivable",
+                "withholding-payable",
+                "supplier-advance",
+                "payable",
+                "cost",
+                "prepayment",
+                "fixed-asset",
                 "parent",
                 "journal",
                 "cash",
@@ -13208,6 +13230,926 @@
           }
         }
       }
+    },
+    "/api/v1/finance/asset-movements": {
+      "get": {
+        "operationId": "assetMovement_get",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "assetId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "POSTED",
+                "VOIDED",
+                "REVERSED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "List {data:{items,total,page,pages,pageSize,filters,totals}} or detail {data:{item,deferredEvents,history}}. item includes ordered lines, nullable entry and receivableEvents; no credential material. Unknown filters rejected, page clamped, exact totals cover all filtered documents.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "assetMovement_post",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetMovementCREATE"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/asset-movements/{id}": {
+      "get": {
+        "operationId": "assetMovement_ById_get",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "List {data:{items,total,page,pages,pageSize,filters,totals}} or detail {data:{item,deferredEvents,history}}. item includes ordered lines, nullable entry and receivableEvents; no credential material. Unknown filters rejected, page clamped, exact totals cover all filtered documents.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "assetMovement_ById_patch",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetMovementUPDATE"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/asset-movements/{id}/post": {
+      "post": {
+        "operationId": "assetMovement_ById_post_post",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetMovementPOST"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/asset-movements/{id}/void": {
+      "post": {
+        "operationId": "assetMovement_ById_void_post",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetMovementVOID"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/asset-movements/{id}/reverse": {
+      "post": {
+        "operationId": "assetMovement_ById_reverse_post",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetMovementREVERSE"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,number,version,journalId}} including replay; no duplicate accounting effects.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/asset-movements/{id}/refresh": {
+      "post": {
+        "operationId": "assetMovement_ById_refresh_post",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetMovementREFRESH"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/asset-movements/{id}/reopen": {
+      "post": {
+        "operationId": "assetMovement_ById_reopen_post",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetMovementREOPEN"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          },
+          "200": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/asset-movements/generate": {
+      "post": {
+        "operationId": "assetMovement_generate_post",
+        "description": "F26 private asset lifecycle. Current selected ACTIVE Super Admin only; mutations require current password/fresh hosted TOTP, canonical Origin/CSRF, exact decimal strings, idempotency and version checks. Permanent asset/month generation creates drafts only. Posting validates reviewed policy, current basis, mappings, earlier months, open period and dated event/journal identity. Corrections retain originals.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Canonical application origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetMovementGENERATE"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canonical {data:{id,version,number,journalId}}; replay rechecks current access/session and returns original result. No duplicate GL/events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Private asset movement detail/list, or command result with id, number, version, optional journalId and reversalId. Monetary values are decimal strings; register-only posted events have no journal."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/invalid idempotency key"
+          },
+          "401": {
+            "description": "No current verified application session"
+          },
+          "403": {
+            "description": "Current role/grant/owner, password, MFA or origin denial"
+          },
+          "404": {
+            "description": "Finance disabled or record unavailable"
+          },
+          "409": {
+            "description": "Version/state/key conflict, invalid current mapping, unavailable period, future/zero posting, source or subledger mismatch; whole transaction rolls back."
+          },
+          "422": {
+            "description": "Invalid allowlisted field, classification, real date or strict JSON body"
+          },
+          "429": {
+            "description": "Actor rate limit exceeded"
+          },
+          "500": {
+            "description": "Safe internal error with request ID"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -17964,6 +18906,444 @@
           }
         },
         "description": "Exactly one posted ASSET bill-line or fixed-asset NONCASH_CAPITAL/FOUNDER_OUTLAY source. Actual GL determines net eligible source pool. Immutable source snapshot/cost and cumulative active allocations; later credit/reversal cannot understate linked assets. Registration creates no GL. Asset tag normalized uppercase; active tags unique; unused VOID history retains former tag/source."
+      },
+      "AssetMovementCREATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reauth",
+          "reason",
+          "assetId",
+          "postingDate",
+          "evidence",
+          "approvalEvidence",
+          "description",
+          "amount",
+          "kind"
+        ],
+        "properties": {
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "assetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "approvalEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$"
+          },
+          "feeAmount": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$"
+          },
+          "newResidual": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$"
+          },
+          "expenseAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "accumulatedAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "counterAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "cashAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "gainAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "lossAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "feeAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "newLifeMonths": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 1200
+          },
+          "newFirstMonth": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "IMPAIRMENT",
+              "ADJUSTMENT_INCREASE",
+              "ADJUSTMENT_DECREASE",
+              "DISPOSAL",
+              "POLICY_CHANGE"
+            ]
+          }
+        }
+      },
+      "AssetMovementGENERATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reauth",
+          "reason",
+          "assetId",
+          "postingDate",
+          "evidence",
+          "approvalEvidence",
+          "month",
+          "expenseAccountId",
+          "accumulatedAccountId"
+        ],
+        "properties": {
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "assetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "approvalEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "expenseAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accumulatedAccountId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "AssetMovementUPDATE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reauth",
+          "reason",
+          "expectedVersion",
+          "postingDate",
+          "evidence",
+          "approvalEvidence",
+          "description",
+          "amount"
+        ],
+        "properties": {
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "approvalEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$"
+          },
+          "feeAmount": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$"
+          },
+          "newResidual": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$"
+          },
+          "expenseAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "accumulatedAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "counterAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "cashAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "gainAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "lossAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "feeAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "newLifeMonths": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 1200
+          },
+          "newFirstMonth": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          }
+        }
+      },
+      "AssetMovementPOST": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reauth",
+          "reason",
+          "expectedVersion"
+        ],
+        "properties": {
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "AssetMovementVOID": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reauth",
+          "reason",
+          "expectedVersion"
+        ],
+        "properties": {
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "AssetMovementREVERSE": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reauth",
+          "reason",
+          "expectedVersion",
+          "postingDate"
+        ],
+        "properties": {
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "AssetMovementREFRESH": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reauth",
+          "reason",
+          "expectedVersion"
+        ],
+        "properties": {
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "AssetMovementREOPEN": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reauth",
+          "reason",
+          "expectedVersion"
+        ],
+        "properties": {
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
       }
     }
   }

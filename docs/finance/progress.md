@@ -1,8 +1,10 @@
 # Finance progress
 
-Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
+Updated 14 November2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F25 complete: 25 of 48 finance engineering milestones; 23 remain outside this request.** Updated14 November2026. The requested F16–F25 scope is implemented and locally verified on finance/f16-f25, with separate milestone commits/pushes. Final759 tests passed:246 unit,469 PostgreSQL integration,44 Chromium (2.5m), plus type/lint, both production builds,116-path API,55 applied checksums and Word/private-value checks. F24 sourcecaa5d2b passed fresh CI43576472332 (741 tests). F25 source7e27443 is separately pushed and [CI43583420594](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43583420594) passed all759 checks and55 migrations on a fresh runner. See [delivery tracker](delivery-F16-F25.md), [verification](testing/F16-F25-results.md) and [Word report](Encova_F16-F25_Report.docx). Hosted finance remains disabled; company policies/real data and controlled release are not inferred.
+**F01–F26 locally complete:26 of48 finance milestones;22 remain.** PR3 containing F16–F25 is merged atb83951d after successful exact-head CI43584464377. F26 adds private reviewed asset lifecycle with exact monthly drafts, policy/impairment/adjustment/disposal and retained corrections.779 distinct checks passed:249 unit,485 PostgreSQL and45 Chromium, plus local build/type/lint/124-path API/59 applied checksums and Word/private-value verification. Supabase-mode production build passed. Separate F26 source publication/fresh CI are being recorded. See [current continuation tracker](delivery-F26-F48.md), [verification](testing/F26-F48-results.md), [Word report](Encova_F26-F48_Report.docx) and [owner review pack](review/owner-review-pack.md). F27 private commercial project records is next. F47 actual human acceptance and F48 release remain separate. Hosted finance stays disabled; no real policies/books or grants are adopted.
+
+Prior F16–F25 evidence remains in [delivery](delivery-F16-F25.md), [verification](testing/F16-F25-results.md) and its [historical Word report](Encova_F16-F25_Report.docx). F25 exact source7e27443 passed CI43583420594 with759 checks and55 fresh migrations.
 
 The following records describe the previously completed and merged F15 release:
 

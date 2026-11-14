@@ -17,6 +17,8 @@ export function AccountPicker({
   required = false,
 }: {
   kind:
+    | "asset-expense"
+    | "accumulated-depreciation"
     | "asset-bill-line"
     | "asset-funding-source"
     | "asset-custodian"

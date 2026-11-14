@@ -56,6 +56,9 @@ test("bill UI posts a private reviewed cost once and denies employee access", as
     await page.getByLabel("Line 1 description").fill("Demo cost");
     await page.getByLabel("Line 1 unit rate (PKR)").fill("120.05");
     await page
+      .getByLabel("Search cost category for line 1", { exact: true })
+      .fill(prefix);
+    await page
       .getByLabel("Cost category for line 1", { exact: true })
       .selectOption(cost.id);
     await page.getByLabel("Reason").fill("Reviewed synthetic purchase");

@@ -25,15 +25,27 @@ export function AssetForm({ item, hosted }: { item?: Asset; hosted: boolean }) {
         description: String(f.get("description")),
         location: String(f.get("location")),
         custodianId: custodian,
-        inServiceDate: String(f.get("inServiceDate")),
-        usefulLifeMonths: Number(f.get("usefulLifeMonths")),
-        residualValue: String(f.get("residualValue")),
+        inServiceDate: item?.usedAt
+          ? item.inServiceDate
+          : String(f.get("inServiceDate")),
+        usefulLifeMonths: item?.usedAt
+          ? item.usefulLifeMonths
+          : Number(f.get("usefulLifeMonths")),
+        residualValue: item?.usedAt
+          ? item.residualValue
+          : String(f.get("residualValue")),
         depreciationMethod: "STRAIGHT_LINE",
-        convention,
-        firstDepMonth:
-          convention === "PENDING" ? null : String(f.get("firstDepMonth")),
-        policyEvidence:
-          convention === "PENDING" ? null : String(f.get("policyEvidence")),
+        convention: item?.usedAt ? item.convention : convention,
+        firstDepMonth: item?.usedAt
+          ? item.firstDepMonth
+          : convention === "PENDING"
+            ? null
+            : String(f.get("firstDepMonth")),
+        policyEvidence: item?.usedAt
+          ? item.policyEvidence
+          : convention === "PENDING"
+            ? null
+            : String(f.get("policyEvidence")),
         reason: String(f.get("reason")),
         ...(item
           ? { expectedVersion: item.version }
@@ -135,81 +147,86 @@ export function AssetForm({ item, hosted }: { item?: Asset; hosted: boolean }) {
             : []
         }
       />
-      <div className="form-grid">
-        <label>
-          In-service date
-          <input
-            name="inServiceDate"
-            type="date"
-            required
-            defaultValue={item?.inServiceDate}
-          />
-        </label>
-        <label>
-          Useful life (months)
-          <input
-            name="usefulLifeMonths"
-            type="number"
-            required
-            min={1}
-            max={1200}
-            defaultValue={item?.usefulLifeMonths}
-          />
-        </label>
-        <label>
-          Residual value (PKR)
-          <input
-            name="residualValue"
-            inputMode="decimal"
-            required
-            defaultValue={item?.residualValue ?? "0.00"}
-          />
-        </label>
-      </div>
-      <p>
-        Depreciation method: straight line. Purchase source and cost stay in
-        history; correcting an unused source allocation requires voiding its
-        registration.
-      </p>
-      <label>
-        Monthly convention review
-        <select
-          value={convention}
-          onChange={(e) => setConvention(e.target.value)}
-        >
-          <option value="PENDING">Pending company confirmation</option>
-          <option value="FULL_MONTH_FROM_FIRST_MONTH">
-            Confirmed full month from the chosen first month
-          </option>
-        </select>
-      </label>
-      {convention === "FULL_MONTH_FROM_FIRST_MONTH" && (
-        <>
+      <fieldset disabled={!!item?.usedAt}>
+        <legend>Initial depreciation policy</legend>
+        <div className="form-grid">
           <label>
-            First depreciation month
+            In-service date
             <input
-              name="firstDepMonth"
-              type="month"
+              name="inServiceDate"
+              type="date"
               required
-              defaultValue={item?.firstDepMonth ?? ""}
+              defaultValue={item?.inServiceDate}
             />
           </label>
           <label>
-            Convention approval evidence
-            <textarea
-              name="policyEvidence"
+            Useful life (months)
+            <input
+              name="usefulLifeMonths"
+              type="number"
               required
-              minLength={3}
-              maxLength={1000}
-              defaultValue={item?.policyEvidence ?? ""}
+              min={1}
+              max={1200}
+              defaultValue={item?.usefulLifeMonths}
             />
           </label>
-        </>
+          <label>
+            Residual value (PKR)
+            <input
+              name="residualValue"
+              inputMode="decimal"
+              required
+              defaultValue={item?.residualValue ?? "0.00"}
+            />
+          </label>
+        </div>
+        <p>
+          Depreciation method: straight line. Purchase source and cost stay in
+          history; correcting an unused source allocation requires voiding its
+          registration.
+        </p>
+        <label>
+          Monthly convention review
+          <select
+            value={convention}
+            onChange={(e) => setConvention(e.target.value)}
+          >
+            <option value="PENDING">Pending company confirmation</option>
+            <option value="FULL_MONTH_FROM_FIRST_MONTH">
+              Confirmed full month from the chosen first month
+            </option>
+          </select>
+        </label>
+        {convention === "FULL_MONTH_FROM_FIRST_MONTH" && (
+          <>
+            <label>
+              First depreciation month
+              <input
+                name="firstDepMonth"
+                type="month"
+                required
+                defaultValue={item?.firstDepMonth ?? ""}
+              />
+            </label>
+            <label>
+              Convention approval evidence
+              <textarea
+                name="policyEvidence"
+                required
+                minLength={3}
+                maxLength={1000}
+                defaultValue={item?.policyEvidence ?? ""}
+              />
+            </label>
+          </>
+        )}
+      </fieldset>
+      {item?.usedAt && (
+        <p>
+          Initial policy is locked after use. Record a dated policy change for
+          future charges.
+        </p>
       )}
-      <p>
-        This register records the posted purchase and planned depreciation
-        policy. It does not generate or post depreciation charges.
-      </p>
     </FinanceActionForm>
   );
 }
