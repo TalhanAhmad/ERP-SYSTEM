@@ -3,7 +3,7 @@
 Requested scope: continue from merged F15 through F25; test and push each milestone separately. Branch finance/f16-f25 starts at main c56cc78. This tracker records actual completed work and pending work without treating the specification as an instruction to launch finance.
 
 ## Status
-F16–F25 implemented and locally verified. The requested source-development scope is complete; final publication/CI evidence follows after observation. Hosted finance remains disabled, without hosted schema changes, owner grants or financial seeds. No real tax, funding, investment or depreciation policy has been selected.
+F16–F25 implemented and locally verified. The requested source-development scope is complete, separately committed/pushed and exact-source CI verified. Hosted finance remains disabled, without hosted schema changes, owner grants or financial seeds. No real tax, funding, investment or depreciation policy has been selected.
 
 ## F16 evidence
 Bills and immediate paid expenses, exact cost/project splits, duplicate supplier reference protection and explicit same-amount review, versioned fresh-auth commands, immutable source/journal/AP events, supplier snapshots, current access and private audit. See [F16](planning/days/F16.md).
@@ -72,3 +72,9 @@ Sourcecaa5d2b11bcdab44c77975999e320d4f5fac88c1 passed [CI43576472332](https://gi
 
 ## Final F25 local acceptance
 See [F25](planning/days/F25.md), [exact verification table](testing/F16-F25-results.md) and [asset rules](accounting/assets.md). All759 distinct checks passed (246 unit/469 integration/44 Chromium), typing/lint and both builds,116-path contracts and55 applied SQL checksums. Fourteen asset cases prove original net-cost links, no duplicate GL and source-credit/reversal protection. Actual browser/mobile WCAG/HR-denial/unused-VOID journey passed; full suite2.5m. Full and focused Word reports include every milestone and the step log. Publishing F25 separately; exact-source CI will be added only after observed success. Hosted finance remains disabled.
+
+## Final F25 publication and acceptance
+
+F25 source **7e274434c2bedaa4f638d29f06de7a964a110873** is pushed. [CI43583420594](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43583420594) passed on a fresh runner:55 migrations,246 unit/469 PostgreSQL/44 Chromium cases (759 distinct), both production builds, typing/lint and116 concrete API paths. Every requested milestone F16–F25 has its own source commit/push; the table in [verification](testing/F16-F25-results.md) provides each successful CI.
+
+The full [progress Word report](../Encova_Progress_Report.docx) and focused [F16–F25 Word report](Encova_F16-F25_Report.docx) record every milestone and work-log step. This final tracking update changes documentation only; application/schema/tests are identical to the verified F25 source. [PR #3](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/3) remains open and unmerged. Hosted finance stays disabled. F26–F48, company adoption and controlled financial release remain outside this request.
