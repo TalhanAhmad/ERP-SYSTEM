@@ -13,8 +13,8 @@ export default async function Transfers({
 }) {
   const raw = await searchParams,
     data = await financePageData((a) => {
-      const p = movementQuerySchema.safeParse({ ...raw, kind: "TRANSFER" });
-      return movements(a, p.success ? p.data : { kind: "TRANSFER" });
+      const p = movementQuerySchema.safeParse({ ...raw, family: "TRANSFERS" });
+      return movements(a, p.success ? p.data : { family: "TRANSFERS" });
     });
   return (
     <section>

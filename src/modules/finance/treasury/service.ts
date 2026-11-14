@@ -11,8 +11,14 @@ import {
   movementQuerySchema,
   cashQuerySchema,
   type MovementAction,
+  fundingKinds,
 } from "./schemas";
 const errors: Record<string, string> = {
+  FINANCE_APPROVAL_REQUIRED: "Record explicit authorization evidence.",
+  FINANCE_FUNDING_CAPACITY:
+    "This would exceed the contributor’s posted balance at this date or a later event.",
+  FINANCE_ALLOCATION_UNAVAILABLE:
+    "The selected bill has insufficient dated payable balance.",
   FINANCE_FORBIDDEN: "Finance access is unavailable.",
   FINANCE_REAUTH_REQUIRED: "Verify your password and authenticator again.",
   FINANCE_INVALID_INPUT: "Check the movement fields.",
@@ -120,6 +126,7 @@ export async function movementDetail(actor: Pick<Actor, "id">, id: string) {
         fromCash: { select: { name: true } },
         toCash: { select: { name: true } },
         party: { select: { name: true } },
+        bill: { select: { id: true, number: true } },
         controlAccount: { select: { code: true, name: true } },
         counterAccount: { select: { code: true, name: true } },
         reversalOf: { select: { id: true, number: true, kind: true } },
@@ -199,6 +206,35 @@ export async function movements(actor: Pick<Actor, "id">, input: unknown = {}) {
     const q = movementQuerySchema.parse(input);
     await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock_shared(629815)`;
     const where: Prisma.FinanceMovementWhereInput = {
+      ...(q.family !== "ALL"
+        ? {
+            AND: [
+              {
+                OR: [
+                  {
+                    kind: {
+                      in:
+                        q.family === "TRANSFERS"
+                          ? ["TRANSFER"]
+                          : [...fundingKinds],
+                    },
+                  },
+                  {
+                    kind: "REVERSAL",
+                    reversalOf: {
+                      kind: {
+                        in:
+                          q.family === "TRANSFERS"
+                            ? ["TRANSFER"]
+                            : [...fundingKinds],
+                      },
+                    },
+                  },
+                ],
+              },
+            ],
+          }
+        : {}),
       ...(q.kind !== "ALL" ? { kind: q.kind } : {}),
       ...(q.state === "REVERSED"
         ? { reversedBy: { isNot: null } }

@@ -66,6 +66,7 @@ export const accountSchema = z
       "LOAN_RECEIVABLE",
     ];
     const liabilityControls = [
+      "FOUNDER_PAYABLE",
       "TAX_OUTPUT",
       "WITHHOLDING_PAYABLE",
       "PAYABLES",
@@ -74,6 +75,8 @@ export const accountSchema = z
       "DEFERRED_REVENUE",
     ];
     if (
+      (["CAPITAL", "DISTRIBUTION"].includes(a.controlType) &&
+        a.type !== "EQUITY") ||
       (assetControls.includes(a.controlType) && a.type !== "ASSET") ||
       (liabilityControls.includes(a.controlType) && a.type !== "LIABILITY")
     )

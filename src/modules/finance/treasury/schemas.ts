@@ -5,9 +5,11 @@ import {
   versionSchema,
 } from "../accounting/schemas";
 import { pkrAmountSchema } from "../accounting/money";
+import { movementKinds } from "./kinds";
+export { fundingKinds, movementKinds } from "./kinds";
 export const movementDraftSchema = z
   .object({
-    kind: z.literal("TRANSFER"),
+    kind: z.enum(movementKinds),
     reference: z.string().trim().min(1).max(80),
     documentDate: accountingDateSchema,
     postingDate: accountingDateSchema,
@@ -18,23 +20,75 @@ export const movementDraftSchema = z
       (v) => v !== "0.00",
       "Amount must be positive.",
     ),
-    fromCashId: z.uuid(),
-    toCashId: z.uuid(),
-    partyId: z.null().default(null),
-    controlAccountId: z.null().default(null),
-    counterAccountId: z.null().default(null),
-    projectId: z.null().default(null),
-    approvalEvidence: z.null().default(null),
+    fromCashId: z.uuid().nullable().default(null),
+    toCashId: z.uuid().nullable().default(null),
+    partyId: z.uuid().nullable().default(null),
+    controlAccountId: z.uuid().nullable().default(null),
+    counterAccountId: z.uuid().nullable().default(null),
+    projectId: z.uuid().nullable().default(null),
+    approvalEvidence: z
+      .string()
+      .trim()
+      .min(3)
+      .max(1000)
+      .nullable()
+      .default(null),
+    billId: z.uuid().nullable().default(null),
     reason: reasonSchema,
   })
   .strict()
   .superRefine((d, c) => {
-    if (d.fromCashId === d.toCashId)
+    if (
+      d.kind === "TRANSFER" &&
+      (!d.fromCashId ||
+        !d.toCashId ||
+        d.fromCashId === d.toCashId ||
+        d.partyId ||
+        d.controlAccountId ||
+        d.counterAccountId ||
+        d.projectId ||
+        d.approvalEvidence ||
+        d.billId)
+    )
       c.addIssue({
         code: "custom",
         path: ["toCashId"],
         message: "Choose two different bank/cash accounts.",
       });
+    if (d.kind !== "TRANSFER") {
+      const incoming = d.kind === "CAPITAL_CONTRIBUTION",
+        outgoing = [
+          "CAPITAL_RETURN",
+          "DISTRIBUTION",
+          "FOUNDER_REIMBURSEMENT",
+        ].includes(d.kind),
+        noncash = !incoming && !outgoing;
+      if (
+        !d.partyId ||
+        !d.controlAccountId ||
+        !!d.toCashId !== incoming ||
+        !!d.fromCashId !== outgoing ||
+        !!d.counterAccountId !== noncash ||
+        !!d.billId !== (d.kind === "FOUNDER_BILL_SETTLEMENT")
+      )
+        c.addIssue({
+          code: "custom",
+          message:
+            "Choose the contributor and exact mappings required by this funding classification.",
+        });
+      if (
+        ["CAPITAL_RETURN", "DISTRIBUTION", "NONCASH_CAPITAL"].includes(
+          d.kind,
+        ) &&
+        !d.approvalEvidence
+      )
+        c.addIssue({
+          code: "custom",
+          path: ["approvalEvidence"],
+          message:
+            "Record the explicit authorization or reviewed noncash evidence.",
+        });
+    }
     if (d.postingDate < d.documentDate)
       c.addIssue({
         code: "custom",
@@ -56,7 +110,8 @@ export type MovementAction = keyof typeof movementSchemas;
 export const movementQuerySchema = z
   .object({
     q: z.string().trim().max(100).default(""),
-    kind: z.enum(["ALL", "TRANSFER", "REVERSAL"]).default("ALL"),
+    kind: z.enum(["ALL", ...movementKinds, "REVERSAL"]).default("ALL"),
+    family: z.enum(["ALL", "TRANSFERS", "FUNDING"]).default("ALL"),
     state: z
       .enum(["ALL", "DRAFT", "POSTED", "REVERSED", "VOIDED"])
       .default("ALL"),

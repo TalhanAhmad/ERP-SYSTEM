@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova Finance Sources, Tax and Withholding",
-    "version": "0.13.0",
+    "title": "Encova private finance through F21",
+    "version": "0.16.0",
     "description": "Implemented F01\u2013F18: private selected-admin accounting with owner-reviewed tax policy, net/tax invoice and purchase posting, capped original-tax credits and evidenced customer/supplier withholding in gross settlements. Default disabled, no hosted financial launch, real tax rates or legal compliance claims. See source-bound accounting and progress evidence. F19 adds private typed evidence, direct upload, quarantine, signed malware attestation, current-access bounded proxy downloads and auditable draft cleanup. Scanner configuration is operator-only; no clean fallback or live signing secrets seeded."
   },
   "security": [
@@ -15425,8 +15425,6 @@
           "description",
           "evidence",
           "amount",
-          "fromCashId",
-          "toCashId",
           "reason",
           "reauth"
         ],
@@ -15450,24 +15448,85 @@
             "type": "string"
           },
           "fromCashId": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
           },
           "toCashId": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
           },
           "reason": {
             "type": "string"
           },
           "kind": {
-            "const": "TRANSFER"
+            "enum": [
+              "TRANSFER",
+              "CAPITAL_CONTRIBUTION",
+              "CAPITAL_RETURN",
+              "DISTRIBUTION",
+              "NONCASH_CAPITAL",
+              "FOUNDER_OUTLAY",
+              "FOUNDER_BILL_SETTLEMENT",
+              "FOUNDER_REIMBURSEMENT"
+            ]
           },
           "currency": {
             "const": "PKR"
           },
           "reauth": {
             "$ref": "#/components/schemas/Reauthentication"
+          },
+          "partyId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "controlAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "counterAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "billId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "approvalEvidence": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 3,
+            "maxLength": 1000
           }
-        }
+        },
+        "description": "Strict typed classification: TRANSFER has distinct from/to bank masters and no party/control; funding requires contributor and reviewed CAPITAL/DISTRIBUTION/FOUNDER_PAYABLE control. Cash input/output, debit account, bill link and explicit approval depend on classification. Funding events and AP effects post atomically and retain dated capacity. No ownership/legal availability inference."
       },
       "MovementUpdate": {
         "type": "object",
@@ -15480,8 +15539,6 @@
           "description",
           "evidence",
           "amount",
-          "fromCashId",
-          "toCashId",
           "reason",
           "reauth",
           "expectedVersion"
@@ -15506,16 +15563,33 @@
             "type": "string"
           },
           "fromCashId": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
           },
           "toCashId": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
           },
           "reason": {
             "type": "string"
           },
           "kind": {
-            "const": "TRANSFER"
+            "enum": [
+              "TRANSFER",
+              "CAPITAL_CONTRIBUTION",
+              "CAPITAL_RETURN",
+              "DISTRIBUTION",
+              "NONCASH_CAPITAL",
+              "FOUNDER_OUTLAY",
+              "FOUNDER_BILL_SETTLEMENT",
+              "FOUNDER_REIMBURSEMENT"
+            ]
           },
           "currency": {
             "const": "PKR"
@@ -15526,8 +15600,52 @@
           "expectedVersion": {
             "type": "integer",
             "minimum": 1
+          },
+          "partyId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "controlAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "counterAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "billId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "approvalEvidence": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 3,
+            "maxLength": 1000
           }
-        }
+        },
+        "description": "Strict typed classification: TRANSFER has distinct from/to bank masters and no party/control; funding requires contributor and reviewed CAPITAL/DISTRIBUTION/FOUNDER_PAYABLE control. Cash input/output, debit account, bill link and explicit approval depend on classification. Funding events and AP effects post atomically and retain dated capacity. No ownership/legal availability inference."
       }
     }
   }

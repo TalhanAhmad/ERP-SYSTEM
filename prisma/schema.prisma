@@ -197,6 +197,7 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ fundingEvents FinanceFundingEvent[]
  controlMovements FinanceMovement[] @relation("MovementControl")
  counterMovements FinanceMovement[] @relation("MovementCounter")
  inputTaxCodes FinanceTaxCode[] @relation("TaxInput")
@@ -308,6 +309,7 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ fundingEvent FinanceFundingEvent?
  movementId String? @unique @db.Uuid
  movement FinanceMovement? @relation(fields:[movementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  billCreditEvents FinanceBillCreditEvent[]
@@ -385,6 +387,7 @@ model FinanceLedgerReceipt {
 }
 
 model FinanceParty {
+ fundingEvents FinanceFundingEvent[]
  movements FinanceMovement[]
  supplierBalanceEvents FinanceSupplierBalanceEvent[]
  supplierDocuments FinanceSupplierDocument[]
@@ -1183,6 +1186,7 @@ model FinanceInvoiceCreditEvent {
 }
 
 model FinanceBill {
+ fundingMovements FinanceMovement[]
  evidenceFiles FinanceFile[]
  supplierCreditDocuments FinanceSupplierDocument[] @relation("SupplierCreditBill")
  supplierAllocations FinanceSupplierAllocation[]
@@ -1252,6 +1256,8 @@ model FinanceBillLine {
  @@unique([billId,sequence])
 }
 model FinancePayableEvent {
+ movementId String? @db.Uuid
+ movement FinanceMovement? @relation(fields:[movementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  supplierDocumentId String? @db.Uuid
  supplierDocument FinanceSupplierDocument? @relation(fields:[supplierDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  id String @id @default(uuid()) @db.Uuid
@@ -1483,6 +1489,10 @@ model FinanceScanAuthority {
 }
 
 model FinanceMovement {
+ billId String? @db.Uuid
+ bill FinanceBill? @relation(fields:[billId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ fundingEvent FinanceFundingEvent?
+ payableEvents FinancePayableEvent[]
  id String @id @default(uuid()) @db.Uuid
  number String @unique
  kind String
@@ -1519,4 +1529,20 @@ model FinanceMovement {
  entry FinanceJournalEntry?
  evidenceFiles FinanceFile[]
  @@index([kind,postingDate,id])
+}
+
+model FinanceFundingEvent {
+ id String @id @default(uuid()) @db.Uuid
+ movementId String @unique @db.Uuid
+ movement FinanceMovement @relation(fields:[movementId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ partyId String @db.Uuid
+ party FinanceParty @relation(fields:[partyId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ accountId String @db.Uuid
+ account FinanceAccount @relation(fields:[accountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalId String @unique @db.Uuid
+ journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ effectiveDate DateTime @db.Date
+ bucket String
+ amount Decimal @db.Decimal(20,2)
+ @@index([partyId,effectiveDate])
 }

@@ -7,6 +7,11 @@ import { accountTypes, reportGroups } from "./catalog";
 export const optionQuerySchema = z
   .object({
     kind: z.enum([
+      "funding-cost",
+      "funding-asset",
+      "capital",
+      "distribution",
+      "founder-payable",
       "tax-input",
       "tax-output",
       "withholding-receivable",
@@ -45,6 +50,29 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
           ? { controlType: "CASH", type: "ASSET", isContra: false }
           : {}),
       ...({
+        "funding-cost": {
+          controlType: { in: ["NONE", "FIXED_ASSET"] },
+          type: {
+            in: ["ASSET", "DIRECT_COST", "OPERATING_EXPENSE", "OTHER_EXPENSE"],
+          },
+          isContra: false,
+        },
+        "funding-asset": {
+          controlType: { in: ["NONE", "FIXED_ASSET"] },
+          type: "ASSET",
+          isContra: false,
+        },
+        capital: { controlType: "CAPITAL", type: "EQUITY", isContra: false },
+        distribution: {
+          controlType: "DISTRIBUTION",
+          type: "EQUITY",
+          isContra: false,
+        },
+        "founder-payable": {
+          controlType: "FOUNDER_PAYABLE",
+          type: "LIABILITY",
+          isContra: false,
+        },
         "tax-input": {
           controlType: "TAX_INPUT",
           type: "ASSET",
@@ -113,6 +141,11 @@ export async function accountOptions(actor: Pick<Actor, "id">, input: unknown) {
         },
       }[
         query.kind as
+          | "funding-cost"
+          | "funding-asset"
+          | "capital"
+          | "distribution"
+          | "founder-payable"
           | "tax-input"
           | "tax-output"
           | "withholding-receivable"

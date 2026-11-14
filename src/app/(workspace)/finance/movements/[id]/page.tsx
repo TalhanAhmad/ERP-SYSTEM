@@ -1,3 +1,4 @@
+import { FundingForm } from "@/modules/finance/components/funding-form";
 import Link from "next/link";
 import { env } from "@/server/env";
 import { financePageData } from "@/modules/finance/accounting/page-data";
@@ -48,6 +49,16 @@ export default async function Movement({
           Amount <MoneyCell value={i.amount} />
         </p>
         <p>Evidence: {i.evidence}</p>
+        <p>
+          Contributor: {i.party?.name ?? "—"} · Control:{" "}
+          {i.controlAccount?.code ?? "—"}
+        </p>
+        {i.approvalEvidence && <p>Authorization: {i.approvalEvidence}</p>}
+        {i.bill && (
+          <Link href={"/finance/bills/" + i.bill.id}>
+            Original bill {i.bill.number}
+          </Link>
+        )}
         {i.reversalOf && (
           <Link href={"/finance/movements/" + i.reversalOf.id}>
             Original {i.reversalOf.number}
@@ -58,7 +69,11 @@ export default async function Movement({
         <>
           <section className="panel" aria-label="Edit movement draft">
             <h2>Edit movement draft</h2>
-            <MovementForm key={i.version} item={i} hosted={hosted} />
+            {i.kind === "TRANSFER" ? (
+              <MovementForm key={i.version} item={i} hosted={hosted} />
+            ) : (
+              <FundingForm key={i.version} item={i} hosted={hosted} />
+            )}
           </section>
           {(["POST", "VOID"] as const).map((action) => (
             <section

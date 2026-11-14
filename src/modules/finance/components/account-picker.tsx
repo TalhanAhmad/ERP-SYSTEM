@@ -16,6 +16,13 @@ export function AccountPicker({
   required = false,
 }: {
   kind:
+    | "contributor"
+    | "funding-cost"
+    | "funding-asset"
+    | "funding-bill"
+    | "capital"
+    | "distribution"
+    | "founder-payable"
     | "payable"
     | "cost"
     | "prepayment"
@@ -119,11 +126,13 @@ export function AccountPicker({
                     "bill",
                     "credit-bill",
                     "bill-line",
+                    "funding-bill",
                     "supplier-advance-source",
                   ].includes(kind)
                 ? "supplier-options?"
                 : [
                       "party",
+                      "contributor",
                       "supplier",
                       "project",
                       "invoice",

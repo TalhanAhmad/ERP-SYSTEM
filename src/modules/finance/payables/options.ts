@@ -17,6 +17,7 @@ export async function supplierOptions(
           "cash-account",
           "supplier-advance-source",
           "credit-bill",
+          "funding-bill",
           "bill-line",
         ]),
         q: z.string().trim().max(100).default(""),
@@ -107,17 +108,18 @@ export async function supplierOptions(
         page,
       };
     }
-    if (q.kind === "bill") {
-      const partyId = z.uuid().parse(q.partyId);
+    if (q.kind === "bill" || q.kind === "funding-bill") {
+      const partyId =
+        q.kind === "funding-bill" ? null : z.uuid().parse(q.partyId);
       const count = await tx.$queryRaw<
         { total: bigint }[]
-      >`SELECT count(*) AS total FROM(SELECT i.id FROM "FinanceBill" i JOIN "FinancePayableEvent" e ON e."billId"=i.id WHERE i.state='POSTED' AND i."partyId"=${partyId}::uuid AND position(lower(${q.q}) in lower(i.number||' '||i.description))>0 GROUP BY i.id HAVING sum(e.amount)>0)x`;
+      >`SELECT count(*) AS total FROM(SELECT i.id FROM "FinanceBill" i JOIN "FinancePayableEvent" e ON e."billId"=i.id WHERE i.state='POSTED' AND (${partyId}::uuid IS NULL OR i."partyId"=${partyId}::uuid) AND position(lower(${q.q}) in lower(i.number||' '||i.description))>0 GROUP BY i.id HAVING sum(e.amount)>0)x`;
       const total = Number(count[0].total),
         pages = Math.max(1, Math.ceil(total / 25)),
         page = Math.min(q.page, pages);
       const rows = await tx.$queryRaw<
         { id: string; code: string; name: string; balance: string }[]
-      >`SELECT i.id,i.number AS code,i.description AS name,sum(e.amount)::text AS balance FROM "FinanceBill" i JOIN "FinancePayableEvent" e ON e."billId"=i.id WHERE i.state='POSTED' AND i."partyId"=${partyId}::uuid AND position(lower(${q.q}) in lower(i.number||' '||i.description))>0 GROUP BY i.id HAVING sum(e.amount)>0 ORDER BY i.number,i.id LIMIT 25 OFFSET ${(page - 1) * 25}`;
+      >`SELECT i.id,i.number AS code,i.description AS name,sum(e.amount)::text AS balance FROM "FinanceBill" i JOIN "FinancePayableEvent" e ON e."billId"=i.id WHERE i.state='POSTED' AND (${partyId}::uuid IS NULL OR i."partyId"=${partyId}::uuid) AND position(lower(${q.q}) in lower(i.number||' '||i.description))>0 GROUP BY i.id HAVING sum(e.amount)>0 ORDER BY i.number,i.id LIMIT 25 OFFSET ${(page - 1) * 25}`;
       return {
         items: rows.map((i) => ({
           id: i.id,
