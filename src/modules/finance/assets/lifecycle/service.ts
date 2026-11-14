@@ -1,3 +1,4 @@
+import { bankMatchErrors } from "../../treasury/matching/errors";
 import { costErrors } from "../../projects/costs/errors";
 import "server-only";
 import { z } from "zod";
@@ -15,6 +16,7 @@ import {
 import { assetErrors } from "../errors";
 const errors: Record<string, string> = {
   ...costErrors,
+  ...bankMatchErrors,
   ...assetErrors,
   FINANCE_APPROVAL_REQUIRED: "Record explicit authorization evidence.",
   FINANCE_FUNDING_CAPACITY:

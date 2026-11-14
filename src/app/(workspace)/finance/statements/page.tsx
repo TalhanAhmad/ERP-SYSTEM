@@ -20,6 +20,7 @@ export default async function Register({
     <section>
       <FinanceNavigation />
       <h1>Bank statement evidence</h1>
+      <Link href="/finance/bank-matches">Review bank matching</Link>
       <Link href="/finance/statements/import">Import a bank statement</Link>
       <p>
         Retained CSV evidence with reviewed columns, value dates and

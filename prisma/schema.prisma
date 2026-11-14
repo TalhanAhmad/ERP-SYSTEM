@@ -80,6 +80,10 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ bankMatches FinanceBankMatch[] @relation("BankMatchCreator")
+ unmatchedBankMatches FinanceBankMatch[] @relation("BankMatchUnmatcher")
+ bankMatchEvents FinanceBankMatchEvent[]
+
  statementUploads FinanceStatementUpload[]
  statementBatches FinanceStatementBatch[]
 
@@ -219,6 +223,8 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ bankMatches FinanceBankMatch[]
+
  statementUploads FinanceStatementUpload[]
  statementBatches FinanceStatementBatch[]
  budgetLines FinanceBudgetLine[]
@@ -407,6 +413,8 @@ model FinanceJournalEntry {
  @@index([postingDate,id])
 }
 model FinanceJournalLine {
+ bankMatchAllocations FinanceBankMatchAllocation[]
+
  costAllocations FinanceCostAllocation[]
 
  billLineId String? @db.Uuid
@@ -477,6 +485,8 @@ model FinanceParty {
  @@index([active,kind,name,id])
 }
 model FinanceCashAccount {
+ bankMatches FinanceBankMatch[]
+
  statementUploads FinanceStatementUpload[]
  statementBatches FinanceStatementBatch[]
 
@@ -2155,6 +2165,8 @@ model FinanceStatementBatch {
  @@index([cashAccountId,startDate,endDate,id])
 }
 model FinanceStatementLine {
+ bankMatchAllocations FinanceBankMatchAllocation[]
+
  id String @id @default(uuid()) @db.Uuid
  batchId String @db.Uuid
  batch FinanceStatementBatch @relation(fields:[batchId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -2169,4 +2181,62 @@ model FinanceStatementLine {
  @@unique([batchId,sequence])
  @@index([fingerprint,batchId,id])
  @@index([valueDate,batchId,id])
+}
+
+model FinanceBankMatch {
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique
+ cashAccountId String @db.Uuid
+ cashAccount FinanceCashAccount @relation(fields:[cashAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ glAccountId String @db.Uuid
+ glAccount FinanceAccount @relation(fields:[glAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ description String
+ evidence String
+ earliestDate DateTime @db.Date
+ latestDate DateTime @db.Date
+ state String @default("DRAFT")
+ version Int @default(1)
+ sourceSnapshot Json
+ unmatchedAt DateTime? @db.Timestamptz
+ unmatchedById String? @db.Uuid
+ unmatchedBy Person? @relation("BankMatchUnmatcher",fields:[unmatchedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ unmatchReason String?
+ createdById String @db.Uuid
+ createdBy Person @relation("BankMatchCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ allocations FinanceBankMatchAllocation[]
+ @@index([cashAccountId,state,latestDate,id])
+}
+model FinanceBankMatchAllocation {
+ id String @id @default(uuid()) @db.Uuid
+ matchId String @db.Uuid
+ match FinanceBankMatch @relation(fields:[matchId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ statementLineId String @db.Uuid
+ statementLine FinanceStatementLine @relation(fields:[statementLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalLineId String @db.Uuid
+ journalLine FinanceJournalLine @relation(fields:[journalLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ amount Decimal @db.Decimal(20,2)
+ effectiveDate DateTime @db.Date
+ sourceSnapshot Json
+ events FinanceBankMatchEvent[]
+ @@unique([matchId,sequence])
+ @@unique([matchId,statementLineId,journalLineId])
+ @@index([statementLineId,matchId,id])
+ @@index([journalLineId,matchId,id])
+}
+model FinanceBankMatchEvent {
+ id String @id @default(uuid()) @db.Uuid
+ allocationId String @db.Uuid
+ allocation FinanceBankMatchAllocation @relation(fields:[allocationId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ kind String
+ delta Decimal @db.Decimal(20,2)
+ effectiveDate DateTime @db.Date
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reason String
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@unique([allocationId,kind])
+ @@index([effectiveDate,allocationId,id])
 }

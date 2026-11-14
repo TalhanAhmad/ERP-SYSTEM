@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F30 engineering is implemented and locally verified. Separate F26–F29 sources passed fresh CI. F30 adds explicit bounded CSV evidence, exact source totals, duplicate review/reuse and retained corrections without GL or automatic matching. F31–F46 remain pending, with F31 cash matching/unmatch next. The requested F47 pack is prepared for the user as evidence grows. Actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
+F01–F31 engineering is implemented and locally verified. Separate F26–F30 sources passed fresh CI. F31 adds explicit many/partial matching with retained opposite correction, no GL, effective-period retention and current-private source screens. F32–F46 remain pending. The requested F47 review pack is prepared as evidence grows; actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
 
 ## F26 delivered
 
@@ -50,3 +50,10 @@ F29 sourcea6b014b9f03ad70e62c8cff3733a4e6070ad3bec passed [fresh CI43612791776](
 A maximum5,000,000-byte/5,000-record UTF-8 CSV transfers through bounded current-uploader capabilities, then explicit date/direction/amount mapping and source equation review. Server-derived rows and checked SQL preserve the actual file hash, original bank/GL identity, key, dates, balances, row fingerprint/digest and duplicate evidence. Exact re-import/races reuse prior sources; different interpretations conflict. Reviewed duplicates remain separate rows; immutable void/replacement chains retain history. Responses/choices/previews/detail pages stay current-private and bounded. These source records never post, execute cash or declare bank reconciliation.
 
 865 distinct local checks passed:267 unit,549 actual PostgreSQL integration (216.85s),49 Chromium (2.8m). The statement journey passed6.8s and6.3s in full regression, including balance-error recovery, exact re-import, duplicate review, retained replacement, selected writer, employee denial, mobile and WCAG, without GL. Both production builds, strict typing/lint,173 concrete API paths/verbs/references and all64 applied migration checksums passed. Word/private-value checks accompany separate F30 publication; fresh CI is observed after push. See [rules](accounting/statement-imports.md) and [F30 record](planning/days/F30.md).
+
+
+## F31 delivered and verified
+
+F30 source151ab2ef05a4a752477ef3d73cca9d8af65a9d78 passed [fresh CI43620888565](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43620888565):64 fresh migrations,865 tests and both builds/type/lint/docs.
+
+882 distinct local checks passed:270 unit,562 actual PostgreSQL integration (229.33s (tests 96%, import 4%)),50 Chromium (2.9m). All66 applied migration checksums, strict typing/lint, both production builds and178 concrete API paths/verbs/references passed. Matching browser acceptance covers excess-amount recovery, actual cash/value dates, explicit confirmation, retained unmatch, no additional GL, mobile/WCAG and employee denial. Full/focused Word and private-value checks accompany separate F31 publication; fresh CI is observed after push. See [matching rules](accounting/bank-matching.md) and [F31 record](planning/days/F31.md).

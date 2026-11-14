@@ -1,3 +1,4 @@
+import { bankMatchErrors } from "../matching/errors";
 import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
@@ -59,6 +60,7 @@ type Evaluation = {
   basisHash: string;
 };
 const messages: Record<string, string> = {
+  ...bankMatchErrors,
   FINANCE_FORBIDDEN: "Finance access is unavailable.",
   FINANCE_REAUTH_REQUIRED: "Verify your password and authenticator again.",
   FINANCE_NOT_FOUND: "Statement source unavailable.",

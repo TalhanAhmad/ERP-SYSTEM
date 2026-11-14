@@ -12,7 +12,7 @@ All45 Chromium journeys passed2.6m, including the new actual generation/post/dis
 
 ## Remaining milestones
 
-F31–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
+F32–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
 
 
 ## Final lifecycle edge cases
@@ -60,3 +60,12 @@ F29 sourcea6b014b9f03ad70e62c8cff3733a4e6070ad3bec passed [fresh CI43612791776](
 A4,780,034-byte file transferred through three bounded actual HTTP requests and imported all5,000 records. Last page200 returned record5,000; preview stayed below250,000 bytes. No GL was created. Browser auth fixtures were renewed after the backend suite. The actual statement journey passed6.8s before full regression and6.3s again, including mobile/WCAG/private denial and actual user form recovery/duplicate/correction steps.
 
 865 distinct local checks passed:267 unit,549 actual PostgreSQL integration (216.85s),49 Chromium (2.8m). The statement journey passed6.8s and6.3s in full regression, including balance-error recovery, exact re-import, duplicate review, retained replacement, selected writer, employee denial, mobile and WCAG, without GL. Both production builds, strict typing/lint,173 concrete API paths/verbs/references and all64 applied migration checksums passed. Word/private-value checks accompany separate F30 publication; fresh CI is observed after push. No immutable source/ledger/audit history was deleted to pass tests. No hosted schema, finance activation, real CSV or bank transaction occurred.
+
+
+## F31 local verification
+
+Additive65 passed DDL and actual-source functional rollback rehearsal before apply. Fixed ambiguous source-side parameter and missing initial snapshot during rehearsal, not by rewriting applied history. Separate66 retains the effective period of a nonposting match and prevents its later void. Thirteen new PostgreSQL cases pass: one-many/many-one/partial capacities, stale event digests even after net-zero correction, replay/conflict, original cash reversal and statement-void guards, source/direction/pair identity, version/state/open-period enforcement, current grant/role/flag denial, runtime/Data API boundaries, forged event/source resistance, concurrent capacity and later-period retention. Three schema cases check exact amounts, edge limits and source-owned dates/IDs.
+
+The first shared-fixture full/targeted/browser overlap was excluded from acceptance; the clean database run below is serialized. Browser fixtures were renewed after backend tests. Corrected seed currency and a lower-role fixture name; corrected the select label structure and an ambiguous route-announcer assertion. Failed/interrupted attempts are not counted. All financial/statement/ledger/audit history is retained.
+
+882 distinct local checks passed:270 unit,562 actual PostgreSQL integration (229.33s (tests 96%, import 4%)),50 Chromium (2.9m). All66 applied migration checksums, strict typing/lint, both production builds and178 concrete API paths/verbs/references passed. Matching browser acceptance covers excess-amount recovery, actual cash/value dates, explicit confirmation, retained unmatch, no additional GL, mobile/WCAG and employee denial. Full/focused Word and private-value checks accompany separate F31 publication; fresh CI is observed after push. No hosted migration/grants/finance enablement or real bank activity occurred.

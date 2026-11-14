@@ -19181,6 +19181,510 @@
           }
         }
       }
+    },
+    "/api/v1/finance/bank-matches": {
+      "get": {
+        "operationId": "bankmatch_bank-matches_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Explicit actual cash/statement associations never post GL. Later of bank value date and cash posting date determines each edge date. Both-side aggregate capacities, original bank/GL/direction and current history basis are independently checked. Read/preview only; current grant and Origin/CSRF on preview. Stable 25-row choices/pages.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "cashAccountId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ALL",
+                "MATCHED",
+                "UNMATCHED"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}; exact string money. Preview returns basisHash, allocations with both positions, intrinsic dates and totals. Options/register items,total,page,pages; detail item,25 allocations/opposite events and history. Command id,number,version,state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "bankmatch_bank-matches_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Explicit actual cash/statement associations never post GL. Later of bank value date and cash posting date determines each edge date. Both-side aggregate capacities, original bank/GL/direction and current history basis are independently checked. Fresh password/hosted TOTP, permanent request key and open intrinsic periods; unmatch retains original allocations and exact opposite events. Resolve matches before original cash reversal or statement void.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Cost command/result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostCommandResult"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Private {data}; exact string money. Preview returns basisHash, allocations with both positions, intrinsic dates and totals. Options/register items,total,page,pages; detail item,25 allocations/opposite events and history. Command id,number,version,state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankMatchCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/bank-matches/preview": {
+      "post": {
+        "operationId": "bankmatch_bank-matches_preview_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Explicit actual cash/statement associations never post GL. Later of bank value date and cash posting date determines each edge date. Both-side aggregate capacities, original bank/GL/direction and current history basis are independently checked. Read/preview only; current grant and Origin/CSRF on preview. Stable 25-row choices/pages.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}; exact string money. Preview returns basisHash, allocations with both positions, intrinsic dates and totals. Options/register items,total,page,pages; detail item,25 allocations/opposite events and history. Command id,number,version,state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankMatchPreview"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/bank-match-options": {
+      "get": {
+        "operationId": "bankmatch_bank-match-options_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Explicit actual cash/statement associations never post GL. Later of bank value date and cash posting date determines each edge date. Both-side aggregate capacities, original bank/GL/direction and current history basis are independently checked. Read/preview only; current grant and Origin/CSRF on preview. Stable 25-row choices/pages.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "cashAccountId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "STATEMENT",
+                "CASH"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "default": "0001-01-01"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "default": "9999-12-31"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}; exact string money. Preview returns basisHash, allocations with both positions, intrinsic dates and totals. Options/register items,total,page,pages; detail item,25 allocations/opposite events and history. Command id,number,version,state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/bank-matches/{id}": {
+      "get": {
+        "operationId": "bankmatch_bank-matches_ById_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Explicit actual cash/statement associations never post GL. Later of bank value date and cash posting date determines each edge date. Both-side aggregate capacities, original bank/GL/direction and current history basis are independently checked. Read/preview only; current grant and Origin/CSRF on preview. Stable 25-row choices/pages.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}; exact string money. Preview returns basisHash, allocations with both positions, intrinsic dates and totals. Options/register items,total,page,pages; detail item,25 allocations/opposite events and history. Command id,number,version,state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/bank-matches/{id}/unmatch": {
+      "post": {
+        "operationId": "bankmatch_bank-matches_ById_unmatch_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Explicit actual cash/statement associations never post GL. Later of bank value date and cash posting date determines each edge date. Both-side aggregate capacities, original bank/GL/direction and current history basis are independently checked. Fresh password/hosted TOTP, permanent request key and open intrinsic periods; unmatch retains original allocations and exact opposite events. Resolve matches before original cash reversal or statement void.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}; exact string money. Preview returns basisHash, allocations with both positions, intrinsic dates and totals. Options/register items,total,page,pages; detail item,25 allocations/opposite events and history. Command id,number,version,state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankMatchUnmatch"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -26585,6 +27089,145 @@
           "description",
           "bankReference"
         ]
+      },
+      "BankMatchPreview": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cashAccountId",
+          "allocations"
+        ],
+        "properties": {
+          "cashAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "allocations": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "statementLineId",
+                "journalLineId",
+                "amount"
+              ],
+              "properties": {
+                "statementLineId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "journalLineId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9][0-9]{0,17})\\.[0-9]{2}$",
+                  "description": "Positive exact PKR, not zero."
+                }
+              }
+            },
+            "description": "Distinct statement/cash pairs; aggregate capacity is enforced on both sides."
+          }
+        }
+      },
+      "BankMatchCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cashAccountId",
+          "allocations",
+          "description",
+          "evidence",
+          "basisHash",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "cashAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "allocations": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "statementLineId",
+                "journalLineId",
+                "amount"
+              ],
+              "properties": {
+                "statementLineId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "journalLineId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9][0-9]{0,17})\\.[0-9]{2}$",
+                  "description": "Positive exact PKR, not zero."
+                }
+              }
+            },
+            "description": "Distinct statement/cash pairs; aggregate capacity is enforced on both sides."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "basisHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "BankMatchUnmatch": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
       }
     }
   }
