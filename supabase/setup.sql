@@ -111,3 +111,5 @@ DO $$ BEGIN IF to_regprocedure('public.encova_finance_report_core(uuid,text,json
 DO $$ BEGIN IF to_regprocedure('public.encova_finance_statement_report(uuid,text,jsonb)') IS NOT NULL THEN GRANT EXECUTE ON FUNCTION public.encova_finance_statement_report(UUID,TEXT,JSONB),public.encova_finance_statement_settings_command(UUID,TEXT,TEXT,TIMESTAMPTZ,TEXT,JSONB,TEXT,UUID) TO encova_app;END IF;END $$;
 
 DO $$ BEGIN IF to_regprocedure('public.encova_finance_cash_flow_read(uuid,text,jsonb)') IS NOT NULL THEN GRANT EXECUTE ON FUNCTION public.encova_finance_cash_flow_read(UUID,TEXT,JSONB),public.encova_finance_cash_flow_command(UUID,TEXT,TEXT,TIMESTAMPTZ,TEXT,JSONB,TEXT,UUID) TO encova_app;END IF;END $$;
+
+DO $$ BEGIN IF to_regprocedure('public.encova_finance_ageing_read(uuid,text,jsonb)') IS NOT NULL THEN GRANT EXECUTE ON FUNCTION public.encova_finance_ageing_read(UUID,TEXT,JSONB) TO encova_app;END IF;END $$;

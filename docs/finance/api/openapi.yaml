@@ -21454,6 +21454,380 @@
           }
         }
       }
+    },
+    "/api/v1/finance/reports/receivables-ageing": {
+      "get": {
+        "operationId": "historical_ar_ageing",
+        "description": "Current ACTIVE selected Super Admin only, private/no-store, readonly. Inclusive Pakistan DATE cutoff, signed actual receivable/payable events, dated payments/advances/credits/releases/reversals and founder noncash AP settlement. Current document/payment state does not erase history. Due today is not overdue; buckets NOT_DUE,1\u201330,31\u201360,61\u201390,over90. Complete company totals and per-control GL agreement include archived history before display search/bucket/includeSettled/page. Negative documents and offsetting control issues remain explicit. Actual ledger/subledger digest metadata. 25 rows/page with running event balances before pagination; no draft or future settlement. Exact aggregate decimal strings without a document-sized numeric cap.",
+        "parameters": [
+          {
+            "name": "asOf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "issuePage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "includeSettled",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "YES",
+                "NO"
+              ],
+              "default": "NO"
+            }
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ALL",
+                "NOT_DUE",
+                "DAYS_1_30",
+                "DAYS_31_60",
+                "DAYS_61_90",
+                "OVER_90"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Report: metadata,side,totals(openAmount,openDocumentCount,notDue,days1To30,days31To60,days61To90,over90),reconciliation(ready,subledgerTotal,controlTotal,difference,issueCount,negativeDocumentCount,25 account issues,page/pages),25 document items,total/page/pages. History: metadata,side,document including original/open amounts/due/bucket,25 dated events with signed amount/runningBalance/actual source links,total/page/pages. All money strings; readonly and no final-export claim.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/invoices/{id}/ageing-events": {
+      "get": {
+        "operationId": "historical_ar_events",
+        "description": "Current ACTIVE selected Super Admin only, private/no-store, readonly. Inclusive Pakistan DATE cutoff, signed actual receivable/payable events, dated payments/advances/credits/releases/reversals and founder noncash AP settlement. Current document/payment state does not erase history. Due today is not overdue; buckets NOT_DUE,1\u201330,31\u201360,61\u201390,over90. Complete company totals and per-control GL agreement include archived history before display search/bucket/includeSettled/page. Negative documents and offsetting control issues remain explicit. Actual ledger/subledger digest metadata. 25 rows/page with running event balances before pagination; no draft or future settlement. Exact aggregate decimal strings without a document-sized numeric cap.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Actual posted invoice/bill identity at cutoff."
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Report: metadata,side,totals(openAmount,openDocumentCount,notDue,days1To30,days31To60,days61To90,over90),reconciliation(ready,subledgerTotal,controlTotal,difference,issueCount,negativeDocumentCount,25 account issues,page/pages),25 document items,total/page/pages. History: metadata,side,document including original/open amounts/due/bucket,25 dated events with signed amount/runningBalance/actual source links,total/page/pages. All money strings; readonly and no final-export claim.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reports/payables-ageing": {
+      "get": {
+        "operationId": "historical_ap_ageing",
+        "description": "Current ACTIVE selected Super Admin only, private/no-store, readonly. Inclusive Pakistan DATE cutoff, signed actual receivable/payable events, dated payments/advances/credits/releases/reversals and founder noncash AP settlement. Current document/payment state does not erase history. Due today is not overdue; buckets NOT_DUE,1\u201330,31\u201360,61\u201390,over90. Complete company totals and per-control GL agreement include archived history before display search/bucket/includeSettled/page. Negative documents and offsetting control issues remain explicit. Actual ledger/subledger digest metadata. 25 rows/page with running event balances before pagination; no draft or future settlement. Exact aggregate decimal strings without a document-sized numeric cap.",
+        "parameters": [
+          {
+            "name": "asOf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "issuePage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "includeSettled",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "YES",
+                "NO"
+              ],
+              "default": "NO"
+            }
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ALL",
+                "NOT_DUE",
+                "DAYS_1_30",
+                "DAYS_31_60",
+                "DAYS_61_90",
+                "OVER_90"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Report: metadata,side,totals(openAmount,openDocumentCount,notDue,days1To30,days31To60,days61To90,over90),reconciliation(ready,subledgerTotal,controlTotal,difference,issueCount,negativeDocumentCount,25 account issues,page/pages),25 document items,total/page/pages. History: metadata,side,document including original/open amounts/due/bucket,25 dated events with signed amount/runningBalance/actual source links,total/page/pages. All money strings; readonly and no final-export claim.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/bills/{id}/ageing-events": {
+      "get": {
+        "operationId": "historical_ap_events",
+        "description": "Current ACTIVE selected Super Admin only, private/no-store, readonly. Inclusive Pakistan DATE cutoff, signed actual receivable/payable events, dated payments/advances/credits/releases/reversals and founder noncash AP settlement. Current document/payment state does not erase history. Due today is not overdue; buckets NOT_DUE,1\u201330,31\u201360,61\u201390,over90. Complete company totals and per-control GL agreement include archived history before display search/bucket/includeSettled/page. Negative documents and offsetting control issues remain explicit. Actual ledger/subledger digest metadata. 25 rows/page with running event balances before pagination; no draft or future settlement. Exact aggregate decimal strings without a document-sized numeric cap.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Actual posted invoice/bill identity at cutoff."
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Report: metadata,side,totals(openAmount,openDocumentCount,notDue,days1To30,days31To60,days61To90,over90),reconciliation(ready,subledgerTotal,controlTotal,difference,issueCount,negativeDocumentCount,25 account issues,page/pages),25 document items,total/page/pages. History: metadata,side,document including original/open amounts/due/bucket,25 dated events with signed amount/runningBalance/actual source links,total/page/pages. All money strings; readonly and no final-export claim.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

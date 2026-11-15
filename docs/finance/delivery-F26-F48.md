@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F35 engineering is implemented and locally verified. Separate F26–F34 sources passed fresh CI. F35 adds reviewed per-cash-leg components, complete direct cash-flow totals and explicit classification readiness. F36–F46 remain pending. F47 review-pack preparation continues for the user; human acceptance and F48 release decisions stay unfilled. Hosted finance stays disabled without schema/grants, real company mappings or financial seeds.
+F01–F36 engineering is implemented and locally verified. Separate F26–F35 sources passed fresh CI. F36 adds historical receivables/payables ageing, dated event running carry, independent full-company control agreement and retained archived-source reporting. F37–F46 remain pending. F47 review-pack preparation continues for the user; human acceptance and F48 release decisions stay unfilled. Hosted finance stays disabled without schema/grants, real company mappings or financial seeds.
 
 ## F26 delivered
 
@@ -85,3 +85,10 @@ F33 source18c8358bbd30eb2a48348090c9fba7b994c71386 passed [fresh CI43716796463](
 F34 sourceca6b25da5f67af86f048f9bdf2328a6ee92314c5 passed [fresh CI43723662717](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43723662717):71 fresh migrations,940 tests and both builds/type/lint/API checks.
 
 962 distinct local checks passed:282 unit,626 actual PostgreSQL integration (302.84s),54 Chromium (3.3m). Both production builds, strict typing/lint,199 concrete API paths/verbs/references and all72 applied migration checksums passed. The new cash-flow browser journey passed3.8s, including fresh confirmation, exact mixed replacement, retained history, current private API, employee denial, mobile and WCAG. Full/focused Word/private-value checks accompany separate F35 publication; fresh CI is observed after push. See [direct cash-flow rules](accounting/cash-flow.md) and [F35 record](planning/days/F35.md).
+
+
+## F36 delivered and verified
+
+F35 source4b4058f162b371b454200de22f12166e79a45969 passed [fresh CI43729128979](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43729128979):72 fresh migrations,962 tests and both builds/type/lint/API checks.
+
+985 distinct local checks passed:285 unit,645 actual PostgreSQL integration (329.29s),55 Chromium (3.4m). Both production builds, strict typing/lint,203 concrete API paths/verbs/references and all73 applied migration checksums passed. The new historical-ageing browser journey passed3.2s, including real later payment/earlier cutoff, exact dated source history, current private API, employee denial, mobile and WCAG. Full/focused Word/private-value checks accompany separate F36 publication; fresh CI is observed after push. See [historical ageing rules](accounting/ageing.md) and [F36 record](planning/days/F36.md).
