@@ -21224,6 +21224,236 @@
           }
         }
       }
+    },
+    "/api/v1/finance/reports/cash-flow": {
+      "get": {
+        "operationId": "cash_flow_reports_cash-flow",
+        "description": "Current ACTIVE explicitly selected Super Admin only, private/no-store. Actual posted PKR CASH legs (including archived and cash equivalents), exact opening/closing and operating/investing/financing inflows/outflows/net. Internal transfer net excluded; noncash entries absent. Missing reviews block classificationReady even when cash nets zero. Complete totals/readiness and component/ledger digests before display search and stable 25-source pagination. Reversals derive the original current reviewed components on the actual opposite account/sequence. Review detail returns at most 200 actual cash legs, current review/basis/evidence, reviewAllowed/internalOnly, 25 retained history records/page, total. No independent reversal review or automatic classification.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Report: metadata,openingBalance,closingBalance,externalNet,internalNet,unclassifiedNet,difference,unclassifiedCount,classificationReady,categories (category,inflows,outflows,net),25 items,total/page/pages. Detail: source,lines,originalJournalId,basisHash,review,reviewAllowed,internalOnly,history,page,total. Money is exact decimal strings. No GL mutation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cash-flow/{journalId}": {
+      "get": {
+        "operationId": "cash_flow_cash-flow_entry",
+        "description": "Current ACTIVE explicitly selected Super Admin only, private/no-store. Actual posted PKR CASH legs (including archived and cash equivalents), exact opening/closing and operating/investing/financing inflows/outflows/net. Internal transfer net excluded; noncash entries absent. Missing reviews block classificationReady even when cash nets zero. Complete totals/readiness and component/ledger digests before display search and stable 25-source pagination. Reversals derive the original current reviewed components on the actual opposite account/sequence. Review detail returns at most 200 actual cash legs, current review/basis/evidence, reviewAllowed/internalOnly, 25 retained history records/page, total. No independent reversal review or automatic classification.",
+        "parameters": [
+          {
+            "name": "journalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Report: metadata,openingBalance,closingBalance,externalNet,internalNet,unclassifiedNet,difference,unclassifiedCount,classificationReady,categories (category,inflows,outflows,net),25 items,total/page/pages. Detail: source,lines,originalJournalId,basisHash,review,reviewAllowed,internalOnly,history,page,total. Money is exact decimal strings. No GL mutation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/cash-flow/confirm": {
+      "post": {
+        "operationId": "cash_flow_confirm",
+        "description": "Current ACTIVE selected Super Admin, valid session/fresh password and hosted TOTP, Origin/CSRF and permanent request key. Confirmation uses server source/review/reversal basis and expected current review identity/version. Exact positive per-cash-leg stored components sum to actual cash; internal components net zero and pure cash transfers are internal only. Original and every derived reversal period must be OPEN. Original snapshots/components are retained; explicit replacement atomically supersedes its predecessor with reason/actor/time and audit. No GL, header-only inferred purpose or independent reversal classification. Request at most800 parts/256KiB.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}: id,journalId,version,state. Permanent replay returns the original result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashFlowConfirm"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -29062,6 +29292,89 @@
             "type": "string",
             "minLength": 3,
             "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "CashFlowConfirm": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "journalId",
+          "basisHash",
+          "components",
+          "evidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "journalId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "basisHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "expectedReviewId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "default": null
+          },
+          "expectedVersion": {
+            "enum": [
+              2,
+              null
+            ],
+            "default": null
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "components": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 800,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "journalLineId",
+                "category",
+                "amount"
+              ],
+              "properties": {
+                "journalLineId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "category": {
+                  "enum": [
+                    "OPERATING",
+                    "INVESTING",
+                    "FINANCING",
+                    "INTERNAL"
+                  ]
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9][0-9]{0,17})\\.[0-9]{2}$",
+                  "description": "Positive absolute cash component. Sign derived from actual GL."
+                }
+              }
+            }
           },
           "reauth": {
             "$ref": "#/components/schemas/Reauthentication"

@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F34 engineering is implemented and locally verified. Separate F26–F33 sources passed fresh CI. F34 adds accounting P&L/BS, actual unclosed profit once, complete company sections independent of displayed rows, explicit readiness/presentation diagnostics and retained nonposting owner mappings. F35–F46 remain pending, including actual year-close integration in F40. F47 review-pack preparation continues for the user; human acceptance and F48 release decisions stay unfilled. Hosted finance stays disabled without schema/grants, real company policy or financial seeds.
+F01–F35 engineering is implemented and locally verified. Separate F26–F34 sources passed fresh CI. F35 adds reviewed per-cash-leg components, complete direct cash-flow totals and explicit classification readiness. F36–F46 remain pending. F47 review-pack preparation continues for the user; human acceptance and F48 release decisions stay unfilled. Hosted finance stays disabled without schema/grants, real company mappings or financial seeds.
 
 ## F26 delivered
 
@@ -78,3 +78,10 @@ F32 source912634c7d44689cee05ded37bc805a17fabb263a passed [fresh CI43714158210](
 F33 source18c8358bbd30eb2a48348090c9fba7b994c71386 passed [fresh CI43716796463](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43716796463):70 fresh migrations,921 tests and both builds/type/lint/API checks.
 
 940 distinct local checks passed:279 unit,608 actual PostgreSQL integration (279.23s),53 Chromium (3.3m). Both production builds, strict typing/lint,196 concrete API paths/verbs/references and all71 applied migration checksums passed. The new statement browser journey passed5.4s after correcting saved-textarea labels, including earned/unpaid results, explicit owner presentation/tax mapping without duplicate cost, balanced BS, protected receivables drill-down, private employee denial and mobile/WCAG. Full/focused Word/private-value checks accompany separate F34 publication; fresh CI is observed after push. See [financial statement rules](accounting/financial-statements.md) and [F34 record](planning/days/F34.md).
+
+
+## F35 delivered and verified
+
+F34 sourceca6b25da5f67af86f048f9bdf2328a6ee92314c5 passed [fresh CI43723662717](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43723662717):71 fresh migrations,940 tests and both builds/type/lint/API checks.
+
+962 distinct local checks passed:282 unit,626 actual PostgreSQL integration (302.84s),54 Chromium (3.3m). Both production builds, strict typing/lint,199 concrete API paths/verbs/references and all72 applied migration checksums passed. The new cash-flow browser journey passed3.8s, including fresh confirmation, exact mixed replacement, retained history, current private API, employee denial, mobile and WCAG. Full/focused Word/private-value checks accompany separate F35 publication; fresh CI is observed after push. See [direct cash-flow rules](accounting/cash-flow.md) and [F35 record](planning/days/F35.md).

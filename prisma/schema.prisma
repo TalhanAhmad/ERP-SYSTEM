@@ -80,6 +80,9 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ cashFlowReviews FinanceCashFlowReview[] @relation("CashFlowReviewer")
+ cashFlowSupersessions FinanceCashFlowReview[] @relation("CashFlowSuperseder")
+
  bankMatches FinanceBankMatch[] @relation("BankMatchCreator")
  unmatchedBankMatches FinanceBankMatch[] @relation("BankMatchUnmatcher")
  bankMatchEvents FinanceBankMatchEvent[]
@@ -371,6 +374,8 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ cashFlowReviews FinanceCashFlowReview[]
+
  costAllocationId String? @unique @db.Uuid
  costAllocation FinanceCostAllocation? @relation(fields:[costAllocationId],references:[id],onDelete:Restrict,onUpdate:NoAction)
 
@@ -425,6 +430,8 @@ model FinanceJournalEntry {
  @@index([postingDate,id])
 }
 model FinanceJournalLine {
+ cashFlowComponents FinanceCashFlowComponent[]
+
  bankMatchAllocations FinanceBankMatchAllocation[]
 
  costAllocations FinanceCostAllocation[]
@@ -2334,4 +2341,39 @@ model FinanceStatementTaxMapping {
  createdAt DateTime @default(now()) @db.Timestamptz
  updatedAt DateTime @default(now()) @db.Timestamptz
  @@index([active,accountId])
+}
+
+model FinanceCashFlowReview {
+ id String @id @default(uuid()) @db.Uuid
+ journalId String @db.Uuid
+ journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ replacesId String? @unique @db.Uuid
+ replaces FinanceCashFlowReview? @relation("CashFlowReplacement",fields:[replacesId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ replacedBy FinanceCashFlowReview? @relation("CashFlowReplacement")
+ evidence String
+ reason String
+ sourceHash String
+ sourceSnapshot Json
+ state String @default("DRAFT")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation("CashFlowReviewer",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ supersededById String? @db.Uuid
+ supersededBy Person? @relation("CashFlowSuperseder",fields:[supersededById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ supersededAt DateTime? @db.Timestamptz
+ supersedeReason String?
+ components FinanceCashFlowComponent[]
+ @@index([journalId,state,id])
+}
+model FinanceCashFlowComponent {
+ id String @id @default(uuid()) @db.Uuid
+ reviewId String @db.Uuid
+ review FinanceCashFlowReview @relation(fields:[reviewId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalLineId String @db.Uuid
+ journalLine FinanceJournalLine @relation(fields:[journalLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ category String
+ amount Decimal @db.Decimal(20,2)
+ @@unique([reviewId,journalLineId,category])
+ @@index([journalLineId,reviewId])
 }

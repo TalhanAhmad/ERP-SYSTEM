@@ -51,6 +51,7 @@ for (const [username, role] of [
   ["e2e.finance.reconciliation", "SUPER_ADMIN"],
   ["e2e.finance.ledger.reports", "SUPER_ADMIN"],
   ["e2e.finance.statements.reports", "SUPER_ADMIN"],
+  ["e2e.finance.cash.flow", "SUPER_ADMIN"],
   ["e2e.finance.statements.writer", "SUPER_ADMIN"],
   ["e2e.finance.commercial.writer", "SUPER_ADMIN"],
   ["e2e.finance.commercial.manager", "TEAM_LEAD"],
