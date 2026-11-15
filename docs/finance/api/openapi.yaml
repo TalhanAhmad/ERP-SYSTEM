@@ -20439,6 +20439,257 @@
           }
         }
       }
+    },
+    "/api/v1/finance/reports/general-ledger": {
+      "get": {
+        "operationId": "core_report_reports_general-ledger",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store, readonly. One consistent posted statement snapshot plus shared financial configuration lock captures rows/totals/company/PKR/basis/date filters/generation/posting cutoff/snapshot/digest. Real DATE0001..9999 inclusive; no date-subtraction underflow. GL includes actual opening and chronological running balances computed before25-row pagination, inactive/controls, posted originals and dated generic/typed reversals with original source anchors; excludes drafts. Trial balance includes all posted accounts in complete company opening/movement/closing totals; q/zero display/pagination only filter visible account rows. Every monetary value is an exact decimal string, including sums larger than individual document limits. No bank/ledger mutation or posting proof is issued.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. General ledger metadata,account,openingBalance,periodDebit/periodCredit,closingBalance,25 items (actual source IDs/type/action/kind/reversal/originalSource anchors/project/party/debit/credit/runningBalance),total/page/pages. Trial balance metadata,companyTotals (opening/period/closing DR/CR and differences/all-account count),25 displayed accounts with signed and DR/CR balances,total/page/pages. Options include controls/archived accounts as items,total/page/pages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reports/trial-balance": {
+      "get": {
+        "operationId": "core_report_reports_trial-balance",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store, readonly. One consistent posted statement snapshot plus shared financial configuration lock captures rows/totals/company/PKR/basis/date filters/generation/posting cutoff/snapshot/digest. Real DATE0001..9999 inclusive; no date-subtraction underflow. GL includes actual opening and chronological running balances computed before25-row pagination, inactive/controls, posted originals and dated generic/typed reversals with original source anchors; excludes drafts. Trial balance includes all posted accounts in complete company opening/movement/closing totals; q/zero display/pagination only filter visible account rows. Every monetary value is an exact decimal string, including sums larger than individual document limits. No bank/ledger mutation or posting proof is issued.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "includeZero",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "YES",
+                "NO"
+              ],
+              "default": "NO"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. General ledger metadata,account,openingBalance,periodDebit/periodCredit,closingBalance,25 items (actual source IDs/type/action/kind/reversal/originalSource anchors/project/party/debit/credit/runningBalance),total/page/pages. Trial balance metadata,companyTotals (opening/period/closing DR/CR and differences/all-account count),25 displayed accounts with signed and DR/CR balances,total/page/pages. Options include controls/archived accounts as items,total/page/pages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/report-account-options": {
+      "get": {
+        "operationId": "core_report_report-account-options",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store, readonly. One consistent posted statement snapshot plus shared financial configuration lock captures rows/totals/company/PKR/basis/date filters/generation/posting cutoff/snapshot/digest. Real DATE0001..9999 inclusive; no date-subtraction underflow. GL includes actual opening and chronological running balances computed before25-row pagination, inactive/controls, posted originals and dated generic/typed reversals with original source anchors; excludes drafts. Trial balance includes all posted accounts in complete company opening/movement/closing totals; q/zero display/pagination only filter visible account rows. Every monetary value is an exact decimal string, including sums larger than individual document limits. No bank/ledger mutation or posting proof is issued.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. General ledger metadata,account,openingBalance,periodDebit/periodCredit,closingBalance,25 items (actual source IDs/type/action/kind/reversal/originalSource anchors/project/party/debit/credit/runningBalance),total/page/pages. Trial balance metadata,companyTotals (opening/period/closing DR/CR and differences/all-account count),25 displayed accounts with signed and DR/CR balances,total/page/pages. Options include controls/archived accounts as items,total/page/pages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

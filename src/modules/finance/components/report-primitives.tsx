@@ -1,0 +1,74 @@
+import Link from "next/link";
+import { MoneyCell } from "./money-cell";
+import type { ReportMetadata } from "../reports/service";
+export function BalanceCell({ value }: { value: string }) {
+  const negative = value.startsWith("-"),
+    absolute = negative ? value.slice(1) : value;
+  return (
+    <span>
+      <MoneyCell value={absolute} />
+      {absolute === "0.00" ? "" : negative ? " CR" : " DR"}
+    </span>
+  );
+}
+export function ReportMetadataPanel({
+  metadata,
+}: {
+  metadata: ReportMetadata;
+}) {
+  return (
+    <section className="panel" aria-label="Report basis and snapshot">
+      <h2>Report basis</h2>
+      <p>
+        {metadata.company} · {metadata.currency} · Posted accrual accounting
+      </p>
+      <p>
+        {metadata.from} — {metadata.to}, inclusive posting dates ·{" "}
+        {metadata.timezone}
+      </p>
+      <p>
+        Generated {metadata.generatedAt} · {metadata.postedEntryCount} posted
+        entries through the report cutoff · Latest included posting{" "}
+        {metadata.postingCutoffAt ?? "none"}
+      </p>
+      <p className="preline">
+        Posting snapshot {metadata.databaseSnapshot} · Ledger proof{" "}
+        {metadata.ledgerDigest}
+      </p>
+      <p>
+        This live response uses one consistent posted dataset for its rows and
+        totals. Opening and YEAR_CLOSE entries and dated reversals are included.
+        Each page request refreshes the current report; retained exports/issued
+        statements are a later workflow.
+      </p>
+    </section>
+  );
+}
+export function FinancialSourceLink({
+  type,
+  id,
+  reference,
+}: {
+  type: string;
+  id: string;
+  reference: string;
+}) {
+  const resources: Record<string, string> = {
+    MOVEMENT: "movements",
+    CUSTOMER_DOCUMENT: "receipts",
+    SUPPLIER_DOCUMENT: "supplier-payments",
+    BILL: "bills",
+    INVOICE: "invoices",
+    ASSET_MOVEMENT: "asset-movements",
+    JOURNAL_DRAFT: "journals",
+    COST_ALLOCATION: "cost-allocations",
+  };
+  const resource = resources[type];
+  return resource ? (
+    <Link href={"/finance/" + resource + "/" + id}>{reference}</Link>
+  ) : (
+    <span>
+      {reference} ({type})
+    </span>
+  );
+}

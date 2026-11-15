@@ -105,3 +105,5 @@ DO $$ BEGIN IF to_regprocedure('public.encova_finance_statement_command(uuid,tex
 DO $$ BEGIN IF to_regprocedure('public.encova_finance_bank_match_command(uuid,text,text,timestamp with time zone,text,jsonb,text,uuid)') IS NOT NULL THEN GRANT EXECUTE ON FUNCTION public.encova_finance_bank_match_command(UUID,TEXT,TEXT,TIMESTAMPTZ,TEXT,JSONB,TEXT,UUID),public.encova_finance_bank_match_options(UUID,JSONB),public.encova_finance_bank_match_preview(UUID,JSONB) TO encova_app;END IF;END $$;
 
 DO $$ BEGIN IF to_regprocedure('public.encova_finance_reconciliation_command(uuid,text,text,timestamp with time zone,text,jsonb,text,uuid)') IS NOT NULL THEN GRANT EXECUTE ON FUNCTION public.encova_finance_reconciliation_command(UUID,TEXT,TEXT,TIMESTAMPTZ,TEXT,JSONB,TEXT,UUID),public.encova_finance_reconciliation_review(UUID,UUID,INTEGER),public.encova_finance_reconciliation_peers(UUID,UUID,TEXT,TEXT,INTEGER) TO encova_app;END IF;END $$;
+
+DO $$ BEGIN IF to_regprocedure('public.encova_finance_report_core(uuid,text,jsonb)') IS NOT NULL THEN GRANT EXECUTE ON FUNCTION public.encova_finance_report_core(UUID,TEXT,JSONB) TO encova_app;END IF;END $$;

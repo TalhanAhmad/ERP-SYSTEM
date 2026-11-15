@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F32 engineering is implemented and locally verified. Separate F26–F31 sources passed fresh CI. F32 adds retained bank reconciliation proofs, zero difference plus every outstanding item reviewed, actual as-of dates, owner corrections and historical source barriers without GL. F33–F46 remain pending. F47 review-pack preparation continues for the user; actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
+F01–F33 engineering is implemented and locally verified. Separate F26–F32 sources passed fresh CI. F33 adds posted ledger/complete trial balance with source links, opening/running/closing carry, typed reversals, exact aggregates and consistent private metadata. F34–F46 remain pending. F47 review-pack preparation continues for the user; actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
 
 ## F26 delivered
 
@@ -64,3 +64,10 @@ F30 source151ab2ef05a4a752477ef3d73cca9d8af65a9d78 passed [fresh CI43620888565](
 F31 source18c631e47184891973e74b5910046bd838d09a0c passed [fresh CI43624960483](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43624960483):66 fresh migrations,882 tests and both builds/type/lint/API checks.
 
 902 distinct local checks passed:273 unit,578 actual PostgreSQL integration (248.88s),51 Chromium (3.3m). Both production builds, strict typing/lint,186 concrete API paths/verbs/references and all68 applied migration checksums passed. The new reconciliation browser journey passed4.6s and3.9s in full regression, including partial cash documentation, finalization, retained owner reopen/replacement, no added GL, mobile/WCAG and employee denial. Full/focused Word/private-value checks accompany separate F32 publication; fresh CI is observed after push. See [reconciliation rules](accounting/bank-reconciliation.md) and [F32 record](planning/days/F32.md).
+
+
+## F33 delivered and verified
+
+F32 source912634c7d44689cee05ded37bc805a17fabb263a passed [fresh CI43714158210](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43714158210):68 fresh migrations,902 tests and both builds/type/lint/API checks.
+
+921 distinct local checks passed:276 unit,593 actual PostgreSQL integration (275.65s),52 Chromium (3.2m). Both production builds, strict typing/lint,189 concrete API paths/verbs/references and all70 applied migration checksums passed. The new ledger browser journey passed6.4s, including second-page running carry, real source navigation, complete company trial totals under display filters, readonly/private employee denial and mobile/WCAG. Full/focused Word/private-value checks accompany separate F33 publication; fresh CI is observed after push. See [ledger/report rules](accounting/ledger-reports.md) and [F33 record](planning/days/F33.md).
