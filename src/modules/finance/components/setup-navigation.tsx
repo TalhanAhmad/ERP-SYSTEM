@@ -5,6 +5,9 @@ export function FinanceNavigation() {
       <Link href="/finance">Finance</Link>
       <Link href="/finance/reports/general-ledger">General ledger</Link>
       <Link href="/finance/reports/trial-balance">Trial balance</Link>
+      <Link href="/finance/reports/profit-loss">Profit and loss</Link>
+      <Link href="/finance/reports/balance-sheet">Balance sheet</Link>
+      <Link href="/finance/report-settings">Statement presentation</Link>
       <Link href="/finance/projects">Commercial projects</Link>
       <Link href="/finance/cost-allocations">Cost allocations</Link>
       <Link href="/finance/budgets">Budgets</Link>

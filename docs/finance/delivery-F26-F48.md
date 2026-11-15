@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F33 engineering is implemented and locally verified. Separate F26–F32 sources passed fresh CI. F33 adds posted ledger/complete trial balance with source links, opening/running/closing carry, typed reversals, exact aggregates and consistent private metadata. F34–F46 remain pending. F47 review-pack preparation continues for the user; actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
+F01–F34 engineering is implemented and locally verified. Separate F26–F33 sources passed fresh CI. F34 adds accounting P&L/BS, actual unclosed profit once, complete company sections independent of displayed rows, explicit readiness/presentation diagnostics and retained nonposting owner mappings. F35–F46 remain pending, including actual year-close integration in F40. F47 review-pack preparation continues for the user; human acceptance and F48 release decisions stay unfilled. Hosted finance stays disabled without schema/grants, real company policy or financial seeds.
 
 ## F26 delivered
 
@@ -71,3 +71,10 @@ F31 source18c631e47184891973e74b5910046bd838d09a0c passed [fresh CI43624960483](
 F32 source912634c7d44689cee05ded37bc805a17fabb263a passed [fresh CI43714158210](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43714158210):68 fresh migrations,902 tests and both builds/type/lint/API checks.
 
 921 distinct local checks passed:276 unit,593 actual PostgreSQL integration (275.65s),52 Chromium (3.2m). Both production builds, strict typing/lint,189 concrete API paths/verbs/references and all70 applied migration checksums passed. The new ledger browser journey passed6.4s, including second-page running carry, real source navigation, complete company trial totals under display filters, readonly/private employee denial and mobile/WCAG. Full/focused Word/private-value checks accompany separate F33 publication; fresh CI is observed after push. See [ledger/report rules](accounting/ledger-reports.md) and [F33 record](planning/days/F33.md).
+
+
+## F34 delivered and verified
+
+F33 source18c8358bbd30eb2a48348090c9fba7b994c71386 passed [fresh CI43716796463](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43716796463):70 fresh migrations,921 tests and both builds/type/lint/API checks.
+
+940 distinct local checks passed:279 unit,608 actual PostgreSQL integration (279.23s),53 Chromium (3.3m). Both production builds, strict typing/lint,196 concrete API paths/verbs/references and all71 applied migration checksums passed. The new statement browser journey passed5.4s after correcting saved-textarea labels, including earned/unpaid results, explicit owner presentation/tax mapping without duplicate cost, balanced BS, protected receivables drill-down, private employee denial and mobile/WCAG. Full/focused Word/private-value checks accompany separate F34 publication; fresh CI is observed after push. See [financial statement rules](accounting/financial-statements.md) and [F34 record](planning/days/F34.md).

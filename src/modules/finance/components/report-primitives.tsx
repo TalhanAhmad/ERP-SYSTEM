@@ -13,8 +13,10 @@ export function BalanceCell({ value }: { value: string }) {
 }
 export function ReportMetadataPanel({
   metadata,
+  sourceNote,
 }: {
   metadata: ReportMetadata;
+  sourceNote?: string;
 }) {
   return (
     <section className="panel" aria-label="Report basis and snapshot">
@@ -27,8 +29,8 @@ export function ReportMetadataPanel({
         {metadata.timezone}
       </p>
       <p>
-        Generated {metadata.generatedAt} · {metadata.postedEntryCount} posted
-        entries through the report cutoff · Latest included posting{" "}
+        Generated {metadata.generatedAt} · {metadata.postedEntryCount} company
+        posted entries through the report cutoff · Latest included posting{" "}
         {metadata.postingCutoffAt ?? "none"}
       </p>
       <p className="preline">
@@ -37,9 +39,10 @@ export function ReportMetadataPanel({
       </p>
       <p>
         This live response uses one consistent posted dataset for its rows and
-        totals. Opening and YEAR_CLOSE entries and dated reversals are included.
-        Each page request refreshes the current report; retained exports/issued
-        statements are a later workflow.
+        totals.{" "}
+        {sourceNote ??
+          "Opening and YEAR_CLOSE entries and dated reversals are included."}{" "}
+        Each page request refreshes the current report.
       </p>
     </section>
   );

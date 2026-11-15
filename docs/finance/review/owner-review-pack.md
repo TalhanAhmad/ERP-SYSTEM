@@ -4,7 +4,7 @@ Prepared for Talha Ahmad, as requested on 14 November 2026. Intended Finance Own
 
 ## Current evidence and scope
 
-F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29 is now locally accepted with838 checks; F30 is now locally accepted with865 checks; F31 is locally accepted with882 checks; F32 is locally accepted with902 checks; F33 is locally accepted with921 checks; F34–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
+F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29 is now locally accepted with838 checks; F30 is now locally accepted with865 checks; F31 is locally accepted with882 checks; F32 is locally accepted with902 checks; F33 is locally accepted with921 checks; F34 is locally accepted with940 checks; F35–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
 
 The final pack will include tested representative statements, source-to-ledger links, dated balances, exception cases, migration/recovery evidence and outstanding decisions. No company figures, legal compliance or accountant approval are inferred from synthetic fixtures.
 
@@ -14,6 +14,8 @@ The final pack will include tested representative statements, source-to-ledger l
 | --- | --- | --- |
 | Reporting currency | PKR-only initial accounting | Pending |
 | Chart/report mapping | Explicit reviewed masters; synthetic test mappings are not company adoption | Pending |
+| Bank-credit presentation | UNREVIEWED until explicit owner choice; synthetic tests do not adopt company policy | Pending |
+| Income-tax expense presentation | Explicit eligible expense-account mapping; no guessed rate/VAT/withholding classification | Pending |
 | Fiscal year and cutover | No live fiscal year or opening books adopted | Pending |
 | Tax and withholding | Optional, effective-dated reviewed mappings; no real rates assumed | Pending |
 | Depreciation convention | Pending by default; full-month straight line requires explicit first month and evidence | Pending |
@@ -94,3 +96,12 @@ A synthetic opening debit balance10.01 plus27 actual1.00 receipts closes37.01. T
 A displayed single account can have a debit or credit balance; complete company opening/movement/closing trial totals still include all posting accounts and remain separately balanced. Search, zero-row display and pagination do not shrink company totals. Archived controls retain actual history. An empty future report range carries prior posted opening to closing; no projected income or cash is invented. Exact paisa survives aggregates larger than the individual document range.
 
 921 distinct local checks passed:276 unit,593 actual PostgreSQL integration (275.65s),52 Chromium (3.2m). Both production builds, strict typing/lint,189 concrete API paths/verbs/references and all70 applied migration checksums passed. The new ledger browser journey passed6.4s, including second-page running carry, real source navigation, complete company trial totals under display filters, readonly/private employee denial and mobile/WCAG. Full/focused Word/private-value checks accompany separate F33 publication; fresh CI is observed after push. These are synthetic verification values, not reviewed company figures. Human acceptance fields remain unfilled.
+
+
+## Financial statement review example through F34
+
+A synthetic earned invoice100.01 plus deferred billing40.00 creates receivables140.01 but earned revenue100.01. An unpaid direct-cost bill60.00 creates a liability60.00 and actual profit40.01, with no claimed cash receipt/payment. Assets140.01 equal liabilities100.00 plus unclosed profit40.01. Prepayments/assets stay outside immediate expense; contra asset credits reduce assets and the actual expense reduces the unclosed result.
+
+Another synthetic invoice100.01 less direct cost60.00 and recorded ordinary tax expense7.00 yields net33.01. Explicitly mapping that7.00 to the tax-expense presentation changes its statement line once and leaves net profit/GL unchanged. A negative bank asset needs explicit presentation review; a reviewed current-liability presentation changes classification while preserving the exact balance equation. None of these simulated choices adopts real company policy.
+
+940 distinct local checks passed:279 unit,608 actual PostgreSQL integration (279.23s),53 Chromium (3.3m). Both production builds, strict typing/lint,196 concrete API paths/verbs/references and all71 applied migration checksums passed. The new statement browser journey passed5.4s after correcting saved-textarea labels, including earned/unpaid results, explicit owner presentation/tax mapping without duplicate cost, balanced BS, protected receivables drill-down, private employee denial and mobile/WCAG. Full/focused Word/private-value checks accompany separate F34 publication; fresh CI is observed after push. Actual fiscal-year close/reopening evidence follows in F40; owner acceptance and live activation remain unfilled.

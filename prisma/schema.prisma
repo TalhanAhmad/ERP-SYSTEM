@@ -155,6 +155,9 @@ model Person {
  reopenedReconciliations FinanceReconciliation[] @relation("ReconciliationReopener")
  reconciliationNotes FinanceReconciliationNote[]
 
+ statementPolicies FinanceStatementPolicy[]
+ statementTaxMappings FinanceStatementTaxMapping[]
+
 }
 
 // No public/admin endpoint may create these grants through generic Person updates.
@@ -301,6 +304,8 @@ impairmentHoldings FinanceInvestmentHolding[] @relation("HoldingImpairment")
  @@index([active,type,code])
  @@index([parentId])
  reconciliations FinanceReconciliation[]
+
+ statementTaxMapping FinanceStatementTaxMapping?
 
 }
 
@@ -2305,4 +2310,28 @@ model FinanceReconciliationNote {
  createdAt DateTime @default(now()) @db.Timestamptz
  updatedAt DateTime @default(now()) @db.Timestamptz
  @@unique([reconciliationId,rowKey])
+}
+
+model FinanceStatementPolicy {
+ id String @id @db.Uuid
+ overdraftPresentation String
+ evidence String
+ version Int @default(1)
+ updatedById String @db.Uuid
+ updatedBy Person @relation(fields:[updatedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+}
+model FinanceStatementTaxMapping {
+ id String @id @default(uuid()) @db.Uuid
+ accountId String @unique @db.Uuid
+ account FinanceAccount @relation(fields:[accountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ active Boolean @default(true)
+ evidence String
+ version Int @default(1)
+ updatedById String @db.Uuid
+ updatedBy Person @relation(fields:[updatedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([active,accountId])
 }

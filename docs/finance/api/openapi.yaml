@@ -20690,6 +20690,540 @@
           }
         }
       }
+    },
+    "/api/v1/finance/reports/profit-loss": {
+      "get": {
+        "operationId": "financial_statement_reports_profit-loss",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store, readonly. Exact posted accrual P&L (excludes YEAR_CLOSE) and BS (all posted through cutoff, unclosed P&L balance included once). Complete company sections remain unchanged by display search/page. Contra assets/deferred/unpaid sources stay in their actual accounting classes. Mapping/book diagnostics (25/page) and exact equation independently gate finalExportEligible; no client readiness claim. An unreviewed negative CASH asset requires explicit owner presentation review. Income-tax expense uses an explicit eligible expense mapping, never a guessed rate, VAT or withholding control. Metadata captures company/PKR/basis/dates/generation/book snapshot/ledger digest/presentation policy/tax-mapping digest. Dates0001..9999; row and issue pages independent. Owner settings/history and eligible archived expense choices are private; per-account mapping read is scoped to its actual account.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "issuePage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Statements metadata,readiness (finalExportEligible/booksBalanced/booksDifference/issueCount/25 issues/page/pages/policy),complete sections,25 account items,total/page/pages. Money exact strings. Settings policy,25 tax mappings,current actor isOwner,50 history records,total/page/pages. Mapping choices items,total/page/pages. Account tax mapping {item:null or explicit current version/evidence/account/updatedBy}. No GL mutation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reports/balance-sheet": {
+      "get": {
+        "operationId": "financial_statement_reports_balance-sheet",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store, readonly. Exact posted accrual P&L (excludes YEAR_CLOSE) and BS (all posted through cutoff, unclosed P&L balance included once). Complete company sections remain unchanged by display search/page. Contra assets/deferred/unpaid sources stay in their actual accounting classes. Mapping/book diagnostics (25/page) and exact equation independently gate finalExportEligible; no client readiness claim. An unreviewed negative CASH asset requires explicit owner presentation review. Income-tax expense uses an explicit eligible expense mapping, never a guessed rate, VAT or withholding control. Metadata captures company/PKR/basis/dates/generation/book snapshot/ledger digest/presentation policy/tax-mapping digest. Dates0001..9999; row and issue pages independent. Owner settings/history and eligible archived expense choices are private; per-account mapping read is scoped to its actual account.",
+        "parameters": [
+          {
+            "name": "asOf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "issuePage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Statements metadata,readiness (finalExportEligible/booksBalanced/booksDifference/issueCount/25 issues/page/pages/policy),complete sections,25 account items,total/page/pages. Money exact strings. Settings policy,25 tax mappings,current actor isOwner,50 history records,total/page/pages. Mapping choices items,total/page/pages. Account tax mapping {item:null or explicit current version/evidence/account/updatedBy}. No GL mutation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-settings": {
+      "get": {
+        "operationId": "financial_statement_statement-settings",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store, readonly. Exact posted accrual P&L (excludes YEAR_CLOSE) and BS (all posted through cutoff, unclosed P&L balance included once). Complete company sections remain unchanged by display search/page. Contra assets/deferred/unpaid sources stay in their actual accounting classes. Mapping/book diagnostics (25/page) and exact equation independently gate finalExportEligible; no client readiness claim. An unreviewed negative CASH asset requires explicit owner presentation review. Income-tax expense uses an explicit eligible expense mapping, never a guessed rate, VAT or withholding control. Metadata captures company/PKR/basis/dates/generation/book snapshot/ledger digest/presentation policy/tax-mapping digest. Dates0001..9999; row and issue pages independent. Owner settings/history and eligible archived expense choices are private; per-account mapping read is scoped to its actual account.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Statements metadata,readiness (finalExportEligible/booksBalanced/booksDifference/issueCount/25 issues/page/pages/policy),complete sections,25 account items,total/page/pages. Money exact strings. Settings policy,25 tax mappings,current actor isOwner,50 history records,total/page/pages. Mapping choices items,total/page/pages. Account tax mapping {item:null or explicit current version/evidence/account/updatedBy}. No GL mutation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-mapping-options": {
+      "get": {
+        "operationId": "financial_statement_statement-mapping-options",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store, readonly. Exact posted accrual P&L (excludes YEAR_CLOSE) and BS (all posted through cutoff, unclosed P&L balance included once). Complete company sections remain unchanged by display search/page. Contra assets/deferred/unpaid sources stay in their actual accounting classes. Mapping/book diagnostics (25/page) and exact equation independently gate finalExportEligible; no client readiness claim. An unreviewed negative CASH asset requires explicit owner presentation review. Income-tax expense uses an explicit eligible expense mapping, never a guessed rate, VAT or withholding control. Metadata captures company/PKR/basis/dates/generation/book snapshot/ledger digest/presentation policy/tax-mapping digest. Dates0001..9999; row and issue pages independent. Owner settings/history and eligible archived expense choices are private; per-account mapping read is scoped to its actual account.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Statements metadata,readiness (finalExportEligible/booksBalanced/booksDifference/issueCount/25 issues/page/pages/policy),complete sections,25 account items,total/page/pages. Money exact strings. Settings policy,25 tax mappings,current actor isOwner,50 history records,total/page/pages. Mapping choices items,total/page/pages. Account tax mapping {item:null or explicit current version/evidence/account/updatedBy}. No GL mutation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/accounts/{id}/statement-tax-mapping": {
+      "get": {
+        "operationId": "financial_statement_accounts_ById_statement-tax-mapping",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store, readonly. Exact posted accrual P&L (excludes YEAR_CLOSE) and BS (all posted through cutoff, unclosed P&L balance included once). Complete company sections remain unchanged by display search/page. Contra assets/deferred/unpaid sources stay in their actual accounting classes. Mapping/book diagnostics (25/page) and exact equation independently gate finalExportEligible; no client readiness claim. An unreviewed negative CASH asset requires explicit owner presentation review. Income-tax expense uses an explicit eligible expense mapping, never a guessed rate, VAT or withholding control. Metadata captures company/PKR/basis/dates/generation/book snapshot/ledger digest/presentation policy/tax-mapping digest. Dates0001..9999; row and issue pages independent. Owner settings/history and eligible archived expense choices are private; per-account mapping read is scoped to its actual account.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Existing finance account identity."
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Statements metadata,readiness (finalExportEligible/booksBalanced/booksDifference/issueCount/25 issues/page/pages/policy),complete sections,25 account items,total/page/pages. Money exact strings. Settings policy,25 tax mappings,current actor isOwner,50 history records,total/page/pages. Mapping choices items,total/page/pages. Account tax mapping {item:null or explicit current version/evidence/account/updatedBy}. No GL mutation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-settings/policy": {
+      "post": {
+        "operationId": "statement_setting_statement-settings_policy",
+        "description": "Current Finance Owner only, ACTIVE selected Super Admin, current provider session and fresh password/hosted TOTP. Origin/CSRF, permanent Idempotency-Key and expectedVersion (null for first record) are required. Nonposting current report presentation only; source/ledger amounts remain unchanged. Retained version/evidence/audit before/after. Tax account must be ordinary PKR operating/other expense, including archived history; VAT/withholding/income/control accounts rejected. Restore UNREVIEWED or deactivate to correct; history cannot be deleted. Existing F30 import interface privileges remain unchanged.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}: id,version,overdraftPresentation or accountId/active. Replay returns its retained command result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementPolicySet"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/statement-settings/tax-mappings": {
+      "post": {
+        "operationId": "statement_setting_statement-settings_tax-mappings",
+        "description": "Current Finance Owner only, ACTIVE selected Super Admin, current provider session and fresh password/hosted TOTP. Origin/CSRF, permanent Idempotency-Key and expectedVersion (null for first record) are required. Nonposting current report presentation only; source/ledger amounts remain unchanged. Retained version/evidence/audit before/after. Tax account must be ordinary PKR operating/other expense, including archived history; VAT/withholding/income/control accounts rejected. Restore UNREVIEWED or deactivate to correct; history cannot be deleted. Existing F30 import interface privileges remain unchanged.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}: id,version,overdraftPresentation or accountId/active. Replay returns its retained command result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatementTaxMappingSet"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -28449,6 +28983,88 @@
                 }
               }
             }
+          }
+        }
+      },
+      "StatementPolicySet": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "overdraftPresentation",
+          "evidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "overdraftPresentation": {
+            "enum": [
+              "UNREVIEWED",
+              "CURRENT_LIABILITY"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "expectedVersion": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 2147483647,
+            "default": null
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "StatementTaxMappingSet": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accountId",
+          "active",
+          "evidence",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "expectedVersion": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 2147483647,
+            "default": null
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
           }
         }
       }

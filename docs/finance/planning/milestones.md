@@ -37,7 +37,7 @@
 | [F31](days/F31.md) | Implement match/unmatch with partial and combined transactions | Complete |
 | [F32](days/F32.md) | Build reconciliation UI and statement-to-GL proof | Complete |
 | [F33](days/F33.md) | Build general ledger and trial balance with opening/running balances | Complete |
-| [F34](days/F34.md) | Build P&L and balance sheet with validated account mapping | Pending |
+| [F34](days/F34.md) | Build P&L and balance sheet with validated account mapping | Complete |
 | [F35](days/F35.md) | Build direct cash flow and mixed-payment cash classifications | Pending |
 | [F36](days/F36.md) | Build historical AR/AP ageing with dated settlement events | Pending |
 | [F37](days/F37.md) | Add project/funding/investment/asset report roll-forwards | Pending |
