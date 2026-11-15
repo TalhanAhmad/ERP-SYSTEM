@@ -12,7 +12,7 @@ All45 Chromium journeys passed2.6m, including the new actual generation/post/dis
 
 ## Remaining milestones
 
-F32–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
+F33–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
 
 
 ## Final lifecycle edge cases
@@ -69,3 +69,12 @@ Additive65 passed DDL and actual-source functional rollback rehearsal before app
 The first shared-fixture full/targeted/browser overlap was excluded from acceptance; the clean database run below is serialized. Browser fixtures were renewed after backend tests. Corrected seed currency and a lower-role fixture name; corrected the select label structure and an ambiguous route-announcer assertion. Failed/interrupted attempts are not counted. All financial/statement/ledger/audit history is retained.
 
 882 distinct local checks passed:270 unit,562 actual PostgreSQL integration (229.33s (tests 96%, import 4%)),50 Chromium (2.9m). All66 applied migration checksums, strict typing/lint, both production builds and178 concrete API paths/verbs/references passed. Matching browser acceptance covers excess-amount recovery, actual cash/value dates, explicit confirmation, retained unmatch, no additional GL, mobile/WCAG and employee denial. Full/focused Word and private-value checks accompany separate F31 publication; fresh CI is observed after push. No hosted migration/grants/finance enablement or real bank activity occurred.
+
+
+## F32 local verification
+
+Additive67 passed DDL and full functional rollback rehearsal: real zero-activity review/refresh/finalize/reopen, actual typed cash and imported partial bank evidence/matching, exact4.00+6.01=10.01 proof with documentation, deferred retained snapshot checks. All rehearsal data rolled back. Added68 without rewriting67 to prevent backdated imports contradicting finalized no-activity evidence and remapping of a retained empty bank.
+
+Sixteen focused PostgreSQL cases passed18.67s: documented partial deposits/payments, exact equation, actual stale-source refresh, earlier cutoff versus later bank matching, historical cash/unmatch/source barriers, owner-only/latest-first reopening, genuine empty-bank evidence, explicit exact/fully matched duplicate peers with retained rows, key/version/void/replacement/no-fork behavior, current role/grant/flag denial, runtime/Data API/helper boundaries, forged snapshots and concurrent finalization, zero-net unresolved activity, stable27-row paging and later contradictory import/remapping. Three schema cases validate source-owned proofs, dates/signed money, bounded distinct notes and actual duplicate peer requirements. No failed attempt is counted as acceptance; immutable financial history was retained.
+
+902 distinct local checks passed:273 unit,578 actual PostgreSQL integration (248.88s),51 Chromium (3.3m). Both production builds, strict typing/lint,186 concrete API paths/verbs/references and all68 applied migration checksums passed. The new reconciliation browser journey passed4.6s and3.9s in full regression, including partial cash documentation, finalization, retained owner reopen/replacement, no added GL, mobile/WCAG and employee denial. Full/focused Word/private-value checks accompany separate F32 publication; fresh CI is observed after push. The complete backend run finished before browser fixture renewal; browser suites and both builds were serialized. No hosted finance operation or real-data import occurred.

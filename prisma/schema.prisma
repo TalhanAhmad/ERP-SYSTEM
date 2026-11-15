@@ -150,6 +150,11 @@ model Person {
  financeParties FinanceParty[]
  financeInvoices FinanceInvoice[]
  @@index([status,role])
+ reconciliations FinanceReconciliation[] @relation("ReconciliationCreator")
+ finalizedReconciliations FinanceReconciliation[] @relation("ReconciliationFinalizer")
+ reopenedReconciliations FinanceReconciliation[] @relation("ReconciliationReopener")
+ reconciliationNotes FinanceReconciliationNote[]
+
 }
 
 // No public/admin endpoint may create these grants through generic Person updates.
@@ -295,6 +300,8 @@ impairmentHoldings FinanceInvestmentHolding[] @relation("HoldingImpairment")
  updatedAt DateTime @default(now()) @db.Timestamptz
  @@index([active,type,code])
  @@index([parentId])
+ reconciliations FinanceReconciliation[]
+
 }
 
 model FinancePeriod {
@@ -508,6 +515,8 @@ model FinanceCashAccount {
  createdAt DateTime @default(now()) @db.Timestamptz
  updatedAt DateTime @default(now()) @db.Timestamptz
  @@index([active,name,id])
+ reconciliations FinanceReconciliation[]
+
 }
 
 model FinanceInvoice {
@@ -2163,6 +2172,8 @@ model FinanceStatementBatch {
  updatedAt DateTime @default(now()) @db.Timestamptz
  lines FinanceStatementLine[]
  @@index([cashAccountId,startDate,endDate,id])
+ reconciliations FinanceReconciliation[]
+
 }
 model FinanceStatementLine {
  bankMatchAllocations FinanceBankMatchAllocation[]
@@ -2181,6 +2192,8 @@ model FinanceStatementLine {
  @@unique([batchId,sequence])
  @@index([fingerprint,batchId,id])
  @@index([valueDate,batchId,id])
+ duplicateReconciliationNotes FinanceReconciliationNote[]
+
 }
 
 model FinanceBankMatch {
@@ -2239,4 +2252,57 @@ model FinanceBankMatchEvent {
  createdAt DateTime @default(now()) @db.Timestamptz
  @@unique([allocationId,kind])
  @@index([effectiveDate,allocationId,id])
+}
+
+model FinanceReconciliation {
+ id String @id @default(uuid()) @db.Uuid
+ number String @unique
+ companyName String
+ cashAccountId String @db.Uuid
+ cashAccount FinanceCashAccount @relation(fields:[cashAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ glAccountId String @db.Uuid
+ glAccount FinanceAccount @relation(fields:[glAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ statementBatchId String? @db.Uuid
+ statementBatch FinanceStatementBatch? @relation(fields:[statementBatchId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ startDate DateTime @db.Date
+ cutoffDate DateTime @db.Date
+ openingBalance Decimal @db.Decimal(20,2)
+ closingBalance Decimal @db.Decimal(20,2)
+ evidence String
+ basisHash String
+ sourceProof Json
+ finalSnapshot Json?
+ state String @default("DRAFT")
+ version Int @default(1)
+ replacesId String? @unique @db.Uuid
+ replaces FinanceReconciliation? @relation("ReconciliationReplacement",fields:[replacesId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ replacedBy FinanceReconciliation? @relation("ReconciliationReplacement")
+ createdById String @db.Uuid
+ createdBy Person @relation("ReconciliationCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ finalizedById String? @db.Uuid
+ finalizedBy Person? @relation("ReconciliationFinalizer",fields:[finalizedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ finalizedAt DateTime? @db.Timestamptz
+ reopenedById String? @db.Uuid
+ reopenedBy Person? @relation("ReconciliationReopener",fields:[reopenedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reopenedAt DateTime? @db.Timestamptz
+ reopenReason String?
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ notes FinanceReconciliationNote[]
+ @@index([glAccountId,state,cutoffDate,id],map:"FinanceReconciliation_bank_state_cutoff_id_idx")
+}
+model FinanceReconciliationNote {
+ id String @id @default(uuid()) @db.Uuid
+ reconciliationId String @db.Uuid
+ reconciliation FinanceReconciliation @relation(fields:[reconciliationId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ rowKey String
+ kind String
+ note String
+ peerStatementLineId String? @db.Uuid
+ peerStatementLine FinanceStatementLine? @relation(fields:[peerStatementLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ updatedById String @db.Uuid
+ updatedBy Person @relation(fields:[updatedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@unique([reconciliationId,rowKey])
 }

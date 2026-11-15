@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F31 engineering is implemented and locally verified. Separate F26–F30 sources passed fresh CI. F31 adds explicit many/partial matching with retained opposite correction, no GL, effective-period retention and current-private source screens. F32–F46 remain pending. The requested F47 review pack is prepared as evidence grows; actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
+F01–F32 engineering is implemented and locally verified. Separate F26–F31 sources passed fresh CI. F32 adds retained bank reconciliation proofs, zero difference plus every outstanding item reviewed, actual as-of dates, owner corrections and historical source barriers without GL. F33–F46 remain pending. F47 review-pack preparation continues for the user; actual human acceptance and F48 release decisions remain unfilled. Hosted finance stays disabled without schema/grants or real financial seeds.
 
 ## F26 delivered
 
@@ -57,3 +57,10 @@ A maximum5,000,000-byte/5,000-record UTF-8 CSV transfers through bounded current
 F30 source151ab2ef05a4a752477ef3d73cca9d8af65a9d78 passed [fresh CI43620888565](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43620888565):64 fresh migrations,865 tests and both builds/type/lint/docs.
 
 882 distinct local checks passed:270 unit,562 actual PostgreSQL integration (229.33s (tests 96%, import 4%)),50 Chromium (2.9m). All66 applied migration checksums, strict typing/lint, both production builds and178 concrete API paths/verbs/references passed. Matching browser acceptance covers excess-amount recovery, actual cash/value dates, explicit confirmation, retained unmatch, no additional GL, mobile/WCAG and employee denial. Full/focused Word and private-value checks accompany separate F31 publication; fresh CI is observed after push. See [matching rules](accounting/bank-matching.md) and [F31 record](planning/days/F31.md).
+
+
+## F32 delivered and verified
+
+F31 source18c631e47184891973e74b5910046bd838d09a0c passed [fresh CI43624960483](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43624960483):66 fresh migrations,882 tests and both builds/type/lint/API checks.
+
+902 distinct local checks passed:273 unit,578 actual PostgreSQL integration (248.88s),51 Chromium (3.3m). Both production builds, strict typing/lint,186 concrete API paths/verbs/references and all68 applied migration checksums passed. The new reconciliation browser journey passed4.6s and3.9s in full regression, including partial cash documentation, finalization, retained owner reopen/replacement, no added GL, mobile/WCAG and employee denial. Full/focused Word/private-value checks accompany separate F32 publication; fresh CI is observed after push. See [reconciliation rules](accounting/bank-reconciliation.md) and [F32 record](planning/days/F32.md).

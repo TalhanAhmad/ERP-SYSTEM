@@ -35,7 +35,7 @@
 | [F29](days/F29.md) | Add versioned budgets, variance views, and separate forecasts | Complete |
 | [F30](days/F30.md) | Implement statement CSV preview/commit and duplicate protection | Complete |
 | [F31](days/F31.md) | Implement match/unmatch with partial and combined transactions | Complete |
-| [F32](days/F32.md) | Build reconciliation UI and statement-to-GL proof | Pending |
+| [F32](days/F32.md) | Build reconciliation UI and statement-to-GL proof | Complete |
 | [F33](days/F33.md) | Build general ledger and trial balance with opening/running balances | Pending |
 | [F34](days/F34.md) | Build P&L and balance sheet with validated account mapping | Pending |
 | [F35](days/F35.md) | Build direct cash flow and mixed-payment cash classifications | Pending |

@@ -19685,6 +19685,760 @@
           }
         }
       }
+    },
+    "/api/v1/finance/reconciliations": {
+      "get": {
+        "operationId": "recon_reconciliations_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. One retained statement cutoff, exact posted GL closing, dated outstanding cash, unresolved source records and documented duplicate exclusions. No GL/cash execution. Stored source rows max5,000 per side; response25 stable rows, source hashes/totals, current basis status and retained actor history. Finalized proof/filters/currency/company/generation metadata remain frozen. Peer choices expose only exact cross-file records fully matched by this cutoff.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "cashAccountId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "FINALIZED",
+                "VOIDED",
+                "REOPENED"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Register items,total,page,pages,filters. Detail item (without full source/final JSON),review.totals,25 current-source/remaining/note items,total/page/pages,undocumentedCount,unresolvedCount,basisStale,sourceUnavailable,generatedAt; history/isOwner. Command id,number,version,state. All money exact strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "recon_reconciliations_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. One retained statement cutoff, exact posted GL closing, dated outstanding cash, unresolved source records and documented duplicate exclusions. No GL/cash execution. Stored source rows max5,000 per side; response25 stable rows, source hashes/totals, current basis status and retained actor history. Fresh password/hosted TOTP, permanent key and current version; final requires zero equation/all item reviews/open cutoff period. Reopen is current-owner only, latest cutoff first, retains issued snapshot. Refresh explicitly recaptures draft source and clears notes into retained audit history. Closed proof blocks historical cash/matching/source void and new imports contradicting no-activity evidence; retained bank identity cannot be remapped.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "201": {
+            "description": "Private {data}. Register items,total,page,pages,filters. Detail item (without full source/final JSON),review.totals,25 current-source/remaining/note items,total/page/pages,undocumentedCount,unresolvedCount,basisStale,sourceUnavailable,generatedAt; history/isOwner. Command id,number,version,state. All money exact strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReconciliationCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliations/{id}": {
+      "get": {
+        "operationId": "recon_reconciliations_ById_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. One retained statement cutoff, exact posted GL closing, dated outstanding cash, unresolved source records and documented duplicate exclusions. No GL/cash execution. Stored source rows max5,000 per side; response25 stable rows, source hashes/totals, current basis status and retained actor history. Finalized proof/filters/currency/company/generation metadata remain frozen. Peer choices expose only exact cross-file records fully matched by this cutoff.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Register items,total,page,pages,filters. Detail item (without full source/final JSON),review.totals,25 current-source/remaining/note items,total/page/pages,undocumentedCount,unresolvedCount,basisStale,sourceUnavailable,generatedAt; history/isOwner. Command id,number,version,state. All money exact strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliations/{id}/peers": {
+      "get": {
+        "operationId": "recon_reconciliations_ById_peers_get",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. One retained statement cutoff, exact posted GL closing, dated outstanding cash, unresolved source records and documented duplicate exclusions. No GL/cash execution. Stored source rows max5,000 per side; response25 stable rows, source hashes/totals, current basis status and retained actor history. Finalized proof/filters/currency/company/generation metadata remain frozen. Peer choices expose only exact cross-file records fully matched by this cutoff.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "rowKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^STATEMENT:[0-9a-f-]{36}$"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Register items,total,page,pages,filters. Detail item (without full source/final JSON),review.totals,25 current-source/remaining/note items,total/page/pages,undocumentedCount,unresolvedCount,basisStale,sourceUnavailable,generatedAt; history/isOwner. Command id,number,version,state. All money exact strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliations/{id}/notes": {
+      "post": {
+        "operationId": "recon_reconciliations_ById_notes_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. One retained statement cutoff, exact posted GL closing, dated outstanding cash, unresolved source records and documented duplicate exclusions. No GL/cash execution. Stored source rows max5,000 per side; response25 stable rows, source hashes/totals, current basis status and retained actor history. Fresh password/hosted TOTP, permanent key and current version; final requires zero equation/all item reviews/open cutoff period. Reopen is current-owner only, latest cutoff first, retains issued snapshot. Refresh explicitly recaptures draft source and clears notes into retained audit history. Closed proof blocks historical cash/matching/source void and new imports contradicting no-activity evidence; retained bank identity cannot be remapped.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}. Register items,total,page,pages,filters. Detail item (without full source/final JSON),review.totals,25 current-source/remaining/note items,total/page/pages,undocumentedCount,unresolvedCount,basisStale,sourceUnavailable,generatedAt; history/isOwner. Command id,number,version,state. All money exact strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReconciliationNotes"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliations/{id}/refresh": {
+      "post": {
+        "operationId": "recon_reconciliations_ById_refresh_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. One retained statement cutoff, exact posted GL closing, dated outstanding cash, unresolved source records and documented duplicate exclusions. No GL/cash execution. Stored source rows max5,000 per side; response25 stable rows, source hashes/totals, current basis status and retained actor history. Fresh password/hosted TOTP, permanent key and current version; final requires zero equation/all item reviews/open cutoff period. Reopen is current-owner only, latest cutoff first, retains issued snapshot. Refresh explicitly recaptures draft source and clears notes into retained audit history. Closed proof blocks historical cash/matching/source void and new imports contradicting no-activity evidence; retained bank identity cannot be remapped.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}. Register items,total,page,pages,filters. Detail item (without full source/final JSON),review.totals,25 current-source/remaining/note items,total/page/pages,undocumentedCount,unresolvedCount,basisStale,sourceUnavailable,generatedAt; history/isOwner. Command id,number,version,state. All money exact strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReconciliationAction"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliations/{id}/finalize": {
+      "post": {
+        "operationId": "recon_reconciliations_ById_finalize_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. One retained statement cutoff, exact posted GL closing, dated outstanding cash, unresolved source records and documented duplicate exclusions. No GL/cash execution. Stored source rows max5,000 per side; response25 stable rows, source hashes/totals, current basis status and retained actor history. Fresh password/hosted TOTP, permanent key and current version; final requires zero equation/all item reviews/open cutoff period. Reopen is current-owner only, latest cutoff first, retains issued snapshot. Refresh explicitly recaptures draft source and clears notes into retained audit history. Closed proof blocks historical cash/matching/source void and new imports contradicting no-activity evidence; retained bank identity cannot be remapped.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}. Register items,total,page,pages,filters. Detail item (without full source/final JSON),review.totals,25 current-source/remaining/note items,total/page/pages,undocumentedCount,unresolvedCount,basisStale,sourceUnavailable,generatedAt; history/isOwner. Command id,number,version,state. All money exact strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReconciliationAction"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliations/{id}/void": {
+      "post": {
+        "operationId": "recon_reconciliations_ById_void_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. One retained statement cutoff, exact posted GL closing, dated outstanding cash, unresolved source records and documented duplicate exclusions. No GL/cash execution. Stored source rows max5,000 per side; response25 stable rows, source hashes/totals, current basis status and retained actor history. Fresh password/hosted TOTP, permanent key and current version; final requires zero equation/all item reviews/open cutoff period. Reopen is current-owner only, latest cutoff first, retains issued snapshot. Refresh explicitly recaptures draft source and clears notes into retained audit history. Closed proof blocks historical cash/matching/source void and new imports contradicting no-activity evidence; retained bank identity cannot be remapped.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}. Register items,total,page,pages,filters. Detail item (without full source/final JSON),review.totals,25 current-source/remaining/note items,total/page/pages,undocumentedCount,unresolvedCount,basisStale,sourceUnavailable,generatedAt; history/isOwner. Command id,number,version,state. All money exact strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReconciliationAction"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliations/{id}/reopen": {
+      "post": {
+        "operationId": "recon_reconciliations_ById_reopen_post",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. One retained statement cutoff, exact posted GL closing, dated outstanding cash, unresolved source records and documented duplicate exclusions. No GL/cash execution. Stored source rows max5,000 per side; response25 stable rows, source hashes/totals, current basis status and retained actor history. Fresh password/hosted TOTP, permanent key and current version; final requires zero equation/all item reviews/open cutoff period. Reopen is current-owner only, latest cutoff first, retains issued snapshot. Refresh explicitly recaptures draft source and clears notes into retained audit history. Closed proof blocks historical cash/matching/source void and new imports contradicting no-activity evidence; retained bank identity cannot be remapped.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "200": {
+            "description": "Private {data}. Register items,total,page,pages,filters. Detail item (without full source/final JSON),review.totals,25 current-source/remaining/note items,total/page/pages,undocumentedCount,unresolvedCount,basisStale,sourceUnavailable,generatedAt; history/isOwner. Command id,number,version,state. All money exact strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReconciliationAction"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -27226,6 +27980,224 @@
           },
           "reauth": {
             "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "ReconciliationCreate": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mode",
+              "cashAccountId",
+              "statementBatchId",
+              "evidence",
+              "reason",
+              "reauth"
+            ],
+            "properties": {
+              "cashAccountId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "evidence": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 1000
+              },
+              "replacesId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid",
+                "default": null
+              },
+              "expectedPriorVersion": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "default": null
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              },
+              "mode": {
+                "const": "STATEMENT"
+              },
+              "statementBatchId": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mode",
+              "cashAccountId",
+              "startDate",
+              "cutoffDate",
+              "openingBalance",
+              "closingBalance",
+              "evidence",
+              "reason",
+              "reauth"
+            ],
+            "properties": {
+              "cashAccountId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "evidence": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 1000
+              },
+              "replacesId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid",
+                "default": null
+              },
+              "expectedPriorVersion": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "default": null
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              },
+              "mode": {
+                "const": "ZERO_ACTIVITY"
+              },
+              "startDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "cutoffDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "openingBalance": {
+                "type": "string",
+                "pattern": "^-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$",
+                "description": "Exact signed PKR normalized to two decimal places."
+              },
+              "closingBalance": {
+                "type": "string",
+                "pattern": "^-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$",
+                "description": "Exact signed PKR normalized to two decimal places."
+              }
+            }
+          }
+        ]
+      },
+      "ReconciliationAction": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "ReconciliationNotes": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedVersion",
+          "notes",
+          "reason",
+          "reauth"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          },
+          "notes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "description": "Distinct retained row keys. Every duplicate exclusion retains the source and identifies an exact fully matched peer.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "rowKey",
+                "kind",
+                "note"
+              ],
+              "properties": {
+                "rowKey": {
+                  "type": "string",
+                  "pattern": "^(CASH|STATEMENT):[0-9a-f-]{36}$"
+                },
+                "kind": {
+                  "enum": [
+                    "DOCUMENT",
+                    "EXCLUDE_DUPLICATE"
+                  ]
+                },
+                "note": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 500
+                },
+                "peerStatementLineId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uuid",
+                  "default": null
+                }
+              }
+            }
           }
         }
       }

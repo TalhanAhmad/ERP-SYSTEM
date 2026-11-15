@@ -9,6 +9,7 @@ export function FinanceNavigation() {
       <Link href="/finance/forecasts">Cash forecasts</Link>
       <Link href="/finance/statements">Bank statements</Link>
       <Link href="/finance/bank-matches">Bank matching</Link>
+      <Link href="/finance/reconciliations">Bank reconciliations</Link>
       <Link href="/finance/customer-credits">Credits</Link>
       <Link href="/finance/customer-refunds">Refunds</Link>
       <Link href="/finance/receipt-unallocations">Settlement releases</Link>

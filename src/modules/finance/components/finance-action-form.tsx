@@ -12,6 +12,7 @@ export function FinanceActionForm({
   children,
   business,
   disabled = false,
+  submitDisabled = false,
   method = "POST",
   redirectPrefix,
   onSaved,
@@ -23,6 +24,7 @@ export function FinanceActionForm({
   children?: React.ReactNode;
   business: (form: FormData) => Record<string, unknown>;
   disabled?: boolean;
+  submitDisabled?: boolean;
   method?: "POST" | "PATCH";
   redirectPrefix?: string;
   onSaved?: () => void;
@@ -143,7 +145,7 @@ export function FinanceActionForm({
             </button>
           </div>
         )}
-        <button type="submit" className="primary">
+        <button type="submit" className="primary" disabled={submitDisabled}>
           {pending ? "Verifying…" : label}
         </button>
       </fieldset>
