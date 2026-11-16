@@ -1,4 +1,4 @@
-# Posted roll-forward reporting — F37 in progress
+# Posted roll-forward reporting
 
 Current implementation reconstructs opening before the start DATE, actual positive increases and absolute decreases within the inclusive range, and closing through cutoff. Project results, funding, loans, investments, assets and advances retain separate metrics. Company totals and individual opening/closing control diagnostics are calculated before display filters and25-row paging.
 
@@ -8,4 +8,4 @@ A protected posted-source viewer shows exact posted lines and entry totals and r
 
 Additive74 implements the reports and source viewer. Additive75 preserves six-place unit precision in diagnostics; applied74 was not rewritten. The negative-unit recovery case uses an operator-only fault inside a rolled-back test transaction and introduces no public bypass.
 
-Final F37 acceptance is pending. The checkpoint has17 passing focused PostgreSQL cases, existing unit checks and affected browser coverage; the complete regression, dedicated roll-forward browser journey and Supabase-shaped build remain to be completed. No final export, hosted finance migration, activation or company/accountant acceptance is claimed.
+1,006 distinct local tests passed:288 unit,662 actual PostgreSQL integration (364.04s),56 Chromium (3.5m). Production and Supabase-shaped builds, strict typing/lint,206 concrete API contracts and all75 applied migration checksums passed. The dedicated roll-forward browser journey passed4.1s, covering real dated project credits/opposites, actual source workflows, six-decimal investment units, all six report views, mobile/WCAG and employee denial. Final export, company/accountant acceptance and live finance remain separate.

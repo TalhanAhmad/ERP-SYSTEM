@@ -200,7 +200,6 @@ const plus = (d: string, n: number) =>
   new Date(new Date(d + "T00:00:00Z").getTime() + n * 86400000)
     .toISOString()
     .slice(0, 10);
-const cents = (v: string) => BigInt(v.replace(".", ""));
 async function move(
   action: Parameters<typeof movementCommand>[2],
   input: unknown,

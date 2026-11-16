@@ -12,7 +12,7 @@ All45 Chromium journeys passed2.6m, including the new actual generation/post/dis
 
 ## Remaining milestones
 
-F37–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
+F38–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
 
 
 ## Final lifecycle edge cases
@@ -123,3 +123,12 @@ The focused browser passed3.2s on its first run: an actual100.01 invoice and act
 ## F37 in-progress source checkpoint
 
 F36 source9e0b9ad7f39e3cdac8e97029f17368670bab5295 passed [fresh CI43731747640](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43731747640):73 fresh migrations,985 tests and both builds/type/lint/API checks. Checkpoint checks passed:285 unit tests,17 focused PostgreSQL cases (17.29s),two affected browser journeys, production build, strict typing/lint,206 concrete API paths/verbs/references and all75 applied migration checksums. This is an in-progress F37 checkpoint: full backend/browser regression, a dedicated roll-forward browser journey, Supabase-shaped build and final milestone acceptance remain pending. The current source is published at the user’s request while final F37 acceptance remains pending. No hosted financial changes.
+
+
+## F37 final local verification
+
+Seventeen real backend cases cover cash/noncash funding, distribution debit-side control agreement and opposites; borrowed/lent principal and interest; investment cost/carrying/six-place units and income receivables; source asset registration and actual depreciation; explicit unregistered asset controls; project earned/deferred/unpaid/shared results; advance pools; company totals before display filters;27-event carry; exact credit/opposite workflow resolution;27-line complete source totals; current selection/revocation/flag/SQL ACL; and a rolled-back tiny negative-unit recovery fault. Additive75 corrected six-place diagnostic precision without rewriting74; all75 applied checksums match. Three schema checks now cover real date/page/kind boundaries, server-derived dimension identities and rejection of caller balance/permission assertions.
+
+The new browser journey uses actual invoices, credits, typed opposites and a reviewed investment acquisition. Its initial attempt used the reverse command’s retained original ID as a child ID. The corrected fixture follows the actual stored reversal relationship; the failed attempt is excluded. Focused acceptance passed4.1s. The browser now checks70.01 earned income at the credit cutoff, actual credit/opposite journal workflow links,3.000001 units without a company units total, all six report screens, current no-store APIs, mobile/WCAG and employee denial. Prior ledger/ageing browser paths retain their actual posted-source drill-down.
+
+1,006 distinct local tests passed:288 unit,662 actual PostgreSQL integration (364.04s),56 Chromium (3.5m). Production and Supabase-shaped builds, strict typing/lint,206 concrete API contracts and all75 applied migration checksums passed. The dedicated roll-forward browser journey passed4.1s, covering real dated project credits/opposites, actual source workflows, six-decimal investment units, all six report views, mobile/WCAG and employee denial. Database regression completed before fixture renewal/browser regression. No posted history or source invariants were removed to make tests pass. Fresh exact-head CI is required before the user-authorized merge. No hosted financial operation, owner policy adoption or human acceptance occurred.

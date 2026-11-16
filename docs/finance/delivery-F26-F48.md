@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F36 engineering is implemented and locally verified. Separate F26–F35 sources passed fresh CI. F36 adds historical receivables/payables ageing, dated event running carry, independent full-company control agreement and retained archived-source reporting. F37–F46 remain pending. F47 review-pack preparation continues for the user; human acceptance and F48 release decisions stay unfilled. Hosted finance stays disabled without schema/grants, real company mappings or financial seeds.
+F01–F37 engineering is implemented and locally verified. F37 includes posted roll-forwards and actual source workflows; F38–F46 remain pending. PR4 merge is authorized after fresh successful verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -97,3 +97,8 @@ F35 source4b4058f162b371b454200de22f12166e79a45969 passed [fresh CI43729128979](
 ## F37 in-progress source checkpoint
 
 F36 source9e0b9ad7f39e3cdac8e97029f17368670bab5295 passed [fresh CI43731747640](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43731747640):73 fresh migrations,985 tests and both builds/type/lint/API checks. Checkpoint checks passed:285 unit tests,17 focused PostgreSQL cases (17.29s),two affected browser journeys, production build, strict typing/lint,206 concrete API paths/verbs/references and all75 applied migration checksums. This is an in-progress F37 checkpoint: full backend/browser regression, a dedicated roll-forward browser journey, Supabase-shaped build and final milestone acceptance remain pending. The current source is published at the user’s request while final F37 acceptance remains pending. No hosted financial changes.
+
+
+## F37 delivered and locally verified
+
+1,006 distinct local tests passed:288 unit,662 actual PostgreSQL integration (364.04s),56 Chromium (3.5m). Production and Supabase-shaped builds, strict typing/lint,206 concrete API contracts and all75 applied migration checksums passed. The dedicated roll-forward browser journey passed4.1s, covering real dated project credits/opposites, actual source workflows, six-decimal investment units, all six report views, mobile/WCAG and employee denial. The prior checkpoint source5feb4c434fc14081284ffa8fc0313721cdeba6d5 passed [fresh CI43845502038](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43845502038). Current final acceptance adds dedicated browser and schema coverage; the resulting commit must pass fresh CI before the authorized PR4 merge. See [roll-forward rules](accounting/rollforwards.md) and [F37 record](planning/days/F37.md).
