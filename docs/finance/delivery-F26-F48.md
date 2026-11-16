@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F37 engineering is implemented and locally verified. F37 includes posted roll-forwards and actual source workflows; F38–F46 remain pending. PR4 merge is authorized after fresh successful verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
+F01–F37 engineering is implemented and locally verified. F37 includes posted roll-forwards and actual source workflows; F38–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -102,3 +102,8 @@ F36 source9e0b9ad7f39e3cdac8e97029f17368670bab5295 passed [fresh CI43731747640](
 ## F37 delivered and locally verified
 
 1,006 distinct local tests passed:288 unit,662 actual PostgreSQL integration (364.04s),56 Chromium (3.5m). Production and Supabase-shaped builds, strict typing/lint,206 concrete API contracts and all75 applied migration checksums passed. The dedicated roll-forward browser journey passed4.1s, covering real dated project credits/opposites, actual source workflows, six-decimal investment units, all six report views, mobile/WCAG and employee denial. The prior checkpoint source5feb4c434fc14081284ffa8fc0313721cdeba6d5 passed [fresh CI43845502038](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43845502038). Current final acceptance adds dedicated browser and schema coverage; the resulting commit must pass fresh CI before the authorized PR4 merge. See [roll-forward rules](accounting/rollforwards.md) and [F37 record](planning/days/F37.md).
+
+
+## PR4 publication and merge
+
+[PR #4](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/4) merged into main on 16 November 2026 at 19:50:22 Asia/Karachi. Merge commit **28065e33ba421d8831ce08bc0aef6ec7dfcc30e4** retains the separate milestone history. Exact final source **3cb6f13b880252540a0522abb8ad9111ee8bf2a8** passed [fresh CI43877779887](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43877779887) before merge: all75 fresh migrations,1,006 tests, typing/lint,both builds and206-path API checks. Local main was fast-forwarded and its application/schema/test/script/config content matches the verified source exactly. No hosted financial migration, finance enablement or company/accountant acceptance was performed.
