@@ -150,6 +150,13 @@ test("posted ledger carries second-page balances, opens real source and preserve
       ),
     ).toBe(true);
     await second.getByRole("link").first().click();
+    await expect(page).toHaveURL(/\/finance\/posted-sources\/[0-9a-f-]+$/);
+    await expect(
+      page.getByRole("heading", { name: "Posted source entry", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Open source workflow", exact: true })
+      .click();
     await expect(page).toHaveURL(/\/finance\/movements\/[0-9a-f-]+$/);
     await expect(
       page.getByRole("region", { name: "Movement preview", exact: true }),

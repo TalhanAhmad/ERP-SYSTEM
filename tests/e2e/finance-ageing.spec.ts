@@ -150,9 +150,18 @@ test("historical ageing keeps later payments out of earlier cutoffs and exposes 
     await expect(events.getByRole("row")).toHaveCount(3);
     await expect(events).toContainText("-20.00");
     await expect(events).toContainText("80.01");
+    const receiptEntry = (
+      await f.sql.query(
+        'SELECT id FROM "FinanceJournalEntry" WHERE "customerDocumentId"=$1',
+        [receipt.id],
+      )
+    ).rows[0];
     await expect(
-      events.locator('a[href="/finance/receipts/' + receipt.id + '"]'),
+      events.locator(
+        'a[href="/finance/posted-sources/' + receiptEntry.id + '"]',
+      ),
     ).toHaveCount(1);
+
     await page.setViewportSize({ width: 390, height: 844 });
     expect(
       await page.evaluate(

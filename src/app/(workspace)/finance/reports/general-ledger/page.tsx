@@ -130,6 +130,7 @@ export default async function Ledger({
                       <td>{l.postingDate}</td>
                       <td>
                         <FinancialSourceLink
+                          journalId={l.journalId}
                           type={l.sourceType}
                           id={l.sourceId}
                           reference={l.reference}
@@ -142,12 +143,11 @@ export default async function Ledger({
                           l.originalSourceId &&
                           l.originalSourceType && (
                             <p>
-                              Reversal of{" "}
-                              <FinancialSourceLink
-                                type={l.originalSourceType}
-                                id={l.originalSourceId}
-                                reference="original source"
-                              />
+                              <Link
+                                href={"/finance/posted-sources/" + l.journalId}
+                              >
+                                View correction and original entry
+                              </Link>
                             </p>
                           )}
                       </td>

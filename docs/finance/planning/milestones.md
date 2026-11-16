@@ -40,7 +40,7 @@
 | [F34](days/F34.md) | Build P&L and balance sheet with validated account mapping | Complete |
 | [F35](days/F35.md) | Build direct cash flow and mixed-payment cash classifications | Complete |
 | [F36](days/F36.md) | Build historical AR/AP ageing with dated settlement events | Complete |
-| [F37](days/F37.md) | Add project/funding/investment/asset report roll-forwards | Pending |
+| [F37](days/F37.md) | Add project/funding/investment/asset report roll-forwards | In progress |
 | [F38](days/F38.md) | Add authorized CSV/PDF exports, snapshots, and export revocation tests | Pending |
 | [F39](days/F39.md) | Build monthly close/reopen checklist and posting-lock concurrency | Pending |
 | [F40](days/F40.md) | Implement year close/reversal; verify retained earnings without duplication | Pending |

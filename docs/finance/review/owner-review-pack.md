@@ -121,3 +121,8 @@ An actual synthetic100.01 invoice remains100.01 at its original as-of cutoff, ev
 Full company AR/AP totals and control differences stay complete when document search returns no rows. Individual account issues cannot cancel into a misleading grand zero. Historical source history retains earlier-page running balances, with actual private journal links and a clear distinction from the current source page.
 
 985 distinct local checks passed:285 unit,645 actual PostgreSQL integration (329.29s),55 Chromium (3.4m). Both production builds, strict typing/lint,203 concrete API paths/verbs/references and all73 applied migration checksums passed. The new historical-ageing browser journey passed3.2s, including real later payment/earlier cutoff, exact dated source history, current private API, employee denial, mobile and WCAG. Full/focused Word/private-value checks accompany separate F36 publication; fresh CI is observed after push. Human acceptance and live financial activation remain unfilled.
+
+
+## F37 checkpoint boundary
+
+Checkpoint checks passed:285 unit tests,17 focused PostgreSQL cases (17.29s),two affected browser journeys, production build, strict typing/lint,206 concrete API paths/verbs/references and all75 applied migration checksums. This is an in-progress F37 checkpoint: full backend/browser regression, a dedicated roll-forward browser journey, Supabase-shaped build and final milestone acceptance remain pending. Current implementation is available for source review; this does not complete company/accountant acceptance or enable live finance.

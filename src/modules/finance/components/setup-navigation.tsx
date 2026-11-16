@@ -5,6 +5,9 @@ export function FinanceNavigation() {
       <Link href="/finance">Finance</Link>
       <Link href="/finance/reports/general-ledger">General ledger</Link>
       <Link href="/finance/reports/trial-balance">Trial balance</Link>
+      <Link href="/finance/reports/roll-forwards/PROJECTS">
+        Roll-forward reports
+      </Link>
       <Link href="/finance/reports/receivables-ageing">Receivables ageing</Link>
       <Link href="/finance/reports/payables-ageing">Payables ageing</Link>
       <Link href="/finance/reports/cash-flow">Direct cash flow</Link>

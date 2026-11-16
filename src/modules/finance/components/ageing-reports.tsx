@@ -409,6 +409,7 @@ export async function AgeingHistoryPage({
                   <td>{i.effectiveDate}</td>
                   <td>
                     <FinancialSourceLink
+                      journalId={i.journalId}
                       type={i.sourceType}
                       id={i.sourceId}
                       reference={i.reference}

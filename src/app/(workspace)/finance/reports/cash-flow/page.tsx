@@ -175,6 +175,7 @@ export default async function CashFlow({
                       <td>{i.postingDate}</td>
                       <td>
                         <FinancialSourceLink
+                          journalId={i.journalId}
                           type={i.sourceType}
                           id={i.sourceId}
                           reference={i.reference}

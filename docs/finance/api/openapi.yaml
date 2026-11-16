@@ -21828,6 +21828,281 @@
           }
         }
       }
+    },
+    "/api/v1/finance/reports/roll-forwards/{kind}": {
+      "get": {
+        "operationId": "rollforward_report",
+        "description": "Current ACTIVE explicitly selected Super Admin only, private/no-store, readonly. Actual posted project, funding, loan, investment, asset and advance events. Complete metrics and independent opening/closing control issues precede display search/page. Units remain six-place and are excluded from company monetary totals. Posted-source detail resolves the actual credit/payment/correction workflow instead of guessing a receipt route. Source/event pages contain at most25 rows; history running balances carry prior dates/pages. No financial write or final-export claim.",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "PROJECTS",
+                "FUNDING",
+                "LOANS",
+                "INVESTMENTS",
+                "ASSETS",
+                "ADVANCES"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          },
+          {
+            "name": "issuePage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Report: metadata,kind,separate metric totals(openingBalance,increases,decreases,periodNet,closingBalance),reconciliation(ready,issueCount,controlCount,negativeRowCount,openingBookDifference,closingBookDifference,25 account/source/book issues,page/pages),25 dimension items,total/page/pages. History: metadata,kind,dimension,openingBalance,closingBalance,25 dated source events with running balance,total/page/pages. Source: metadata,entry,actual workflow/original link,debitTotal,creditTotal,difference,25 explicit posted lines,total/page/pages. Decimal strings: PKR2 places and unit quantities6 places, including tiny negative-unit diagnostics. No credentials or whole source snapshots.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reports/roll-forwards/{kind}/events": {
+      "get": {
+        "operationId": "rollforward_history",
+        "description": "Current ACTIVE explicitly selected Super Admin only, private/no-store, readonly. Actual posted project, funding, loan, investment, asset and advance events. Complete metrics and independent opening/closing control issues precede display search/page. Units remain six-place and are excluded from company monetary totals. Posted-source detail resolves the actual credit/payment/correction workflow instead of guessing a receipt route. Source/event pages contain at most25 rows; history running balances carry prior dates/pages. No financial write or final-export claim.",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "PROJECTS",
+                "FUNDING",
+                "LOANS",
+                "INVESTMENTS",
+                "ASSETS",
+                "ADVANCES"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "rowKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "description": "Server-generated report dimension identity."
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Report: metadata,kind,separate metric totals(openingBalance,increases,decreases,periodNet,closingBalance),reconciliation(ready,issueCount,controlCount,negativeRowCount,openingBookDifference,closingBookDifference,25 account/source/book issues,page/pages),25 dimension items,total/page/pages. History: metadata,kind,dimension,openingBalance,closingBalance,25 dated source events with running balance,total/page/pages. Source: metadata,entry,actual workflow/original link,debitTotal,creditTotal,difference,25 explicit posted lines,total/page/pages. Decimal strings: PKR2 places and unit quantities6 places, including tiny negative-unit diagnostics. No credentials or whole source snapshots.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/posted-sources/{id}": {
+      "get": {
+        "operationId": "rollforward_source",
+        "description": "Current ACTIVE explicitly selected Super Admin only, private/no-store, readonly. Actual posted project, funding, loan, investment, asset and advance events. Complete metrics and independent opening/closing control issues precede display search/page. Units remain six-place and are excluded from company monetary totals. Posted-source detail resolves the actual credit/payment/correction workflow instead of guessing a receipt route. Source/event pages contain at most25 rows; history running balances carry prior dates/pages. No financial write or final-export claim.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}. Report: metadata,kind,separate metric totals(openingBalance,increases,decreases,periodNet,closingBalance),reconciliation(ready,issueCount,controlCount,negativeRowCount,openingBookDifference,closingBookDifference,25 account/source/book issues,page/pages),25 dimension items,total/page/pages. History: metadata,kind,dimension,openingBalance,closingBalance,25 dated source events with running balance,total/page/pages. Source: metadata,entry,actual workflow/original link,debitTotal,creditTotal,difference,25 explicit posted lines,total/page/pages. Decimal strings: PKR2 places and unit quantities6 places, including tiny negative-unit diagnostics. No credentials or whole source snapshots.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

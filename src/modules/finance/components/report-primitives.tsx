@@ -48,18 +48,18 @@ export function ReportMetadataPanel({
   );
 }
 export function FinancialSourceLink({
+  journalId,
   type,
   id,
   reference,
 }: {
+  journalId?: string | null;
   type: string;
   id: string;
   reference: string;
 }) {
   const resources: Record<string, string> = {
     MOVEMENT: "movements",
-    CUSTOMER_DOCUMENT: "receipts",
-    SUPPLIER_DOCUMENT: "supplier-payments",
     BILL: "bills",
     INVOICE: "invoices",
     ASSET_MOVEMENT: "asset-movements",
@@ -67,6 +67,10 @@ export function FinancialSourceLink({
     COST_ALLOCATION: "cost-allocations",
   };
   const resource = resources[type];
+  if (journalId)
+    return (
+      <Link href={"/finance/posted-sources/" + journalId}>{reference}</Link>
+    );
   return resource ? (
     <Link href={"/finance/" + resource + "/" + id}>{reference}</Link>
   ) : (

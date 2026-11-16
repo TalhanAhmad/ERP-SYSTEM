@@ -24,6 +24,7 @@ export default async function Review({
         <h2>Posted cash source</h2>
         <p>
           <FinancialSourceLink
+            journalId={d.source.journalId}
             type={d.source.sourceType}
             id={d.source.sourceId}
             reference={d.source.reference}
