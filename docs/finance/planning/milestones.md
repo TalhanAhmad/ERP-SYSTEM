@@ -29,18 +29,18 @@
 | [F23](days/F23.md) | Build investment holdings, acquisition lots, and movement services | Complete |
 | [F24](days/F24.md) | Build investment disposals, returns, adjustments, and over-disposal tests | Complete |
 | [F25](days/F25.md) | Build fixed asset register linked to purchases without duplicate postings | Complete |
-| [F26](days/F26.md) | Implement depreciation drafts, exact rounding, disposal, and reversals | Pending |
-| [F27](days/F27.md) | Add private project contracts, variations, and billing milestones | Pending |
-| [F28](days/F28.md) | Build cost allocation/reclassification and project result calculations | Pending |
-| [F29](days/F29.md) | Add versioned budgets, variance views, and separate forecasts | Pending |
-| [F30](days/F30.md) | Implement statement CSV preview/commit and duplicate protection | Pending |
-| [F31](days/F31.md) | Implement match/unmatch with partial and combined transactions | Pending |
-| [F32](days/F32.md) | Build reconciliation UI and statement-to-GL proof | Pending |
-| [F33](days/F33.md) | Build general ledger and trial balance with opening/running balances | Pending |
-| [F34](days/F34.md) | Build P&L and balance sheet with validated account mapping | Pending |
-| [F35](days/F35.md) | Build direct cash flow and mixed-payment cash classifications | Pending |
-| [F36](days/F36.md) | Build historical AR/AP ageing with dated settlement events | Pending |
-| [F37](days/F37.md) | Add project/funding/investment/asset report roll-forwards | Pending |
+| [F26](days/F26.md) | Implement depreciation drafts, exact rounding, disposal, and reversals | Complete |
+| [F27](days/F27.md) | Add private project contracts, variations, and billing milestones | Complete |
+| [F28](days/F28.md) | Build cost allocation/reclassification and project result calculations | Complete |
+| [F29](days/F29.md) | Add versioned budgets, variance views, and separate forecasts | Complete |
+| [F30](days/F30.md) | Implement statement CSV preview/commit and duplicate protection | Complete |
+| [F31](days/F31.md) | Implement match/unmatch with partial and combined transactions | Complete |
+| [F32](days/F32.md) | Build reconciliation UI and statement-to-GL proof | Complete |
+| [F33](days/F33.md) | Build general ledger and trial balance with opening/running balances | Complete |
+| [F34](days/F34.md) | Build P&L and balance sheet with validated account mapping | Complete |
+| [F35](days/F35.md) | Build direct cash flow and mixed-payment cash classifications | Complete |
+| [F36](days/F36.md) | Build historical AR/AP ageing with dated settlement events | Complete |
+| [F37](days/F37.md) | Add project/funding/investment/asset report roll-forwards | Complete |
 | [F38](days/F38.md) | Add authorized CSV/PDF exports, snapshots, and export revocation tests | Pending |
 | [F39](days/F39.md) | Build monthly close/reopen checklist and posting-lock concurrency | Pending |
 | [F40](days/F40.md) | Implement year close/reversal; verify retained earnings without duplication | Pending |

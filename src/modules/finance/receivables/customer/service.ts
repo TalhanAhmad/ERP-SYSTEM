@@ -1,3 +1,5 @@
+import { bankMatchErrors } from "../../treasury/matching/errors";
+import { costErrors } from "../../projects/costs/errors";
 import "server-only";
 import { z } from "zod";
 import { db } from "@/server/db";
@@ -12,10 +14,15 @@ import {
   type CustomerResource,
 } from "./schemas";
 const errors: Record<string, string> = {
- FINANCE_TAX_POLICY:"Choose an applicable reviewed tax/withholding policy for the posting date.",
- FINANCE_TAX_MAPPING:"The tax policy or mapped accounts are inactive or invalid. Review the draft before posting.",
- FINANCE_TAX_MISMATCH:"Tax snapshots, amounts and mapped journal must agree.",
- FINANCE_CREDIT_TAX_ORDER:"A later taxed credit reserves the tax split. Correct it first or use a later posting date.",
+  ...costErrors,
+  ...bankMatchErrors,
+  FINANCE_TAX_POLICY:
+    "Choose an applicable reviewed tax/withholding policy for the posting date.",
+  FINANCE_TAX_MAPPING:
+    "The tax policy or mapped accounts are inactive or invalid. Review the draft before posting.",
+  FINANCE_TAX_MISMATCH: "Tax snapshots, amounts and mapped journal must agree.",
+  FINANCE_CREDIT_TAX_ORDER:
+    "A later taxed credit reserves the tax split. Correct it first or use a later posting date.",
   FINANCE_CREDIT_UNAVAILABLE:
     "Credit lines must belong to the invoice and remain within the eligible original amounts.",
   FINANCE_SETTLEMENT_ORDER:
@@ -153,7 +160,7 @@ function dto<
 >(d: T) {
   return {
     ...d,
-    withholdingAmount:d.withholdingAmount.toFixed(2),
+    withholdingAmount: d.withholdingAmount.toFixed(2),
     cashAmount: d.cashAmount.toFixed(2),
     feeAmount: d.feeAmount.toFixed(2),
     allocationAmount: d.allocationAmount.toFixed(2),

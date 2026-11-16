@@ -135,16 +135,14 @@ test("owner configures accounts and periods; selected administrators have a read
     ).toContainText("account update");
 
     // Retained fixtures are intentional: no deletion of configuration/audit history.
-    const max = (
-      await sql.query('SELECT max("endDate") AS last FROM "FinancePeriod"')
-    ).rows[0].last;
-    const start = new Date(
-      Math.max(
-        new Date(max ?? "6000-01-01").getTime(),
-        new Date("6000-01-01").getTime(),
-      ) +
-        35 * 86400000,
-    );
+    const candidate = (
+      await sql.query(
+        `SELECT d::date AS start FROM generate_series(DATE '6000-01-01',DATE '9000-01-01',interval '1 year')d WHERE NOT EXISTS(SELECT 1 FROM "FinancePeriod" p WHERE p.state<>'VOID' AND daterange(p."startDate",p."endDate",'[]') && daterange(d::date,(d+interval '90 days')::date,'[]')) ORDER BY d LIMIT 1`,
+      )
+    ).rows[0];
+    if (!candidate)
+      throw new Error("No isolated bounded browser period available");
+    const start = new Date(candidate.start);
     const end = new Date(start.getTime() + 29 * 86400000);
     await page.goto("/finance/periods");
     const create = page.getByRole("region", {

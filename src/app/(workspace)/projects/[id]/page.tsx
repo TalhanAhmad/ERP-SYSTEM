@@ -11,6 +11,7 @@ import {
   RemoveMember,
 } from "@/components/lifecycle-forms";
 import { db } from "@/server/db";
+import { hasFinanceAccess } from "@/modules/finance/access/policy";
 export default async function ProjectDetailPage({
   params,
 }: {
@@ -24,6 +25,7 @@ export default async function ProjectDetailPage({
     if (e.code === "NOT_FOUND") notFound();
     throw e;
   });
+  const finance = await hasFinanceAccess(actor);
   const manage =
     actor.role === "SUPER_ADMIN" ||
     (actor.role === "TEAM_LEAD" && p.managerId === actor.id);
@@ -52,6 +54,11 @@ export default async function ProjectDetailPage({
   return (
     <>
       <Link href="/projects">← Back to projects</Link>
+      {finance && (
+        <Link className="button" href={"/finance/projects/" + p.id}>
+          Project finance
+        </Link>
+      )}
       <div className="page-heading">
         <div>
           <span className="eyebrow">PROJECT</span>

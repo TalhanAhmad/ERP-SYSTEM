@@ -30,7 +30,9 @@ export default async function Assets({
       <section className="panel" aria-label="Registered asset totals">
         <p>
           Registered matching cost{" "}
-          <MoneyCell value={d.summary.registeredCost} /> · Residual value{" "}
+          <MoneyCell value={d.summary.registeredCost} /> · Current cost{" "}
+          <MoneyCell value={d.summary.currentCost} /> · Carrying value{" "}
+          <MoneyCell value={d.summary.carryingValue} /> · Initial residual value{" "}
           <MoneyCell value={d.summary.residualValue} /> · Accumulated
           depreciation <MoneyCell value={d.summary.accumulatedDepreciation} />
         </p>
@@ -40,10 +42,11 @@ export default async function Assets({
         drawer={false}
         label="Asset"
         columns={[
+          "Asset",
           "Description",
           "Location / custodian",
           "State",
-          "Cost (PKR)",
+          "Current cost (PKR)",
           "Carrying value (PKR)",
           "Convention",
         ]}
@@ -56,7 +59,7 @@ export default async function Assets({
             i.description,
             i.location + " · " + (i.custodian?.displayName ?? "Unassigned"),
             i.state,
-            <MoneyCell key="c" value={i.cost} />,
+            <MoneyCell key="c" value={i.currentCost} />,
             <MoneyCell key="v" value={i.carryingValue} />,
             i.convention,
           ],
@@ -83,7 +86,7 @@ export default async function Assets({
           <label>
             Registration state
             <select name="state" defaultValue={d.filters.state}>
-              {["REGISTERED", "VOIDED", "ALL"].map((s) => (
+              {["REGISTERED", "DISPOSED", "VOIDED", "ALL"].map((s) => (
                 <option key={s}>{s}</option>
               ))}
             </select>

@@ -42,3 +42,9 @@ Current and later effective balances must all remain nonnegative. Backdated cred
 Typed source adapters share the existing engine/current-access/period/receipt boundary. Funding, principal/interest and investment basis/results are separate. Explicit investment lots capture reproducible basis and reject stale drafts/earlier lot dates; zero-carrying retirements retain audited register facts without an invented GL. Purchase-linked assets allocate existing net GL cost and block later source understatement.
 
 Default asset convention remains PENDING. A selectable reviewed full-month policy is implemented for future scheduling, but no company adoption or depreciation charge is inferred. F26–F48 and live financial migration/grants/policy/scanner/retention/real-data acceptance remain outside this delivery.
+
+## F26–F48 continuation and review recipient — 14 November2026
+
+User explicitly requested PR3 merge and continuation. PR3 merged atb83951d after exact-head successful CI43584464377. Remaining finance engineering continues on finance/f26-f48, with separate milestone commits/pushes. The user answered “Prepare the review pack for me”; [owner review pack](review/owner-review-pack.md) records pending company policies and unfilled acceptance fields. This does not claim accountant sign-off, approve real books, establish live fiscal/cutover policy or enable hosted finance.
+
+F26 implements only explicitly confirmed full-month straight-line plans with exact final-paisa charges, source/month identity, separately reviewed posting, dated lifecycle changes and immutable correction. Company policy defaults remain pending; event/job generation cannot silently post.

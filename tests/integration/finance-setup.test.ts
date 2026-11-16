@@ -169,14 +169,14 @@ beforeEach(async () => {
       reason: "Explicit selected read-only setup fixture",
     },
   });
-  const latest = await db.financePeriod.findFirst({
-    orderBy: { endDate: "desc" },
-    select: { endDate: true },
-  });
-  anchor = new Date(
-    (latest?.endDate ?? new Date("6000-01-01T00:00:00Z")).getTime() +
-      35 * 86400000,
-  );
+  // A far-future date-guard fixture must not push this test beyond year 9999.
+  // Choose an unused bounded range instead of adding days to the global maximum.
+  const available = await db.$queryRaw<
+    { start: Date }[]
+  >`SELECT d::date AS start FROM generate_series(DATE '6000-01-01',DATE '9000-01-01',interval '1 year')d WHERE NOT EXISTS(SELECT 1 FROM "FinancePeriod" p WHERE p.state<>'VOID' AND daterange(p."startDate",p."endDate",'[]') && daterange(d::date,(d+interval '90 days')::date,'[]')) ORDER BY d LIMIT 1`;
+  if (!available[0])
+    throw new Error("No isolated bounded setup period available");
+  anchor = available[0].start;
 });
 afterAll(async () => {
   await releaseOwnedSingleton();

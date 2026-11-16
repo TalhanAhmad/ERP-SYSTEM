@@ -395,7 +395,15 @@ it("rejects protected controls, groups and inactive posting accounts at the data
   ).rejects.toMatchObject({ code: "FINANCE_PROJECT_UNAVAILABLE" });
 });
 it("rejects dates outside open periods and future posting dates", async () => {
-  const noPeriod = await command("CREATE", body({ postingDate: "1800-01-01" }));
+  const uncovered = await db.$queryRaw<
+    { day: Date }[]
+  >`SELECT d::date AS day FROM generate_series(DATE '1000-01-01',DATE '1400-01-01',interval '1 year')d WHERE NOT EXISTS(SELECT 1 FROM "FinancePeriod" p WHERE p.state='OPEN' AND d::date BETWEEN p."startDate" AND p."endDate") ORDER BY d LIMIT 1`;
+  if (!uncovered[0])
+    throw new Error("No uncovered date for missing-period test");
+  const noPeriod = await command(
+    "CREATE",
+    body({ postingDate: uncovered[0].day.toISOString().slice(0, 10) }),
+  );
   await expect(
     command("POST", {
       id: noPeriod.id,

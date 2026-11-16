@@ -125,3 +125,6 @@ F12 invoice screens/private PDF, F13 receipts, F14 client advances and F15 credi
 ## PR #2 merge — 13 November 2026
 
 [PR #2](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/2) was merged into main at 18:43:40 Pakistan time on 13 November 2026 (13:43:40 UTC), following Talha’s explicit request. Merge commit: **32964e847ccef43f6152a4e406239a9c657da4be**. A merge commit preserved the separate milestone commits. Exact PR head86c0cd2aebcdf28e7c9535789b8fec4ede4bb1b8 passed [CI43423801209](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43423801209) before merge. Local main was fast-forwarded to the merged result; application/schema/test/script content is identical to that verified head. No manual hosted finance migration or activation was performed.
+
+
+Finance continuation,14 November2026: PR3 is merged and F26 asset lifecycle is locally verified with779 distinct checks. [Current finance tracker](finance/delivery-F26-F48.md) and [Word report](finance/Encova_F26-F48_Report.docx) record remaining F27–F48 work and the requested owner review pack. Hosted finance remains disabled.

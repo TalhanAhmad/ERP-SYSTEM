@@ -131,8 +131,14 @@ export default async function Cash({
                   </Link>
                 </td>
                 <td>
-                  {i.sourceType === "MOVEMENT" ? (
-                    <Link href={"/finance/movements/" + i.sourceId}>
+                  {["MOVEMENT", "ASSET_MOVEMENT"].includes(i.sourceType) ? (
+                    <Link
+                      href={
+                        (i.sourceType === "ASSET_MOVEMENT"
+                          ? "/finance/asset-movements/"
+                          : "/finance/movements/") + i.sourceId
+                      }
+                    >
                       {i.reference}
                     </Link>
                   ) : (

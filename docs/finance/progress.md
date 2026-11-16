@@ -1,8 +1,10 @@
 # Finance progress
 
-Updated 13 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
+Updated 16 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F25 complete: 25 of 48 finance engineering milestones; 23 remain outside this request.** Updated14 November2026. The requested F16–F25 scope is implemented and locally verified on finance/f16-f25, with separate milestone commits/pushes. Final759 tests passed:246 unit,469 PostgreSQL integration,44 Chromium (2.5m), plus type/lint, both production builds,116-path API,55 applied checksums and Word/private-value checks. F24 sourcecaa5d2b passed fresh CI43576472332 (741 tests). F25 source7e27443 is separately pushed and [CI43583420594](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43583420594) passed all759 checks and55 migrations on a fresh runner. See [delivery tracker](delivery-F16-F25.md), [verification](testing/F16-F25-results.md) and [Word report](Encova_F16-F25_Report.docx). Hosted finance remains disabled; company policies/real data and controlled release are not inferred.
+**F01–F37 locally complete:37 of48 finance milestones;11 remain.** F37 delivers actual project/funding/loan/investment/asset/advance roll-forwards, independent control diagnostics and protected posted-source/workflow traceability. 1,006 distinct local tests passed:288 unit,662 actual PostgreSQL integration (364.04s),56 Chromium (3.5m). Production and Supabase-shaped builds, strict typing/lint,206 concrete API contracts and all75 applied migration checksums passed. The dedicated roll-forward browser journey passed4.1s, covering real dated project credits/opposites, actual source workflows, six-decimal investment units, all six report views, mobile/WCAG and employee denial. The prior checkpoint source5feb4c434fc14081284ffa8fc0313721cdeba6d5 passed [fresh CI43845502038](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43845502038). Current final acceptance adds dedicated browser and schema coverage; the resulting commit must pass fresh CI before the authorized PR4 merge. Full and focused Word reports record accepted results and corrections. See [delivery](delivery-F26-F48.md), [verification](testing/F26-F48-results.md), [Word report](Encova_F26-F48_Report.docx) and [owner review pack](review/owner-review-pack.md). The user authorized testing followed by PR4 merge after successful verification. F38–F46 engineering, human F47 review and live F48 activation remain separate. Finance stays disabled live; no hosted financial schema/grants or real books were adopted.
+
+Prior F16–F25 evidence remains in [delivery](delivery-F16-F25.md), [verification](testing/F16-F25-results.md) and its [historical Word report](Encova_F16-F25_Report.docx). F25 exact source7e27443 passed CI43583420594 with759 checks and55 fresh migrations.
 
 The following records describe the previously completed and merged F15 release:
 
@@ -36,3 +38,38 @@ Reviewed policy setup, inclusive/exclusive source taxes, original net/tax credit
 
 ## F19 development
 Typed private evidence, signed malware quarantine, strict current-access bounded download, immutable posted retention and explicit operator setup/cleanup implemented. Fourteen backend and three unit checks passed;6MiB browser journey passed5.6s. Schema47, API97 paths. Live finance/scanner remain disabled/unconfigured. F18 corrected exact-source CI43455396870 passed642 cases. F20 next.
+
+
+F27 separate publication verified: source9e23dfc36b472ac540617245df753cb9292445de passed [fresh CI43604433797](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43604433797), including60 fresh migrations, all798 tests, both builds/type/lint/142-path docs. F28 engineering and final verification are in progress; [cost-allocation rules](accounting/cost-allocation.md) describe the implemented boundary.
+
+
+F28 source2c3b0031e87fab2a63e0445118e216e7f61718ca passed [fresh CI43609969834](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43609969834):61 migrations, all818 tests, both builds/type/lint/152-path API verification. F29 local acceptance is complete; source publication/fresh CI are recorded separately.
+
+
+F29 sourcea6b014b9f03ad70e62c8cff3733a4e6070ad3bec passed [fresh CI43612791776](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43612791776):63 migrations, all838 tests, both builds/type/lint/162-path documentation checks. F30 local acceptance is complete; separate publication/fresh CI is recorded in the continuation tracker.
+
+
+F30 source151ab2ef05a4a752477ef3d73cca9d8af65a9d78 passed [fresh CI43620888565](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43620888565):64 fresh migrations,865 tests and both builds/type/lint/docs. F31 local acceptance is complete; separate publication/CI is recorded in the continuation tracker.
+
+
+F31 source18c631e47184891973e74b5910046bd838d09a0c passed [fresh CI43624960483](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43624960483):66 fresh migrations,882 tests and both builds/type/lint/API checks. F32 local acceptance is complete; separate publication/CI is recorded in the continuation tracker.
+
+
+F32 source912634c7d44689cee05ded37bc805a17fabb263a passed [fresh CI43714158210](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43714158210):68 fresh migrations,902 tests and both builds/type/lint/API checks. F33 local acceptance is complete; separate publication/CI is recorded in the continuation tracker.
+
+
+F33 source18c8358bbd30eb2a48348090c9fba7b994c71386 passed [fresh CI43716796463](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43716796463):70 fresh migrations,921 tests and both builds/type/lint/API checks. F34 local acceptance is complete; separate publication/CI is recorded in the continuation tracker.
+
+
+F34 sourceca6b25da5f67af86f048f9bdf2328a6ee92314c5 passed [fresh CI43723662717](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43723662717):71 fresh migrations,940 tests and both builds/type/lint/API checks. F35 local acceptance is complete; separate publication/CI is recorded in the continuation tracker.
+
+
+F35 source4b4058f162b371b454200de22f12166e79a45969 passed [fresh CI43729128979](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43729128979):72 fresh migrations,962 tests and both builds/type/lint/API checks. F36 development and full acceptance are in progress.
+
+
+F36 local acceptance is complete; separate source/fresh CI is recorded in the continuation tracker.
+
+
+## F37 development checkpoint — 16 November 2026
+
+F36 source9e0b9ad7f39e3cdac8e97029f17368670bab5295 passed [fresh CI43731747640](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43731747640):73 fresh migrations,985 tests and both builds/type/lint/API checks. Checkpoint checks passed:285 unit tests,17 focused PostgreSQL cases (17.29s),two affected browser journeys, production build, strict typing/lint,206 concrete API paths/verbs/references and all75 applied migration checksums. This is an in-progress F37 checkpoint: full backend/browser regression, a dedicated roll-forward browser journey, Supabase-shaped build and final milestone acceptance remain pending. The user requested a source push before final F37 completion. Roll-forwards and actual posted-source workflow resolution are included; F37 is not marked complete. Finance stays disabled live.

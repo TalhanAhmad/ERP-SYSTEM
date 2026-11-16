@@ -3,6 +3,24 @@ export function FinanceNavigation() {
   return (
     <nav aria-label="Finance navigation" className="form-actions">
       <Link href="/finance">Finance</Link>
+      <Link href="/finance/reports/general-ledger">General ledger</Link>
+      <Link href="/finance/reports/trial-balance">Trial balance</Link>
+      <Link href="/finance/reports/roll-forwards/PROJECTS">
+        Roll-forward reports
+      </Link>
+      <Link href="/finance/reports/receivables-ageing">Receivables ageing</Link>
+      <Link href="/finance/reports/payables-ageing">Payables ageing</Link>
+      <Link href="/finance/reports/cash-flow">Direct cash flow</Link>
+      <Link href="/finance/reports/profit-loss">Profit and loss</Link>
+      <Link href="/finance/reports/balance-sheet">Balance sheet</Link>
+      <Link href="/finance/report-settings">Statement presentation</Link>
+      <Link href="/finance/projects">Commercial projects</Link>
+      <Link href="/finance/cost-allocations">Cost allocations</Link>
+      <Link href="/finance/budgets">Budgets</Link>
+      <Link href="/finance/forecasts">Cash forecasts</Link>
+      <Link href="/finance/statements">Bank statements</Link>
+      <Link href="/finance/bank-matches">Bank matching</Link>
+      <Link href="/finance/reconciliations">Bank reconciliations</Link>
       <Link href="/finance/customer-credits">Credits</Link>
       <Link href="/finance/customer-refunds">Refunds</Link>
       <Link href="/finance/receipt-unallocations">Settlement releases</Link>
@@ -14,9 +32,10 @@ export function FinanceNavigation() {
       <Link href="/finance/supplier-refunds">Supplier refunds</Link>
       <Link href="/finance/supplier-releases">Payment releases</Link>
       <Link href="/finance/assets">Fixed assets</Link>
- <Link href="/finance/investments">Investments</Link>
- <Link href="/finance/loans">Loans</Link>
- <Link href="/finance/funding">Founder funding</Link>
+      <Link href="/finance/asset-movements">Asset movements</Link>
+      <Link href="/finance/investments">Investments</Link>
+      <Link href="/finance/loans">Loans</Link>
+      <Link href="/finance/funding">Founder funding</Link>
       <Link href="/finance/cash-register">Cash register</Link>
       <Link href="/finance/transfers">Transfers</Link>
       <Link href="/finance/attachments">Evidence</Link>

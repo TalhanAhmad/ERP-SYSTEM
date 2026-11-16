@@ -1,0 +1,3 @@
+export const MAX_STATEMENT_BYTES = 5_000_000;
+export const MAX_STATEMENT_ROWS = 5000;
+export const STATEMENT_CHUNK_BYTES = 2 * 1024 * 1024;

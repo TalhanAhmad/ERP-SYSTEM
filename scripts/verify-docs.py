@@ -29,7 +29,7 @@ api=json.loads((root/'docs/finance/api/openapi.yaml').read_text())
 verbs={'GET','POST','PATCH','DELETE','PUT','HEAD','OPTIONS'}
 actual={}
 for route in (root/'src/app/api/v1/finance').rglob('route.ts'):
- path='/'+str(route.parent.relative_to(root/'src/app')).replace('[id]','{id}')
+ path='/'+re.sub(r'\[([^\]]+)\]', r'{\1}', str(route.parent.relative_to(root/'src/app')))
  exports=set(re.findall(r'export\s+(?:async\s+)?function\s+(GET|POST|PATCH|DELETE|PUT|HEAD|OPTIONS)\b|export\s+const\s+(GET|POST|PATCH|DELETE|PUT|HEAD|OPTIONS)\b',route.read_text()))
  actual[path]={next(x for x in pair if x).lower() for pair in exports}
  for block in re.findall(r'export\s*\{([^}]+)\}',route.read_text()):

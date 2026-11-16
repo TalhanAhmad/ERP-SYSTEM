@@ -17,7 +17,7 @@ export async function assetRead(
   try {
     requireFinanceEnabled();
     const actor = await context(request.headers);
-    await rateLimit("finance:movements:read:" + actor.id);
+    await rateLimit("finance:assets:read:" + actor.id);
     const query = Object.fromEntries(new URL(request.url).searchParams);
     return financePrivate(
       NextResponse.json({

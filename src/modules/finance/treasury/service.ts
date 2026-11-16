@@ -1,3 +1,5 @@
+import { bankMatchErrors } from "./matching/errors";
+import { costErrors } from "../projects/costs/errors";
 import "server-only";
 import { assetErrors } from "../assets/errors";
 import { holdingErrors } from "../investments/service";
@@ -19,6 +21,8 @@ import {
   fundingKinds,
 } from "./schemas";
 const errors: Record<string, string> = {
+  ...costErrors,
+  ...bankMatchErrors,
   ...assetErrors,
   ...loanErrors,
   ...holdingErrors,

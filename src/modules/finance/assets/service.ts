@@ -114,6 +114,23 @@ export async function assetCommand(
   }
   throw new AppError("CONCURRENT_CHANGE", "Concurrent change; retry.", 409);
 }
+
+export async function assetPositions(
+  tx: Prisma.TransactionClient,
+  ids: string[],
+) {
+  if (!ids.length)
+    return new Map<string, { currentCost: string; carryingValue: string }>();
+  const rows = await tx.$queryRaw<
+    { id: string; currentCost: string; carryingValue: string }[]
+  >(Prisma.sql`
+    SELECT a.id, round(a.cost + coalesce(sum(e."costDelta"),0),2)::text AS "currentCost",
+    round(a.cost + coalesce(sum(e."costDelta"-e."depreciationDelta"),0),2)::text AS "carryingValue"
+    FROM "FinanceAsset" a LEFT JOIN "FinanceAssetEvent" e ON e."assetId"=a.id
+    WHERE a.id IN (${Prisma.join(ids.map((id) => Prisma.sql`${id}::uuid`))}) GROUP BY a.id`);
+  return new Map(rows.map((r) => [r.id, r]));
+}
+
 const date = (d: Date) => d.toISOString().slice(0, 10);
 export async function assetDetail(actor: Pick<Actor, "id">, id: string) {
   return withFinanceAccess(actor, async (tx) => {
@@ -135,6 +152,31 @@ export async function assetDetail(actor: Pick<Actor, "id">, id: string) {
       },
     });
     invariant(item, "FINANCE_NOT_FOUND", "Asset unavailable.", 404);
+    const positions = await assetPositions(tx, [id]);
+    const movements = await tx.financeAssetMovement.findMany({
+      where: { assetId: id },
+      select: {
+        id: true,
+        number: true,
+        kind: true,
+        month: true,
+        postingDate: true,
+        amount: true,
+        state: true,
+        reversedBy: { select: { id: true } },
+      },
+      orderBy: [{ postingDate: "desc" }, { createdAt: "desc" }, { id: "asc" }],
+      take: 50,
+    });
+    const policies = await tx.financeAssetEvent.findMany({
+      where: {
+        assetId: id,
+        movement: { kind: "POLICY_CHANGE", state: "POSTED", reversedBy: null },
+      },
+      select: { policy: true },
+      orderBy: [{ recordedAt: "desc" }, { id: "desc" }],
+      take: 1,
+    });
     const history = await tx.financeAuditEvent.findMany({
       where: { entityType: "FinanceAsset", entityId: id },
       select: {
@@ -153,12 +195,28 @@ export async function assetDetail(actor: Pick<Actor, "id">, id: string) {
         cost: item.cost.toFixed(2),
         residualValue: item.residualValue.toFixed(2),
         accumulatedDepreciation: item.accumulatedDepreciation.toFixed(2),
-        carryingValue: item.cost.minus(item.accumulatedDepreciation).toFixed(2),
+        currentCost: positions.get(id)!.currentCost,
+        carryingValue: positions.get(id)!.carryingValue,
         purchaseDate: date(item.purchaseDate),
         sourcePostingDate: date(item.sourcePostingDate),
         inServiceDate: date(item.inServiceDate),
         disposalDate: item.disposalDate ? date(item.disposalDate) : null,
       },
+      movements: movements.map((m) => ({
+        ...m,
+        amount: m.amount.toFixed(2),
+        postingDate: date(m.postingDate),
+      })),
+      activePolicy: policies[0]?.policy
+        ? z
+            .object({
+              base: z.string(),
+              residual: z.string(),
+              months: z.number(),
+              firstMonth: z.string(),
+            })
+            .parse(policies[0].policy)
+        : null,
       history,
     };
   });
@@ -208,13 +266,26 @@ export async function assets(actor: Pick<Actor, "id">, input: unknown = {}) {
           accumulatedDepreciation: true,
         },
       });
+    const events = await tx.financeAssetEvent.aggregate({
+      where: { asset: { AND: [where, { state: "REGISTERED" }] } },
+      _sum: { costDelta: true },
+    });
+    const Exact = Prisma.Decimal.clone({ precision: 64 });
+    const currentCost = new Exact(sum._sum.cost?.toString() ?? "0").plus(
+      events._sum.costDelta?.toString() ?? "0",
+    );
+    const positions = await assetPositions(
+      tx,
+      items.map((i) => i.id),
+    );
     return {
       items: items.map((i) => ({
         ...i,
         cost: i.cost.toFixed(2),
         residualValue: i.residualValue.toFixed(2),
         accumulatedDepreciation: i.accumulatedDepreciation.toFixed(2),
-        carryingValue: i.cost.minus(i.accumulatedDepreciation).toFixed(2),
+        currentCost: positions.get(i.id)!.currentCost,
+        carryingValue: positions.get(i.id)!.carryingValue,
         inServiceDate: date(i.inServiceDate),
       })),
       total,
@@ -223,6 +294,10 @@ export async function assets(actor: Pick<Actor, "id">, input: unknown = {}) {
       filters: q,
       summary: {
         registeredCost: sum._sum.cost?.toFixed(2) ?? "0.00",
+        currentCost: currentCost.toFixed(2),
+        carryingValue: currentCost
+          .minus(sum._sum.accumulatedDepreciation?.toString() ?? "0")
+          .toFixed(2),
         residualValue: sum._sum.residualValue?.toFixed(2) ?? "0.00",
         accumulatedDepreciation:
           sum._sum.accumulatedDepreciation?.toFixed(2) ?? "0.00",
@@ -265,8 +340,8 @@ export async function assetOptions(actor: Pick<Actor, "id">, input: unknown) {
     }
     const source =
       q.kind === "BILL_LINE"
-        ? Prisma.sql`SELECT l.id,b.number||' line '||l.sequence::text AS code,l.description AS name,(SELECT coalesce(sum(j.debit-j.credit),0) FROM "FinanceJournalLine" j WHERE j."billLineId"=l.id AND j."accountId"=l."costAccountId")-(SELECT coalesce(sum(a.cost),0) FROM "FinanceAsset" a WHERE a."billLineId"=l.id AND a.state='REGISTERED') AS remaining FROM "FinanceBillLine" l JOIN "FinanceBill" b ON b.id=l."billId" JOIN "FinanceAccount" account ON account.id=l."costAccountId" WHERE b.state='POSTED' AND l.treatment='ASSET' AND account."controlType"='FIXED_ASSET' AND account.active AND position(lower(${q.q}) IN lower(b.number||' '||b.reference||' '||l.description))>0`
-        : Prisma.sql`SELECT d.id,d.number AS code,d.description AS name,(SELECT coalesce(sum(j.debit-j.credit),0) FROM "FinanceJournalLine" j JOIN "FinanceJournalEntry" e ON e.id=j."journalId" JOIN "FinanceMovement" m ON m.id=e."movementId" WHERE(m.id=d.id OR m."reversalOfId"=d.id) AND j."accountId"=d."counterAccountId")-(SELECT coalesce(sum(a.cost),0) FROM "FinanceAsset" a WHERE a."fundingMovementId"=d.id AND a.state='REGISTERED') AS remaining FROM "FinanceMovement" d JOIN "FinanceAccount" account ON account.id=d."counterAccountId" WHERE d.state='POSTED' AND d.kind IN('NONCASH_CAPITAL','FOUNDER_OUTLAY') AND account."controlType"='FIXED_ASSET' AND account.active AND position(lower(${q.q}) IN lower(d.number||' '||d.reference||' '||d.description))>0`;
+        ? Prisma.sql`SELECT l.id,b.number||' line '||l.sequence::text AS code,l.description AS name,(SELECT coalesce(sum(j.debit-j.credit),0) FROM "FinanceJournalLine" j WHERE j."billLineId"=l.id AND j."accountId"=l."costAccountId")-(SELECT coalesce(sum(a.cost),0) FROM "FinanceAsset" a WHERE a."billLineId"=l.id AND a.state IN('REGISTERED','DISPOSED')) AS remaining FROM "FinanceBillLine" l JOIN "FinanceBill" b ON b.id=l."billId" JOIN "FinanceAccount" account ON account.id=l."costAccountId" WHERE b.state='POSTED' AND l.treatment='ASSET' AND account."controlType"='FIXED_ASSET' AND account.active AND position(lower(${q.q}) IN lower(b.number||' '||b.reference||' '||l.description))>0`
+        : Prisma.sql`SELECT d.id,d.number AS code,d.description AS name,(SELECT coalesce(sum(j.debit-j.credit),0) FROM "FinanceJournalLine" j JOIN "FinanceJournalEntry" e ON e.id=j."journalId" JOIN "FinanceMovement" m ON m.id=e."movementId" WHERE(m.id=d.id OR m."reversalOfId"=d.id) AND j."accountId"=d."counterAccountId")-(SELECT coalesce(sum(a.cost),0) FROM "FinanceAsset" a WHERE a."fundingMovementId"=d.id AND a.state IN('REGISTERED','DISPOSED')) AS remaining FROM "FinanceMovement" d JOIN "FinanceAccount" account ON account.id=d."counterAccountId" WHERE d.state='POSTED' AND d.kind IN('NONCASH_CAPITAL','FOUNDER_OUTLAY') AND account."controlType"='FIXED_ASSET' AND account.active AND position(lower(${q.q}) IN lower(d.number||' '||d.reference||' '||d.description))>0`;
     const total = Number(
         (
           await tx.$queryRaw<{ total: bigint }[]>(
