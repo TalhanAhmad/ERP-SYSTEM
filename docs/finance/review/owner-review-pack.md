@@ -141,3 +141,8 @@ Checkpoint checks passed:285 unit tests,17 focused PostgreSQL cases (17.29s),two
 ## F38 representative export evidence
 
 Actual synthetic earned income100.01 and incurred expense60.00 produce balanced160.01 trial movements and profit40.01 with independently agreeing AR/AP controls. A registered no-activity bank blocks a final copy until its actual exact-cutoff review is finalized; a different cutoff is still blocked. Missing asset registration blocks a new final copy. Review exports preserve incomplete diagnostics. Issued CSV/PDF retain the same snapshot and file hashes after later postings. Browser-tested exports include all27 filtered rows, exact values, private current-access downloads and employee denial. These are synthetic engineering checks; they do not approve a company statement, choose accounting policies or complete the human acceptance record above. Logical24-hour availability and private immutable retention are documented for owner review.
+
+
+## F38 source publication and fresh verification
+
+F38 source **8bca4c26a0cab30f00e9f58a9f3ab407022b9572** is committed and pushed to **finance/f38-exports** on 17 November2026. [Draft PR #5](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/5) contains the milestone and targets main. [Fresh CI44102819006](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44102819006) passed for that exact source: all77 fresh migrations,1,045 tests, typing/lint,both builds and211-path API verification. The subsequent documentation-only recording preserves the verified application/schema/tests/scripts/config source exactly. The PR remains unmerged; finance remains disabled live. F39 monthly close/reopen is next.
