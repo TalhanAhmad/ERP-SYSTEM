@@ -80,6 +80,8 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ financeExports FinanceReportExport[]
+
  cashFlowReviews FinanceCashFlowReview[] @relation("CashFlowReviewer")
  cashFlowSupersessions FinanceCashFlowReview[] @relation("CashFlowSuperseder")
 
@@ -2376,4 +2378,35 @@ model FinanceCashFlowComponent {
  amount Decimal @db.Decimal(20,2)
  @@unique([reviewId,journalLineId,category])
  @@index([journalLineId,reviewId])
+}
+
+model FinanceReportExport {
+ id String @id @default(uuid()) @db.Uuid
+ requesterId String @db.Uuid
+ requester Person @relation(fields:[requesterId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ requesterGrantId String @db.Uuid
+ reportType String
+ filters Json
+ mode String
+ reason String
+ state String @default("QUEUED")
+ version Int @default(1)
+ attempts Int @default(0)
+ leaseId String? @db.Uuid
+ leaseUntil DateTime? @db.Timestamptz
+ snapshot Json?
+ snapshotHash String?
+ csv Bytes?
+ pdf Bytes?
+ csvHash String?
+ pdfHash String?
+ errorCode String?
+ failureDetails Json?
+ supersededAt DateTime? @db.Timestamptz
+ supersedeReason String?
+ createdAt DateTime @default(now()) @db.Timestamptz
+ expiresAt DateTime @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ @@index([requesterId,createdAt,id])
+ @@index([state,leaseUntil,createdAt])
 }

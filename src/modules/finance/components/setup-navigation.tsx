@@ -13,6 +13,7 @@ export function FinanceNavigation() {
       <Link href="/finance/reports/cash-flow">Direct cash flow</Link>
       <Link href="/finance/reports/profit-loss">Profit and loss</Link>
       <Link href="/finance/reports/balance-sheet">Balance sheet</Link>
+      <Link href="/finance/exports">Report exports</Link>
       <Link href="/finance/report-settings">Statement presentation</Link>
       <Link href="/finance/projects">Commercial projects</Link>
       <Link href="/finance/cost-allocations">Cost allocations</Link>

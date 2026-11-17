@@ -12,7 +12,7 @@ All45 Chromium journeys passed2.6m, including the new actual generation/post/dis
 
 ## Remaining milestones
 
-F38–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
+F39–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
 
 
 ## Final lifecycle edge cases
@@ -137,3 +137,12 @@ The new browser journey uses actual invoices, credits, typed opposites and a rev
 ## Exact-source CI and merge confirmation
 
 [PR #4](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/4) merged into main on 16 November 2026 at 19:50:22 Asia/Karachi. Merge commit **28065e33ba421d8831ce08bc0aef6ec7dfcc30e4** retains the separate milestone history. Exact final source **3cb6f13b880252540a0522abb8ad9111ee8bf2a8** passed [fresh CI43877779887](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43877779887) before merge: all75 fresh migrations,1,006 tests, typing/lint,both builds and206-path API checks. Local main was fast-forwarded and its application/schema/test/script/config content matches the verified source exactly. No hosted financial migration, finance enablement or company/accountant acceptance was performed. All merge conditions were verified before executing the merge, without bypassing repository requirements.
+
+
+## F38 local verification — 17 November 2026
+
+1,045 distinct local tests passed:303 unit (4.62s),685 actual PostgreSQL integration (379.90s),57 Chromium (3.6m). Production and Supabase-shaped builds, strict typing/lint,211 concrete API contracts and all77 applied migration checksums passed. The dedicated export browser journey passed4.6s and3.9s in the full regression, covering actual private CSV/PDF downloads and matching hashes, all27 filtered rows beyond page one, immutable refresh, mobile/WCAG, blocked final issuance and employee denial.
+
+23 new PostgreSQL cases cover actual balanced income/cost sources, exact-cutoff finalized zero-activity evidence, approved budget revision/variance, genuine unregistered capitalized-cost failure, all supported reports, private authorization at request/execute/complete/download, original grant epochs, owner visibility, no revoked/regrant resurrection, leases/stale workers, immutable rows/bytes, permanent keys, fresh versions, three-attempt limits, expiration and2001-row rejection. A fully owned ephemeral PostgreSQL17 instance applies all77 migrations and proves a passing final dataset independently of retained regression history. Fifteen new unit cases cover nine strict query families, forged identities/readiness/paging, signed exact PKR/aggregate/six-place-unit numeric cells, formula text, quoting, totals/beyond-first-page rows, embedded-font multi-page PDF and oversize rejection.
+
+The first17-case run passed16 and found FINAL versus FINALIZED in the new bank gate. Additive77 corrected it without editing76 and also required approved-budget proof. Added fixtures then exposed a removed period declaration and missing legalName; correcting the fixtures kept all original validation. All23 focused cases passed11.11s. Initial browser capture/download/hash/mobile checks passed before a dropdown label selector timed out; changing the test to its actual combobox role passed4.6s, and3.9s in the full run. No test or business guard was weakened. Prior legacy pg query-queue deprecation notices remain warnings; the full integration suite passed. Fresh source CI is observed after the separate push rather than inferred from local results.

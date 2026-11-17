@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F37 engineering is implemented and locally verified. F37 includes posted roll-forwards and actual source workflows; F38–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
+F01–F38 engineering is implemented and locally verified. F38 adds current-authorized frozen CSV/PDF exports and truthful final issuance gates; F39–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -107,3 +107,10 @@ F36 source9e0b9ad7f39e3cdac8e97029f17368670bab5295 passed [fresh CI43731747640](
 ## PR4 publication and merge
 
 [PR #4](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/4) merged into main on 16 November 2026 at 19:50:22 Asia/Karachi. Merge commit **28065e33ba421d8831ce08bc0aef6ec7dfcc30e4** retains the separate milestone history. Exact final source **3cb6f13b880252540a0522abb8ad9111ee8bf2a8** passed [fresh CI43877779887](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/43877779887) before merge: all75 fresh migrations,1,006 tests, typing/lint,both builds and206-path API checks. Local main was fast-forwarded and its application/schema/test/script/config content matches the verified source exactly. No hosted financial migration, finance enablement or company/accountant acceptance was performed.
+
+
+## F38 delivered and verified — 17 November 2026
+
+Private exports cover all nine report families with canonical rows/totals/basis, strict normalized filters, exact money/units and retained source/file hashes. Full-company final controls cannot be hidden by search filters; actual finalized exact-cutoff bank evidence and approved-budget versions are required. Current requester/grant epochs, private downloads, expiry, immutable history, fresh request/retry/cancel, leases and bounded processing are enforced. UI report links preserve filters while exporting all filtered rows. Scheduled resumption stays private and disabled with the feature.
+
+1,045 distinct local tests passed:303 unit (4.62s),685 actual PostgreSQL integration (379.90s),57 Chromium (3.6m). Production and Supabase-shaped builds, strict typing/lint,211 concrete API contracts and all77 applied migration checksums passed. The dedicated export browser journey passed4.6s and3.9s in the full regression, covering actual private CSV/PDF downloads and matching hashes, all27 filtered rows beyond page one, immutable refresh, mobile/WCAG, blocked final issuance and employee denial. Applied76 remains immutable;77 corrected the actual bank state and final budget requirements after a failing acceptance case. A separate owned PostgreSQL instance proves genuinely passing final books without deleting shared regression history. The initial browser selector timeout occurred after successful downloads; a role-based dropdown selector corrected the test and the journey passed. Full/focused Word documents and all steps are recorded for today's separate commit/push. Fresh CI will be observed after publication. No new PR merge or hosted finance activation is implied. See [rules](accounting/exports.md) and [F38 record](planning/days/F38.md).

@@ -1,5 +1,6 @@
 import { maintenancePass, previousCompanyDate } from "./maintenance";
 import "server-only";
+import { processFinanceExports } from "@/modules/finance/reports/exports/worker";
 import { cleanupExpiredAnnouncements } from "@/modules/announcements/service";
 import { db } from "../db";
 import { workDate } from "@/lib/dates";
@@ -75,6 +76,8 @@ export async function scheduledPass(
       throw error;
     }
   }
+  // Finance resumes privately only when enabled; ordinary operations return no export details.
+  await processFinanceExports(deadline);
   await db.rateLimit.deleteMany({ where: { expiresAt: { lt: new Date() } } });
   await db.idempotency.deleteMany({ where: { expiresAt: { lt: new Date() } } });
   return {
