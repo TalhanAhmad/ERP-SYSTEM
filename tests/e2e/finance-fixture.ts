@@ -8,8 +8,10 @@ export async function financeFixture(
   page: Page,
   base: string,
   username: string,
+  isolated?: { url: string },
 ) {
   const url =
+    isolated?.url ??
     process.env.TEST_DATABASE_URL ??
     "postgresql://encova:local_only@localhost:55432/encova_test";
   if (new URL(url).pathname !== "/encova_test")
@@ -138,7 +140,10 @@ export async function financeFixture(
     ).rows[0];
     if (!candidate) throw new Error("No isolated test interval");
     const start = String(candidate.start),
-      end = new Date(new Date(String(candidate.start) + "T00:00:00Z").getTime() + 9 * 86400000)
+      end = new Date(
+        new Date(String(candidate.start) + "T00:00:00Z").getTime() +
+          9 * 86400000,
+      )
         .toISOString()
         .slice(0, 10);
     return {

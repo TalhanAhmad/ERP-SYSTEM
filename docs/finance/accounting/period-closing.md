@@ -1,0 +1,35 @@
+# Period close and reopen — F39
+
+## Review and save a close
+
+The existing accounting periods use their explicitly configured inclusive dates; no calendar month/fiscal year is assumed or seeded. A current selected Finance user can review the checklist/history and original saved statements. Only the current Finance Owner may close, reopen, or record/resolve review issues. Every mutation requires fresh password/hosted MFA, a permanent request key and applicable current versions.
+
+Open a period's closing review. Automatic checks cover balanced books and statement mapping, AR/AP controls, exact-cutoff finalized bank evidence, cash classifications, deferred revenue, advances/assets/investments/loans/funding and opening clearing. They also require all earlier configured open periods to close first, no unresolved recorded review issues through the cutoff, and no pending journal/invoice/bill/customer/supplier/movement/asset/cost-allocation draft through the cutoff. Counts/source hashes cover all records; diagnostic lists are25 rows. Future cutoffs cannot close. Closed or void periods cannot close again without the dedicated reopen workflow.
+
+Failed-posting and pending-adjustment reviews require both explicit owner confirmations and evidence. Known issues are recorded as POSTING_FAILURE or PENDING_ADJUSTMENT with source/review evidence. Resolve them through their original workflows, then record the resolution with a fresh version/reason. No issue history is deleted. This milestone does not invent an automatic posting-failure log for previously rolled-back commands; F42 introduces broader durable worker monitoring. The owner must review actual failed outcomes as part of the checklist. A passing automatic preview alone is not an owner review.
+
+Close compares the current canonical source fingerprint with the preview and independently recomputes its checklist/reports under the financial writer/configuration locks. A changed source or version requires refresh and review, not silent recapture. Save one numbered immutable close cycle, actor/grant epoch/time/reason, review evidence, checklist, full unfiltered trial balance/P&L/balance sheet, company/PKR/posted-accrual basis, dates/filters/generation/cutoff/ledger proofs and report hashes. Save no fake balancing entries or year-close journal. Complete snapshot limits are2,000 rows per statement,6MiB per canonical report and16MiB per three-report bundle. Oversize/unfinished controls fail; no row truncation permits closing. F45 separately measures larger-volume performance.
+
+## Posting and concurrency barriers
+
+Close/reopen and ordinary checked financial writers use the existing global writer → current person/grant → configuration → period protocol. Closing marks the period CLOSED only alongside an independently validated retained close. Deferred consistency checks reject a close record without its corresponding closed period or an uncompleted reopen. Runtime tables remain SELECT-only; current-actor checked functions are the only mutations.
+
+Actual journal and dated receivable/payable/advance/deferred/funding/loan/investment/asset/matching events share a closed-cutoff barrier. It protects dates in the period and earlier dates that could change cumulative/starting balances. Earlier open ranges must already be closed, and new earlier live ranges cannot bypass an issued close. Later open dates remain available. A new-dated reversal in a later open period does not alter the original closed cutoff; a reversal/allocation effective in the closed cutoff is blocked. Register-only/no-cash actions keep the same date protection. Bank-specific finalized evidence barriers from F32 remain active independently. A bank proof used under a closed cutoff cannot reopen until the owner reopens the period first.
+
+Concurrent source posting either completes before review (changing the fingerprint/checklist) or is rejected by the committed close. A close cannot admit an unreviewed concurrent posting. Source draft creation after close may prepare a correction but cannot post through the barrier; it must be reviewed/voided or handled after an authorized reopen. Existing posting guards are not disabled by the application.
+
+## Reopen and supersession
+
+Owner reopen requires the exact current close and both period/close versions, fresh verification and a reason. Reopen later closed cutoffs first. Preserve every original source/report/checklist/hash and actor/time; mark the old cycle REOPENED and retain reopen evidence. Re-closing creates a new numbered cycle rather than rewriting or deleting the old one. Used period dates stay fixed after reopen, including an otherwise empty issued close.
+
+Reopening supersedes affected READY exports and retains their bytes/hash/source for audit. It cancels QUEUED/RUNNING/FAILED affected jobs, clearing leases. The criterion includes later-range exports whose opening balances depend on the reopened period, not just overlapping date ranges. A worker claimed before reopen cannot publish afterwards. Ordinary download accepts only READY/unexpired/currently authorized files, so superseded/cancelled copies cannot be served as current. Retained close-report pages remain readable with an explicit superseded notice. A later-range copy genuinely ending before the reopened start remains unchanged.
+
+## Export saved closed statements
+
+Use the saved close's statement-export form for TB/P&L/BS. It creates a new private F38 job bound immutably to that current close and the requester's exact grant epoch. A copy uses the saved original statement/filters/totals/generation/proofs, not a live recapture. CSV/PDF include close id/sequence/snapshot proof. Current finance users may request a copy while the close remains current; current requester/owner visibility,24-hour download availability, file/row limits, leases/attempt bounds and authorization after rendering remain unchanged. A new authorized request can reissue an expired copy without extending the old job's expiry.
+
+Unlinked new FINAL exports overlapping closed periods remain blocked; use the close-history source. Reopened old cycles cannot issue new final copies. Re-closing creates a new source. No public storage, bearer URL, email, hosted finance migration or activation is performed.
+
+## Verification boundary
+
+Dedicated owned PostgreSQL17 fixtures prove actual income100.01 and incurred cost60.00, independent AR/AP agreement, balanced160.01 movements, profit40.01, original closed reports/exports, reopening and actual dated correction. They exercise current owner/role/grant, stale source/versions, permanent receipts, source/post races, close ordering, direct SQL/ACL denial, claimed-worker cancellation, bank evidence, all source rows and review-issue counts. Shared regression history is not deleted or falsely declared ready. The representative browser close uses its own owned database/server to prove a genuinely passing checklist independently of intentionally incomplete legacy fixtures. All figures remain synthetic; company/accountant review and live release are separate milestones.

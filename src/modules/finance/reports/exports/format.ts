@@ -59,6 +59,7 @@ export function exportSections(snapshot: ExportSnapshot, hash: string) {
           ? "Checks passed at capture"
           : "INCOMPLETE — review only",
         snapshotHash: hash,
+        ...(snapshot.periodClose ? { periodClose: snapshot.periodClose } : {}),
         allFilteredRows: snapshot.rowCount,
         currencyOrUnits: "PKR unless an explicit row unit says UNITS",
         ...metadata,

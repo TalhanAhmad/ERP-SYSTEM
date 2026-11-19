@@ -22586,6 +22586,855 @@
           }
         }
       }
+    },
+    "/api/v1/finance/periods/{id}/close-preview": {
+      "get": {
+        "operationId": "period_close_preview",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PeriodClosePreview"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}/closes": {
+      "get": {
+        "operationId": "period_close_history",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PeriodCloseRegister"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}/close": {
+      "post": {
+        "operationId": "period_close",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred. Posting and dated allocation/reversal events use the same serial configuration protocol. Reopen latest closed cutoff first; preserve original close statements, supersede all affected issued exports (including later-range opening balances), and cancel unfinished affected jobs. Closed-statement export requires current authorized requester and original current close; captures the saved snapshot rather than querying changed live books, uses normal private bounded F38 worker/download controls and fresh 24h availability. Owner/grant/lease checks run again after rendering.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodCloseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Private {data:{id,version,state,periodId,...}}. Close/reopen also include sequence/closeVersion. Export id targets the private F38 job; HTTP202 may report a nonready/failed job and does not assert artifact readiness.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}/reopen": {
+      "post": {
+        "operationId": "period_reopen",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred. Posting and dated allocation/reversal events use the same serial configuration protocol. Reopen latest closed cutoff first; preserve original close statements, supersede all affected issued exports (including later-range opening balances), and cancel unfinished affected jobs. Closed-statement export requires current authorized requester and original current close; captures the saved snapshot rather than querying changed live books, uses normal private bounded F38 worker/download controls and fresh 24h availability. Owner/grant/lease checks run again after rendering.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodReopenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data:{id,version,state,periodId,...}}. Close/reopen also include sequence/closeVersion. Export id targets the private F38 job; HTTP202 may report a nonready/failed job and does not assert artifact readiness.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}/closes/{closeId}": {
+      "get": {
+        "operationId": "period_close_detail",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "closeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PeriodCloseDetail"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}/closes/{closeId}/exports": {
+      "post": {
+        "operationId": "period_closed_export",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred. Posting and dated allocation/reversal events use the same serial configuration protocol. Reopen latest closed cutoff first; preserve original close statements, supersede all affected issued exports (including later-range opening balances), and cancel unfinished affected jobs. Closed-statement export requires current authorized requester and original current close; captures the saved snapshot rather than querying changed live books, uses normal private bounded F38 worker/download controls and fresh 24h availability. Owner/grant/lease checks run again after rendering.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "closeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClosedStatementExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "202": {
+            "description": "Private {data:{id,version,state,periodId,...}}. Close/reopen also include sequence/closeVersion. Export id targets the private F38 job; HTTP202 may report a nonready/failed job and does not assert artifact readiness.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}/closes/{closeId}/reports/{reportType}": {
+      "get": {
+        "operationId": "period_closed_report",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "closeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "reportType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "TRIAL_BALANCE",
+                "PROFIT_LOSS",
+                "BALANCE_SHEET"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PeriodCloseReport"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}/close-issues": {
+      "get": {
+        "operationId": "period_close_issues",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PeriodCloseIssues"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "period_close_issue_create",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred. Posting and dated allocation/reversal events use the same serial configuration protocol. Reopen latest closed cutoff first; preserve original close statements, supersede all affected issued exports (including later-range opening balances), and cancel unfinished affected jobs. Closed-statement export requires current authorized requester and original current close; captures the saved snapshot rather than querying changed live books, uses normal private bounded F38 worker/download controls and fresh 24h availability. Owner/grant/lease checks run again after rendering.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodCloseIssueRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Private {data:{id,version,state,periodId,...}}. Close/reopen also include sequence/closeVersion. Export id targets the private F38 job; HTTP202 may report a nonready/failed job and does not assert artifact readiness.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/periods/{id}/close-issues/{issueId}/resolve": {
+      "post": {
+        "operationId": "period_close_issue_resolve",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Only current Finance Owner may close/reopen or create/resolve review issues. Close requires fresh provider proof, permanent key, current period version and current canonical basis hash; actual company book/presentation/bank/subledger/cash checks, no earlier open period, no pending source draft through cutoff and no unresolved recorded review issue. Both failed-posting and adjustment reviews require explicit owner confirmation/evidence; automatic durable posting-failure monitoring is a later F42 dependency and is not fabricated. Close emits no journal; it saves the checklist and full unfiltered TB/P&L/BS snapshots (max2000 rows per report; 16MiB retained report bundle). No calendar fiscal year or real company policy is inferred. Posting and dated allocation/reversal events use the same serial configuration protocol. Reopen latest closed cutoff first; preserve original close statements, supersede all affected issued exports (including later-range opening balances), and cancel unfinished affected jobs. Closed-statement export requires current authorized requester and original current close; captures the saved snapshot rather than querying changed live books, uses normal private bounded F38 worker/download controls and fresh 24h availability. Owner/grant/lease checks run again after rendering.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "issueId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodCloseIssueResolve"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data:{id,version,state,periodId,...}}. Close/reopen also include sequence/closeVersion. Export id targets the private F38 job; HTTP202 may report a nonready/failed job and does not assert artifact readiness.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -31324,6 +32173,205 @@
             "type": "integer"
           }
         }
+      },
+      "PeriodCloseRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "basisHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "postingFailuresReviewed": {
+            "type": "boolean",
+            "const": true
+          },
+          "pendingAdjustmentsReviewed": {
+            "type": "boolean",
+            "const": true
+          },
+          "postingReviewEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "adjustmentReviewEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "basisHash",
+          "postingFailuresReviewed",
+          "pendingAdjustmentsReviewed",
+          "postingReviewEvidence",
+          "adjustmentReviewEvidence",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PeriodReopenRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "closeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "expectedCloseVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "closeId",
+          "expectedVersion",
+          "expectedCloseVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "ClosedStatementExportRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reportType": {
+            "enum": [
+              "TRIAL_BALANCE",
+              "PROFIT_LOSS",
+              "BALANCE_SHEET"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "reportType",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PeriodCloseIssueRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "POSTING_FAILURE",
+              "PENDING_ADJUSTMENT"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "kind",
+          "description",
+          "evidence",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PeriodCloseIssueResolve": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "resolution": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "resolution",
+          "reason",
+          "reauth"
+        ]
+      },
+      "PeriodClosePreview": {
+        "type": "object",
+        "description": "Private period(id/name/state/version/dates),canManage,basisHash,reportRows and checklist. Checklist includes readiness(full-company F38 controls),ready,priorOpenPeriods,pendingDrafts(total/sourceHash/counts/first25 items),openReviewIssueCount,first25 reviewIssues and explicit manual-review scope. No full report snapshot or financial posting occurs."
+      },
+      "PeriodCloseRegister": {
+        "type": "object",
+        "description": "Private period,canManage,items (at most25 retained closes with id/sequence/state/version/actor/time/reason/hash/reopen metadata),total/page/pages. Latest closed cutoff must reopen first."
+      },
+      "PeriodCloseDetail": {
+        "type": "object",
+        "description": "Immutable close id/periodId/sequence/source period version/date range/basisHash/checklist/snapshotHash/closedBy/time/reason/owner evidence; state/version and retained reopen actor/time/reason; current period/canManage/reportRows. No raw full reports or historical grant epoch."
+      },
+      "PeriodCloseReport": {
+        "type": "object",
+        "description": "Original saved statement metadata,full totals/context,at most25 original items,total/page/pages,closeState and source snapshot hash. Reopened snapshots remain readable as superseded history; values never silently refresh. Exact decimal monetary strings."
+      },
+      "PeriodCloseIssues": {
+        "type": "object",
+        "description": "Private period,canManage,at most25 issue items,total/page/pages. Every source kind/description/evidence/creator/time and resolution/version/resolver/time is retained. Owner creates/resolves only in OPEN periods; no deletion or overwrite."
       }
     }
   }

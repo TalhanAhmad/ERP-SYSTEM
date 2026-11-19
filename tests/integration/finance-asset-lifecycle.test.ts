@@ -836,16 +836,26 @@ it("future and closed periods reject monetary and register-only asset postings",
     { day: Date }[]
   >`SELECT d::date AS day FROM generate_series(DATE '1850-01-01',DATE '1899-01-01',interval '1 year')d WHERE NOT EXISTS(SELECT 1 FROM "FinancePeriod" p WHERE p.state<>'VOID' AND d::date BETWEEN p."startDate" AND p."endDate") ORDER BY d LIMIT 1`;
   const day = rows[0].day;
-  // Explicit closed fixture inserted by isolated database operator; close/reopen workflows belong to F39.
-  await db.financePeriod.create({
-    data: {
-      name: prefix + " closed lifecycle fixture",
-      startDate: day,
-      endDate: day,
-      state: "CLOSED",
-      closedAt: new Date(),
-      closedById: people.owner.id,
-    },
+  // Operator-only closed-state fault fixture; actual owner close is covered by finance-closing.
+  // Restore the state guard before commit so no other connection can observe a disabled guard.
+  await db.$transaction(async (tx) => {
+    await tx.$executeRawUnsafe(
+      'ALTER TABLE "FinancePeriod" DISABLE TRIGGER "FinancePeriod_guard"',
+    );
+    await tx.financePeriod.create({
+      data: {
+        name: prefix + " closed lifecycle fixture",
+        startDate: day,
+        endDate: day,
+        state: "CLOSED",
+        closedAt: new Date(),
+        closedById: people.owner.id,
+      },
+    });
+    await tx.$executeRawUnsafe("SET CONSTRAINTS ALL IMMEDIATE");
+    await tx.$executeRawUnsafe(
+      'ALTER TABLE "FinancePeriod" ENABLE TRIGGER "FinancePeriod_guard"',
+    );
   });
   const dt = day.toISOString().slice(0, 10),
     d = await life("CREATE", change(e, { postingDate: dt })),
