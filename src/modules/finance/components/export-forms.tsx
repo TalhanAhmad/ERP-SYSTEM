@@ -233,9 +233,9 @@ export function ExportCreateForm({
       </label>
       <p>
         Final exports require complete book, presentation, bank and subledger
-        checks. Narrowing the displayed rows does not narrow those checks.
-        Closed-period final copies require the forthcoming controlled close
-        workflow.
+        checks. Narrowing the displayed rows does not narrow those checks. For
+        closed periods, export the saved statements from the period close
+        history.
       </p>
     </FinanceActionForm>
   );

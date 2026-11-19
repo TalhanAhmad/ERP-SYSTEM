@@ -19,7 +19,7 @@ const messages: Record<string, string> = {
   FINANCE_EXPORT_ATTEMPTS:
     "The maximum of three processing attempts has been reached. Request a new export after reviewing the issue.",
   FINANCE_EXPORT_CLOSED_PERIOD:
-    "The report overlaps a closed period. Use the controlled close snapshot workflow when available.",
+    "The report overlaps a closed period. Export the saved statement from the period close history.",
 };
 export default async function ExportPage({
   params,

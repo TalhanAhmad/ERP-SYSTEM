@@ -543,7 +543,7 @@ it("unmatch rejects stale version, closed intrinsic period, and repeated state t
     code: "FINANCE_STALE_VERSION",
   });
   const p = await db.financePeriod.findUniqueOrThrow({ where: { id: f.p.id } });
-  // Closed-period fixture is transaction-local and rolled back. No public closing bypass is added before F39.
+  // Closed-state fault fixture is transaction-local and rolled back; actual owner closing has separate F39 coverage.
   const c = new pg.Client({ connectionString: url });
   await c.connect();
   try {
@@ -555,6 +555,7 @@ it("unmatch rejects stale version, closed intrinsic period, and repeated state t
       'UPDATE "FinancePeriod" SET state=\'CLOSED\',"closedAt"=CURRENT_TIMESTAMP,"closedById"=$2 WHERE id=$1',
       [p.id, people.owner.id],
     );
+    await c.query("SET CONSTRAINTS ALL IMMEDIATE");
     await c.query(
       'ALTER TABLE "FinancePeriod" ENABLE TRIGGER "FinancePeriod_guard"',
     );

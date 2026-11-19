@@ -80,6 +80,10 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ financePeriodCloses FinancePeriodClose[] @relation("PeriodCloseActor")
+ financePeriodReopens FinancePeriodClose[] @relation("PeriodReopenActor")
+ financeCloseIssues FinanceCloseIssue[] @relation("CloseIssueCreator")
+ financeResolvedCloseIssues FinanceCloseIssue[] @relation("CloseIssueResolver")
  financeExports FinanceReportExport[]
 
  cashFlowReviews FinanceCashFlowReview[] @relation("CashFlowReviewer")
@@ -315,6 +319,8 @@ impairmentHoldings FinanceInvestmentHolding[] @relation("HoldingImpairment")
 }
 
 model FinancePeriod {
+ closes FinancePeriodClose[]
+ reviewIssues FinanceCloseIssue[]
  id String @id @default(uuid()) @db.Uuid
  name String
  startDate DateTime @db.Date
@@ -2381,6 +2387,8 @@ model FinanceCashFlowComponent {
 }
 
 model FinanceReportExport {
+ periodCloseId String? @db.Uuid
+ periodClose FinancePeriodClose? @relation(fields:[periodCloseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
  id String @id @default(uuid()) @db.Uuid
  requesterId String @db.Uuid
  requester Person @relation(fields:[requesterId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -2409,4 +2417,53 @@ model FinanceReportExport {
  updatedAt DateTime @default(now()) @db.Timestamptz
  @@index([requesterId,createdAt,id])
  @@index([state,leaseUntil,createdAt])
+ @@index([periodCloseId])
+}
+
+model FinancePeriodClose {
+ id String @id @default(uuid()) @db.Uuid
+ periodId String @db.Uuid
+ period FinancePeriod @relation(fields:[periodId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ state String @default("CLOSED")
+ version Int @default(1)
+ periodVersion Int
+ startDate DateTime @db.Date
+ endDate DateTime @db.Date
+ basisHash String
+ checklist Json
+ reports Json
+ snapshotHash String
+ closedById String @db.Uuid
+ closedBy Person @relation("PeriodCloseActor",fields:[closedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ closedGrantId String @db.Uuid
+ closedAt DateTime @default(now()) @db.Timestamptz
+ reason String
+ postingReviewEvidence String
+ adjustmentReviewEvidence String
+ reopenedAt DateTime? @db.Timestamptz
+ reopenedById String? @db.Uuid
+ reopenedBy Person? @relation("PeriodReopenActor",fields:[reopenedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reopenReason String?
+ exports FinanceReportExport[]
+ @@unique([periodId,sequence])
+ @@index([state,endDate,id])
+}
+model FinanceCloseIssue {
+ id String @id @default(uuid()) @db.Uuid
+ periodId String @db.Uuid
+ period FinancePeriod @relation(fields:[periodId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ kind String
+ description String
+ evidence String
+ state String @default("OPEN")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation("CloseIssueCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ resolvedById String? @db.Uuid
+ resolvedBy Person? @relation("CloseIssueResolver",fields:[resolvedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ resolvedAt DateTime? @db.Timestamptz
+ resolution String?
+ @@index([periodId,state,createdAt,id])
 }

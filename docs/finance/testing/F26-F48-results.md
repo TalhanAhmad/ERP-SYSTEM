@@ -12,7 +12,7 @@ All45 Chromium journeys passed2.6m, including the new actual generation/post/dis
 
 ## Remaining milestones
 
-F39–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
+F40–F46 implementations and final cross-module acceptance remain pending. F47 review pack preparation was requested by the user; human acceptance fields stay unfilled. F48 release remains separate. Hosted finance is disabled; all financial examples in this report are synthetic, with no live schema/grants/seeds or bank/trade operation.
 
 
 ## Final lifecycle edge cases
@@ -156,3 +156,17 @@ F38 source **8bca4c26a0cab30f00e9f58a9f3ab407022b9572** is committed and pushed 
 ## PR5 merge confirmed — 19 November2026
 
 [PR #5](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/5) merged into main on 19 November 2026 at 13:59:08 Asia/Karachi. Merge commit **30cc426c6a7b03c59bd6786db0498c3152df5783** retains the separate F38 source/documentation commits. Latest PR head **d3f508c96579ffa1322313cc9c47f09aa29aed4b** passed [CI44112657600](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44112657600) before merge: all77 fresh migrations,1,045 tests, typing/lint,both builds and211-path API verification. GitHub independently confirmed merged=true and the expected source/merge identity. Local main was fast-forwarded and application/schema/tests/scripts/config source matches that tested head exactly. The subsequent documentation-only recording updates full/focused Word reports and preserves that application source. No hosted financial migration, finance enablement or company/accountant acceptance occurred. F39 monthly close/reopen is next.
+
+
+## F39 local verification — 19 November2026
+
+1,080 distinct local tests passed:316 unit (5.16s),706 actual PostgreSQL integration (397.67s),58 Chromium (3.8m). Production and Supabase-shaped builds, strict typing/lint,220 concrete finance API contracts and all79 applied migration checksums passed. The dedicated owned-database close browser journey passed10.9s and11.5s in full regression, covering actual income/cost statements, owner close/export/reopen, original saved values, superseded downloads, mobile/WCAG and employee denial.
+
+21 new PostgreSQL cases cover actual posted income/cost/control agreement, owner evidence/close snapshots, saved private exports, locked posting, pending drafts/issues, original snapshots after reopen, source/version/key conflicts, sequence/history, source/post races in both orders, ordered closing/reopening, live worker cancellation, raw SQL/ACL denial, private role/Origin/flag checks, missing and genuine exact-cutoff bank proof, closed-bank reopen denial, later-range supersession and complete saved-report/issue pagination. The dedicated owned database applies79 migrations and preserves all source/event history during acceptance. Thirteen schema cases reject forged readiness/reports/actors/dates, false or truthy-string attestations, missing evidence, malformed fingerprints, stale/invalid versions, replacement closed-copy filters and unbounded paging.
+
+Pre-apply row-type trigger fix passed initial7 (8.50s), expanded17 (15.95s),20 (22.02s) cases. First full regression703/705 failed only two operator fault fixtures because new deferred triggers must be flushed before ALTER TABLE re-enables their test-disabled guard. Corrected fixtures restore the application guard before commit/rollback and preserve posting denial; no production guard was weakened. Added79 bank-evidence protection;66 focused affected backend tests passed69.92s. Browser failure corrections concern server-only fixture imports, explicit bill defaults and streamed page readiness; the actual owner flow then passed10.9s including mobile/WCAG. All actual finance examples remain synthetic. Fresh source CI is observed after publication, not extrapolated from local results.
+
+
+## F39 source publication and fresh verification
+
+F39 source **35356d61e31036289a6dd35a4466c8dcd8fadef3** is committed and pushed to **finance/f39-period-close** on 19 November2026. [Draft PR #6](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/6) targets main and remains unmerged. [Fresh CI44502508756](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44502508756) passed for that exact source: all79 fresh migrations,1,080 tests, typing/lint,both builds and220-path API verification. The subsequent documentation-only recording preserves application/schema/tests/scripts/config source exactly. F40 fiscal-year closing is next; F40–F46 engineering, F47 human review and F48 live activation remain. No hosted financial migration, real books/policy adoption or human acceptance occurred.

@@ -7,6 +7,12 @@ export type ExportReadiness = {
 };
 export type ExportSnapshot = {
   schemaVersion: 1;
+  periodClose?: {
+    id: string;
+    sequence: number;
+    snapshotHash: string;
+    closedAt: string;
+  };
   reportType: ExportRequest["reportType"];
   filters: Record<string, unknown>;
   mode: "REVIEW" | "FINAL";

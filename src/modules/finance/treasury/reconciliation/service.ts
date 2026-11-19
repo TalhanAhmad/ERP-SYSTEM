@@ -57,7 +57,7 @@ const errors: Record<string, string> = {
   FINANCE_RECON_REOPEN_ORDER:
     "Reopen later finalized cutoffs for this bank first; their snapshots also cover earlier cash.",
   FINANCE_PERIOD_UNAVAILABLE:
-    "Finalization requires an open accounting period at the cutoff.",
+    "Finalization and reopening require an open accounting period at the cutoff.",
 };
 function databaseError(e: unknown): never {
   const code = (

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { env } from "@/server/env";
 import { periodDetail } from "@/modules/finance/accounting/service";
 import { financePageData } from "@/modules/finance/accounting/page-data";
@@ -26,6 +27,11 @@ export default async function Period({
       <p>
         {p.startDate.toISOString().slice(0, 10)} through{" "}
         {p.endDate.toISOString().slice(0, 10)} · {p.state}
+      </p>
+      <p>
+        <Link href={`/finance/periods/${p.id}/close`}>
+          Review closing checklist and history
+        </Link>
       </p>
       {data.canManage && p.state === "OPEN" ? (
         <>
