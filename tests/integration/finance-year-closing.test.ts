@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { beforeAll, afterAll, it, expect } from "vitest";
+import { beforeAll, afterAll, it, expect, vi } from "vitest";
 import EmbeddedPostgres from "embedded-postgres";
 import { execFileSync } from "node:child_process";
 import { readFile, rm } from "node:fs/promises";
@@ -7,6 +7,9 @@ import { createServer } from "node:net";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import pg from "pg";
+// Multi-command report/close/reversal workflows take more than five seconds on CI.
+// Bound only this file; retain every assertion and all production timeouts.
+vi.setConfig({ testTimeout: 30_000 });
 // A separate, fully owned database proves final readiness without deleting the regression database's retained books.
 const reservation = createServer();
 await new Promise<void>((r) => reservation.listen(0, "127.0.0.1", r));
@@ -259,6 +262,7 @@ beforeAll(async () => {
   await post("AP", "Original cost", "60.00");
 }, 120000);
 afterAll(async () => {
+  vi.resetConfig();
   await db.$disconnect();
   await sql.end();
   await local.stop();
