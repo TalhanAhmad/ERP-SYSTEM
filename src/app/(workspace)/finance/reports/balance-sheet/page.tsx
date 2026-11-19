@@ -1,3 +1,4 @@
+import { ReportExportLink } from "@/modules/finance/components/report-export-link";
 import Link from "next/link";
 import { workDate } from "@/lib/dates";
 import { financePageData } from "@/modules/finance/accounting/page-data";
@@ -72,6 +73,7 @@ export default async function BalanceSheet({
       </section>
       {d && (
         <>
+          <ReportExportLink reportType="BALANCE_SHEET" filters={input} />
           <StatementReadinessPanel
             metadata={d.metadata}
             readiness={d.readiness}

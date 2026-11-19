@@ -1,8 +1,8 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-14 (Asia/Karachi)
+Last updated: 2026-11-17 (Asia/Karachi)
 
-Finance extension: engineering acceptance through F25 is separately tracked in [finance progress](finance/progress.md) and the [F16–F25 Word report](finance/Encova_F16-F25_Report.docx). Final local759 checks passed; hosted finance stays disabled. This does not replace or complete the original ERP learning roadmap below.
+Finance extension: F01–F37 are accepted and merged through PR4; F38 private CSV/PDF exports are locally accepted with1,045 tests and are separately committed/pushed in unmerged PR5 with successful fresh source CI. Current source work and the full/focused Word reports are tracked in [finance progress](finance/progress.md) and [the continuation report](finance/delivery-F26-F48.md). Hosted finance stays disabled; this does not replace or complete the original ERP learning roadmap below.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded

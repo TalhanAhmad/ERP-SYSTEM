@@ -2,7 +2,10 @@ import type { NextConfig } from "next";
 const config: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ["pg", "pdfkit"],
-  outputFileTracingIncludes: { "/api/v1/finance/**": ["./assets/fonts/*"] },
+  outputFileTracingIncludes: {
+    "/api/v1/finance/**": ["./assets/fonts/*"],
+    "/api/internal/jobs": ["./assets/fonts/*"],
+  },
   async headers() {
     return [
       {

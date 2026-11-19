@@ -1,3 +1,4 @@
+import { ReportExportLink } from "./report-export-link";
 import Link from "next/link";
 import { workDate } from "@/lib/dates";
 import { financePageData } from "../accounting/page-data";
@@ -99,6 +100,12 @@ export async function AgeingReportPage({
       </section>
       {d && (
         <>
+          <ReportExportLink
+            reportType={
+              side === "AR" ? "RECEIVABLES_AGEING" : "PAYABLES_AGEING"
+            }
+            filters={input}
+          />
           <ReportMetadataPanel
             metadata={d.metadata}
             sourceNote="Balances reconstruct actual dated subledger events at the inclusive cutoff. Later payments, credits, releases and reversals do not change earlier amounts. Due today is not overdue."

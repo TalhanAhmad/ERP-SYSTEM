@@ -22103,6 +22103,489 @@
           }
         }
       }
+    },
+    "/api/v1/finance/exports": {
+      "get": {
+        "operationId": "report_exports_list",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Requester may access own retained exports; current Finance Owner may review other currently authorized requesters. Original requester exact grant epoch and role/status must remain active; regrant cannot revive revoked copies. No public bucket, bearer URL, money posting or ordinary operations details. All filtered rows (up to2000), exact decimals, immutable snapshot and SHA-256 proofs. Source JSON up to6MiB; each private CSV/PDF up to3MiB. Downloads expire24h after request; retained history is not deleted.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Authorized private response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ReportExportRegister"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "report_exports_request",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Requester may access own retained exports; current Finance Owner may review other currently authorized requesters. Original requester exact grant epoch and role/status must remain active; regrant cannot revive revoked copies. No public bucket, bearer URL, money posting or ordinary operations details. All filtered rows (up to2000), exact decimals, immutable snapshot and SHA-256 proofs. Source JSON up to6MiB; each private CSV/PDF up to3MiB. Downloads expire24h after request; retained history is not deleted. Fresh password/hosted MFA, permanent idempotency key and versioned retry/cancel. Request processing starts inline and can resume privately through the worker. FINAL is blocked unless full-company book, presentation, exact-cutoff finalized bank, cash-component, AR/AP, deferred and roll-forward controls pass. Approved budget/mappings are required for final budget variance; overspend remains advisory. Closed-period new FINAL issuance is blocked pending F39. REVIEW explicitly retains incomplete diagnostics. Leases60s, at most3 attempts. Accepted jobs may return FAILED; HTTP202 does not assert readiness.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "202": {
+            "description": "Private {data:{id,version,state}}; inspect detail for readiness/errors.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/exports/{id}": {
+      "get": {
+        "operationId": "report_exports_detail",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Requester may access own retained exports; current Finance Owner may review other currently authorized requesters. Original requester exact grant epoch and role/status must remain active; regrant cannot revive revoked copies. No public bucket, bearer URL, money posting or ordinary operations details. All filtered rows (up to2000), exact decimals, immutable snapshot and SHA-256 proofs. Source JSON up to6MiB; each private CSV/PDF up to3MiB. Downloads expire24h after request; retained history is not deleted.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Authorized private response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ReportExportDetail"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/exports/{id}/{format}": {
+      "get": {
+        "operationId": "report_exports_download",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Requester may access own retained exports; current Finance Owner may review other currently authorized requesters. Original requester exact grant epoch and role/status must remain active; regrant cannot revive revoked copies. No public bucket, bearer URL, money posting or ordinary operations details. All filtered rows (up to2000), exact decimals, immutable snapshot and SHA-256 proofs. Source JSON up to6MiB; each private CSV/PDF up to3MiB. Downloads expire24h after request; retained history is not deleted. READY, unexpired and not superseded only. Authorization is checked again after retrieving bytes. Fixed safe attachment filename; nosniff and sandbox CSP. Text formula-leading CSV cells are prefixed; genuine signed numeric cells retain exact numeric text. PDF embeds the bundled font, repeats headers, preserves totals and all columns in readable bands with stable row numbers.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "format",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "csv",
+                "pdf"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private attachment in the requested format.",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/exports/{id}/retry": {
+      "post": {
+        "operationId": "report_exports_retry",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Requester may access own retained exports; current Finance Owner may review other currently authorized requesters. Original requester exact grant epoch and role/status must remain active; regrant cannot revive revoked copies. No public bucket, bearer URL, money posting or ordinary operations details. All filtered rows (up to2000), exact decimals, immutable snapshot and SHA-256 proofs. Source JSON up to6MiB; each private CSV/PDF up to3MiB. Downloads expire24h after request; retained history is not deleted. Fresh password/hosted MFA, permanent idempotency key and versioned retry/cancel. Request processing starts inline and can resume privately through the worker. FINAL is blocked unless full-company book, presentation, exact-cutoff finalized bank, cash-component, AR/AP, deferred and roll-forward controls pass. Approved budget/mappings are required for final budget variance; overspend remains advisory. Closed-period new FINAL issuance is blocked pending F39. REVIEW explicitly retains incomplete diagnostics. Leases60s, at most3 attempts. Accepted jobs may return FAILED; HTTP202 does not assert readiness.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportExportChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data:{id,version,state}}; inspect detail for readiness/errors.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/exports/{id}/cancel": {
+      "post": {
+        "operationId": "report_exports_cancel",
+        "description": "Current ACTIVE explicitly selected Super Admin only; private/no-store. Requester may access own retained exports; current Finance Owner may review other currently authorized requesters. Original requester exact grant epoch and role/status must remain active; regrant cannot revive revoked copies. No public bucket, bearer URL, money posting or ordinary operations details. All filtered rows (up to2000), exact decimals, immutable snapshot and SHA-256 proofs. Source JSON up to6MiB; each private CSV/PDF up to3MiB. Downloads expire24h after request; retained history is not deleted. Fresh password/hosted MFA, permanent idempotency key and versioned retry/cancel. Request processing starts inline and can resume privately through the worker. FINAL is blocked unless full-company book, presentation, exact-cutoff finalized bank, cash-component, AR/AP, deferred and roll-forward controls pass. Approved budget/mappings are required for final budget variance; overspend remains advisory. Closed-period new FINAL issuance is blocked pending F39. REVIEW explicitly retains incomplete diagnostics. Leases60s, at most3 attempts. Accepted jobs may return FAILED; HTTP202 does not assert readiness.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportExportChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data:{id,version,state}}; inspect detail for readiness/errors.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -30027,6 +30510,818 @@
           },
           "reauth": {
             "$ref": "#/components/schemas/Reauthentication"
+          }
+        }
+      },
+      "ReportExportRequest": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reportType": {
+                "const": "GENERAL_LEDGER"
+              },
+              "filters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "accountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to",
+                  "accountId"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "REVIEW",
+                  "FINAL"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              }
+            },
+            "required": [
+              "reportType",
+              "filters",
+              "mode",
+              "reason",
+              "reauth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reportType": {
+                "const": "TRIAL_BALANCE"
+              },
+              "filters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "default": ""
+                  },
+                  "includeZero": {
+                    "type": "string",
+                    "enum": [
+                      "YES",
+                      "NO"
+                    ],
+                    "default": "NO"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "REVIEW",
+                  "FINAL"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              }
+            },
+            "required": [
+              "reportType",
+              "filters",
+              "mode",
+              "reason",
+              "reauth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reportType": {
+                "const": "PROFIT_LOSS"
+              },
+              "filters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "default": ""
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "REVIEW",
+                  "FINAL"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              }
+            },
+            "required": [
+              "reportType",
+              "filters",
+              "mode",
+              "reason",
+              "reauth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reportType": {
+                "const": "BALANCE_SHEET"
+              },
+              "filters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "asOf": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "default": ""
+                  }
+                },
+                "required": [
+                  "asOf"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "REVIEW",
+                  "FINAL"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              }
+            },
+            "required": [
+              "reportType",
+              "filters",
+              "mode",
+              "reason",
+              "reauth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reportType": {
+                "const": "CASH_FLOW"
+              },
+              "filters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "default": ""
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "REVIEW",
+                  "FINAL"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              }
+            },
+            "required": [
+              "reportType",
+              "filters",
+              "mode",
+              "reason",
+              "reauth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reportType": {
+                "const": "RECEIVABLES_AGEING"
+              },
+              "filters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "asOf": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "default": ""
+                  },
+                  "includeSettled": {
+                    "type": "string",
+                    "enum": [
+                      "YES",
+                      "NO"
+                    ],
+                    "default": "NO"
+                  },
+                  "bucket": {
+                    "enum": [
+                      "ALL",
+                      "NOT_DUE",
+                      "DAYS_1_30",
+                      "DAYS_31_60",
+                      "DAYS_61_90",
+                      "OVER_90"
+                    ],
+                    "default": "ALL"
+                  }
+                },
+                "required": [
+                  "asOf"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "REVIEW",
+                  "FINAL"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              }
+            },
+            "required": [
+              "reportType",
+              "filters",
+              "mode",
+              "reason",
+              "reauth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reportType": {
+                "const": "PAYABLES_AGEING"
+              },
+              "filters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "asOf": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "default": ""
+                  },
+                  "includeSettled": {
+                    "type": "string",
+                    "enum": [
+                      "YES",
+                      "NO"
+                    ],
+                    "default": "NO"
+                  },
+                  "bucket": {
+                    "enum": [
+                      "ALL",
+                      "NOT_DUE",
+                      "DAYS_1_30",
+                      "DAYS_31_60",
+                      "DAYS_61_90",
+                      "OVER_90"
+                    ],
+                    "default": "ALL"
+                  }
+                },
+                "required": [
+                  "asOf"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "REVIEW",
+                  "FINAL"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              }
+            },
+            "required": [
+              "reportType",
+              "filters",
+              "mode",
+              "reason",
+              "reauth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reportType": {
+                "const": "ROLL_FORWARD"
+              },
+              "filters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "default": ""
+                  },
+                  "kind": {
+                    "enum": [
+                      "PROJECTS",
+                      "FUNDING",
+                      "LOANS",
+                      "INVESTMENTS",
+                      "ASSETS",
+                      "ADVANCES"
+                    ]
+                  }
+                },
+                "required": [
+                  "from",
+                  "to",
+                  "kind"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "REVIEW",
+                  "FINAL"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              }
+            },
+            "required": [
+              "reportType",
+              "filters",
+              "mode",
+              "reason",
+              "reauth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reportType": {
+                "const": "BUDGET_VARIANCE"
+              },
+              "filters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "month": {
+                    "type": "string",
+                    "pattern": "^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])$"
+                  },
+                  "projectId": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      {
+                        "const": "SHARED"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "month",
+                  "projectId"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "REVIEW",
+                  "FINAL"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              }
+            },
+            "required": [
+              "reportType",
+              "filters",
+              "mode",
+              "reason",
+              "reauth"
+            ]
+          }
+        ],
+        "discriminator": {
+          "propertyName": "reportType"
+        }
+      },
+      "ReportExportChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "ReportExportItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reportType": {
+            "enum": [
+              "GENERAL_LEDGER",
+              "TRIAL_BALANCE",
+              "PROFIT_LOSS",
+              "BALANCE_SHEET",
+              "CASH_FLOW",
+              "RECEIVABLES_AGEING",
+              "PAYABLES_AGEING",
+              "ROLL_FORWARD",
+              "BUDGET_VARIANCE"
+            ]
+          },
+          "mode": {
+            "enum": [
+              "REVIEW",
+              "FINAL"
+            ]
+          },
+          "state": {
+            "enum": [
+              "QUEUED",
+              "RUNNING",
+              "READY",
+              "FAILED",
+              "CANCELLED",
+              "SUPERSEDED"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "errorCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "snapshotHash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rowCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2000
+          }
+        },
+        "required": [
+          "id",
+          "reportType",
+          "mode",
+          "state",
+          "version",
+          "attempts",
+          "createdAt",
+          "expiresAt",
+          "errorCode",
+          "snapshotHash",
+          "rowCount"
+        ]
+      },
+      "ReportExportRegister": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 25,
+            "items": {
+              "$ref": "#/components/schemas/ReportExportItem"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pages"
+        ]
+      },
+      "ReportExportDetail": {
+        "type": "object",
+        "description": "Retained private metadata, filters, reason, requesterId, bounded failureDetails/readiness, original metadata/summary, rowCount, at most25 items/page/pages, file hashes, expiry and canMutate. No raw artifacts, full snapshot, lease token or requester grant epoch. Money and units remain exact decimal strings.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reportType": {
+            "enum": [
+              "GENERAL_LEDGER",
+              "TRIAL_BALANCE",
+              "PROFIT_LOSS",
+              "BALANCE_SHEET",
+              "CASH_FLOW",
+              "RECEIVABLES_AGEING",
+              "PAYABLES_AGEING",
+              "ROLL_FORWARD",
+              "BUDGET_VARIANCE"
+            ]
+          },
+          "mode": {
+            "enum": [
+              "REVIEW",
+              "FINAL"
+            ]
+          },
+          "state": {
+            "enum": [
+              "QUEUED",
+              "RUNNING",
+              "READY",
+              "FAILED",
+              "CANCELLED",
+              "SUPERSEDED"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "errorCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "snapshotHash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rowCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2000
+          },
+          "filters": {
+            "type": "object"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "requesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expired": {
+            "type": "boolean"
+          },
+          "canMutate": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 25,
+            "items": {
+              "type": "object"
+            }
+          },
+          "readiness": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "failureDetails": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "metadata": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "summary": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "csvHash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pdfHash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
           }
         }
       }

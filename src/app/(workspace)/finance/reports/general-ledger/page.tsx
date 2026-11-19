@@ -1,3 +1,4 @@
+import { ReportExportLink } from "@/modules/finance/components/report-export-link";
 import Link from "next/link";
 import { workDate } from "@/lib/dates";
 import { financePageData } from "@/modules/finance/accounting/page-data";
@@ -66,6 +67,7 @@ export default async function Ledger({
       </section>
       {d && (
         <>
+          <ReportExportLink reportType="GENERAL_LEDGER" filters={input} />
           <ReportMetadataPanel metadata={d.metadata} />
           <section className="panel" aria-label="Ledger account totals">
             <h2>

@@ -1,3 +1,4 @@
+import { ReportExportLink } from "./report-export-link";
 import Link from "next/link";
 import { workDate } from "@/lib/dates";
 import { financePageData } from "../accounting/page-data";
@@ -144,6 +145,10 @@ export async function RollforwardReportPage({ params, searchParams }: Props) {
       </section>
       {d && (
         <>
+          <ReportExportLink
+            reportType="ROLL_FORWARD"
+            filters={{ ...input, kind }}
+          />
           <ReportMetadataPanel
             metadata={d.metadata}
             sourceNote="Opening precedes the start date; posted signed increases and decreases within the inclusive range lead to closing. Planning amounts, draft charges and later reversals do not replace actual dated events."

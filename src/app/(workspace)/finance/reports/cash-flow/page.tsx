@@ -1,3 +1,4 @@
+import { ReportExportLink } from "@/modules/finance/components/report-export-link";
 import Link from "next/link";
 import { workDate } from "@/lib/dates";
 import { financePageData } from "@/modules/finance/accounting/page-data";
@@ -76,6 +77,7 @@ export default async function CashFlow({
       </section>
       {d && (
         <>
+          <ReportExportLink reportType="CASH_FLOW" filters={input} />
           <ReportMetadataPanel
             metadata={d.metadata}
             sourceNote="Actual PKR cash controls include archived accounts and designated cash equivalents. Reviewed components follow posted cash amounts; noncash journals do not create cash flows."

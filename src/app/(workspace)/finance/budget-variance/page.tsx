@@ -1,3 +1,4 @@
+import { ReportExportLink } from "@/modules/finance/components/report-export-link";
 import Link from "next/link";
 import { financePageData } from "@/modules/finance/accounting/page-data";
 import { budgetVariance } from "@/modules/finance/planning/service";
@@ -30,6 +31,13 @@ export default async function Variance({
     <section>
       <FinanceNavigation />
       <h1>Monthly budget variance</h1>
+      <ReportExportLink
+        reportType="BUDGET_VARIANCE"
+        filters={{
+          month: d.filters.month,
+          projectId: d.project?.id ?? "SHARED",
+        }}
+      />
       <VarianceFilters
         month={d.filters.month}
         projectId={d.project?.id ?? null}
