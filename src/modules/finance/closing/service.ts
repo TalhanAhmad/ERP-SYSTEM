@@ -24,6 +24,7 @@ import type {
   CloseReport,
 } from "./types";
 const errors: Record<string, string> = {
+  FINANCE_YEAR_REOPEN_REQUIRED: "Reopen the fiscal year first to reverse its closing journal before monthly adjustments.",
   FINANCE_FORBIDDEN: "Finance access is unavailable.",
   FINANCE_OWNER_REQUIRED:
     "Only the current Finance Owner can close, reopen or resolve period review issues.",

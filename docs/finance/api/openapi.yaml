@@ -23435,6 +23435,756 @@
           }
         }
       }
+    },
+    "/api/v1/finance/fiscal-years": {
+      "get": {
+        "operationId": "fiscal_year__get",
+        "description": "Current ACTIVE selected Super Admin reads; current Finance Owner mutations only. Private/no-store, Origin/CSRF, fresh provider proof and permanent request key. Fiscal dates/mapping are explicit. Annual close requires exact version/source hash, full contiguous period coverage, prior reviewed closes, final OPEN period, no prior income/expense carryover, valid exact balances and both evidenced owner reviews. Atomically emit one YEAR_CLOSE transfer (none if no lines), save BEFORE/AFTER annual statements and close final period through F39. P&L excludes closing/opposite lines; GL/TB include them; BS includes posted retained earnings plus remaining profit exactly once. Reopening latest-first reverses exact original journal at year end before adjustments and supersedes affected F38 exports through F39; originals retained. Generic monthly reopen cannot bypass annual close. 400 lines; full snapshot limits apply; finance stays disabled live.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FiscalYearRegister"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "fiscal_year__post",
+        "description": "Current ACTIVE selected Super Admin reads; current Finance Owner mutations only. Private/no-store, Origin/CSRF, fresh provider proof and permanent request key. Fiscal dates/mapping are explicit. Annual close requires exact version/source hash, full contiguous period coverage, prior reviewed closes, final OPEN period, no prior income/expense carryover, valid exact balances and both evidenced owner reviews. Atomically emit one YEAR_CLOSE transfer (none if no lines), save BEFORE/AFTER annual statements and close final period through F39. P&L excludes closing/opposite lines; GL/TB include them; BS includes posted retained earnings plus remaining profit exactly once. Reopening latest-first reverses exact original journal at year end before adjustments and supersedes affected F38 exports through F39; originals retained. Generic monthly reopen cannot bypass annual close. 400 lines; full snapshot limits apply; finance stays disabled live.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FiscalYearCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FiscalYearResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/fiscal-years/{id}/close-preview": {
+      "get": {
+        "operationId": "fiscal_year__id_close-preview_get",
+        "description": "Current ACTIVE selected Super Admin reads; current Finance Owner mutations only. Private/no-store, Origin/CSRF, fresh provider proof and permanent request key. Fiscal dates/mapping are explicit. Annual close requires exact version/source hash, full contiguous period coverage, prior reviewed closes, final OPEN period, no prior income/expense carryover, valid exact balances and both evidenced owner reviews. Atomically emit one YEAR_CLOSE transfer (none if no lines), save BEFORE/AFTER annual statements and close final period through F39. P&L excludes closing/opposite lines; GL/TB include them; BS includes posted retained earnings plus remaining profit exactly once. Reopening latest-first reverses exact original journal at year end before adjustments and supersedes affected F38 exports through F39; originals retained. Generic monthly reopen cannot bypass annual close. 400 lines; full snapshot limits apply; finance stays disabled live.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FiscalYearPreview"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/fiscal-years/{id}/closes": {
+      "get": {
+        "operationId": "fiscal_year__id_closes_get",
+        "description": "Current ACTIVE selected Super Admin reads; current Finance Owner mutations only. Private/no-store, Origin/CSRF, fresh provider proof and permanent request key. Fiscal dates/mapping are explicit. Annual close requires exact version/source hash, full contiguous period coverage, prior reviewed closes, final OPEN period, no prior income/expense carryover, valid exact balances and both evidenced owner reviews. Atomically emit one YEAR_CLOSE transfer (none if no lines), save BEFORE/AFTER annual statements and close final period through F39. P&L excludes closing/opposite lines; GL/TB include them; BS includes posted retained earnings plus remaining profit exactly once. Reopening latest-first reverses exact original journal at year end before adjustments and supersedes affected F38 exports through F39; originals retained. Generic monthly reopen cannot bypass annual close. 400 lines; full snapshot limits apply; finance stays disabled live.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FiscalYearHistory"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/fiscal-years/{id}/closes/{closeId}": {
+      "get": {
+        "operationId": "fiscal_year__id_closes_closeId_get",
+        "description": "Current ACTIVE selected Super Admin reads; current Finance Owner mutations only. Private/no-store, Origin/CSRF, fresh provider proof and permanent request key. Fiscal dates/mapping are explicit. Annual close requires exact version/source hash, full contiguous period coverage, prior reviewed closes, final OPEN period, no prior income/expense carryover, valid exact balances and both evidenced owner reviews. Atomically emit one YEAR_CLOSE transfer (none if no lines), save BEFORE/AFTER annual statements and close final period through F39. P&L excludes closing/opposite lines; GL/TB include them; BS includes posted retained earnings plus remaining profit exactly once. Reopening latest-first reverses exact original journal at year end before adjustments and supersedes affected F38 exports through F39; originals retained. Generic monthly reopen cannot bypass annual close. 400 lines; full snapshot limits apply; finance stays disabled live.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "closeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FiscalYearDetail"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/fiscal-years/{id}/closes/{closeId}/reports/{reportType}/{stage}": {
+      "get": {
+        "operationId": "fiscal_year__id_closes_closeId_reports_reportType_stage_get",
+        "description": "Current ACTIVE selected Super Admin reads; current Finance Owner mutations only. Private/no-store, Origin/CSRF, fresh provider proof and permanent request key. Fiscal dates/mapping are explicit. Annual close requires exact version/source hash, full contiguous period coverage, prior reviewed closes, final OPEN period, no prior income/expense carryover, valid exact balances and both evidenced owner reviews. Atomically emit one YEAR_CLOSE transfer (none if no lines), save BEFORE/AFTER annual statements and close final period through F39. P&L excludes closing/opposite lines; GL/TB include them; BS includes posted retained earnings plus remaining profit exactly once. Reopening latest-first reverses exact original journal at year end before adjustments and supersedes affected F38 exports through F39; originals retained. Generic monthly reopen cannot bypass annual close. 400 lines; full snapshot limits apply; finance stays disabled live.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "closeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "reportType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TRIAL_BALANCE",
+                "PROFIT_LOSS",
+                "BALANCE_SHEET"
+              ]
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "BEFORE",
+                "AFTER"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FiscalYearReport"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/fiscal-years/{id}/close": {
+      "post": {
+        "operationId": "fiscal_year__id_close_post",
+        "description": "Current ACTIVE selected Super Admin reads; current Finance Owner mutations only. Private/no-store, Origin/CSRF, fresh provider proof and permanent request key. Fiscal dates/mapping are explicit. Annual close requires exact version/source hash, full contiguous period coverage, prior reviewed closes, final OPEN period, no prior income/expense carryover, valid exact balances and both evidenced owner reviews. Atomically emit one YEAR_CLOSE transfer (none if no lines), save BEFORE/AFTER annual statements and close final period through F39. P&L excludes closing/opposite lines; GL/TB include them; BS includes posted retained earnings plus remaining profit exactly once. Reopening latest-first reverses exact original journal at year end before adjustments and supersedes affected F38 exports through F39; originals retained. Generic monthly reopen cannot bypass annual close. 400 lines; full snapshot limits apply; finance stays disabled live.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodCloseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FiscalYearResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/fiscal-years/{id}/reopen": {
+      "post": {
+        "operationId": "fiscal_year__id_reopen_post",
+        "description": "Current ACTIVE selected Super Admin reads; current Finance Owner mutations only. Private/no-store, Origin/CSRF, fresh provider proof and permanent request key. Fiscal dates/mapping are explicit. Annual close requires exact version/source hash, full contiguous period coverage, prior reviewed closes, final OPEN period, no prior income/expense carryover, valid exact balances and both evidenced owner reviews. Atomically emit one YEAR_CLOSE transfer (none if no lines), save BEFORE/AFTER annual statements and close final period through F39. P&L excludes closing/opposite lines; GL/TB include them; BS includes posted retained earnings plus remaining profit exactly once. Reopening latest-first reverses exact original journal at year end before adjustments and supersedes affected F38 exports through F39; originals retained. Generic monthly reopen cannot bypass annual close. 400 lines; full snapshot limits apply; finance stays disabled live.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodReopenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FiscalYearResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/fiscal-years/{id}/void": {
+      "post": {
+        "operationId": "fiscal_year__id_void_post",
+        "description": "Current ACTIVE selected Super Admin reads; current Finance Owner mutations only. Private/no-store, Origin/CSRF, fresh provider proof and permanent request key. Fiscal dates/mapping are explicit. Annual close requires exact version/source hash, full contiguous period coverage, prior reviewed closes, final OPEN period, no prior income/expense carryover, valid exact balances and both evidenced owner reviews. Atomically emit one YEAR_CLOSE transfer (none if no lines), save BEFORE/AFTER annual statements and close final period through F39. P&L excludes closing/opposite lines; GL/TB include them; BS includes posted retained earnings plus remaining profit exactly once. Reopening latest-first reverses exact original journal at year end before adjustments and supersedes affected F38 exports through F39; originals retained. Generic monthly reopen cannot bypass annual close. 400 lines; full snapshot limits apply; finance stays disabled live.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FiscalYearVoid"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FiscalYearResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -32372,6 +33122,100 @@
       "PeriodCloseIssues": {
         "type": "object",
         "description": "Private period,canManage,at most25 issue items,total/page/pages. Every source kind/description/evidence/creator/time and resolution/version/resolver/time is retained. Owner creates/resolves only in OPEN periods; no deletion or overwrite."
+      },
+      "FiscalYearCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "retainedAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "name",
+          "startDate",
+          "endDate",
+          "retainedAccountId",
+          "evidence",
+          "reason",
+          "reauth"
+        ],
+        "description": "Explicit inclusive fiscal range and active PKR posting noncontra ordinary EQUITY/CREDIT mapping; end>=start; no live calendar or mapping seeded. Unused misconfiguration can be voided."
+      },
+      "FiscalYearVoid": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "FiscalYearRegister": {
+        "type": "object",
+        "description": "Private paged items of explicit years (id,name,inclusive startDate/endDate,retainedAccountId,evidence,state,version,creator/time); total,page,pages,canManage. 25 records per page."
+      },
+      "FiscalYearPreview": {
+        "type": "object",
+        "description": "Private year,canManage,basisHash,exact string netProfit,proposed closing lines (sequence,accountId,code,accountName,description,debit/credit exact strings),checklist:ready,completePeriodCoverage,priorUnclosedPeriods,priorUnclosedIncomeAccounts,invalidClosingAccounts,retainedMappingValid,lineCount,finalPeriod,periodChecklist. No full statement arrays."
+      },
+      "FiscalYearHistory": {
+        "type": "object",
+        "description": "Private paged immutable close cycles:sequence,state CLOSED/REVERSED,version,netProfit exact string,journal/reversal ids,actor/time/reason,snapshotHash; year,total,page,pages,canManage."
+      },
+      "FiscalYearDetail": {
+        "type": "object",
+        "description": "Private original annual close configuration,evidence,basis/checklist,closing lines,exact string netProfit,final period/close links,journal/reversal ids and retained snapshot hash; current year and canManage. Full statement arrays and original grant id excluded."
+      },
+      "FiscalYearReport": {
+        "type": "object",
+        "description": "Original BEFORE/AFTER annual TB/P&L/BS metadata,summary,25 saved items,total/page/pages,yearCloseId,closeState,snapshotHash; immutable original values remain readable when REVERSED."
+      },
+      "FiscalYearResult": {
+        "type": "object",
+        "description": "Private {id:yearId,version,state,closeId,closeVersion,sequence,journalId,reversalJournalId}; nullable journal for zero remaining balances. No fake zero-value posting."
       }
     }
   }

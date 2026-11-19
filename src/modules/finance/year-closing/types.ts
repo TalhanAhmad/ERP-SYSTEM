@@ -1,0 +1,90 @@
+import type { CloseChecklist, ClosePeriod } from "../closing/types";
+import type { ReportMetadata } from "../reports/service";
+export type Year = {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  retainedAccountId: string;
+  evidence: string;
+  state: "OPEN" | "CLOSED" | "VOID";
+  version: number;
+  createdById: string;
+  createdAt: string;
+};
+export type YearLine = {
+  code: string;
+  accountName: string;
+  sequence: number;
+  accountId: string;
+  description: string;
+  debit: string;
+  credit: string;
+};
+export type YearChecklist = {
+  ready: boolean;
+  completePeriodCoverage: boolean;
+  priorUnclosedPeriods: number;
+  priorUnclosedIncomeAccounts: number;
+  invalidClosingAccounts: number;
+  retainedMappingValid: boolean;
+  lineCount: number;
+  finalPeriod: ClosePeriod | null;
+  periodChecklist: CloseChecklist | null;
+};
+export type YearPreview = {
+  year: Year;
+  canManage: boolean;
+  checklist: YearChecklist;
+  lines: YearLine[];
+  netProfit: string;
+  basisHash: string;
+};
+export type YearCycle = {
+  id: string;
+  sequence: number;
+  state: "CLOSED" | "REVERSED";
+  version: number;
+  netProfit: string;
+  snapshotHash: string;
+  journalId: string | null;
+  reversalJournalId: string | null;
+  closedAt: string;
+  closedById: string;
+  reversedAt: string | null;
+  reversedById: string | null;
+  reason: string;
+  reverseReason: string | null;
+};
+export type YearDetail = YearCycle & {
+  year: Year;
+  canManage: boolean;
+  fiscalYearId: string;
+  yearVersion: number;
+  basisHash: string;
+  checklist: YearChecklist;
+  lines: YearLine[];
+  periodId: string;
+  periodCloseId: string;
+  postingReviewEvidence: string;
+  adjustmentReviewEvidence: string;
+};
+export type YearPaging<T> = {
+  year: Year | null;
+  canManage: boolean;
+  items: T[];
+  page: number;
+  pages: number;
+  total: number;
+};
+export type YearReport = {
+  yearCloseId: string;
+  closeState: string;
+  snapshotHash: string;
+  metadata: ReportMetadata;
+  summary: Record<string, unknown>;
+  items: Record<string, unknown>[];
+  total: number;
+  page: number;
+  pages: number;
+};

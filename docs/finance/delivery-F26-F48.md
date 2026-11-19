@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F39 engineering is implemented and locally verified. F39 adds reviewed close/reopen, saved statements and date/evidence/export protection; F40–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
+F01–F40 engineering is implemented and locally verified. F40 adds exact annual close/reversal and retained statements integrated with F39 period locks. F41–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -141,3 +141,12 @@ F39 source **35356d61e31036289a6dd35a4466c8dcd8fadef3** is committed and pushed 
 ## PR6 merge verified — 19 November2026
 
 [PR #6](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/6) merged into main at 22:49:47 Asia/Karachi on 19 November 2026. Merge commit **05be78b833eecc8dc6bd3e09b97203ee111420b3** retains the F39 milestone history. Exact final head **52e892a334f91bb982e9e2b8e1eed434ae729066** passed [CI44505033377](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44505033377) before merge:79 fresh migrations,1,080 tests, both builds, typing/lint and220 API contracts. Independently confirmed the merged state/head, fetched main and created finance/f40-year-close. F40 is in progress; no hosted finance activation or human acceptance occurred.
+
+
+## F40 complete local acceptance — 19 November2026
+
+F40 adds explicit owner-reviewed fiscal calendars/retained mapping, unused void/replacement, full-period coverage and prior-income carryover checks, atomic exact YEAR_CLOSE transfer with before/after annual TB/P&L/BS and final-period F39 close, controlled exact reversal/export supersession and immutable numbered re-closing. P&L stays unchanged by closing entries and balance-sheet retained equity/unclosed profit counts income once. Actual profit40.01 becomes retained equity40.01/unclosed0.00; a real100.02 adjustment after reopening produces loss60.01. Empty and gross-zero years are independently verified. Concurrent retries create one cycle/receipt, and raw runtime writes/unchecked internal function calls remain denied. [Annual rules](accounting/year-closing.md) and [F40](planning/days/F40.md) describe scope. F41 opening imports/clearing proof is next; F41–F46 engineering, F47 user review and F48 release remain. Hosted finance stays disabled; no real fiscal policy, mapping, books or grant was configured.
+
+1,113 distinct local tests passed:328 unit (4.96s),726 actual PostgreSQL integration (421.08s),59 Chromium (4.0m). Production and Supabase-shaped builds, strict typing/lint,228 concrete finance API contracts and all80 applied migration checksums passed. The dedicated owned-database annual browser journey passed12.3s before full regression, covering explicit fiscal-year creation, actual income100.01/cost60.00, closing/reversal, preserved original annual statements, real journal link, mobile layout/WCAG and employee denial. All20 focused database cases also passed24.85s after adding actual direct retained-account posting denial and confirming no partial journal survived the rejected post.
+
+Source publication and fresh GitHub verification follow separately. Earlier applied migrations remain unchanged. The full backend run completed before browser preparation; hosted-shaped build followed the entire browser regression. All first final browser cases passed, including the new annual journey. No fake dates, effort hours, owner acceptance or live release are asserted.

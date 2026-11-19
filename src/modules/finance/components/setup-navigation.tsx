@@ -48,6 +48,7 @@ export function FinanceNavigation() {
       <Link href="/finance/cash-accounts">Cash accounts</Link>
       <Link href="/finance/accounts">Accounts</Link>
       <Link href="/finance/periods">Periods</Link>
+      <Link href="/finance/fiscal-years">Fiscal years</Link>
       <Link href="/finance/access">Access</Link>
     </nav>
   );
