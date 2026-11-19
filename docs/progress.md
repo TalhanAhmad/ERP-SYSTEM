@@ -1,8 +1,8 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-17 (Asia/Karachi)
+Last updated: 2026-11-19 (Asia/Karachi)
 
-Finance extension: F01–F37 are accepted and merged through PR4; F38 private CSV/PDF exports are locally accepted with1,045 tests and are separately committed/pushed in unmerged PR5 with successful fresh source CI. Current source work and the full/focused Word reports are tracked in [finance progress](finance/progress.md) and [the continuation report](finance/delivery-F26-F48.md). Hosted finance stays disabled; this does not replace or complete the original ERP learning roadmap below.
+Finance extension: F01–F38 are accepted and merged through PR5, merge30cc426 on 19 November2026, after successful CI44112657600 on the latest PR head. F38 private CSV/PDF exports passed1,045 tests. Current source work and the full/focused Word reports are tracked in [finance progress](finance/progress.md) and [the continuation report](finance/delivery-F26-F48.md). Hosted finance stays disabled; this does not replace or complete the original ERP learning roadmap below.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded

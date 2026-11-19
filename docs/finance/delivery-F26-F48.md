@@ -119,3 +119,8 @@ Private exports cover all nine report families with canonical rows/totals/basis,
 ## F38 source publication and fresh verification
 
 F38 source **8bca4c26a0cab30f00e9f58a9f3ab407022b9572** is committed and pushed to **finance/f38-exports** on 17 November2026. [Draft PR #5](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/5) contains the milestone and targets main. [Fresh CI44102819006](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44102819006) passed for that exact source: all77 fresh migrations,1,045 tests, typing/lint,both builds and211-path API verification. The subsequent documentation-only recording preserves the verified application/schema/tests/scripts/config source exactly. The PR remains unmerged; finance remains disabled live. F39 monthly close/reopen is next.
+
+
+## PR5 merge confirmed — 19 November2026
+
+[PR #5](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/5) merged into main on 19 November 2026 at 13:59:08 Asia/Karachi. Merge commit **30cc426c6a7b03c59bd6786db0498c3152df5783** retains the separate F38 source/documentation commits. Latest PR head **d3f508c96579ffa1322313cc9c47f09aa29aed4b** passed [CI44112657600](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44112657600) before merge: all77 fresh migrations,1,045 tests, typing/lint,both builds and211-path API verification. GitHub independently confirmed merged=true and the expected source/merge identity. Local main was fast-forwarded and application/schema/tests/scripts/config source matches that tested head exactly. The subsequent documentation-only recording updates full/focused Word reports and preserves that application source. No hosted financial migration, finance enablement or company/accountant acceptance occurred. F39 monthly close/reopen is next.
