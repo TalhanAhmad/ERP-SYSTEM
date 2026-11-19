@@ -156,3 +156,8 @@ F38 source **8bca4c26a0cab30f00e9f58a9f3ab407022b9572** is committed and pushed 
 ## F39 owner review evidence
 
 Actual synthetic income100.01 and incurred expense60.00 close with balanced160.01 movements and40.01 profit. Reviewed reopening allows a later3.01 dated correction, while the original close/report values remain unchanged. Re-close creates another numbered cycle. Source/post races cannot admit unreviewed posting. A closed bank proof cannot reopen beneath an issued period close. Current owner review of failed posting outcomes and required adjustments is explicit, with retained evidence and recorded issue resolution; automatic monitoring of historical rolled-back commands is not claimed. The user should review this manual process and future F42 monitoring before adopting real books. All human acceptance and live release fields remain pending.
+
+
+## F39 source publication and fresh verification
+
+F39 source **35356d61e31036289a6dd35a4466c8dcd8fadef3** is committed and pushed to **finance/f39-period-close** on 19 November2026. [Draft PR #6](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/6) targets main and remains unmerged. [Fresh CI44502508756](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44502508756) passed for that exact source: all79 fresh migrations,1,080 tests, typing/lint,both builds and220-path API verification. The subsequent documentation-only recording preserves application/schema/tests/scripts/config source exactly. F40 fiscal-year closing is next; F40–F46 engineering, F47 human review and F48 live activation remain. No hosted financial migration, real books/policy adoption or human acceptance occurred.

@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-19 (Asia/Karachi)
 
-Finance extension: F01–F38 are accepted and merged through PR5. F39 owner period close/reopen is locally accepted with1,080 tests and is being committed/pushed separately. See [finance progress](finance/progress.md) and [the continuation report](finance/delivery-F26-F48.md) for source/verification and updated full/focused Word reports. Hosted finance stays disabled; the original ERP learning roadmap remains separate.
+Finance extension: F01–F38 are accepted and merged through PR5. F39 owner period close/reopen is locally accepted with1,080 tests and is committed/pushed in unmerged PR6 with successful fresh source CI. See [finance progress](finance/progress.md) and [the continuation report](finance/delivery-F26-F48.md) for source/verification and updated full/focused Word reports. Hosted finance stays disabled; the original ERP learning roadmap remains separate.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded
