@@ -113,12 +113,15 @@ beforeAll(async () => {
   await local.initialise();
   await local.start();
   await local.createDatabase("encova_test");
+  await sql.connect();
+  await sql.query(
+    "CREATE ROLE anon NOLOGIN NOINHERIT; CREATE ROLE authenticated NOLOGIN NOINHERIT",
+  );
   execFileSync("pnpm", ["db:migrate:deploy"], {
     env: { ...process.env, DATABASE_URL: url, DIRECT_URL: url },
     stdio: "pipe",
     timeout: 90000,
   });
-  await sql.connect();
   await sql.query(await readFile("supabase/setup.sql", "utf8"));
   for (const [name, role] of [
     ["owner", "SUPER_ADMIN"],
@@ -885,7 +888,7 @@ async function customer(
   resource: Parameters<
     typeof import("@/modules/finance/receivables/customer/service").customerCommand
   >[2],
-  action: "CREATE" | "POST",
+  action: "CREATE" | "POST" | "UPDATE",
   body: unknown,
 ) {
   const { customerCommand } =
@@ -1175,4 +1178,841 @@ it("depreciates only the imported asset's remaining carrying amount and preserve
   expect(
     (await openingDetail(people.owner, batch)).proof?.clearingBalance,
   ).toBe("0.00");
+});
+
+// F42 acceptance continues in the same wholly owned cutover books: no shared financial history is deleted.
+const {
+  automationCommand,
+  recurringSchedules,
+  recurringRuns,
+  recurringRun,
+  recognition,
+  recognitions,
+  preparationOptions,
+} = await import("@/modules/finance/automation/service");
+const { processRecurringRun, processFinanceRecurring } =
+  await import("@/modules/finance/automation/worker");
+async function auto(
+  action: Parameters<typeof automationCommand>[2],
+  body: unknown,
+  id?: string,
+  who = "owner",
+  key = crypto.randomUUID(),
+) {
+  const p = await proof(who);
+  return automationCommand(p.actor, p.proof, action, id, body, key);
+}
+const schedule = (
+  kind: "BILL" | "JOURNAL" | "DEPRECIATION",
+  template: Record<string, unknown>,
+  patch: Record<string, unknown> = {},
+) =>
+  auto("CREATE", {
+    name: "Reviewed monthly " + kind,
+    kind,
+    template: {
+      description: "Reviewed recurring obligation or adjustment",
+      ...template,
+    },
+    startMonth: "2020-02",
+    endMonth: "2020-03",
+    day: 1,
+    evidence: "Explicit reviewed monthly amount and source classification",
+    reason: "Configure reviewable drafts only",
+    ...patch,
+  });
+let billSchedule: string, journalSchedule: string;
+it("configures exact monthly bill and accrual templates without posting or creating a draft immediately", async () => {
+  const before = await db.financeJournalEntry.count(),
+    bills = await db.financeBill.count();
+  billSchedule = (
+    await schedule("BILL", {
+      partyId: supplier,
+      payableAccountId: accounts.ap,
+      costAccountId: accounts.expense,
+      amount: "10.01",
+      dueDays: 15,
+    })
+  ).id;
+  journalSchedule = (
+    await schedule("JOURNAL", {
+      debitAccountId: accounts.expense,
+      creditAccountId: accounts.ordinary,
+      amount: "2.01",
+    })
+  ).id;
+  expect(await db.financeJournalEntry.count()).toBe(before);
+  expect(await db.financeBill.count()).toBe(bills);
+  expect((await recurringSchedules(people.owner)).total).toBe(2);
+});
+it("prepares one actual draft per schedule and month across duplicate worker passes with no new journal or cash", async () => {
+  const before = await db.financeJournalEntry.count();
+  await processFinanceRecurring(Date.now() + 60000);
+  await processFinanceRecurring(Date.now() + 60000);
+  await processFinanceRecurring(Date.now() + 60000);
+  const b = await db.financeRecurringRun.findMany({
+      where: { scheduleId: billSchedule },
+      orderBy: { month: "asc" },
+    }),
+    j = await db.financeRecurringRun.findMany({
+      where: { scheduleId: journalSchedule },
+    });
+  expect(b).toHaveLength(2);
+  expect(j).toHaveLength(2);
+  expect(
+    [...b, ...j].map((x) => ({
+      state: x.state,
+      attempts: x.attempts,
+      error: x.errorCode,
+    })),
+  ).toEqual(
+    Array.from({ length: 4 }, () => ({
+      state: "READY",
+      attempts: 1,
+      error: null,
+    })),
+  );
+  for (const r of b) {
+    const draft = await db.financeBill.findUniqueOrThrow({
+      where: { id: r.sourceId! },
+    });
+    expect(draft).toMatchObject({
+      state: "DRAFT",
+      totalAmount: expect.anything(),
+    });
+    expect(draft.totalAmount.toFixed(2)).toBe("10.01");
+    expect(draft.reference).toBe(`REC-${billSchedule}-${r.month}`);
+  }
+  for (const r of j)
+    expect(
+      (
+        await db.financeJournalDraft.findUniqueOrThrow({
+          where: { id: r.sourceId! },
+        })
+      ).state,
+    ).toBe("DRAFT");
+  expect(await db.financeJournalEntry.count()).toBe(before);
+  const history = await recurringRun(people.owner, b[0].id);
+  expect(history.attempts).toHaveLength(1);
+  expect(history.attempts[0].outcome).toBe("READY");
+  expect(JSON.stringify(history)).not.toContain("leaseId");
+});
+it("resumes an expired lease and refuses its stale finisher without duplicating a draft", async () => {
+  const s = await schedule(
+    "JOURNAL",
+    {
+      debitAccountId: accounts.expense,
+      creditAccountId: accounts.ordinary,
+      amount: "1.00",
+    },
+    { startMonth: "2020-04", endMonth: "2020-04" },
+  );
+  await sql.query("SELECT encova_finance_automation_enqueue()");
+  const run = await db.financeRecurringRun.findFirstOrThrow({
+    where: { scheduleId: s.id },
+  });
+  const first = (
+    await sql.query("SELECT encova_finance_automation_claim($1) AS data", [
+      run.id,
+    ])
+  ).rows[0].data;
+  await sql.query(
+    'UPDATE "FinanceRecurringRun" SET "leaseUntil"=CURRENT_TIMESTAMP-interval \'1 second\',version=version+1 WHERE id=$1',
+    [run.id],
+  );
+  const second = (
+    await sql.query("SELECT encova_finance_automation_claim($1) AS data", [
+      run.id,
+    ])
+  ).rows[0].data;
+  expect(second.leaseId).not.toBe(first.leaseId);
+  await sql.query("SELECT encova_finance_automation_finish($1,$2)", [
+    run.id,
+    first.leaseId,
+  ]);
+  expect(
+    (await db.financeRecurringRun.findUniqueOrThrow({ where: { id: run.id } }))
+      .sourceId,
+  ).toBeNull();
+  await sql.query("SELECT encova_finance_automation_finish($1,$2)", [
+    run.id,
+    second.leaseId,
+  ]);
+  const done = await recurringRun(people.owner, run.id);
+  expect(done.run).toMatchObject({ state: "READY", attempts: 2 });
+  expect(done.attempts.map((a) => a.outcome)).toEqual(["EXPIRED", "READY"]);
+});
+it("records failed mappings, retains safe attempt history and requires current-owner review for retry", async () => {
+  const missing = crypto.randomUUID(),
+    s = await schedule(
+      "BILL",
+      {
+        partyId: supplier,
+        payableAccountId: accounts.ap,
+        costAccountId: missing,
+        amount: "10.00",
+        dueDays: 0,
+      },
+      { startMonth: "2020-05", endMonth: "2020-05" },
+    );
+  const count = await db.financeBill.count();
+  await processFinanceRecurring(Date.now() + 60000);
+  const run = await db.financeRecurringRun.findFirstOrThrow({
+    where: { scheduleId: s.id },
+  });
+  expect(run).toMatchObject({
+    state: "FAILED",
+    attempts: 1,
+    errorCode: "FINANCE_AUTOMATION_MAPPING",
+    sourceId: null,
+  });
+  expect(await db.financeBill.count()).toBe(count);
+  await expect(
+    auto(
+      "RETRY",
+      { expectedVersion: run.version, reason: "Unauthorized retry" },
+      run.id,
+      "selected",
+    ),
+  ).rejects.toMatchObject({ code: "FINANCE_OWNER_REQUIRED" });
+  await auto(
+    "RETRY",
+    {
+      expectedVersion: run.version,
+      reason: "Review failed preparation and retry",
+    },
+    run.id,
+  );
+  await processRecurringRun(run.id);
+  expect(
+    (await recurringRun(people.owner, run.id)).attempts.map((a) => a.outcome),
+  ).toEqual(["FAILED", "FAILED"]);
+  await expect(
+    sql.query(
+      'UPDATE "FinanceRecurringAttempt" SET "errorCode"=NULL WHERE "runId"=$1',
+      [run.id],
+    ),
+  ).rejects.toThrow("FINANCE_AUTOMATION_RETAINED");
+});
+it("checks the original grant again at release and cancels a revoked claimed job before any draft exists", async () => {
+  const s = await schedule(
+    "JOURNAL",
+    {
+      debitAccountId: accounts.expense,
+      creditAccountId: accounts.ordinary,
+      amount: "1.00",
+    },
+    { startMonth: "2020-06", endMonth: "2020-06" },
+  );
+  await sql.query("SELECT encova_finance_automation_enqueue()");
+  const run = await db.financeRecurringRun.findFirstOrThrow({
+      where: { scheduleId: s.id },
+    }),
+    claim = (
+      await sql.query("SELECT encova_finance_automation_claim($1) AS data", [
+        run.id,
+      ])
+    ).rows[0].data;
+  await sql.query("BEGIN");
+  try {
+    await sql.query(
+      'UPDATE "FinanceSettings" SET "ownerId"=$1,"ownerGrantId"=(SELECT id FROM "FinanceGrant" WHERE "userId"=$1 AND "revokedAt" IS NULL),version=version+1',
+      [people.selected.id],
+    );
+    await sql.query(
+      'UPDATE "FinanceGrant" SET "revokedAt"=CURRENT_TIMESTAMP,"revokedById"=$1,version=version+1 WHERE id=$2',
+      [people.owner.id, run.grantId],
+    );
+    await sql.query("SELECT encova_finance_automation_finish($1,$2)", [
+      run.id,
+      claim.leaseId,
+    ]);
+    const result = (
+      await sql.query(
+        'SELECT state,"sourceId" FROM "FinanceRecurringRun" WHERE id=$1',
+        [run.id],
+      )
+    ).rows[0];
+    expect(result).toMatchObject({ state: "CANCELLED", sourceId: null });
+  } finally {
+    await sql.query("ROLLBACK");
+  }
+  await processRecurringRun(run.id); // Active lease remains owned until it expires; cannot steal it.
+  expect(
+    (await db.financeRecurringRun.findUniqueOrThrow({ where: { id: run.id } }))
+      .state,
+  ).toBe("RUNNING");
+  await sql.query(
+    'UPDATE "FinanceRecurringRun" SET "leaseUntil"=CURRENT_TIMESTAMP-interval \'1 second\',version=version+1 WHERE id=$1',
+    [run.id],
+  );
+  await processRecurringRun(run.id);
+  expect(
+    (await db.financeRecurringRun.findUniqueOrThrow({ where: { id: run.id } }))
+      .state,
+  ).toBe("READY");
+});
+it("pauses schedules and cancels an already claimed run without permitting automatic posting", async () => {
+  const s = await schedule(
+    "JOURNAL",
+    {
+      debitAccountId: accounts.expense,
+      creditAccountId: accounts.ordinary,
+      amount: "1.00",
+    },
+    { startMonth: "2020-07", endMonth: "2020-07" },
+  );
+  await sql.query("SELECT encova_finance_automation_enqueue()");
+  const run = await db.financeRecurringRun.findFirstOrThrow({
+      where: { scheduleId: s.id },
+    }),
+    claim = (
+      await sql.query("SELECT encova_finance_automation_claim($1) AS data", [
+        run.id,
+      ])
+    ).rows[0].data;
+  const paused = await auto(
+    "PAUSE",
+    { expectedVersion: s.version, reason: "Pause future draft preparation" },
+    s.id,
+  );
+  await sql.query("SELECT encova_finance_automation_finish($1,$2)", [
+    run.id,
+    claim.leaseId,
+  ]);
+  expect(
+    (await db.financeRecurringRun.findUniqueOrThrow({ where: { id: run.id } }))
+      .state,
+  ).toBe("CANCELLED");
+  await auto(
+    "RESUME",
+    {
+      expectedVersion: paused.version,
+      reason: "Resume future reviewed months",
+    },
+    s.id,
+  );
+  await processFinanceRecurring(Date.now() + 60000);
+  expect(
+    await db.financeRecurringRun.count({ where: { scheduleId: s.id } }),
+  ).toBe(1);
+});
+let recognitionId: string;
+it("previews available deferred lines and posts exactly evidenced recognition without new receivables or cash", async () => {
+  const line = await db.financeOpeningLine.findFirstOrThrow({
+      where: { batchId: batch, kind: "DEFERRED" },
+    }),
+    cashBefore = (
+      await sql.query(
+        'SELECT coalesce(sum(l.debit-l.credit),0)::text AS balance FROM "FinanceJournalLine" l WHERE "accountId"=$1',
+        [accounts.cash],
+      )
+    ).rows[0].balance,
+    arBefore = await db.financeReceivableEvent.count();
+  const options = await preparationOptions(people.owner, {
+    kind: "DEFERRED",
+    asOf: "2020-02-15",
+  });
+  expect(
+    options.items.some((x) => x.id === line.id && x.balance === "16.00"),
+  ).toBe(true);
+  const d = await auto("RECOGNITION_CREATE", {
+    invoiceLineId: line.id,
+    postingDate: "2020-02-15",
+    amount: "5.01",
+    description: "Earn reviewed portion of legacy service",
+    evidence: "Documented delivered service acceptance",
+    reason: "Draft earned deferred obligation",
+  });
+  recognitionId = d.id;
+  const key = crypto.randomUUID(),
+    posted = await auto(
+      "RECOGNITION_POST",
+      {
+        expectedVersion: d.version,
+        reason: "Post evidenced service recognition",
+      },
+      d.id,
+      "owner",
+      key,
+    ),
+    again = await auto(
+      "RECOGNITION_POST",
+      {
+        expectedVersion: d.version,
+        reason: "Post evidenced service recognition",
+      },
+      d.id,
+      "owner",
+      key,
+    );
+  expect(again).toEqual(posted);
+  expect((await recognition(people.owner, d.id)).item).toMatchObject({
+    state: "POSTED",
+    amount: "5.01",
+    journalId: posted.journalId,
+  });
+  expect(await db.financeReceivableEvent.count()).toBe(arBefore);
+  expect(
+    (
+      await sql.query(
+        'SELECT coalesce(sum(l.debit-l.credit),0)::text AS balance FROM "FinanceJournalLine" l WHERE "accountId"=$1',
+        [accounts.cash],
+      )
+    ).rows[0].balance,
+  ).toBe(cashBefore);
+  expect(
+    (
+      await sql.query(
+        "SELECT encova_finance_deferred_capacity($1,'2020-02-15')::text AS n",
+        [line.id],
+      )
+    ).rows[0].n,
+  ).toBe("10.99");
+  expect(
+    (await openingDetail(people.owner, batch)).proof?.clearingBalance,
+  ).toBe("0.00");
+});
+it("protects future reserved deferred obligations from a competing earlier recognition", async () => {
+  const line = await db.financeOpeningLine.findFirstOrThrow({
+      where: { batchId: batch, kind: "DEFERRED" },
+    }),
+    draft = (date: string, amount: string) =>
+      auto("RECOGNITION_CREATE", {
+        invoiceLineId: line.id,
+        postingDate: date,
+        amount,
+        description: "Evidenced delivered deferred service",
+        evidence: "Owner reviews exact delivered portion",
+        reason: "Prepare service recognition",
+      });
+  const future = await draft("2020-03-15", "10.99");
+  await auto(
+    "RECOGNITION_POST",
+    {
+      expectedVersion: future.version,
+      reason: "Recognize later delivered service",
+    },
+    future.id,
+  );
+  const tooMuch = await draft("2020-02-16", "0.01"),
+    before = await db.financeJournalEntry.count();
+  await expect(
+    auto(
+      "RECOGNITION_POST",
+      {
+        expectedVersion: tooMuch.version,
+        reason: "Competing earlier recognition",
+      },
+      tooMuch.id,
+    ),
+  ).rejects.toMatchObject({ code: "FINANCE_RECOGNITION_CAPACITY" });
+  expect(await db.financeJournalEntry.count()).toBe(before);
+  expect((await recognition(people.owner, tooMuch.id)).item.state).toBe(
+    "DRAFT",
+  );
+  await auto(
+    "RECOGNITION_VOID",
+    {
+      expectedVersion: tooMuch.version,
+      reason: "Retain rejected recognition draft",
+    },
+    tooMuch.id,
+  );
+});
+it("reverses an actual recognition at a later date while retaining earlier balances and the original exact journal", async () => {
+  const original = await recognition(people.owner, recognitionId),
+    before = await db.financeJournalLine.findMany({
+      where: { journalId: original.item.journalId! },
+      orderBy: { sequence: "asc" },
+    });
+  const r = await auto(
+    "RECOGNITION_REVERSE",
+    {
+      expectedVersion: original.item.version,
+      postingDate: "2020-04-15",
+      reason: "Reverse service acceptance with dated evidence",
+    },
+    recognitionId,
+  );
+  expect((await recognition(people.owner, recognitionId)).item).toMatchObject({
+    state: "REVERSED",
+    reversalJournalId: r.journalId,
+    reversalDate: expect.stringContaining("2020-04-15"),
+  });
+  const reverse = await db.financeJournalLine.findMany({
+    where: { journalId: r.journalId },
+    orderBy: { sequence: "asc" },
+  });
+  expect(
+    reverse.map((x) => [x.accountId, x.debit.toFixed(2), x.credit.toFixed(2)]),
+  ).toEqual(
+    before.map((x) => [x.accountId, x.credit.toFixed(2), x.debit.toFixed(2)]),
+  );
+  expect(
+    (
+      await sql.query(
+        'SELECT coalesce(sum(amount),0)::text AS balance FROM "FinanceDeferredRevenueEvent" WHERE "invoiceLineId"=$1 AND "effectiveDate"<=\'2020-02-28\'',
+        [original.item.invoiceLineId],
+      )
+    ).rows[0].balance,
+  ).toBe("10.99");
+  expect(
+    (
+      await sql.query(
+        "SELECT encova_finance_deferred_capacity($1,'2020-04-15')::text AS balance",
+        [original.item.invoiceLineId],
+      )
+    ).rows[0].balance,
+  ).toBe("5.01");
+  await expect(
+    sql.query('UPDATE "FinanceRecognition" SET amount=1 WHERE id=$1', [
+      recognitionId,
+    ]),
+  ).rejects.toThrow("FINANCE_RECOGNITION_RETAINED");
+});
+it("denies automation and recognition mutations by all unselected roles and raw draft-core execution by the runtime", async () => {
+  for (const who of ["selected", "other", "hr", "lead", "member"])
+    await expect(scheduleDenied(who)).rejects.toMatchObject({
+      code: who === "selected" ? "FINANCE_OWNER_REQUIRED" : "FINANCE_FORBIDDEN",
+    });
+  async function scheduleDenied(who: string) {
+    return auto(
+      "PREPARE",
+      { reason: "Unauthorized draft job preparation" },
+      undefined,
+      who,
+    );
+  }
+  for (const role of ["encova_app", "anon", "authenticated"]) {
+    const acl = (
+      await sql.query(
+        "SELECT has_function_privilege($1,'encova_finance_bill_core(uuid,text,jsonb,text,uuid)','EXECUTE') AS core,has_table_privilege($1,'\"FinanceRecognition\"','INSERT') AS write",
+        [role],
+      )
+    ).rows[0];
+    expect(acl).toMatchObject({ core: false, write: false });
+  }
+  expect((await recurringRuns(people.owner)).items.length).toBeLessThanOrEqual(
+    25,
+  );
+  expect((await recognitions(people.owner)).total).toBe(3);
+});
+it("reuses one normal depreciation draft per asset/month even across reviewed schedules", async () => {
+  const asset = await db.financeAsset.findFirstOrThrow(),
+    template = {
+      assetId: asset.id,
+      expenseAccountId: accounts.expense,
+      accumulatedAccountId: accounts.accumulated,
+    };
+  const before = await db.financeJournalEntry.count(),
+    one = await schedule("DEPRECIATION", template, {
+      startMonth: "2020-02",
+      endMonth: "2020-02",
+      day: 28,
+    }),
+    two = await schedule("DEPRECIATION", template, {
+      startMonth: "2020-02",
+      endMonth: "2020-02",
+      day: 28,
+    });
+  await processFinanceRecurring(Date.now() + 60000);
+  await processFinanceRecurring(Date.now() + 60000);
+  const runs = await db.financeRecurringRun.findMany({
+    where: { scheduleId: { in: [one.id, two.id] } },
+  });
+  expect(runs).toHaveLength(2);
+  expect(runs.every((x) => x.state === "READY")).toBe(true);
+  expect(runs[0].sourceId).toBe(runs[1].sourceId);
+  expect(
+    await db.financeAssetMovement.count({
+      where: { assetId: asset.id, kind: "DEPRECIATION", month: "2020-02" },
+    }),
+  ).toBe(1);
+  const draft = await db.financeAssetMovement.findUniqueOrThrow({
+    where: { id: runs[0].sourceId! },
+  });
+  expect(draft.state).toBe("DRAFT");
+  expect(draft.amount.toFixed(2)).toBe("1.00");
+  expect(await db.financeJournalEntry.count()).toBe(before);
+});
+it("bounds manual recovery to nine retained attempts and requires a new explicit review to issue each retry", async () => {
+  const run = await db.financeRecurringRun.findFirstOrThrow({
+    where: { errorCode: "FINANCE_AUTOMATION_MAPPING", state: "FAILED" },
+  });
+  for (let n = run.attempts; n < 9; n++) {
+    const current = await db.financeRecurringRun.findUniqueOrThrow({
+      where: { id: run.id },
+    });
+    await auto(
+      "RETRY",
+      {
+        expectedVersion: current.version,
+        reason: "Review unresolved mapping and explicit bounded retry",
+      },
+      run.id,
+    );
+    await processRecurringRun(run.id);
+  }
+  const final = await recurringRun(people.owner, run.id);
+  expect(final.run).toMatchObject({ state: "FAILED", attempts: 9, budget: 9 });
+  expect(final.attempts).toHaveLength(9);
+  await expect(
+    auto(
+      "RETRY",
+      {
+        expectedVersion: final.run.version,
+        reason: "Attempt beyond retained retry limit",
+      },
+      run.id,
+    ),
+  ).rejects.toMatchObject({ code: "FINANCE_AUTOMATION_STATE" });
+});
+it("requires owner opening-equity review for an imported customer credit and keeps clearing/current sales unchanged", async () => {
+  const line = await db.financeOpeningLine.findFirstOrThrow({
+      where: { batchId: batch, kind: "AR" },
+    }),
+    d = await customer("CUSTOMER_CREDIT", "CREATE", {
+      reference: "LEGACY-AR-CREDIT",
+      partyId: client,
+      invoiceId: line.id,
+      documentDate: "2020-08-01",
+      postingDate: "2020-08-01",
+      description: "Reviewed reduction of imported unpaid balance",
+      evidence: "Original legacy credit evidence",
+      advanceAccountId: accounts.clientAdvance,
+      creditLines: [{ invoiceLineId: line.id, amount: "3.01" }],
+      reason: "Prepare imported balance correction",
+    });
+  await expect(
+    customer("CUSTOMER_CREDIT", "POST", {
+      id: d.id,
+      expectedVersion: d.version,
+      reason: "Try unreviewed opening credit",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_OPENING_CREDIT_REVIEW" });
+  const review = {
+    side: "CUSTOMER",
+    documentId: d.id,
+    expectedVersion: d.version,
+    offsetAccountId: accounts.retained,
+    evidence: "Owner reviewed correction to original retained opening equity",
+    reason: "Approve exact imported credit classification",
+  };
+  await expect(
+    auto("OPENING_CREDIT_REVIEW", review, undefined, "selected"),
+  ).rejects.toMatchObject({ code: "FINANCE_OWNER_REQUIRED" });
+  await auto("OPENING_CREDIT_REVIEW", review);
+  const posted = await customer("CUSTOMER_CREDIT", "POST", {
+    id: d.id,
+    expectedVersion: d.version,
+    reason: "Post owner-reviewed imported credit",
+  });
+  const lines = await db.financeJournalLine.findMany({
+    where: { journalId: posted.journalId! },
+  });
+  expect(
+    lines.map((x) => ({
+      accountId: x.accountId,
+      debit: x.debit.toFixed(2),
+      credit: x.credit.toFixed(2),
+    })),
+  ).toContainEqual({
+    accountId: accounts.retained,
+    debit: "3.01",
+    credit: "0.00",
+  });
+  expect(
+    lines.some(
+      (x) =>
+        x.accountId === accounts.clearing || x.accountId === accounts.revenue,
+    ),
+  ).toBe(false);
+  expect(
+    (
+      await sql.query(
+        'SELECT coalesce(sum(debit-credit),0)::text AS n FROM "FinanceJournalLine" WHERE "accountId"=$1',
+        [accounts.clearing],
+      )
+    ).rows[0].n,
+  ).toBe("0.00");
+});
+it("reviews an imported supplier credit against opening equity without reducing current costs or clearing", async () => {
+  const line = await db.financeOpeningLine.findFirstOrThrow({
+      where: { batchId: batch, kind: "AP" },
+    }),
+    d = await supplierAction("SUPPLIER_CREDIT", "CREATE", {
+      reference: "LEGACY-AP-CREDIT",
+      partyId: supplier,
+      billId: line.id,
+      documentDate: "2020-08-01",
+      postingDate: "2020-08-01",
+      description: "Reviewed supplier reduction of imported balance",
+      evidence: "Original supplier credit evidence",
+      advanceAccountId: accounts.supplierAdvance,
+      creditLines: [{ billLineId: line.id, amount: "2.01" }],
+      reason: "Prepare imported supplier correction",
+    });
+  await expect(
+    supplierAction("SUPPLIER_CREDIT", "POST", {
+      id: d.id,
+      expectedVersion: d.version,
+      reason: "Try unreviewed supplier credit",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_OPENING_CREDIT_REVIEW" });
+  await auto("OPENING_CREDIT_REVIEW", {
+    side: "SUPPLIER",
+    documentId: d.id,
+    expectedVersion: d.version,
+    offsetAccountId: accounts.retained,
+    evidence: "Owner reviewed legacy supplier correction to opening equity",
+    reason: "Approve exact supplier credit classification",
+  });
+  const posted = await supplierAction("SUPPLIER_CREDIT", "POST", {
+    id: d.id,
+    expectedVersion: d.version,
+    reason: "Post reviewed supplier correction",
+  });
+  const lines = await db.financeJournalLine.findMany({
+    where: { journalId: posted.journalId! },
+  });
+  expect(
+    lines.map((x) => ({
+      accountId: x.accountId,
+      debit: x.debit.toFixed(2),
+      credit: x.credit.toFixed(2),
+    })),
+  ).toContainEqual({
+    accountId: accounts.retained,
+    debit: "0.00",
+    credit: "2.01",
+  });
+  expect(
+    lines.some(
+      (x) =>
+        x.accountId === accounts.clearing || x.accountId === accounts.expense,
+    ),
+  ).toBe(false);
+});
+it("rechecks feature and current access for every new private API read and returns no raw lease or grant", async () => {
+  const { automationRead } = await import("@/modules/finance/automation/http");
+  const r = await automationRead(request(), "SCHEDULES");
+  expect(r.status).toBe(200);
+  expect(r.headers.get("cache-control")).toContain("no-store");
+  expect(JSON.stringify(await r.json())).not.toContain("grantId");
+  for (const who of ["other", "hr", "lead", "member"])
+    expect((await automationRead(request(who), "RECOGNITIONS")).status).toBe(
+      403,
+    );
+  env.FINANCE_ENABLED = false;
+  try {
+    expect((await automationRead(request(), "SCHEDULES")).status).toBe(404);
+    await processFinanceRecurring();
+  } finally {
+    env.FINANCE_ENABLED = true;
+  }
+});
+it("posts a prepared normal bill and journal only through separate fresh verified source actions", async () => {
+  const run = await db.financeRecurringRun.findFirstOrThrow({
+      where: { scheduleId: billSchedule, state: "READY" },
+    }),
+    bill = await db.financeBill.findUniqueOrThrow({
+      where: { id: run.sourceId! },
+    }),
+    before = await db.financeJournalEntry.count();
+  const { billCommand } = await import("@/modules/finance/payables/service"),
+    { ledgerCommand } = await import("@/modules/finance/ledger/service");
+  let p = await proof();
+  const posted = await billCommand(
+    p.actor,
+    p.proof,
+    "POST",
+    {
+      id: bill.id,
+      expectedVersion: bill.version,
+      reason: "Independently review original recurring supplier bill",
+    },
+    crypto.randomUUID(),
+  );
+  expect(posted.journalId).toBeTruthy();
+  const jr = await db.financeRecurringRun.findFirstOrThrow({
+      where: { scheduleId: journalSchedule, state: "READY" },
+    }),
+    journal = await db.financeJournalDraft.findUniqueOrThrow({
+      where: { id: jr.sourceId! },
+    });
+  p = await proof();
+  const j = await ledgerCommand(
+    p.actor,
+    p.proof,
+    "POST",
+    {
+      id: journal.id,
+      expectedVersion: journal.version,
+      reason: "Independently review monthly prepaid recognition",
+    },
+    crypto.randomUUID(),
+  );
+  expect(j.journalId).toBeTruthy();
+  expect(await db.financeJournalEntry.count()).toBe(before + 2);
+  expect(
+    await db.financeRecurringRun.count({
+      where: { id: { in: [run.id, jr.id] }, state: "READY" },
+    }),
+  ).toBe(2);
+});
+it("requires a new retained owner classification when an imported credit draft changes", async () => {
+  const line = await db.financeOpeningLine.findFirstOrThrow({
+      where: { batchId: batch, kind: "AR" },
+    }),
+    body = {
+      reference: "CHANGED-LEGACY-CREDIT",
+      partyId: client,
+      invoiceId: line.id,
+      documentDate: "2020-09-01",
+      postingDate: "2020-09-01",
+      description: "Original reviewed imported credit",
+      evidence: "Original evidence before update",
+      advanceAccountId: accounts.clientAdvance,
+      creditLines: [{ invoiceLineId: line.id, amount: "1.00" }],
+      reason: "Prepare exact legacy credit draft",
+    },
+    d = await customer("CUSTOMER_CREDIT", "CREATE", body),
+    review = {
+      side: "CUSTOMER",
+      documentId: d.id,
+      expectedVersion: d.version,
+      offsetAccountId: accounts.retained,
+      evidence: "Owner reviewed original opening equity adjustment",
+      reason: "Bind exact source classification",
+    };
+  await auto("OPENING_CREDIT_REVIEW", review);
+  const changed = await customer("CUSTOMER_CREDIT", "UPDATE", {
+    ...body,
+    id: d.id,
+    expectedVersion: d.version,
+    description: "Changed source requires independent owner review",
+  });
+  await expect(
+    customer("CUSTOMER_CREDIT", "POST", {
+      id: d.id,
+      expectedVersion: changed.version,
+      reason: "Try obsolete classification",
+    }),
+  ).rejects.toMatchObject({ code: "FINANCE_OPENING_CREDIT_REVIEW" });
+  await auto("OPENING_CREDIT_REVIEW", {
+    ...review,
+    expectedVersion: changed.version,
+    evidence: "Owner reviewed changed exact opening adjustment",
+  });
+  await customer("CUSTOMER_CREDIT", "POST", {
+    id: d.id,
+    expectedVersion: changed.version,
+    reason: "Post newly reviewed exact credit",
+  });
+  expect(
+    await db.financeOpeningCreditReview.count({
+      where: { customerDocumentId: d.id },
+    }),
+  ).toBe(2);
 });

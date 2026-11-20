@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F41 engineering is implemented and locally verified. F40 annual close/reversal is merged through PR7; F41 adds reviewed opening cutover and clearing proof. F42–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
+F01–F42 engineering is implemented and locally verified. F40 is merged through PR7; F41 opening cutover passed fresh CI in draft PR8; F42 adds reviewed recurring drafts, recognition and private recovery. F43–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -169,3 +169,19 @@ PR7 was merged as a2a1814d0c9629f8840a8bf13367b27007085077 after exact-head CI44
 1,147 distinct local tests passed:338 unit (5.18s),749 PostgreSQL (408.88s),60 Chromium (4.1m). Focused opening database acceptance passed23 cases8.53s; the actual upload/owner approval/original download/mobile/WCAG/employee-denial browser journey passed9.1s focused. Production and Supabase-shaped builds, strict typing/lint,235 concrete finance API paths and all81 applied source checksums are checked before publication. Work-log336 records every material failure/correction, including the local migration helper transaction-wrapper mistake and checksum-based Prisma reconciliation. Fresh owned databases applied the same migration successfully; no financial history or earlier migrations were deleted/changed.
 
 The first full-browser attempt failed fixture renewal because the shell lacked the explicit encova_test DATABASE_URL; the guard prevented fixture writes to any other DB. Stopped that run, explicitly set DATABASE_URL/DIRECT_URL/TEST_DATABASE_URL to the dedicated test DB, renewed fixtures and reran all60 successfully. No production rate limit or assertion was relaxed. F42 automation/adjustments and F43–F46 acceptance/recovery follow. The F47 user pack and F48 launch decision remain unaccepted; finance stays disabled live.
+
+
+## F42 implementation and regression checkpoint — 20 November2026
+
+Added immutable owner-reviewed recurring bill/accrual/prepaid/depreciation draft schedules, private durable job/run/attempt UI, original-grant authorization at claim/release,60-second leases and stale-finisher denial, explicit bounded retries, and separate verified normal-source posting. Workers cannot choose POST. Added evidenced deferred-recognition sources and exact dated reversal with capacity checks across future events; no new AR/cash. Imported unpaid customer/supplier credits now require immutable owner review of their exact source and ordinary opening-equity offset, preserving zero clearing and current sales/costs. Updating the draft requires a fresh retained review. See [automation rules](accounting/automation.md) and [F42 record](planning/days/F42.md).
+
+Focused40 owned PostgreSQL cases passed12.01s,13 new unit cases passed205ms, full351 units passed5.69s and full766 PostgreSQL passed436.03s. Real owned browser journey passed12.7s, including recurring draft preparation, separate recognition/post/reversal, mobile/WCAG/keyboard and employee denial. Production build/type/lint and250 API paths/verbs/refs passed;82 applied migration hashes match. The true wrapper-stripped rollback rehearsal passed before applying82 only to the dedicated test DB. Full browser and hosted-shaped production acceptance are in progress. Original F41 sourcee758baa passed fresh CI44736998016 in unmerged draft PR8.
+
+Work-log339 retains the SQL/fixture/UI corrections, including owner protection, posting-derived split versus source-proof distinction, private void-result transport and grant-preserving owned browser teardown. No product guard, financial history, earlier applied migration or human decision was bypassed. No real accounting obligation/policy, hosted migration or live finance access was configured.
+
+
+## F42 complete local acceptance — 20 November2026
+
+All1,178 distinct local tests passed:351 unit (5.69s),766 actual PostgreSQL (436.03s),61 Chromium (4.3m). The actual owned automation/recognition browser journey passed12.7s focused. Production and Supabase-shaped builds, strict typing/lint,250 concrete API contracts and all82 applied migration checksums are checked before publication. No source amounts are fabricated by workers: normal drafts need separate current verification before posting. The full suite retains ERP login, assignments, attendance, HR/leave, file and finance regression coverage.
+
+Completed the private schedule/source/attempt UI, failure/retry states, shared checked normal draft preparation, current original-grant/owner/lease checks, recognized/reversed deferred events and retained opening-credit input reviews. The source proof excludes posting-created split rows while original credit rules independently validate them. No earlier applied migration was changed. Word records retain every material correction, fixture cleanup adjustment and actual passing run. F42 source commit/push and new CI follow; F43–F46 remain, and actual F47 human acceptance/F48 activation are still unfilled. Hosted finance remains disabled.

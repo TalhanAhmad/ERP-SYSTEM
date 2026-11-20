@@ -167,7 +167,9 @@ export async function financeFixture(
     historicalPeriod,
     close: async () => {
       try {
-        await cleanup();
+        // Owned databases retain grants until the whole isolated database is stopped/discarded.
+        // Recurring schedules deliberately retain their original grant foreign key.
+        if (!isolated) await cleanup();
       } finally {
         await sql.end();
       }

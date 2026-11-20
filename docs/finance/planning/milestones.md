@@ -45,7 +45,7 @@
 | [F39](days/F39.md) | Build monthly close/reopen checklist and posting-lock concurrency | Complete |
 | [F40](days/F40.md) | Implement year close/reversal; verify retained earnings without duplication | Complete |
 | [F41](days/F41.md) | Implement opening subledger and trial-balance import with clearing proof | Complete |
-| [F42](days/F42.md) | Add recurring draft jobs, accrual/recognition adjustments, and job recovery | Pending |
+| [F42](days/F42.md) | Add recurring draft jobs, accrual/recognition adjustments, and job recovery | Complete |
 | [F43](days/F43.md) | Run complete accounting fixture and rounding/credit/advance edge cases | Pending |
 | [F44](days/F44.md) | Run full access, attachment, permission-revocation, and ERP regression suite | Pending |
 | [F45](days/F45.md) | Complete browser journey, keyboard/mobile checks, and error recovery fixes | Pending |
