@@ -221,3 +221,8 @@ F46 engineering is locally verified: actual custom-format backup/restore of both
 78 focused checks passed25.35s:76 owned PostgreSQL scenarios plus2 recovery unit cases. All353 units passed5.64s. Normal build/type/lint passed; prior F45 Supabase-shaped build passed.84 source migration hashes match; no applied SQL was rewritten. The complete final backend/browser regression and refreshed hosted-shaped build are still running/pending and are recorded separately, rather than inferred from focused tests.
 
 See [observed recovery evidence](review/recovery-evidence.md). F47 review workbook and F48 engineering release evidence/final verification remain to publish. Actual human policy acceptance, hosted staging/restore verification, real books, live grants and launch remain separate decisions.
+
+
+## F47 user review pack prepared — 20 November2026
+
+The user-selected workbook/owner pack is complete with representative actual synthetic statements, exact source/control equations, retained corrections, restore/security evidence and pending policy/reviewer fields. F47 human review is still pending; no accountant/company approval or real figures were invented. Documentation/Word/private-value checks precede separate publication. F44 sourcebb14c49 passed fresh CI44774304395; F45/F46 fresh verification and final local regression are separately tracked.

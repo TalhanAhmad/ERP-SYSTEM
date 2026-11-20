@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-20 (Asia/Karachi)
 
-Finance extension: F01–F40 merged through PR7; F41–F45 pushed separately in draft PR8. F46 populated restore/source/object/ACL and rollback checks are locally verified. Complete final regression and F47/F48 review/release packs are being finalized. See [finance progress](finance/progress.md). Human acceptance and live finance activation remain pending.
+Finance extension: F01–F40 merged through PR7; F41–F45 pushed separately in draft PR8. F46 populated restore/source/object/ACL and rollback checks are locally verified. All802 final backend tests and353 units pass; full browser regression is running. F47 review workbook is prepared; F48 release evidence is being finalized. See [finance progress](finance/progress.md). Human acceptance and live finance activation remain pending.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded

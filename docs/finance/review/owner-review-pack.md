@@ -1,6 +1,10 @@
-# Finance owner review pack — preparation in progress
+# Finance owner review pack — prepared for Talha
 
 Prepared for Talha Ahmad, as requested on 14 November 2026. Intended Finance Owner: zablerkhanahmad@gmail.com. This identifies the intended owner only; no live finance grant or configuration is implied.
+
+## Current review instructions
+
+Read the [F47 workbook](reviewer-workbook.md), [observed statements](acceptance-fixture.md), [populated recovery evidence](recovery-evidence.md), and [deployment procedure](../operations/deployment.md). The workbook provides exact accounting equations, retained-source/correction examples, a policy decision table and unfilled reviewer/date/acceptance fields. Engineering through F46 is locally verified and published separately in draft PR8. Actual human review remains pending; no company/accountant acceptance or launch is inferred. Historical entries below preserve the evidence available at each earlier milestone; use [progress](../progress.md) for the current source/CI status.
 
 ## Current evidence and scope
 

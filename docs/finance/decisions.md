@@ -48,3 +48,8 @@ Default asset convention remains PENDING. A selectable reviewed full-month polic
 User explicitly requested PR3 merge and continuation. PR3 merged atb83951d after exact-head successful CI43584464377. Remaining finance engineering continues on finance/f26-f48, with separate milestone commits/pushes. The user answered “Prepare the review pack for me”; [owner review pack](review/owner-review-pack.md) records pending company policies and unfilled acceptance fields. This does not claim accountant sign-off, approve real books, establish live fiscal/cutover policy or enable hosted finance.
 
 F26 implements only explicitly confirmed full-month straight-line plans with exact final-paisa charges, source/month identity, separately reviewed posting, dated lifecycle changes and immutable correction. Company policy defaults remain pending; event/job generation cannot silently post.
+
+
+## F47 review-pack delivery — 20 November2026
+
+Talha selected “Prepare the review pack for me.” The [workbook](review/reviewer-workbook.md) and owner pack now provide representative statements, source links, edge cases, recovery evidence and an explicit policy/gap record. This completes the requested pack preparation; actual reviewer/date/company decisions and financial acceptance remain pending. Engineering evidence and live finance launch are separate. No synthetic fiscal/tax/depreciation/investment/backup policy is adopted for the company.
