@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F40 engineering is implemented and locally verified. F40 adds exact annual close/reversal and retained statements integrated with F39 period locks. F41–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
+F01–F41 engineering is implemented and locally verified. F40 annual close/reversal is merged through PR7; F41 adds reviewed opening cutover and clearing proof. F42–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -160,3 +160,12 @@ The first F40 source57b22a7 [CI44591098174](https://github.com/TalhanAhmad/ERP-S
 ## F40 publication and fresh verification — 20 November 2026
 
 F40 source **5ab1e8a5b3ccf6466c28160bca1db91a4a19bd72** is committed and pushed to **finance/f40-year-close**. [Draft PR #7](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/7) targets main and remains unmerged. [Fresh CI44593966836](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44593966836) passed for that exact source: all80 fresh migrations,1,113 tests, typing/lint,both builds and228-path API verification. The subsequent documentation-only recording preserves application/schema/tests/scripts/config source exactly. The annual browser journey passed12.3s focused and12.1s in full local regression. F41 opening imports and clearing proof is next; F41–F46 engineering, F47 human review and F48 live release remain. Hosted finance stays disabled; no actual fiscal policy/mapping/books, hosted grant or human acceptance occurred.
+
+
+## F41 local acceptance — 20 November2026
+
+PR7 was merged as a2a1814d0c9629f8840a8bf13367b27007085077 after exact-head CI44597691743 passed. Continued on finance/f41-release-completion. Added private immutable source staging, original UTF-8 download/hash, typed normal subledgers, owner version/basis/evidence review, exact no-double-count TB controls, zero clearing, one cutover and earlier-posting/report-coverage barriers. Original references/dates/due dates, loan buckets, investment cost/carrying/units, assets/remaining-life policy, advances and settled deferred obligations are preserved. No live books were imported.
+
+1,147 distinct local tests passed:338 unit (5.18s),749 PostgreSQL (408.88s),60 Chromium (4.1m). Focused opening database acceptance passed23 cases8.53s; the actual upload/owner approval/original download/mobile/WCAG/employee-denial browser journey passed9.1s focused. Production and Supabase-shaped builds, strict typing/lint,235 concrete finance API paths and all81 applied source checksums are checked before publication. Work-log336 records every material failure/correction, including the local migration helper transaction-wrapper mistake and checksum-based Prisma reconciliation. Fresh owned databases applied the same migration successfully; no financial history or earlier migrations were deleted/changed.
+
+The first full-browser attempt failed fixture renewal because the shell lacked the explicit encova_test DATABASE_URL; the guard prevented fixture writes to any other DB. Stopped that run, explicitly set DATABASE_URL/DIRECT_URL/TEST_DATABASE_URL to the dedicated test DB, renewed fixtures and reran all60 successfully. No production rate limit or assertion was relaxed. F42 automation/adjustments and F43–F46 acceptance/recovery follow. The F47 user pack and F48 launch decision remain unaccepted; finance stays disabled live.

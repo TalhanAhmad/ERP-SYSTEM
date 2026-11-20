@@ -4,7 +4,7 @@ Prepared for Talha Ahmad, as requested on 14 November 2026. Intended Finance Own
 
 ## Current evidence and scope
 
-F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29 is now locally accepted with838 checks; F30 is now locally accepted with865 checks; F31 is locally accepted with882 checks; F32 is locally accepted with902 checks; F33 is locally accepted with921 checks; F34 is locally accepted with940 checks; F35 is locally accepted with962 checks; F36 is locally accepted with985 checks; F37 is locally accepted with1,006 tests; F38 is locally accepted with1,045 tests; F39 is locally accepted with1,080 tests; F40 fiscal-year close/reversal is locally accepted with1,113 tests; F41–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
+F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29 is now locally accepted with838 checks; F30 is now locally accepted with865 checks; F31 is locally accepted with882 checks; F32 is locally accepted with902 checks; F33 is locally accepted with921 checks; F34 is locally accepted with940 checks; F35 is locally accepted with962 checks; F36 is locally accepted with985 checks; F37 is locally accepted with1,006 tests; F38 is locally accepted with1,045 tests; F39 is locally accepted with1,080 tests; F40 fiscal-year close/reversal is locally accepted with1,113 tests; F41 opening imports are locally accepted with1,147 tests; F42–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
 
 The final pack will include tested representative statements, source-to-ledger links, dated balances, exception cases, migration/recovery evidence and outstanding decisions. No company figures, legal compliance or accountant approval are inferred from synthetic fixtures.
 
@@ -23,7 +23,7 @@ The final pack will include tested representative statements, source-to-ledger l
 | Funding classification | Capital, founder-payable and distributions are distinct source types | Pending |
 | Finance selection and owner security | Current ACTIVE Super Admin plus explicit grant; fresh verification for writes | Pending |
 | Private evidence/scanner | Separate private bucket and signed clean attestation; live scanner not configured | Pending |
-| Cutover import/reconciliation/closing | Later milestone acceptance still required | Pending |
+| Cutover import/reconciliation/closing | Engineering through reviewed opening imports is tested; actual company source file/cutover/control review remains required | Pending |
 
 ## Verified F26 synthetic example
 
@@ -180,3 +180,8 @@ Source publication and fresh GitHub verification follow separately. Earlier appl
 ## F40 publication and fresh verification — 20 November 2026
 
 F40 source **5ab1e8a5b3ccf6466c28160bca1db91a4a19bd72** is committed and pushed to **finance/f40-year-close**. [Draft PR #7](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/7) targets main and remains unmerged. [Fresh CI44593966836](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44593966836) passed for that exact source: all80 fresh migrations,1,113 tests, typing/lint,both builds and228-path API verification. The subsequent documentation-only recording preserves application/schema/tests/scripts/config source exactly. The annual browser journey passed12.3s focused and12.1s in full local regression. F41 opening imports and clearing proof is next; F41–F46 engineering, F47 human review and F48 live release remain. Hosted finance stays disabled; no actual fiscal policy/mapping/books, hosted grant or human acceptance occurred.
+
+
+## F41 reviewed cutover example
+
+A synthetic trial balance has equal debits/credits554.00. Sixteen typed positions enter normal registers once: unpaid AR100/AP60, bank200, loan principal/interest, investment carrying80 versus cost70 with2.500000 units, income receivable3, asset cost100/accumulated20, capital50/distribution10/founder15, customer advance25/supplier advance12 and settled deferred obligation16. Ordinary retained equity323 reconciles the books. Opening clearing is exactly0.00; current income/expenses are zero. Opening cash flow is opening200/closing200 with no fabricated period receipt. Follow-on ordinary collections, supplier payments, advance applications, loan repayment, half-lot disposal and first remaining-life depreciation are tested. The original UTF-8 file/hash/approval remains unchanged. These figures are acceptance data only; the owner must supply and review actual cutover books before any real import.

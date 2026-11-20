@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-20 (Asia/Karachi)
 
-Finance extension: F01–F39 are accepted and merged through PR6. F40 annual close/reversal is locally accepted with1,113 tests; source5ab1e8a is committed/pushed in unmerged PR7 with successful fresh CI44593966836. See [finance progress](finance/progress.md), [the continuation report](finance/delivery-F26-F48.md) and full/focused Word reports. F41–F46 engineering, F47 human review and F48 release remain. Hosted finance stays disabled.
+Finance extension: F01–F40 are implemented and merged through PR7. F41 opening imports are locally accepted with1,147 tests; F42–F46 engineering and F47/F48 review/release preparation remain. See [finance progress](finance/progress.md) and the full/focused Word reports. Hosted finance stays disabled.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded

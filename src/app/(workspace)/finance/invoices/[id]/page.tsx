@@ -1,4 +1,4 @@
-import {EvidenceSection} from "@/modules/finance/components/evidence-section";
+import { EvidenceSection } from "@/modules/finance/components/evidence-section";
 import Link from "next/link";
 import { env } from "@/server/env";
 import { financePageData } from "@/modules/finance/accounting/page-data";
@@ -36,7 +36,16 @@ export default async function Invoice({
         {i.state} · version {i.version} · PKR
       </p>
       <section className="panel" aria-label="Invoice preview">
-        <h2>Invoice preview</h2>
+        <h2>{data.opening ? "Imported opening balance" : "Invoice preview"}</h2>
+        {data.opening && (
+          <p>
+            Retained balance at {data.opening.cutoverDate}. This records a
+            legacy opening amount, not a newly issued sale.{" "}
+            <Link href={`/finance/openings/${data.opening.batchId}`}>
+              View original cutover source and proof
+            </Link>
+          </p>
+        )}
         <h3>{party.legalName}</h3>
         <p>{party.name}</p>
         <p style={{ whiteSpace: "pre-wrap" }}>{party.address}</p>
@@ -47,67 +56,72 @@ export default async function Invoice({
         </p>
         <p>{i.description}</p>
         <p>Reference: {i.reference ?? "—"}</p>
-        <div
-          className="table-wrap"
-          role="region"
-          aria-label="Invoice lines table"
-          tabIndex={0}
-        >
-          <table>
-            <thead>
-              <tr>
-                {[
-                  "Description",
-                  "Quantity",
-                  "Unit rate",
-                  "Discount",
-                  "Treatment",
-                  "Total",
-                ].map((t) => (
-                  <th scope="col" key={t}>
-                    {t}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {i.lines.map((l) => (
-                <tr key={l.id}>
-                  <td>
-                    {l.description}
-                    {l.project && " · " + l.project.name}
-                  </td>
-                  <td>{l.quantity}</td>
-                  <td>{l.unitRate}</td>
-                  <td>
-                    <MoneyCell value={l.discountAmount} />
-                  </td>
-                  <td>
-                    {l.recognition}
-                    {l.taxSnapshot && (
-                      <small>
-                        {" "}
-                        · Tax {(l.taxSnapshot as { code: string }).code} ·{" "}
-                        {(l.taxSnapshot as { rate: string }).rate}% ·{" "}
-                        {(l.taxSnapshot as { mode: string }).mode}
-                      </small>
-                    )}
-                  </td>
-                  <td>
-                    <MoneyCell value={l.totalAmount} />
-                  </td>
+        {!data.opening && (
+          <div
+            className="table-wrap"
+            role="region"
+            aria-label="Invoice lines table"
+            tabIndex={0}
+          >
+            <table>
+              <thead>
+                <tr>
+                  {[
+                    "Description",
+                    "Quantity",
+                    "Unit rate",
+                    "Discount",
+                    "Treatment",
+                    "Total",
+                  ].map((t) => (
+                    <th scope="col" key={t}>
+                      {t}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p>
-          Gross <MoneyCell value={i.lineAmount} /> · Discount{" "}
-          <MoneyCell value={i.discountAmount} /> · Tax{" "}
-          <MoneyCell value={i.taxAmount} /> · Total{" "}
-          <MoneyCell value={i.totalAmount} />
-        </p>
-        {i.state === "POSTED" && (
+              </thead>
+              <tbody>
+                {i.lines.map((l) => (
+                  <tr key={l.id}>
+                    <td>
+                      {l.description}
+                      {l.project && " · " + l.project.name}
+                    </td>
+                    <td>{l.quantity}</td>
+                    <td>{l.unitRate}</td>
+                    <td>
+                      <MoneyCell value={l.discountAmount} />
+                    </td>
+                    <td>
+                      {l.recognition}
+                      {l.taxSnapshot && (
+                        <small>
+                          {" "}
+                          · Tax {
+                            (l.taxSnapshot as { code: string }).code
+                          } · {(l.taxSnapshot as { rate: string }).rate}% ·{" "}
+                          {(l.taxSnapshot as { mode: string }).mode}
+                        </small>
+                      )}
+                    </td>
+                    <td>
+                      <MoneyCell value={l.totalAmount} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {!data.opening && (
+          <p>
+            Gross <MoneyCell value={i.lineAmount} /> · Discount{" "}
+            <MoneyCell value={i.discountAmount} /> · Tax{" "}
+            <MoneyCell value={i.taxAmount} /> · Total{" "}
+            <MoneyCell value={i.totalAmount} />
+          </p>
+        )}
+        {i.state === "POSTED" && !data.opening && (
           <a
             className="button"
             href={"/api/v1/finance/invoices/" + i.id + "/pdf"}
@@ -164,7 +178,7 @@ export default async function Invoice({
           Posted journal: {i.entry.reference} · {i.entry.postingDate}
         </p>
       )}
-      <EvidenceSection sourceType="INVOICE" sourceId={i.id} state={i.state}/>
+      <EvidenceSection sourceType="INVOICE" sourceId={i.id} state={i.state} />
       <SetupHistory events={data.history} />
     </section>
   );

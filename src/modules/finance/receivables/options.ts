@@ -87,13 +87,13 @@ export async function invoiceOptions(actor: Pick<Actor, "id">, input: unknown) {
       const partyId = z.uuid().parse(q.partyId),
         count = await tx.$queryRaw<
           { total: bigint }[]
-        >`SELECT count(*) AS total FROM(SELECT d.id FROM "FinanceCustomerDocument" d JOIN "FinanceClientBalanceEvent" b ON b."sourceDocumentId"=d.id WHERE d.state='POSTED' AND d.kind IN('RECEIPT','CUSTOMER_CREDIT','UNALLOCATION') AND d."partyId"=${partyId}::uuid AND position(lower(${q.q}) in lower(d.number||' '||d.description))>0 GROUP BY d.id HAVING sum(b.amount)>0)x`;
+        >`SELECT count(*) AS total FROM(SELECT d.id FROM "FinanceCustomerDocument" d JOIN "FinanceClientBalanceEvent" b ON b."sourceDocumentId"=d.id WHERE d.state='POSTED' AND d.kind IN('RECEIPT','CUSTOMER_CREDIT','UNALLOCATION','OPENING_ADVANCE') AND d."partyId"=${partyId}::uuid AND position(lower(${q.q}) in lower(d.number||' '||d.description))>0 GROUP BY d.id HAVING sum(b.amount)>0)x`;
       const total = Number(count[0].total),
         pages = Math.max(1, Math.ceil(total / 25)),
         page = Math.min(q.page, pages),
         rows = await tx.$queryRaw<
           { id: string; code: string; name: string; balance: string }[]
-        >`SELECT d.id,d.number AS code,d.description AS name,sum(b.amount)::text AS balance FROM "FinanceCustomerDocument" d JOIN "FinanceClientBalanceEvent" b ON b."sourceDocumentId"=d.id WHERE d.state='POSTED' AND d.kind IN('RECEIPT','CUSTOMER_CREDIT','UNALLOCATION') AND d."partyId"=${partyId}::uuid AND position(lower(${q.q}) in lower(d.number||' '||d.description))>0 GROUP BY d.id HAVING sum(b.amount)>0 ORDER BY d.number,d.id LIMIT 25 OFFSET ${(page - 1) * 25}`;
+        >`SELECT d.id,d.number AS code,d.description AS name,sum(b.amount)::text AS balance FROM "FinanceCustomerDocument" d JOIN "FinanceClientBalanceEvent" b ON b."sourceDocumentId"=d.id WHERE d.state='POSTED' AND d.kind IN('RECEIPT','CUSTOMER_CREDIT','UNALLOCATION','OPENING_ADVANCE') AND d."partyId"=${partyId}::uuid AND position(lower(${q.q}) in lower(d.number||' '||d.description))>0 GROUP BY d.id HAVING sum(b.amount)>0 ORDER BY d.number,d.id LIMIT 25 OFFSET ${(page - 1) * 25}`;
       return {
         items: rows.map((r) => ({
           id: r.id,

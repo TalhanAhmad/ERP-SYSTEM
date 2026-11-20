@@ -20,6 +20,9 @@ export type ReportMetadata = {
   postingCutoffAt: string | null;
   postedEntryCount: number;
   ledgerDigest: string;
+  openingCutoverDate?: string | null;
+  openingSourceHash?: string | null;
+  beforeCutoverRequested?: boolean;
 };
 type Paging = { page: number; pages: number; total: number };
 export type GeneralLedgerReport = Paging & {

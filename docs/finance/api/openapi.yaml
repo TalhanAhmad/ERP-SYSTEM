@@ -24185,6 +24185,613 @@
           }
         }
       }
+    },
+    "/api/v1/finance/openings": {
+      "get": {
+        "operationId": "opening_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningRegister"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "opening_post",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpeningCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}": {
+      "get": {
+        "operationId": "opening_id_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningDetail"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/preview": {
+      "get": {
+        "operationId": "opening_id_preview_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningPreview"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/lines": {
+      "get": {
+        "operationId": "opening_id_lines_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "TB",
+                "ITEMS"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningLines"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/source": {
+      "get": {
+        "operationId": "opening_id_source_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. Download exact reviewed JSON bytes with safe attachment name and x-content-sha256; current grant rechecked.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private retained JSON attachment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/post": {
+      "post": {
+        "operationId": "opening_id_post_post",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpeningPost"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/void": {
+      "post": {
+        "operationId": "opening_id_void_post",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpeningVoid"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -24270,6 +24877,17 @@
           "controlType": {
             "type": "string",
             "enum": [
+              "OPENING_CLEARING",
+              "INVESTMENT_INCOME_RECEIVABLE",
+              "INTEREST_RECEIVABLE",
+              "INTEREST_PAYABLE",
+              "CAPITAL",
+              "DISTRIBUTION",
+              "FOUNDER_PAYABLE",
+              "TAX_INPUT",
+              "TAX_OUTPUT",
+              "WITHHOLDING_RECEIVABLE",
+              "WITHHOLDING_PAYABLE",
               "NONE",
               "CASH",
               "RECEIVABLES",
@@ -24281,11 +24899,7 @@
               "INVESTMENT",
               "LOAN_RECEIVABLE",
               "LOAN_PAYABLE",
-              "DEFERRED_REVENUE",
-              "TAX_INPUT",
-              "TAX_OUTPUT",
-              "WITHHOLDING_RECEIVABLE",
-              "WITHHOLDING_PAYABLE"
+              "DEFERRED_REVENUE"
             ]
           },
           "currency": {
@@ -24385,6 +24999,17 @@
           "controlType": {
             "type": "string",
             "enum": [
+              "OPENING_CLEARING",
+              "INVESTMENT_INCOME_RECEIVABLE",
+              "INTEREST_RECEIVABLE",
+              "INTEREST_PAYABLE",
+              "CAPITAL",
+              "DISTRIBUTION",
+              "FOUNDER_PAYABLE",
+              "TAX_INPUT",
+              "TAX_OUTPUT",
+              "WITHHOLDING_RECEIVABLE",
+              "WITHHOLDING_PAYABLE",
               "NONE",
               "CASH",
               "RECEIVABLES",
@@ -24396,11 +25021,7 @@
               "INVESTMENT",
               "LOAN_RECEIVABLE",
               "LOAN_PAYABLE",
-              "DEFERRED_REVENUE",
-              "TAX_INPUT",
-              "TAX_OUTPUT",
-              "WITHHOLDING_RECEIVABLE",
-              "WITHHOLDING_PAYABLE"
+              "DEFERRED_REVENUE"
             ]
           },
           "currency": {
@@ -33216,6 +33837,115 @@
       "FiscalYearResult": {
         "type": "object",
         "description": "Private {id:yearId,version,state,closeId,closeVersion,sequence,journalId,reversalJournalId}; nullable journal for zero remaining balances. No fake zero-value posting."
+      },
+      "OpeningCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "maxLength": 160,
+            "pattern": "\\.json$"
+          },
+          "sourceText": {
+            "type": "string",
+            "maxLength": 180000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "fileName",
+          "sourceText",
+          "reason",
+          "reauth"
+        ],
+        "description": "Exact reviewed UTF-8 JSON, at most180KB; formatVersion1, PKR, explicit cutover/clearing/evidence; 2–200 single-sided TB rows, 0–200 typed items. See opening-balances.md for kind-specific mappings. Strict fields and numeric strings. Staging never posts."
+      },
+      "OpeningPost": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "basisHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "reviewEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "basisHash",
+          "reviewEvidence",
+          "reason",
+          "reauth"
+        ],
+        "description": "Current owner fresh proof and exact preview basis; first OPEN date, empty ledger, one cutover, balanced TB and exact typed controls. Atomically posts source/GL once, reconciles zero clearing and retains approval/source/journal digest."
+      },
+      "OpeningVoid": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "OpeningRegister": {
+        "type": "object",
+        "description": "Private items,total,page,pages,canManage; 25 batches per page. Immutable source hash, cutover, state, version and approver."
+      },
+      "OpeningDetail": {
+        "type": "object",
+        "description": "Private retained batch configuration/evidence/state/proof, lineCount,journalCount,canManage. Posted proof includes exact expected/posted/difference per account, clearingBalance,journalDigest and original sourceHash."
+      },
+      "OpeningPreview": {
+        "type": "object",
+        "description": "Private ready,balanced,debits,credits,mappingIssueCount,issues,controls,ledgerEmpty,cutoverIsFirstOpenDate,basisHash,version,canManage. Exact money strings."
+      },
+      "OpeningLines": {
+        "type": "object",
+        "description": "Private 25-item source row page; total,page,pages,canManage. Original dates/reference/kind, exact amounts, cash side and posted journal links."
+      },
+      "OpeningResult": {
+        "type": "object",
+        "description": "Private id,version,state,sourceHash. Permanent idempotency; exact-file replay returns retained source."
       }
     }
   }
