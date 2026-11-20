@@ -80,6 +80,9 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ financeYearsCreated FinanceFiscalYear[] @relation("YearCreator")
+ financeYearsClosed FinanceYearClose[] @relation("YearCloser")
+ financeYearsReopened FinanceYearClose[] @relation("YearReopener")
  financePeriodCloses FinancePeriodClose[] @relation("PeriodCloseActor")
  financePeriodReopens FinancePeriodClose[] @relation("PeriodReopenActor")
  financeCloseIssues FinanceCloseIssue[] @relation("CloseIssueCreator")
@@ -240,6 +243,7 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ retainedFiscalYears FinanceFiscalYear[]
  bankMatches FinanceBankMatch[]
 
  statementUploads FinanceStatementUpload[]
@@ -319,6 +323,7 @@ impairmentHoldings FinanceInvestmentHolding[] @relation("HoldingImpairment")
 }
 
 model FinancePeriod {
+ yearCloses FinanceYearClose[]
  closes FinancePeriodClose[]
  reviewIssues FinanceCloseIssue[]
  id String @id @default(uuid()) @db.Uuid
@@ -382,6 +387,8 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ yearClose FinanceYearClose? @relation("YearJournal")
+ yearReversal FinanceYearClose? @relation("YearReversal")
  cashFlowReviews FinanceCashFlowReview[]
 
  costAllocationId String? @unique @db.Uuid
@@ -2421,6 +2428,7 @@ model FinanceReportExport {
 }
 
 model FinancePeriodClose {
+ yearCloses FinanceYearClose[]
  id String @id @default(uuid()) @db.Uuid
  periodId String @db.Uuid
  period FinancePeriod @relation(fields:[periodId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -2466,4 +2474,57 @@ model FinanceCloseIssue {
  resolvedAt DateTime? @db.Timestamptz
  resolution String?
  @@index([periodId,state,createdAt,id])
+}
+
+model FinanceFiscalYear {
+ id String @id @db.Uuid
+ name String
+ startDate DateTime @db.Date
+ endDate DateTime @db.Date
+ retainedAccountId String @db.Uuid
+ retainedAccount FinanceAccount @relation(fields:[retainedAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ evidence String
+ state String @default("OPEN")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation("YearCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ closes FinanceYearClose[]
+ @@index([endDate,id])
+}
+model FinanceYearClose {
+ id String @id @db.Uuid
+ fiscalYearId String @db.Uuid
+ fiscalYear FinanceFiscalYear @relation(fields:[fiscalYearId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ state String @default("DRAFT")
+ version Int @default(1)
+ yearVersion Int
+ basisHash String
+ checklist Json
+ lines Json
+ netProfit Decimal @db.Decimal(20,2)
+ beforeReports Json
+ afterReports Json?
+ snapshotHash String?
+ periodId String @db.Uuid
+ period FinancePeriod @relation(fields:[periodId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ periodCloseId String? @db.Uuid
+ periodClose FinancePeriodClose? @relation(fields:[periodCloseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalId String? @unique @db.Uuid
+ journal FinanceJournalEntry? @relation("YearJournal",fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reversalJournalId String? @unique @db.Uuid
+ reversalJournal FinanceJournalEntry? @relation("YearReversal",fields:[reversalJournalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ closedById String @db.Uuid
+ closedBy Person @relation("YearCloser",fields:[closedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ closedGrantId String @db.Uuid
+ closedAt DateTime @default(now()) @db.Timestamptz
+ reason String
+ postingReviewEvidence String
+ adjustmentReviewEvidence String
+ reversedAt DateTime? @db.Timestamptz
+ reversedById String? @db.Uuid
+ reversedBy Person? @relation("YearReopener",fields:[reversedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reverseReason String?
+ @@unique([fiscalYearId,sequence])
 }
