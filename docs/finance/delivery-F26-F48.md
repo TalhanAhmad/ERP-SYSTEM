@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F42 engineering is implemented and locally verified. F40 is merged through PR7; F41 opening cutover passed fresh CI in draft PR8; F42 adds reviewed recurring drafts, recognition and private recovery. F43–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
+F01–F43 engineering is implemented and locally verified. F40 is merged through PR7; F41 opening cutover passed fresh CI in draft PR8; F42 adds reviewed recurring drafts, recognition and private recovery. F44–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -185,3 +185,12 @@ Work-log339 retains the SQL/fixture/UI corrections, including owner protection, 
 All1,178 distinct local tests passed:351 unit (5.69s),766 actual PostgreSQL (436.03s),61 Chromium (4.3m). The actual owned automation/recognition browser journey passed12.7s focused. Production and Supabase-shaped builds, strict typing/lint,250 concrete API contracts and all82 applied migration checksums are checked before publication. No source amounts are fabricated by workers: normal drafts need separate current verification before posting. The full suite retains ERP login, assignments, attendance, HR/leave, file and finance regression coverage.
 
 Completed the private schedule/source/attempt UI, failure/retry states, shared checked normal draft preparation, current original-grant/owner/lease checks, recognized/reversed deferred events and retained opening-credit input reviews. The source proof excludes posting-created split rows while original credit rules independently validate them. No earlier applied migration was changed. Word records retain every material correction, fixture cleanup adjustment and actual passing run. F42 source commit/push and new CI follow; F43–F46 remain, and actual F47 human acceptance/F48 activation are still unfilled. Hosted finance remains disabled.
+
+
+## F43 combined acceptance — 20 November2026
+
+The actual specification fixture now posts all nine sources through normal checked services with fresh proofs, zero opening journals and explicit synthetic cash classifications. Period debits/credits1445000.00 each; bank575000.00; AR100000.00/AP30000.00; loan75000.00; equipment60000.00/investments50000.00; profit180000.00; assets785000.00 reconcile to liabilities105000.00 plus capital500000.00/profit180000.00. Operating/investing/financing cash are110000.00/-110000.00/575000.00. Private project results now explicitly show recorded cash110000.00 separately from contribution180000.00, without attributing unassigned company cash.
+
+15 new fixture cases and15 existing cost-allocation cases passed30/30 in21.25s. Independent50000.00 advance,20000.00 internal transfer and30000.00 credit replay once; cash/profit/AR and earlier statements remain exact. Real fractional postings and competing rounded credits preserve paisa/capacity.351 units passed5.47s, two affected browser journeys5.4s/4.4s (11.4s total), normal/hosted-shaped builds,type/lint,250 API paths and82 source hashes are checked before publication. [Observed report](review/acceptance-fixture.md) and [exact captured JSON](review/acceptance-fixture.json) retain actual results and source/code hashes. No source history is deleted to reset tests; target/history guards reject unsafe seeding.
+
+Initial fixture corrections preserved product guards: a loan interest result needed its existing OTHER_EXPENSE mapping; a raw SQL zero amount had unscaled formatting; cash classifications correctly remained unreviewed until explicit fixture owner confirmation. The actual missing project-cash presentation was implemented and tested rather than inferred from profit. F44/F45 complete cross-module regression and F46 recovery remain; real policies/data and F47/F48 human decisions stay pending.

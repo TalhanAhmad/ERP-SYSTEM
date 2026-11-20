@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-20 (Asia/Karachi)
 
-Finance extension: F01–F40 are merged through PR7. F41 passed fresh GitHub CI in draft PR8; F42 is locally accepted with1,178 tests. F43–F46 acceptance/recovery and F47/F48 review/release preparation remain. See [finance progress](finance/progress.md) and the full/focused Word reports. Hosted finance stays disabled.
+Finance extension: F01–F40 are merged through PR7. F41/F42 are pushed in draft PR8; F43 combined accounting acceptance is locally verified with actual captured synthetic statements. F44–F46 access/browser/recovery verification and F47/F48 review/release preparation remain. See [finance progress](finance/progress.md) and full/focused Word reports. Hosted finance stays disabled.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded

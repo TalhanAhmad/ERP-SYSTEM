@@ -32721,6 +32721,11 @@
           "companyUnassignedDirectCosts": {
             "type": "string",
             "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "cashMovement": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$",
+            "description": "Actual dated bank/cash journal debit minus credit explicitly tagged to this project. Includes only recorded project cash, without inferring shared or unassigned movements; distinct from contribution/forecast."
           }
         },
         "required": [
@@ -32731,7 +32736,8 @@
           "contribution",
           "fullyAllocatedResult",
           "companyUnallocatedOverhead",
-          "companyUnassignedDirectCosts"
+          "companyUnassignedDirectCosts",
+          "cashMovement"
         ]
       },
       "BudgetLineInput": {
