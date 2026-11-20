@@ -739,6 +739,8 @@ it("retained reports and private jobs require current role and original export g
     data: { status: "ACTIVE" },
   });
 });
+// Two real competing close/post orders, cleanup and fresh proofs need a workflow budget.
+// Retain every SQL timeout and assertion on clean Linux runners.
 it("close versus source posting serializes so a reviewed cutoff cannot admit an unreviewed concurrent posting", async () => {
   await reopen(currentClose);
   for (const order of ["CLOSE_FIRST", "POST_FIRST"]) {
@@ -796,7 +798,7 @@ it("close versus source posting serializes so a reviewed cutoff cannot admit an 
     );
   }
   currentClose = (await close()).id;
-});
+}, 30_000);
 it("a missing bank proof blocks closing even if other control balances and book totals tie", async () => {
   await reopen(currentClose);
   const cash = await account({ controlType: "CASH" });

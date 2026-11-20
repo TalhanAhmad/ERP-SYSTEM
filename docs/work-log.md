@@ -597,3 +597,12 @@ PR7 is merged at a2a1814d0c9629f8840a8bf13367b27007085077. F41 e758baa, F42 f62a
 Prepared the concise final engineering Word report and refreshed the full/focused progress Word reports. Added the separate release record, exact source/test/recovery evidence, policy/reviewer blanks and incident/staging steps. Updated current finance indices/backlog/migration/acceptance status without overwriting historical learning or fabricated effort. Word/private-value/docs/source checks precede final report publication.
 
 Authorized engineering and review/release-pack preparation are complete. F47 actual company review/policy acceptance and F48 separate staging/live launch decision remain pending. Actual hosted finance migration/runtime-private permissions/scanner/Storage/provider restore verification, real fiscal/chart/tax/measurement/cutover choices, original opening reconciliation, live owner/grants/MFA and activation are not configured by these synthetic tests. Finance stays disabled. No real books or paid upgrade occurred.
+
+
+## 350 — Clean Linux recovery passed; narrow closing concurrency test budget corrected — 20 November2026
+
+The corrected PostgreSQL17 image clients worked in fresh Linux CI44778293871: all58 opening/recognition/recurring integration cases passed22.599s and all18 base acceptance/restore cases passed14.585s. The full backend run returned799 passing/3 failing of802: an existing close-versus-posting multi-step concurrency test exceeded Vitest's default5000ms, then its unfinished shared close state caused two dependent fixture failures. Directly inspected the private job log and retained that failed run.
+
+Scoped only that concurrency case to30000ms, matching its actual two-order command/review/cleanup workflow. All financial assertions, transaction/SQL locks and production timeouts remain unchanged. The whole21-case closing file is rerun locally before publishing this correction; fresh final CI must independently pass. Earlier passing1,218 local acceptance remains recorded as observed, not a substitute for a fresh runner. No app/schema/financial data/policy or hosted activation was changed.
+
+The corrected complete21-case closing file passed21.24s locally; strict types/lint passed. Fresh CI on prior report headb85a1ae already passed all802 database tests before its browser/build stages; the narrow timeout correction removes the observed default-budget flake without changing app behavior. Updated full/focused/concise Word reports and source/docs/private-value checks accompany this follow-up publication.

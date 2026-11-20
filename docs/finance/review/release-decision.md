@@ -39,3 +39,8 @@ Synthetic local databases verify checked application workflows and PostgreSQL17 
 Decision maker/date: Pending. Exact release source/head and passing CI URL: Pending. Human review/policies/effective dates accepted: Pending. Staging verification and backup evidence: Pending. Intended hosted target and chosen initial grants: Pending. Accepted remaining risks/change list: Pending. Launch decision: Pending. Operator and rollback owner: Pending.
 
 Default remains disabled. A future explicit staging/live launch decision must identify the target, approved policies/cutover and security/recovery controls. No paid upgrade, domain purchase or real-data import is included in this engineering completion.
+
+
+## Final Linux follow-up — 20 November2026
+
+Corrected recovery clients passed all58 cutover/automation and18 acceptance/restore cases on Linux in CI44778293871. That run's799/802 backend result exposed an existing closing concurrency case exceeding5000ms and two dependent fixture failures. Only that two-order workflow now has a30000ms test budget; no SQL/production timeout or assertion changed. All21 closing cases passed21.24s locally, with type/lint. Prior report headb85a1ae also passed all802 backend tests in fresh CI44779091761; its later stages and the final follow-up source CI remain separately observed through PR8 checks.
