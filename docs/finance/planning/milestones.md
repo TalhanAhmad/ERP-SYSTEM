@@ -51,4 +51,4 @@
 | [F45](days/F45.md) | Complete browser journey, keyboard/mobile checks, and error recovery fixes | Complete |
 | [F46](days/F46.md) | Rehearse additive migration, restore, rollback, and document deployment | Complete |
 | [F47](days/F47.md) | Review representative reports and policies with company/accountant; record gaps | Pack prepared; human review pending |
-| [F48](days/F48.md) | Review acceptance evidence and remaining risks; request separate launch decision | Pending |
+| [F48](days/F48.md) | Review acceptance evidence and remaining risks; request separate launch decision | Engineering release pack prepared; launch decision pending |

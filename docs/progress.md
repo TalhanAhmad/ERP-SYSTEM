@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-20 (Asia/Karachi)
 
-Finance extension: F01–F40 merged through PR7; F41–F45 pushed separately in draft PR8. F46 populated restore/source/object/ACL and rollback checks are locally verified. All802 final backend tests and353 units pass; full browser regression is running. F47 review workbook is prepared; F48 release evidence is being finalized. See [finance progress](finance/progress.md). Human acceptance and live finance activation remain pending.
+Finance extension: F01–F46 engineering is complete; F47/F48 review/release packs are delivered.1,218 final local tests,both builds/type/lint,250 API contracts and84 applied source checksums pass. PR7 is merged; continuation commits are in unmerged PR8. [Concise report](finance/Encova_Final_Engineering_Report.docx) and [finance progress](finance/progress.md) record exact evidence and current fresh CI. Human policy acceptance and a separate launch decision remain; finance stays disabled live.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded

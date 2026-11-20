@@ -1,5 +1,10 @@
 # Migrations
 
+## Current local verification — 20 November2026
+
+All84 finished migration source checksums match on the dedicated encova_test; fresh owned databases apply the complete source.81 adds reviewed opening cutover;82 adds recurring drafts/recognition/opening-credit review;83 independently binds automation/review metadata to real sources;84 adds authorized opening/recognition workflow backlinks. No earlier applied SQL was changed. True additive84 rehearsal and faulted/escaping transaction tests are recorded in F45/F46. Populated restore preserves migration receipts plus all financial source/security objects. Hosted financial migrations remain unperformed; the following sections preserve historical milestone evidence rather than assert a newly inspected provider state.
+
+
 18th additive migration: 20261111010000_finance_access_foundation. Creates only FinanceGrant, FinanceAuditEvent, indexes/checks/retention FKs, audit immutability trigger and RLS/runtime privileges. No existing column/data rewrite or grant backfill.
 
 Applied only to loopback encova_test for verification. Hosted Supabase remains on the original 17 migrations. No live migration/deployment is authorized merely by the supplied document. supabase/setup.sql now excludes Finance-prefixed tables from generic CRUD grants and explicitly reapplies the narrower access permissions; tests rehearse it twice.
