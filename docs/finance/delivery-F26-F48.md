@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F43 engineering is implemented and locally verified. F40 is merged through PR7; F41 opening cutover passed fresh CI in draft PR8; F42 adds reviewed recurring drafts, recognition and private recovery. F44–F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
+F01–F44 engineering is implemented and locally verified. F40 is merged through PR7; F41 opening cutover passed fresh CI in draft PR8; F42 adds reviewed recurring drafts, recognition and private recovery. F45/F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -194,3 +194,12 @@ The actual specification fixture now posts all nine sources through normal check
 15 new fixture cases and15 existing cost-allocation cases passed30/30 in21.25s. Independent50000.00 advance,20000.00 internal transfer and30000.00 credit replay once; cash/profit/AR and earlier statements remain exact. Real fractional postings and competing rounded credits preserve paisa/capacity.351 units passed5.47s, two affected browser journeys5.4s/4.4s (11.4s total), normal/hosted-shaped builds,type/lint,250 API paths and82 source hashes are checked before publication. [Observed report](review/acceptance-fixture.md) and [exact captured JSON](review/acceptance-fixture.json) retain actual results and source/code hashes. No source history is deleted to reset tests; target/history guards reject unsafe seeding.
 
 Initial fixture corrections preserved product guards: a loan interest result needed its existing OTHER_EXPENSE mapping; a raw SQL zero amount had unscaled formatting; cash classifications correctly remained unreviewed until explicit fixture owner confirmation. The actual missing project-cash presentation was implemented and tested rather than inferred from profit. F44/F45 complete cross-module regression and F46 recovery remain; real policies/data and F47/F48 human decisions stay pending.
+
+
+## F44 complete local acceptance — 20 November2026
+
+1,209 distinct local tests passed:351 unit5.46s,797 PostgreSQL445.12s across53 files,61 Chromium4.4m.56 focused opening/automation/credit/source/access cases passed12.84s. Normal/hosted-shaped builds,type/lint,250 API paths and83 finished source hashes are checked before publication. Full coverage includes confidential finance file/scanner/evidence/revocation tests and original ERP role, task, attendance, HR, leave, announcement, invitation, report, table and operations workflows.
+
+Additive83 independently binds schedule/run/attempt metadata, readiness outputs and owner opening-credit reviews to their actual sources. Runtime direct writes and internal helper execution remain denied; no browser DB role receives table access. Every new read mode and ten mutation actions deny unselected/non-owner access, and feature-off responses stop before source parsing. Regranting a new epoch cannot revive the original revoked job. No product ownership guard or financial history was bypassed. [Permission/source matrix](accounting/access-acceptance.md) records the exact boundaries and corrections.
+
+F43 exact608ab0a passed fresh CI44769070851:351 unit,781 PostgreSQL,61 Chromium (1,193),82 fresh migrations and both builds/docs. F44 source publication follows separately. F45 combined browser/error recovery, F46 financial restore and F47/F48 review/release decisions remain; no real books/policies/grants or hosted activation were configured.

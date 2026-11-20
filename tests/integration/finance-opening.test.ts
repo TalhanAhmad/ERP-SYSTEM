@@ -2016,3 +2016,349 @@ it("requires a new retained owner classification when an imported credit draft c
     }),
   ).toBe(2);
 });
+
+it("rejects forged schedule ownership, out-of-range runs and invented attempt history at the database boundary", async () => {
+  const grant = await db.financeGrant.findFirstOrThrow({
+      where: { userId: people.owner.id, revokedAt: null },
+    }),
+    count = await db.financeRecurringSchedule.count();
+  await expect(
+    sql.query(
+      "INSERT INTO \"FinanceRecurringSchedule\"(id,name,kind,template,\"startMonth\",\"endMonth\",day,evidence,\"createdById\",\"grantId\") VALUES($1,'Forged owner','JOURNAL',$2,'2020-12','2020-12',1,'Synthetic invalid metadata',$3,$4)",
+      [
+        crypto.randomUUID(),
+        {
+          description: "Reviewed source",
+          debitAccountId: accounts.expense,
+          creditAccountId: accounts.ordinary,
+          amount: "1.00",
+          projectId: null,
+        },
+        people.selected.id,
+        grant.id,
+      ],
+    ),
+  ).rejects.toThrow("FINANCE_OWNER_REQUIRED");
+  expect(await db.financeRecurringSchedule.count()).toBe(count);
+  await expect(
+    sql.query(
+      'INSERT INTO "FinanceRecurringRun"(id,"scheduleId",month,"postingDate","requesterId","grantId") VALUES($1,$2,\'2030-01\',\'2030-01-01\',$3,$4)',
+      [crypto.randomUUID(), billSchedule, people.owner.id, grant.id],
+    ),
+  ).rejects.toThrow("FINANCE_AUTOMATION_SOURCE");
+  const run = await db.financeRecurringRun.findFirstOrThrow({
+    where: { scheduleId: billSchedule, state: "READY" },
+  });
+  await expect(
+    sql.query(
+      'INSERT INTO "FinanceRecurringAttempt"(id,"runId",attempt,"leaseId") VALUES($1,$2,9,$3)',
+      [crypto.randomUUID(), run.id, crypto.randomUUID()],
+    ),
+  ).rejects.toThrow("FINANCE_AUTOMATION_SOURCE");
+});
+it("rejects readiness that points to an invented source even after a valid job and lease exist", async () => {
+  const s = await schedule(
+    "JOURNAL",
+    {
+      debitAccountId: accounts.expense,
+      creditAccountId: accounts.ordinary,
+      amount: "0.01",
+    },
+    { startMonth: "2020-10", endMonth: "2020-10" },
+  );
+  await sql.query("SELECT encova_finance_automation_enqueue()");
+  const run = await db.financeRecurringRun.findFirstOrThrow({
+      where: { scheduleId: s.id },
+    }),
+    claim = (
+      await sql.query("SELECT encova_finance_automation_claim($1) AS data", [
+        run.id,
+      ])
+    ).rows[0].data;
+  await expect(
+    sql.query(
+      'UPDATE "FinanceRecurringRun" SET state=\'READY\',version=version+1,"leaseId"=NULL,"leaseUntil"=NULL,"sourceId"=$2,"sourceType"=\'JOURNAL\' WHERE id=$1',
+      [run.id, crypto.randomUUID()],
+    ),
+  ).rejects.toThrow("FINANCE_AUTOMATION_SOURCE");
+  expect(
+    (await db.financeRecurringRun.findUniqueOrThrow({ where: { id: run.id } }))
+      .state,
+  ).toBe("RUNNING");
+  await sql.query("SELECT encova_finance_automation_finish($1,$2)", [
+    run.id,
+    claim.leaseId,
+  ]);
+  expect(
+    (await db.financeRecurringRun.findUniqueOrThrow({ where: { id: run.id } }))
+      .state,
+  ).toBe("READY");
+});
+it("rejects forged, stale or non-equity opening-credit reviews independently of the API", async () => {
+  const line = await db.financeOpeningLine.findFirstOrThrow({
+      where: { batchId: batch, kind: "AR" },
+    }),
+    d = await customer("CUSTOMER_CREDIT", "CREATE", {
+      reference: "F44-REVIEW-BOUNDARY",
+      partyId: client,
+      invoiceId: line.id,
+      documentDate: "2020-12-01",
+      postingDate: "2020-12-01",
+      description: "Exact source for independent review guard",
+      evidence: "Synthetic boundary evidence",
+      advanceAccountId: accounts.clientAdvance,
+      creditLines: [{ invoiceLineId: line.id, amount: "0.01" }],
+      reason: "Prepare guarded input review fixture",
+    }),
+    basis = (
+      await sql.query(
+        "SELECT encova_finance_opening_credit_basis('CUSTOMER',$1) AS hash",
+        [d.id],
+      )
+    ).rows[0].hash;
+  const insert = (actor: string, account: string, hash: string) =>
+    sql.query(
+      'INSERT INTO "FinanceOpeningCreditReview"(id,"customerDocumentId","offsetAccountId","basisHash",evidence,"createdById") VALUES($1,$2,$3,$4,\'Synthetic exact input review\',$5)',
+      [crypto.randomUUID(), d.id, account, hash, actor],
+    );
+  await expect(
+    insert(people.selected.id, accounts.retained, basis),
+  ).rejects.toThrow("FINANCE_OWNER_REQUIRED");
+  await expect(
+    insert(people.owner.id, accounts.revenue, basis),
+  ).rejects.toThrow("FINANCE_OPENING_CREDIT_REVIEW");
+  await expect(
+    insert(people.owner.id, accounts.retained, "0".repeat(64)),
+  ).rejects.toThrow("FINANCE_OPENING_CREDIT_REVIEW");
+  expect(
+    await db.financeOpeningCreditReview.count({
+      where: { customerDocumentId: d.id },
+    }),
+  ).toBe(0);
+  await auto("OPENING_CREDIT_REVIEW", {
+    side: "CUSTOMER",
+    documentId: d.id,
+    expectedVersion: d.version,
+    offsetAccountId: accounts.retained,
+    evidence: "Owner reviews exact original source through verified action",
+    reason: "Prove normal current-owner review still works",
+  });
+  expect(
+    await db.financeOpeningCreditReview.count({
+      where: { customerDocumentId: d.id },
+    }),
+  ).toBe(1);
+});
+it("does not revive an old queued job after ownership transfer, revocation and a newly issued grant", async () => {
+  const s = await schedule(
+    "JOURNAL",
+    {
+      debitAccountId: accounts.expense,
+      creditAccountId: accounts.ordinary,
+      amount: "0.01",
+    },
+    { startMonth: "2020-11", endMonth: "2020-11" },
+  );
+  await sql.query("SELECT encova_finance_automation_enqueue()");
+  const run = await db.financeRecurringRun.findFirstOrThrow({
+    where: { scheduleId: s.id },
+  });
+  await sql.query("BEGIN");
+  try {
+    await sql.query(
+      'UPDATE "FinanceSettings" SET "ownerId"=$1,"ownerGrantId"=(SELECT id FROM "FinanceGrant" WHERE "userId"=$1 AND "revokedAt" IS NULL),version=version+1',
+      [people.selected.id],
+    );
+    await sql.query(
+      'UPDATE "FinanceGrant" SET "revokedAt"=CURRENT_TIMESTAMP,"revokedById"=$1,version=version+1 WHERE id=$2',
+      [people.selected.id, run.grantId],
+    );
+    const fresh = crypto.randomUUID();
+    await sql.query(
+      'INSERT INTO "FinanceGrant"(id,"userId","grantedById",reason) VALUES($1,$2,$3,\'Explicit synthetic new grant epoch\')',
+      [fresh, people.owner.id, people.selected.id],
+    );
+    await sql.query(
+      'UPDATE "FinanceSettings" SET "ownerId"=$1,"ownerGrantId"=$2,version=version+1',
+      [people.owner.id, fresh],
+    );
+    expect(
+      (
+        await sql.query("SELECT encova_finance_automation_claim($1) AS data", [
+          run.id,
+        ])
+      ).rows[0].data,
+    ).toBeNull();
+    expect(
+      (
+        await sql.query(
+          'SELECT state,"sourceId" FROM "FinanceRecurringRun" WHERE id=$1',
+          [run.id],
+        )
+      ).rows[0],
+    ).toMatchObject({ state: "CANCELLED", sourceId: null });
+  } finally {
+    await sql.query("ROLLBACK");
+  }
+  await processRecurringRun(run.id);
+  expect(
+    (await db.financeRecurringRun.findUniqueOrThrow({ where: { id: run.id } }))
+      .state,
+  ).toBe("READY");
+});
+const ownerOnlyActions = [
+  "CREATE",
+  "PAUSE",
+  "RESUME",
+  "PREPARE",
+  "RETRY",
+  "RECOGNITION_CREATE",
+  "RECOGNITION_POST",
+  "RECOGNITION_VOID",
+  "RECOGNITION_REVERSE",
+  "OPENING_CREDIT_REVIEW",
+] as const;
+it.each(ownerOnlyActions)(
+  "denies selected non-owner action %s without exposing or changing source state",
+  async (action) => {
+    const reason = "Unselected ownership boundary check",
+      change = { expectedVersion: 1, reason };
+    let body: unknown = change,
+      id: string | undefined = billSchedule;
+    if (action === "CREATE") {
+      body = {
+        name: "Denied reviewed schedule",
+        kind: "JOURNAL",
+        template: {
+          description: "Reviewed ordinary source",
+          debitAccountId: accounts.expense,
+          creditAccountId: accounts.ordinary,
+          amount: "1.00",
+        },
+        startMonth: "2020-12",
+        endMonth: "2020-12",
+        day: 1,
+        evidence: "Reviewed synthetic source",
+        reason,
+      };
+      id = undefined;
+    }
+    if (action === "PREPARE") {
+      body = { reason };
+      id = undefined;
+    }
+    if (action === "RECOGNITION_CREATE") {
+      body = {
+        invoiceLineId: crypto.randomUUID(),
+        postingDate: "2020-01-01",
+        amount: "0.01",
+        description: "Denied recognition",
+        evidence: "Denied owner action",
+        reason,
+      };
+      id = undefined;
+    }
+    if (action === "RECOGNITION_REVERSE")
+      body = { ...change, postingDate: "2020-01-02" };
+    if (action === "OPENING_CREDIT_REVIEW") {
+      body = {
+        side: "CUSTOMER",
+        documentId: crypto.randomUUID(),
+        expectedVersion: 1,
+        offsetAccountId: accounts.retained,
+        evidence: "Denied review source",
+        reason,
+      };
+      id = undefined;
+    }
+    await expect(auto(action, body, id, "selected")).rejects.toMatchObject({
+      code: "FINANCE_OWNER_REQUIRED",
+    });
+  },
+);
+// Permission denial precedes filter validation, including deliberately unsupported filters on other modes.
+it("denies every new private read mode to all unselected roles and stops before input/authentication when disabled", async () => {
+  const { automationRead, automationMutation } =
+      await import("@/modules/finance/automation/http"),
+    run = await db.financeRecurringRun.findFirstOrThrow(),
+    modes = [
+      "SCHEDULES",
+      "SCHEDULE",
+      "RUNS",
+      "RUN",
+      "RECOGNITIONS",
+      "RECOGNITION",
+      "OPTIONS",
+      "CREDIT_REVIEWS",
+    ] as const;
+  for (const who of ["other", "hr", "lead", "member"])
+    for (const mode of modes) {
+      const id =
+          mode === "SCHEDULE"
+            ? billSchedule
+            : mode === "RECOGNITION"
+              ? recognitionId
+              : run.id,
+        r = await automationRead(
+          request(
+            who,
+            undefined,
+            crypto.randomUUID(),
+            "/api/v1/finance/automation/options?kind=ASSET",
+          ),
+          mode,
+          id,
+        );
+      expect(r.status).toBe(403);
+      expect(r.headers.get("cache-control")).toContain("no-store");
+      expect(Object.keys(await r.json())).toEqual(["error"]);
+    }
+  env.FINANCE_ENABLED = false;
+  try {
+    for (const mode of modes)
+      expect((await automationRead(request(), mode, run.id)).status).toBe(404);
+    for (const action of ownerOnlyActions)
+      expect(
+        (await automationMutation(request("owner", {}), action, run.id)).status,
+      ).toBe(404);
+  } finally {
+    env.FINANCE_ENABLED = true;
+  }
+});
+it("keeps draft cores and new trigger helpers private while runtime tables remain read-only and browser roles have no read", async () => {
+  for (const role of ["encova_app", "anon", "authenticated"]) {
+    for (const table of [
+      "FinanceRecurringSchedule",
+      "FinanceRecurringRun",
+      "FinanceRecurringAttempt",
+      "FinanceRecognition",
+      "FinanceOpeningCreditReview",
+    ]) {
+      const p = (
+        await sql.query(
+          "SELECT has_table_privilege($1,$2,'INSERT,UPDATE,DELETE') AS write,has_table_privilege($1,$2,'SELECT') AS read",
+          [role, '"' + table + '"'],
+        )
+      ).rows[0];
+      expect(p.write).toBe(false);
+      expect(p.read).toBe(role === "encova_app");
+    }
+    for (const fn of [
+      "encova_finance_bill_core(uuid,text,jsonb,text,uuid)",
+      "encova_finance_ledger_core(uuid,text,jsonb,text,uuid)",
+      "encova_finance_asset_movement_core(uuid,text,jsonb,text,uuid)",
+      "encova_finance_automation_insert_guard()",
+      "encova_finance_automation_ready_guard()",
+      "encova_finance_opening_credit_review_guard()",
+    ]) {
+      expect(
+        (
+          await sql.query(
+            "SELECT has_function_privilege($1,$2,'EXECUTE') AS allowed",
+            [role, fn],
+          )
+        ).rows[0].allowed,
+      ).toBe(false);
+    }
+  }
+});

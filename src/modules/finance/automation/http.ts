@@ -37,6 +37,7 @@ export async function automationRead(
     requireFinanceEnabled();
     const a = await context(request.headers);
     await rateLimit("finance:automation:read:" + a.id);
+    await financeStatus(a);
     const q = Object.fromEntries(new URL(request.url).searchParams);
     if (["RUN", "RECOGNITION"].includes(mode)) z.object({}).strict().parse(q);
     const data =
