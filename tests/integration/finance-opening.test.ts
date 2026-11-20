@@ -2362,3 +2362,38 @@ it("keeps draft cores and new trigger helpers private while runtime tables remai
     }
   }
 });
+
+it("links every retained opening and recognition journal to its authorized source workflow", async () => {
+  const { postedSource } =
+    await import("@/modules/finance/reports/rollforwards/service");
+  const entries = await db.financeJournalEntry.findMany({
+    where: { sourceType: { in: ["OPENING", "RECOGNITION"] } },
+  });
+  expect(entries.some((e) => e.sourceType === "OPENING")).toBe(true);
+  expect(entries.some((e) => e.sourceType === "RECOGNITION")).toBe(true);
+  for (const entry of entries) {
+    const result = await postedSource(people.owner, { id: entry.id });
+    const id =
+      entry.sourceType === "OPENING"
+        ? (
+            await db.financeOpeningPosting.findUniqueOrThrow({
+              where: { id: entry.sourceId! },
+            })
+          ).batchId
+        : entry.sourceId;
+    expect(result.workflow?.href).toBe(
+      `/finance/${entry.sourceType === "OPENING" ? "openings" : "recognitions"}/${id}`,
+    );
+    expect(result.difference).toBe("0.00");
+  }
+  for (const role of ["encova_app", "anon", "authenticated"]) {
+    expect(
+      (
+        await sql.query(
+          "SELECT has_function_privilege($1,'encova_finance_posted_source_before_workflow_links(uuid,jsonb)','EXECUTE') AS allowed",
+          [role],
+        )
+      ).rows[0].allowed,
+    ).toBe(false);
+  }
+});

@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F44 engineering is implemented and locally verified. F40 is merged through PR7; F41 opening cutover passed fresh CI in draft PR8; F42 adds reviewed recurring drafts, recognition and private recovery. F45/F46 remain pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
+F01–F45 engineering is implemented and locally verified. F40 is merged through PR7; F41 opening cutover passed fresh CI in draft PR8; F42 adds reviewed recurring drafts, recognition and private recovery. F46 remains pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -203,3 +203,12 @@ Initial fixture corrections preserved product guards: a loan interest result nee
 Additive83 independently binds schedule/run/attempt metadata, readiness outputs and owner opening-credit reviews to their actual sources. Runtime direct writes and internal helper execution remain denied; no browser DB role receives table access. Every new read mode and ten mutation actions deny unselected/non-owner access, and feature-off responses stop before source parsing. Regranting a new epoch cannot revive the original revoked job. No product ownership guard or financial history was bypassed. [Permission/source matrix](accounting/access-acceptance.md) records the exact boundaries and corrections.
 
 F43 exact608ab0a passed fresh CI44769070851:351 unit,781 PostgreSQL,61 Chromium (1,193),82 fresh migrations and both builds/docs. F44 source publication follows separately. F45 combined browser/error recovery, F46 financial restore and F47/F48 review/release decisions remain; no real books/policies/grants or hosted activation were configured.
+
+
+## F45 combined workflow and recoverable submission — 20 November2026
+
+F45 engineering acceptance is complete locally. The exact nine-source scenario passed the owned combined Chromium journey in19.7s: project contribution180000.00 versus recorded cash110000.00, seven bank matches, final reconciliation, reviewed period close and real frozen PDF, blocked closed-period credit with unchanged nine journals, owner reopening/superseded download, dated0.01 original-service correction, live profit179999.99, new ready private PDF and current selected-access revocation denying that existing artifact. A separate real lost-response journey passed9.3s: first POST committed201 but transport failed; unchanged retry reused its exact original key, retained one schedule and zero journals, cleared password and passed mobile/WCAG/keyboard checks. Source preparation uses actual checked services; the nine original sources were API-assisted, not all typed in the browser.
+
+57 affected owned PostgreSQL tests passed13.71s, including actual opening/recognition workflow backlinks and private wrapper ACLs. Additive84 passed true rollback rehearsal before dedicated test application; no earlier applied SQL was changed. Full351 units and both production configurations/type/lint/API/Word/private-value checks accompany publication. F44 previously passed1,209 full regression tests; the complete post-F46 suite is still pending and is not inferred from focused F45 results.
+
+F46 populated financial restore/rollback and deployment documentation, followed by the prepared F47/F48 review/release packs. Actual company policy, human acceptance, hosted financial migration/grants and activation remain unconfigured.

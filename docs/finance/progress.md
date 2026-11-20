@@ -2,7 +2,7 @@
 
 Updated 20 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F44 locally accepted:44 of48 milestones;4 remain.** F01–F40 are merged through PR7. F41 sourcee758baa passed CI44736998016; F42 sourcef62a4fa passed CI44766025259; F43 source608ab0a passed [CI44769070851](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44769070851), including351 units,781 PostgreSQL and61 Chromium tests. [Draft PR8](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/8) remains unmerged. F44 complete local regression passed1,209 tests:351 unit (5.46s),797 PostgreSQL (445.12s),61 Chromium (4.4m). Both builds/type/lint,250 contracts and83 source hashes are checked before its separate publication. F45 browser/error recovery and F46 financial recovery remain, followed by F47/F48 review/release preparation and actual human decisions. Hosted finance remains disabled.
+**F01–F45 locally accepted:45 of48 milestones;3 remain.** F01–F40 are merged through PR7. F41–F43 passed fresh CI. F44 sourcebb14c49 is pushed in [draft PR8](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/8), with1,209 passing local tests; its fresh CI44774304395 is tracked separately. F45 now passes the combined actual nine-source browser journey, committed-response retry test and57 affected backend cases; full351 units/both builds/type/lint and250 API contracts are verified before publication.84 dedicated test migration checksums match. F46 recovery and F47/F48 concrete review/release preparation remain; human acceptance and live finance activation are not asserted.
 
 The following is the verified and merged F39 baseline:
 

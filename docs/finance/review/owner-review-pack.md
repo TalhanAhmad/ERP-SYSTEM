@@ -202,3 +202,12 @@ From the synthetic imported deferred obligation16.00, an evidenced delivered por
 ## F44 access and source assurance
 
 [Verified permission/source matrix](../accounting/access-acceptance.md) records role, owner, feature, original-grant, lease, source, SQL and private-file boundaries. Full1,209-test local regression passes, including existing ERP workflows. Fresh F43 source608ab0a independently passed CI44769070851. Invalid operator metadata is rejected without relaxing runtime permissions or ownership protection. No actual live finance grant or human review has been performed.
+
+
+## F45 combined workflow and recoverable submission — 20 November2026
+
+F45 engineering acceptance is complete locally. The exact nine-source scenario passed the owned combined Chromium journey in19.7s: project contribution180000.00 versus recorded cash110000.00, seven bank matches, final reconciliation, reviewed period close and real frozen PDF, blocked closed-period credit with unchanged nine journals, owner reopening/superseded download, dated0.01 original-service correction, live profit179999.99, new ready private PDF and current selected-access revocation denying that existing artifact. A separate real lost-response journey passed9.3s: first POST committed201 but transport failed; unchanged retry reused its exact original key, retained one schedule and zero journals, cleared password and passed mobile/WCAG/keyboard checks. Source preparation uses actual checked services; the nine original sources were API-assisted, not all typed in the browser.
+
+57 affected owned PostgreSQL tests passed13.71s, including actual opening/recognition workflow backlinks and private wrapper ACLs. Additive84 passed true rollback rehearsal before dedicated test application; no earlier applied SQL was changed. Full351 units and both production configurations/type/lint/API/Word/private-value checks accompany publication. F44 previously passed1,209 full regression tests; the complete post-F46 suite is still pending and is not inferred from focused F45 results.
+
+F46 populated financial restore/rollback and deployment documentation, followed by the prepared F47/F48 review/release packs. Actual company policy, human acceptance, hosted financial migration/grants and activation remain unconfigured.

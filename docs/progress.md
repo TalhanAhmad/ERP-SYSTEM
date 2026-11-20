@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-20 (Asia/Karachi)
 
-Finance extension: F01–F40 are merged through PR7. F41–F43 passed fresh CI in draft PR8; F44 local access/file/ERP regression passed1,209 tests. F45 combined browser/error recovery, F46 financial restore/rollback and F47/F48 review/release preparation remain. See [finance progress](finance/progress.md) and full/focused Word reports. Hosted finance stays disabled.
+Finance extension: F01–F40 merged through PR7; F41–F44 pushed separately in draft PR8. F45 combined browser, mobile/keyboard, retry and retained-source navigation are locally verified. F46 recovery/final regression and F47/F48 concrete review/release preparation remain. See [finance progress](finance/progress.md). Finance stays disabled live.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded
