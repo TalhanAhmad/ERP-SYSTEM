@@ -2,7 +2,7 @@ import "dotenv/config";
 import { beforeAll, afterAll, it, expect, vi } from "vitest";
 import EmbeddedPostgres from "embedded-postgres";
 import { execFileSync } from "node:child_process";
-import { readFile, rm } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -2397,3 +2397,49 @@ it("links every retained opening and recognition journal to its authorized sourc
     ).toBe(false);
   }
 });
+
+it("restores populated cutover, recognition, recurring attempts and retained opening source bytes with exact permissions", async () => {
+  const { restoreOwnedFinance } =
+    await import("../../scripts/finance/owned-recovery");
+  expect(await db.financeOpeningPosting.count()).toBeGreaterThan(0);
+  expect(await db.financeRecognition.count()).toBeGreaterThan(0);
+  expect(await db.financeRecurringAttempt.count()).toBeGreaterThan(0);
+  const result = await restoreOwnedFinance(url, directory);
+  expect(result.evidence).toMatchObject({
+    sourceUnchanged: true,
+    aclPreserved: true,
+    productionTouched: false,
+  });
+  const restored = new pg.Client({ connectionString: result.targetUrl });
+  await restored.connect();
+  try {
+    for (const table of [
+      "FinanceOpeningPosting",
+      "FinanceRecognition",
+      "FinanceRecurringSchedule",
+      "FinanceRecurringAttempt",
+    ]) {
+      expect(
+        (await restored.query(`SELECT count(*)::int AS n FROM "${table}"`))
+          .rows[0].n,
+      ).toBeGreaterThan(0);
+    }
+    const original = await sql.query(
+      'SELECT id,"sourceHash","sourceText" FROM "FinanceOpeningBatch" ORDER BY id',
+    );
+    expect(
+      (
+        await restored.query(
+          'SELECT id,"sourceHash","sourceText" FROM "FinanceOpeningBatch" ORDER BY id',
+        )
+      ).rows,
+    ).toEqual(original.rows);
+  } finally {
+    await restored.end();
+  }
+  await writeFile(
+    ".local/finance/f46-cutover-recovery-evidence.json",
+    JSON.stringify(result.evidence, null, 2),
+    { mode: 0o600 },
+  );
+}, 120000);

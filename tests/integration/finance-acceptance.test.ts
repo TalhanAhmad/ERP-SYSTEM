@@ -336,6 +336,233 @@ async function classify(
     ),
   );
 }
+it("restores populated actual finance sources, PDF/CSV bytes, separately stored signed evidence and all private ACLs without changing the source", async () => {
+  const { restoreOwnedFinance } =
+    await import("../../scripts/finance/owned-recovery");
+  const { exportCommand, exportDownload } =
+    await import("@/modules/finance/reports/exports/service");
+  const { processExport } =
+    await import("@/modules/finance/reports/exports/worker");
+  const { reserveFile, completeFile, scanFile, downloadFile } =
+    await import("@/modules/finance/documents/files/service");
+  const { createHmac } = await import("node:crypto");
+  const originals = new Map<string, Uint8Array>(),
+    restoredObjects = new Map<string, Uint8Array>();
+  const store = (map: Map<string, Uint8Array>) => ({
+    signedUpload: async () => "https://synthetic.example.test/upload",
+    get: async (key: string) => {
+      const b = map.get(key);
+      if (!b) throw Error("Missing owned object");
+      return b;
+    },
+    put: async (key: string, b: Uint8Array) => {
+      map.set(key, b);
+    },
+    remove: async (key: string) => {
+      map.delete(key);
+    },
+  });
+  const source = store(originals),
+    target = store(restoredObjects),
+    bytes = Buffer.from(
+      "%PDF-1.7\nSynthetic recovered original finance source\n%%EOF",
+    ),
+    sha = createHash("sha256").update(bytes).digest("hex"),
+    authority = crypto.randomUUID(),
+    secret = "Synthetic recovery scan authority 32 characters";
+  await db.financeScanAuthority.create({
+    data: {
+      id: authority,
+      name: "Owned recovery synthetic scanner",
+      secret: Buffer.from(secret),
+      createdById: people.owner.id,
+      reason: "Verify exact scanner attestation recovery",
+    },
+  });
+  const v = await proof();
+  const reserved = await reserveFile(
+    v.actor,
+    v.proof,
+    {
+      sourceType: "BILL",
+      sourceId: fixture.bill.id,
+      fileName: "recovery-source.pdf",
+      mimeType: "application/pdf",
+      byteSize: bytes.length,
+      sha256: sha,
+      reason: "Retain exact original source evidence",
+    },
+    crypto.randomUUID(),
+    source,
+  );
+  const file = await db.financeFile.findUniqueOrThrow({
+    where: { id: reserved.file.id },
+  });
+  await source.put(file.objectKey, bytes);
+  await completeFile(
+    people.owner,
+    { id: file.id, intent: reserved.intent },
+    source,
+  );
+  await scanFile(
+    people.owner,
+    { id: file.id, intent: reserved.intent },
+    source,
+    async (b, digest, _mime, id, challenge) => {
+      const engine = "Synthetic recovery scanner",
+        status = "CLEAN" as const;
+      return {
+        status,
+        sha256: digest,
+        engine,
+        keyId: authority,
+        signature: createHmac("sha256", secret)
+          .update(
+            [
+              id,
+              digest,
+              b.length,
+              status,
+              Buffer.byteLength(engine),
+              engine,
+              challenge,
+            ].join(":"),
+          )
+          .digest("hex"),
+      };
+    },
+  );
+  expect(
+    Buffer.from(
+      (await downloadFile(people.owner, file.id, null, source)).bytes,
+    ),
+  ).toEqual(bytes);
+  const e = await invoke((v) =>
+    exportCommand(
+      v.actor,
+      v.proof,
+      "REQUEST",
+      {
+        reportType: "PROFIT_LOSS",
+        mode: "REVIEW",
+        filters: baseRange,
+        reason: "Retain actual acceptance statements before recovery",
+      },
+      crypto.randomUUID(),
+    ),
+  );
+  await processExport(e.id);
+  const pdf = await exportDownload(people.owner, e.id, "pdf");
+  expect(Buffer.from(pdf.bytes).subarray(0, 5).toString()).toBe("%PDF-");
+  const drill = await restoreOwnedFinance(url, directory, {
+    source,
+    restored: target,
+  });
+  expect(drill.evidence).toMatchObject({
+    objectCount: 1,
+    sourceUnchanged: true,
+    aclPreserved: true,
+    productionTouched: false,
+    totals: { debit: "1445000.00", credit: "1445000.00" },
+  });
+  expect(await target.get(file.objectKey)).toEqual(bytes);
+  const recovered = new pg.Client({ connectionString: drill.targetUrl });
+  await recovered.connect();
+  try {
+    expect(
+      (
+        await recovered.query(
+          'SELECT count(*)::int AS n FROM "FinanceJournalEntry"',
+        )
+      ).rows[0].n,
+    ).toBe(9);
+    const report = (
+      await recovered.query(
+        "SELECT encova_finance_statement_report($1,'PROFIT_LOSS',$2::jsonb) AS data",
+        [
+          people.owner.id,
+          JSON.stringify({ ...baseRange, q: "", page: 1, issuePage: 1 }),
+        ],
+      )
+    ).rows[0].data;
+    expect(report.sections.netProfit).toBe("180000.00");
+    for (const role of ["anon", "authenticated", "encova_app"]) {
+      const acl = (
+        await recovered.query(
+          "SELECT has_table_privilege($1,'\"FinanceJournalLine\"','INSERT,UPDATE,DELETE') AS write,has_function_privilege($1,'encova_finance_bill_core(uuid,text,jsonb,text,uuid)','EXECUTE') AS core",
+          [role],
+        )
+      ).rows[0];
+      expect(acl).toEqual({ write: false, core: false });
+    }
+    const restoredFile = (
+      await recovered.query(
+        'SELECT "objectKey",sha256,state,"scanResult" FROM "FinanceFile" WHERE id=$1',
+        [file.id],
+      )
+    ).rows[0];
+    expect(restoredFile).toMatchObject({
+      objectKey: file.objectKey,
+      sha256: sha,
+      state: "CLEAN",
+      scanResult: { keyId: authority, status: "CLEAN" },
+    });
+  } finally {
+    await recovered.end();
+  }
+  await writeFile(
+    ".local/finance/f46-base-recovery-evidence.json",
+    JSON.stringify(drill.evidence, null, 2),
+    { mode: 0o600 },
+  );
+}, 120000);
+
+it("refuses hosted and mismatched owned recovery targets before creating any restore database", async () => {
+  const { restoreOwnedFinance } =
+    await import("../../scripts/finance/owned-recovery");
+  await expect(
+    restoreOwnedFinance(
+      "postgresql://synthetic:synthetic@hosted.example.test/postgres",
+      directory,
+    ),
+  ).rejects.toThrow("loopback encova_test");
+  await expect(restoreOwnedFinance(url, ".local/finance")).rejects.toThrow(
+    "owned finance cluster",
+  );
+});
+
+it("rehearses an additive transaction and a faulted migration without committing schema or financial rows", async () => {
+  const { rehearseMigration, rollbackBody } =
+    await import("../../scripts/finance/rehearse-migration");
+  const { financeFingerprints } =
+    await import("../../scripts/finance/owned-recovery");
+  const before = await financeFingerprints(sql);
+  await rehearseMigration(
+    sql,
+    "BEGIN; CREATE TABLE public.owned_rollback_probe(id integer); INSERT INTO public.owned_rollback_probe VALUES (1); DO $$ BEGIN PERFORM 1; END $$; COMMIT;",
+  );
+  expect(
+    (await sql.query("SELECT to_regclass('public.owned_rollback_probe') AS t"))
+      .rows[0].t,
+  ).toBe(null);
+  await expect(
+    rehearseMigration(
+      sql,
+      "BEGIN; CREATE TABLE public.owned_failed_probe(id integer); SELECT 1/0; COMMIT;",
+    ),
+  ).rejects.toThrow();
+  expect(
+    (await sql.query("SELECT to_regclass('public.owned_failed_probe') AS t"))
+      .rows[0].t,
+  ).toBe(null);
+  expect(() =>
+    rollbackBody(
+      "BEGIN; CREATE TABLE escape_probe(id integer); COMMIT; BEGIN; COMMIT;",
+    ),
+  ).toThrow("Nested transaction");
+  expect((await financeFingerprints(sql)).sha256).toBe(before.sha256);
+});
+
 let originalDigest: string;
 it("retains the known base report digest before independent follow-up activity", async () => {
   originalDigest = (await trialBalance(people.owner, baseRange)).metadata

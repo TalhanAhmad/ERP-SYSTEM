@@ -1,0 +1,38 @@
+{
+  "kind": "SYNTHETIC_ONLY",
+  "scope": "Owned local PostgreSQL17; source unchanged; no hosted systems",
+  "runs": [
+    {
+      "kind": "OWNED_SYNTHETIC_RECOVERY",
+      "at": "2026-11-20T16:50:29.061Z",
+      "tables": 132,
+      "rows": 329,
+      "catalogHash": "30eb6d7d6d6070c9bb8a0b2f236c58fa2dc6c236fa333b2b08a48f961f4cd395",
+      "backupHash": "1c9efd5eee5837f9e020377caf619c986b54f1f2e70adf72a6b159544d6ac10f",
+      "objectCount": 1,
+      "totals": {
+        "debit": "1445000.00",
+        "credit": "1445000.00"
+      },
+      "sourceUnchanged": true,
+      "aclPreserved": true,
+      "productionTouched": false
+    },
+    {
+      "kind": "OWNED_SYNTHETIC_RECOVERY",
+      "at": "2026-11-20T16:49:19.017Z",
+      "tables": 132,
+      "rows": 922,
+      "catalogHash": "ca8f3c31b89c87960013d4721180a411b0765eb56bcd37f9075df02d4f430e5c",
+      "backupHash": "b321377d402ccefee88a673cd055360f0e0424918855d6a89574d0b980f2f969",
+      "objectCount": 0,
+      "totals": {
+        "debit": "1244.05",
+        "credit": "1244.05"
+      },
+      "sourceUnchanged": true,
+      "aclPreserved": true,
+      "productionTouched": false
+    }
+  ]
+}

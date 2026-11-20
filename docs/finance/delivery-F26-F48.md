@@ -4,7 +4,7 @@ User authorized merging PR3 and continuing the remaining milestones. PR3 final h
 
 ## Current status
 
-F01–F45 engineering is implemented and locally verified. F40 is merged through PR7; F41 opening cutover passed fresh CI in draft PR8; F42 adds reviewed recurring drafts, recognition and private recovery. F46 remains pending. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
+F01–F46 engineering is implemented and locally verified. F40 is merged through PR7; F41 opening cutover passed fresh CI in draft PR8; F42 adds reviewed recurring drafts, recognition and private recovery. F46 recovery is locally verified; final regression is tracked separately. PR4 is merged after successful local and fresh GitHub verification. The user’s F47 review pack is prepared incrementally; human acceptance and F48 release decisions remain unfilled. Finance stays disabled live.
 
 ## F26 delivered
 
@@ -212,3 +212,12 @@ F45 engineering acceptance is complete locally. The exact nine-source scenario p
 57 affected owned PostgreSQL tests passed13.71s, including actual opening/recognition workflow backlinks and private wrapper ACLs. Additive84 passed true rollback rehearsal before dedicated test application; no earlier applied SQL was changed. Full351 units and both production configurations/type/lint/API/Word/private-value checks accompany publication. F44 previously passed1,209 full regression tests; the complete post-F46 suite is still pending and is not inferred from focused F45 results.
 
 F46 populated financial restore/rollback and deployment documentation, followed by the prepared F47/F48 review/release packs. Actual company policy, human acceptance, hosted financial migration/grants and activation remain unconfigured.
+
+
+## F46 populated financial recovery — 20 November2026
+
+F46 engineering is locally verified: actual custom-format backup/restore of both populated nine-source accounting books and opening/recognition/recurring history into new owned databases; every public table and security/catalog definition compared, balanced totals and original source/report bytes preserved, external signed evidence object copied separately and hash-verified. Default ACL and associative CHECK serialization differences normalize without dropping semantics. Runtime/browser raw-write/core execution remains denied after restore. Hosted targets, unowned source clusters and empty books are refused. Actual additive and faulted migration rehearsals roll back without source changes; escaping transaction aliases are rejected. Updated CI ensures PostgreSQL17 recovery clients. Deployment and rollback runbooks record exact boundaries and outstanding hosted operations.
+
+78 focused checks passed25.35s:76 owned PostgreSQL scenarios plus2 recovery unit cases. All353 units passed5.64s. Normal build/type/lint passed; prior F45 Supabase-shaped build passed.84 source migration hashes match; no applied SQL was rewritten. The complete final backend/browser regression and refreshed hosted-shaped build are still running/pending and are recorded separately, rather than inferred from focused tests.
+
+See [observed recovery evidence](review/recovery-evidence.md). F47 review workbook and F48 engineering release evidence/final verification remain to publish. Actual human policy acceptance, hosted staging/restore verification, real books, live grants and launch remain separate decisions.

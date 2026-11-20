@@ -49,6 +49,6 @@
 | [F43](days/F43.md) | Run complete accounting fixture and rounding/credit/advance edge cases | Complete |
 | [F44](days/F44.md) | Run full access, attachment, permission-revocation, and ERP regression suite | Complete |
 | [F45](days/F45.md) | Complete browser journey, keyboard/mobile checks, and error recovery fixes | Complete |
-| [F46](days/F46.md) | Rehearse additive migration, restore, rollback, and document deployment | Pending |
+| [F46](days/F46.md) | Rehearse additive migration, restore, rollback, and document deployment | Complete |
 | [F47](days/F47.md) | Review representative reports and policies with company/accountant; record gaps | Pending |
 | [F48](days/F48.md) | Review acceptance evidence and remaining risks; request separate launch decision | Pending |

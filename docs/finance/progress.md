@@ -2,7 +2,7 @@
 
 Updated 20 November 2026 (Asia/Karachi). Engineering acceptance remains separate from the original ERP/learning roadmap; no effort hours asserted.
 
-**F01–F45 locally accepted:45 of48 milestones;3 remain.** F01–F40 are merged through PR7. F41–F43 passed fresh CI. F44 sourcebb14c49 is pushed in [draft PR8](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/8), with1,209 passing local tests; its fresh CI44774304395 is tracked separately. F45 now passes the combined actual nine-source browser journey, committed-response retry test and57 affected backend cases; full351 units/both builds/type/lint and250 API contracts are verified before publication.84 dedicated test migration checksums match. F46 recovery and F47/F48 concrete review/release preparation remain; human acceptance and live finance activation are not asserted.
+**F01–F46 engineering locally verified:46 of48 milestones.** F01–F40 merged through PR7; F41–F45 separately pushed in [draft PR8](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/8). F45 sourcec097849 passed the combined nine-source browser and lost-response retry journeys. F46 now passes78 recovery-focused checks, including two populated restores, private signed object evidence, exact source/catalog/ACL comparison and real rollback/failure rehearsals;353 units/build/type/lint and84 checksums are verified. Complete final regression/fresh CI remain separately tracked. F47 review and F48 release decision remain pending; their concrete packs are being finalized. No hosted migration, real policy/books/grant or live finance enablement occurred.
 
 The following is the verified and merged F39 baseline:
 
