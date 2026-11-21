@@ -1,12 +1,12 @@
 # Encova Finance final engineering report
 
-Prepared20 November2026, Asia/Karachi, for Talha Ahmad. Intended Finance Owner: zablerkhanahmad@gmail.com. This report records completed engineering, actual checks, publication and the remaining user decisions; it does not record company/accountant acceptance.
+Updated 21 November 2026, Asia/Karachi, for Talha Ahmad. Intended Finance Owner: zablerkhanahmad@gmail.com. This report records completed engineering, actual checks, publication and the remaining user decisions; it does not record company/accountant acceptance.
 
 ## Outcome and source
 
-PR7 is merged at a2a1814d0c9629f8840a8bf13367b27007085077. F41 e758baa, F42 f62a4fa, F43 608ab0a, F44 bb14c49, F45 c097849, F46 85072d4 and F47 review pack703cc14 were separately committed/pushed in draft PR8. CI client preparation correctionb8b2a1f reuses the existing PostgreSQL17 image. F44 exact-head CI44774304395 and F45 exact-head CI44775856017 passed. F46/F47 initial CI preparation failed on missing Ubuntu client17; failed runs remain recorded and no tests were skipped. Fresh corrected/final source CI is an independent gate, linked from PR8 checks; no success is inferred before it actually completes.
+PR #8 merged into main on 21 November 2026 at 12:54:56 Asia/Karachi, merge 62128ee7a24e5d2926fbceaae63c1ea55a56aaad. Its final source a14bc0d43b59fc3ad52da8a084a08454c9497274 passed CI 44781169698 before merge. The merged main passed [fresh CI 44882423627](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44882423627): migrations, TypeScript/lint, unit/PostgreSQL/browser suites, both production build modes and API/documentation checks. A complete git tree comparison confirms the merge contains exactly the verified PR files. The earlier local 1,218-test result remains recorded separately: 353 unit, 802 PostgreSQL, 63 Chromium. Historical failed runs/corrections remain retained.
 
-[Continuation PR8](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/8) contains the separate milestone commits and current fresh CI checks. The new PR remains unmerged. Existing live workspace: https://encova-workspace.vercel.app/login. Finance remains disabled live.
+Read-only Vercel inspection found the canonical workspace still points to READY production deployment dpl_2SSKGD2xS2jojkBuHhoqN6xjLCa4, created before this merge. Vercel returned no source commit metadata, so this is not proof of a deployment of merged main. Public checks: /login 200 with the sign-in form; anonymous /dashboard 307 to /login; anonymous /api/v1/finance/status 401 UNAUTHENTICATED. The 401 proves authentication is required, not the finance feature flag, schema, grants or readiness. No hosted migrations, deployment, environment changes, grants or financial activation were performed during this post-merge pass.
 
 ## What was completed
 
@@ -26,7 +26,7 @@ No previous applied SQL was rewritten. Four additive migrations81–84 extend th
 
 ## Actual verification
 
-Final local engineering acceptance passed1,218 distinct tests:353 unit5.64s,802 actual PostgreSQL454.42s,63 Chromium4.7m. The complete browser run includes the new combined nine-source journey19.1s and lost committed-response recovery9.0s, ERP roles/HR/attendance/leave/assignments/announcements/invitations, private files/scanning/exports, mobile/keyboard/WCAG and retained correction/access boundaries. Both normal and Supabase-shaped production builds, strict TypeScript/lint,250 concrete API contracts and all84 applied source checksums pass.78 recovery-focused checks additionally passed25.35s after strengthening column/trigger/owner/grantor/index/RLS comparisons; they are included in the distinct full-suite count, not added again.
+Final local engineering acceptance passed 1,218 distinct tests:353 unit5.64s,802 actual PostgreSQL454.42s,63 Chromium4.7m. The complete browser run includes the new combined nine-source journey19.1s and lost committed-response recovery9.0s, ERP roles/HR/attendance/leave/assignments/announcements/invitations, private files/scanning/exports, mobile/keyboard/WCAG and retained correction/access boundaries. Both normal and Supabase-shaped production builds, strict TypeScript/lint,250 concrete API contracts and all84 applied source checksums pass.78 recovery-focused checks additionally passed25.35s after strengthening column/trigger/owner/grantor/index/RLS comparisons; they are included in the distinct full-suite count, not added again.
 
 The fixed nine-source dataset reconciles1445000.00 debit/credit turnover,575000.00 bank,100000.00 AR,30000.00 AP,75000.00 loan,60000.00 equipment,50000.00 investment,180000.00 earned profit and785000.00 assets. Liabilities105000.00 plus equity680000.00 equal assets. Project contribution180000.00 differs from recorded project cash110000.00. Cash categories operating110000.00/investing-110000.00/financing575000.00 reconcile. These are synthetic examples, not company figures.
 
