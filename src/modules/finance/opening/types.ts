@@ -1,0 +1,84 @@
+export type OpeningControl = {
+  accountId: string;
+  expected: string;
+  items: string;
+  difference: string;
+  ready: boolean;
+};
+export type OpeningProof = {
+  ready: boolean;
+  clearingBalance: string;
+  accounts: {
+    accountId: string;
+    expected: string;
+    posted: string;
+    difference: string;
+  }[];
+  journalCount: number;
+  sourceHash: string;
+  journalDigest: string;
+};
+export type OpeningBatch = {
+  id: string;
+  name: string;
+  cutoverDate: string;
+  clearingAccountId: string;
+  fileName: string;
+  sourceHash: string;
+  evidence: string;
+  state: "DRAFT" | "POSTED" | "VOIDED";
+  version: number;
+  createdById: string;
+  createdAt: string;
+  postedById: string | null;
+  postedAt: string | null;
+  reviewEvidence: string | null;
+  basisHash: string | null;
+  proof: OpeningProof | null;
+  canManage: boolean;
+  lineCount: number;
+  journalCount: number;
+};
+export type OpeningPreview = {
+  id: string;
+  version: number;
+  state: string;
+  canManage: boolean;
+  ready: boolean;
+  balanced: boolean;
+  debits: string;
+  credits: string;
+  mappingIssueCount: number;
+  issues: { id: string; code: string }[];
+  controls: OpeningControl[];
+  ledgerEmpty: boolean;
+  cutoverIsFirstOpenDate: boolean;
+  basisHash: string;
+};
+export type OpeningLine = {
+  id: string;
+  sequence: number;
+  kind: string;
+  side: "DEBIT" | "CREDIT" | null;
+  reference: string;
+  originalDate: string | null;
+  dueDate: string | null;
+  accountId: string;
+  code: string;
+  accountName: string;
+  debit: string;
+  credit: string;
+  amount: string;
+  accumulatedDepreciation: string;
+  costBasis: string;
+  units: string | null;
+  description: string;
+  journalId: string | null;
+};
+export type OpeningPaging<T> = {
+  items: T[];
+  total: number;
+  page: number;
+  pages: number;
+  canManage: boolean;
+};

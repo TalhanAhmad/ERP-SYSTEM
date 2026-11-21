@@ -12,10 +12,13 @@ import {
   type InvoiceAction,
 } from "./schemas";
 const errors: Record<string, string> = {
- FINANCE_TAX_POLICY:"Choose an applicable reviewed tax/withholding policy for the posting date.",
- FINANCE_TAX_MAPPING:"The tax policy or mapped accounts are inactive or invalid. Review the draft before posting.",
- FINANCE_TAX_MISMATCH:"Tax snapshots, amounts and mapped journal must agree.",
- FINANCE_CREDIT_TAX_ORDER:"A later taxed credit reserves the tax split. Correct it first or use a later posting date.",
+  FINANCE_TAX_POLICY:
+    "Choose an applicable reviewed tax/withholding policy for the posting date.",
+  FINANCE_TAX_MAPPING:
+    "The tax policy or mapped accounts are inactive or invalid. Review the draft before posting.",
+  FINANCE_TAX_MISMATCH: "Tax snapshots, amounts and mapped journal must agree.",
+  FINANCE_CREDIT_TAX_ORDER:
+    "A later taxed credit reserves the tax split. Correct it first or use a later posting date.",
   FINANCE_FORBIDDEN: "Finance access is unavailable.",
   FINANCE_REAUTH_REQUIRED: "Verify your password and authenticator again.",
   FINANCE_INVALID_INPUT: "Check the invoice fields.",
@@ -221,7 +224,33 @@ export async function invoiceDetail(actor: Pick<Actor, "id">, id: string) {
       orderBy: [{ postingDate: "desc" }, { id: "asc" }],
       take: 100,
     });
+    const opening =
+      invoice.entry?.sourceType === "OPENING"
+        ? await tx.financeOpeningLine.findUnique({
+            where: { id },
+            select: {
+              kind: true,
+              batch: {
+                select: { id: true, cutoverDate: true, sourceHash: true },
+              },
+            },
+          })
+        : null;
+    invariant(
+      invoice.entry?.sourceType !== "OPENING" || opening,
+      "FINANCE_OPENING_SOURCE_UNAVAILABLE",
+      "The retained opening source is unavailable. Restore the source permissions before continuing.",
+      503,
+    );
     return {
+      opening: opening
+        ? {
+            kind: opening.kind,
+            batchId: opening.batch.id,
+            cutoverDate: date(opening.batch.cutoverDate),
+            sourceHash: opening.batch.sourceHash,
+          }
+        : null,
       credits: credits.map((c) => ({
         ...c,
         totalAmount: c.totalAmount.toFixed(2),

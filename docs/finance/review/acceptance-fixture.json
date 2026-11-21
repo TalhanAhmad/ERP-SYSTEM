@@ -1,0 +1,161 @@
+{
+  "kind": "SYNTHETIC_ACCEPTANCE_ONLY",
+  "capturedAt": "2026-11-20T15:55:17.291Z",
+  "period": {
+    "from": "2020-01-01",
+    "to": "2020-01-10"
+  },
+  "assumptions": {
+    "currency": "PKR",
+    "opening": "zero",
+    "tax": "none",
+    "depreciation": "none",
+    "overheadAllocation": "none",
+    "services": "earned on original invoice",
+    "cashClassification": "explicit synthetic owner review"
+  },
+  "sourceHashes": {
+    "tests/fixtures/finance-acceptance.ts": "36c6f067935270cd5f3fea7ae059c285b5c131b4ab6ad7dda699871d6e853b19",
+    "src/modules/finance/projects/costs/service.ts": "12642a895411b4d87050b6810b666aecb1d938469d9dfb7c1f10bd23e4ebce66"
+  },
+  "journalCount": 9,
+  "trialBalance": {
+    "periodDebit": "1445000.00",
+    "accountCount": 19,
+    "closingDebit": "905000.00",
+    "openingDebit": "0.00",
+    "periodCredit": "1445000.00",
+    "closingCredit": "905000.00",
+    "openingCredit": "0.00",
+    "periodDifference": "0.00",
+    "closingDifference": "0.00",
+    "openingDifference": "0.00"
+  },
+  "profitLoss": {
+    "revenue": "300000.00",
+    "netProfit": "180000.00",
+    "directCosts": "120000.00",
+    "grossProfit": "180000.00",
+    "otherIncome": "0.00",
+    "otherExpenses": "0.00",
+    "operatingProfit": "180000.00",
+    "incomeTaxExpense": "0.00",
+    "operatingExpenses": "0.00",
+    "profitBeforeIncomeTax": "180000.00"
+  },
+  "balanceSheet": {
+    "difference": "0.00",
+    "totalAssets": "785000.00",
+    "totalEquity": "680000.00",
+    "postedEquity": "500000.00",
+    "currentAssets": "675000.00",
+    "unclosedProfit": "180000.00",
+    "noncurrentAssets": "110000.00",
+    "totalLiabilities": "105000.00",
+    "currentLiabilities": "30000.00",
+    "noncurrentLiabilities": "75000.00"
+  },
+  "cashFlow": {
+    "opening": "0.00",
+    "closing": "575000.00",
+    "categories": [
+      {
+        "net": "575000.00",
+        "inflows": "600000.00",
+        "category": "FINANCING",
+        "outflows": "25000.00"
+      },
+      {
+        "net": "-110000.00",
+        "inflows": "0.00",
+        "category": "INVESTING",
+        "outflows": "110000.00"
+      },
+      {
+        "net": "110000.00",
+        "inflows": "200000.00",
+        "category": "OPERATING",
+        "outflows": "90000.00"
+      }
+    ],
+    "difference": "0.00",
+    "classificationReady": true
+  },
+  "project": {
+    "netInvoiced": "300000.00",
+    "recognizedIncome": "300000.00",
+    "directCosts": "120000.00",
+    "assignedOverhead": "0.00",
+    "contribution": "180000.00",
+    "fullyAllocatedResult": "180000.00",
+    "companyUnallocatedOverhead": "0.00",
+    "companyUnassignedDirectCosts": "0.00",
+    "cashMovement": "110000.00"
+  },
+  "ledgerDigest": "5129dbbb68f6496fdf7b3254c2aa7e1b18499105f61c91aa1b0e303c65856a37",
+  "documents": [
+    {
+      "id": "5fbf1941-b2c8-4ea2-b717-e0b09a064bbf",
+      "reference": "JRN-5fbf1941-b2c8-4ea2-b717-e0b09a064bbf",
+      "sourceType": "MOVEMENT",
+      "sourceId": "395a8ab3-eb37-4919-834a-fe0f662cb73f",
+      "postingDate": "2020-01-02T00:00:00.000Z"
+    },
+    {
+      "id": "0cb03c0c-1984-47ce-9e6a-a5fe814167ec",
+      "reference": "JRN-0cb03c0c-1984-47ce-9e6a-a5fe814167ec",
+      "sourceType": "MOVEMENT",
+      "sourceId": "0c2c540b-f1d0-44b2-9e54-9cd0c1c867a7",
+      "postingDate": "2020-01-03T00:00:00.000Z"
+    },
+    {
+      "id": "7fc3baa6-24a5-4c2d-ba0e-a927fca05423",
+      "reference": "JRN-7fc3baa6-24a5-4c2d-ba0e-a927fca05423",
+      "sourceType": "INVOICE",
+      "sourceId": "465d24d5-bdc1-4c88-8f72-c41813555bf2",
+      "postingDate": "2020-01-04T00:00:00.000Z"
+    },
+    {
+      "id": "ae636e00-ba96-4527-8d4e-69ea4ecd2c3d",
+      "reference": "JRN-ae636e00-ba96-4527-8d4e-69ea4ecd2c3d",
+      "sourceType": "CUSTOMER_DOCUMENT",
+      "sourceId": "17ebf856-24ef-481d-9889-dbafab595bac",
+      "postingDate": "2020-01-05T00:00:00.000Z"
+    },
+    {
+      "id": "0a9db4bb-d938-4a50-9b12-3570a570a1c0",
+      "reference": "JRN-0a9db4bb-d938-4a50-9b12-3570a570a1c0",
+      "sourceType": "BILL",
+      "sourceId": "908d2e06-7e20-4f8f-995e-d7758f57e215",
+      "postingDate": "2020-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "ad5de493-a8cd-4e1f-a12c-24a5d973c6e2",
+      "reference": "JRN-ad5de493-a8cd-4e1f-a12c-24a5d973c6e2",
+      "sourceType": "SUPPLIER_DOCUMENT",
+      "sourceId": "553935d2-a387-4254-b686-a434e7365fa9",
+      "postingDate": "2020-01-07T00:00:00.000Z"
+    },
+    {
+      "id": "799fcc45-a1a8-48bd-b3e2-13a07445ffd0",
+      "reference": "JRN-799fcc45-a1a8-48bd-b3e2-13a07445ffd0",
+      "sourceType": "BILL",
+      "sourceId": "0258b9aa-145f-4ecc-8902-491f27559c06",
+      "postingDate": "2020-01-08T00:00:00.000Z"
+    },
+    {
+      "id": "e3ac46f9-43fb-4b5f-8220-704f58a84c28",
+      "reference": "JRN-e3ac46f9-43fb-4b5f-8220-704f58a84c28",
+      "sourceType": "MOVEMENT",
+      "sourceId": "3aadb081-008c-44c3-b990-f485450a7b14",
+      "postingDate": "2020-01-09T00:00:00.000Z"
+    },
+    {
+      "id": "044d254a-31da-411b-b412-8e6a9b5a28de",
+      "reference": "JRN-044d254a-31da-411b-b412-8e6a9b5a28de",
+      "sourceType": "MOVEMENT",
+      "sourceId": "f3cb81f4-80a8-4ba4-840b-70718b97ecf5",
+      "postingDate": "2020-01-10T00:00:00.000Z"
+    }
+  ]
+}

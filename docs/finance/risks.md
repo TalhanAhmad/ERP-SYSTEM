@@ -1,12 +1,18 @@
 # Finance risks
 
-- No posting engine or financial reports exist in this foundation. Screens must not display invented zero balances or readiness claims.
+## Current review position — 20 November2026
+
+Engineering through F46 supplies the actual posting engine, typed subledgers, reports, private files/exports, closing, opening imports, reviewed draft automation and populated financial restore/rollback evidence. [Review workbook](review/reviewer-workbook.md) lists company decisions. Actual hosted migration/permissions/private scanner/Storage, live grants/MFA, real chart/fiscal calendar/tax/measurement/cutover approval and provider backup/PITR/object retention remain unconfigured. Synthetic acceptance is not accountant approval or a hosted recovery guarantee. Current source/test/publication status is in [progress](progress.md).
+
+## Historical foundation risks (superseded as implementation advanced)
+
+- At the initial foundation stage, no posting engine or financial reports existed. Screens must not display invented zero balances or readiness claims.
 - F04 implements owner bootstrap/transfer/revoke, database last-owner/identity safeguards and provider step-up authentication, with final verification tracked in progress.md. Actual hosted migration, owner device enrollment and setup remain pending; no hosted owner is seeded.
 - Finance grants are read-only to the runtime role. Owner operations now use a narrowly scoped function; operator bootstrap/recovery remains unavailable to the runtime.
 - All future finance operations must use the shared access transaction; revocation must use the same Person → advisory-lock order. Direct operator SQL is privileged and must follow the documented protocol.
 - PostgreSQL RLS protects against anonymous/authenticated Data API access; the shared server role remains privileged. Application services must check the current actor on every boundary.
 - Financial policy and opening data require accountant/company review. No statutory, IFRS or Pakistan tax certification is claimed.
-- Finance has no production/staging deployment, financial backup proof or attachment scanning service yet. ERP recovery evidence is not finance recovery evidence.
+- At the initial foundation stage, finance had no deployment, finance-specific restore evidence or attachment scanner. F46 now provides local populated recovery; hosted deployment/scanner and operational recovery remain pending.
 
 ## F05 limits
 

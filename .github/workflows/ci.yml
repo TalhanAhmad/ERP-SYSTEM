@@ -40,6 +40,20 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test:unit
+      - name: Use matching PostgreSQL17 backup/restore clients
+        run: |
+          # Reuse the already-pulled service image; Ubuntu's default apt source has no client17.
+          docker run --rm postgres:17 pg_dump --version
+          mkdir -p .local/tools/recovery
+          cat > .local/tools/recovery/pg_dump <<'CLIENT'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          exec docker run --rm --network host --user "$(id -u):$(id -g)" --env PGPASSWORD --volume "$PWD/.local/recovery:$PWD/.local/recovery" postgres:17 "$(basename "$0")" "$@"
+          CLIENT
+          cp .local/tools/recovery/pg_dump .local/tools/recovery/pg_restore
+          chmod 700 .local/tools/recovery/pg_dump .local/tools/recovery/pg_restore
+          echo "PG_DUMP_BIN=$PWD/.local/tools/recovery/pg_dump" >> "$GITHUB_ENV"
+          echo "PG_RESTORE_BIN=$PWD/.local/tools/recovery/pg_restore" >> "$GITHUB_ENV"
       - run: pnpm test:integration
       - run: pnpm test:e2e:prepare
       - run: pnpm build

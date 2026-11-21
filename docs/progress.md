@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-20 (Asia/Karachi)
 
-Finance extension: F01–F39 are accepted and merged through PR6. F40 annual close/reversal is locally accepted with1,113 tests; source5ab1e8a is committed/pushed in unmerged PR7 with successful fresh CI44593966836. See [finance progress](finance/progress.md), [the continuation report](finance/delivery-F26-F48.md) and full/focused Word reports. F41–F46 engineering, F47 human review and F48 release remain. Hosted finance stays disabled.
+Finance extension: F01–F46 engineering is complete; F47/F48 review/release packs are delivered.1,218 final local tests,both builds/type/lint,250 API contracts and84 applied source checksums pass. PR7 is merged; continuation commits are in unmerged PR8. [Concise report](finance/Encova_Final_Engineering_Report.docx) and [finance progress](finance/progress.md) record exact evidence and current fresh CI. Human policy acceptance and a separate launch decision remain; finance stays disabled live.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded

@@ -20,6 +20,7 @@ export default async function Result({
     directCosts: "Direct incurred costs",
     assignedOverhead: "Assigned overhead",
     contribution: "Contribution",
+    cashMovement: "Recorded project cash movement",
     fullyAllocatedResult: "Result after assigned overhead",
     companyUnallocatedOverhead: "Company unallocated overhead",
     companyUnassignedDirectCosts: "Company unassigned direct costs",
@@ -68,8 +69,9 @@ export default async function Result({
           are not deducted again from this project.
         </p>
         <p>
-          Cash collections, receivables and budget forecasts will be available
-          in their dedicated reports.
+          Cash includes recorded bank/cash movements assigned to this project.
+          Company movements without a project are excluded. Receivables and
+          forecasts remain separate from earned income and contribution.
         </p>
       </section>
     </section>

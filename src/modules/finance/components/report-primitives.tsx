@@ -37,6 +37,7 @@ export function ReportMetadataPanel({
         Posting snapshot {metadata.databaseSnapshot} · Ledger proof{" "}
         {metadata.ledgerDigest}
       </p>
+      {metadata.openingCutoverDate && <p>Reviewed opening cutover: {metadata.openingCutoverDate}. {metadata.beforeCutoverRequested ? "This date range includes time before imported coverage; opening positions do not represent earlier transaction history." : "Balances include the reviewed imported starting position."}</p>}
       <p>
         This live response uses one consistent posted dataset for its rows and
         totals.{" "}

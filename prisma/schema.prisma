@@ -80,6 +80,15 @@ enum TaskStatus {
  CANCELED
 }
 model Person {
+ financeRecurringSchedules FinanceRecurringSchedule[]
+ financeRecurringRuns FinanceRecurringRun[]
+ financeRecognitionsCreated FinanceRecognition[] @relation("RecognitionCreator")
+ financeRecognitionsPosted FinanceRecognition[] @relation("RecognitionPoster")
+ financeRecognitionsReversed FinanceRecognition[] @relation("RecognitionReverser")
+ financeOpeningCreditReviews FinanceOpeningCreditReview[]
+
+ openingCreated FinanceOpeningBatch[] @relation("OpeningCreator")
+ openingApproved FinanceOpeningBatch[] @relation("OpeningApprover")
  financeYearsCreated FinanceFiscalYear[] @relation("YearCreator")
  financeYearsClosed FinanceYearClose[] @relation("YearCloser")
  financeYearsReopened FinanceYearClose[] @relation("YearReopener")
@@ -174,6 +183,9 @@ model Person {
 
 // No public/admin endpoint may create these grants through generic Person updates.
 model FinanceGrant {
+ recurringSchedules FinanceRecurringSchedule[]
+ recurringRuns FinanceRecurringRun[]
+
  id String @id @default(uuid()) @db.Uuid
  userId String @db.Uuid
  user Person @relation("FinanceGrantee",fields:[userId],references:[id],onDelete:Restrict)
@@ -243,6 +255,13 @@ model FinanceAuditEvent {
 }
 
 model FinanceAccount {
+ openingCreditReviews FinanceOpeningCreditReview[]
+
+ openingClearingBatches FinanceOpeningBatch[] @relation("OpeningClearing")
+ openingPrimaryLines FinanceOpeningLine[] @relation("OpeningAccount")
+ openingSecondaryLines FinanceOpeningLine[] @relation("OpeningSecondary")
+ openingResultLines FinanceOpeningLine[] @relation("OpeningResult")
+ openingReceivableLines FinanceOpeningLine[] @relation("OpeningReceivable")
  retainedFiscalYears FinanceFiscalYear[]
  bankMatches FinanceBankMatch[]
 
@@ -387,6 +406,10 @@ model FinanceJournalDraftLine {
  @@unique([draftId,sequence])
 }
 model FinanceJournalEntry {
+ recognitionOriginal FinanceRecognition? @relation("RecognitionJournal")
+ recognitionReversal FinanceRecognition? @relation("RecognitionReversalJournal")
+
+ openingPosting FinanceOpeningPosting?
  yearClose FinanceYearClose? @relation("YearJournal")
  yearReversal FinanceYearClose? @relation("YearReversal")
  cashFlowReviews FinanceCashFlowReview[]
@@ -485,6 +508,7 @@ model FinanceLedgerReceipt {
 }
 
 model FinanceParty {
+ openingLines FinanceOpeningLine[]
  forecasts FinanceForecast[]
 
  projectProfiles FinanceProjectProfile[]
@@ -519,6 +543,7 @@ model FinanceParty {
  @@index([active,kind,name,id])
 }
 model FinanceCashAccount {
+ openingLines FinanceOpeningLine[]
  bankMatches FinanceBankMatch[]
 
  statementUploads FinanceStatementUpload[]
@@ -584,6 +609,8 @@ model FinanceInvoice {
  @@index([state,postingDate,id])
 }
 model FinanceInvoiceLine {
+ recognitions FinanceRecognition[]
+
  milestoneLinks FinanceMilestoneInvoiceLink[]
 
  taxCodeId String? @db.Uuid
@@ -1179,6 +1206,8 @@ model AppSession {
 }
 
 model FinanceCustomerDocument {
+ openingCreditReviews FinanceOpeningCreditReview[]
+
  evidenceFiles FinanceFile[]
  withholdingCodeId String? @db.Uuid
  withholdingCode FinanceTaxCode? @relation(fields:[withholdingCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -1400,6 +1429,8 @@ model FinancePayableEvent {
 }
 
 model FinanceSupplierDocument {
+ openingCreditReviews FinanceOpeningCreditReview[]
+
  evidenceFiles FinanceFile[]
  withholdingCodeId String? @db.Uuid
  withholdingCode FinanceTaxCode? @relation(fields:[withholdingCodeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -1682,6 +1713,7 @@ model FinanceFundingEvent {
 }
 
 model FinanceLoan {
+ openingLines FinanceOpeningLine[]
  id String @id @default(uuid()) @db.Uuid
  number String @unique
  name String
@@ -1726,6 +1758,7 @@ model FinanceLoanEvent {
 }
 
 model FinanceInvestmentHolding {
+ openingLines FinanceOpeningLine[]
  incomeEvents FinanceInvestmentIncomeEvent[]
  id String @id @default(uuid()) @db.Uuid
  number String @unique
@@ -2527,4 +2560,180 @@ model FinanceYearClose {
  reversedBy Person? @relation("YearReopener",fields:[reversedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
  reverseReason String?
  @@unique([fiscalYearId,sequence])
+}
+
+model FinanceOpeningBatch {
+ id String @id @db.Uuid
+ name String
+ cutoverDate DateTime @db.Date
+ clearingAccountId String @db.Uuid
+ clearingAccount FinanceAccount @relation("OpeningClearing",fields:[clearingAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ fileName String
+ sourceText String
+ sourceHash String @unique
+ evidence String
+ state String @default("DRAFT")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation("OpeningCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ postedById String? @db.Uuid
+ postedBy Person? @relation("OpeningApprover",fields:[postedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ postedAt DateTime? @db.Timestamptz
+ reviewEvidence String?
+ basisHash String?
+ proof Json?
+ lines FinanceOpeningLine[]
+ postings FinanceOpeningPosting[]
+}
+model FinanceOpeningLine {
+ id String @id @db.Uuid
+ batchId String @db.Uuid
+ batch FinanceOpeningBatch @relation(fields:[batchId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ sequence Int
+ kind String
+ cashSide String @default("DEBIT")
+ accountId String @db.Uuid
+ account FinanceAccount @relation("OpeningAccount",fields:[accountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ debit Decimal @default(0) @db.Decimal(20,2)
+ credit Decimal @default(0) @db.Decimal(20,2)
+ amount Decimal @default(0) @db.Decimal(20,2)
+ reference String
+ originalDate DateTime? @db.Date
+ dueDate DateTime? @db.Date
+ description String
+ partyId String? @db.Uuid
+ party FinanceParty? @relation(fields:[partyId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ cashAccountId String? @db.Uuid
+ cashAccount FinanceCashAccount? @relation(fields:[cashAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ loanId String? @db.Uuid
+ loan FinanceLoan? @relation(fields:[loanId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ holdingId String? @db.Uuid
+ holding FinanceInvestmentHolding? @relation(fields:[holdingId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ secondaryAccountId String? @db.Uuid
+ secondaryAccount FinanceAccount? @relation("OpeningSecondary",fields:[secondaryAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ resultAccountId String? @db.Uuid
+ resultAccount FinanceAccount? @relation("OpeningResult",fields:[resultAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ receivableAccountId String? @db.Uuid
+ receivableAccount FinanceAccount? @relation("OpeningReceivable",fields:[receivableAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ costBasis Decimal? @db.Decimal(20,2)
+ accumulated Decimal @default(0) @db.Decimal(20,2)
+ units Decimal? @db.Decimal(20,6)
+ tag String?
+ location String?
+ inServiceDate DateTime? @db.Date
+ residual Decimal @default(0) @db.Decimal(20,2)
+ remainingMonths Int?
+ firstDepMonth String?
+ policyEvidence String?
+ posting FinanceOpeningPosting?
+ @@unique([batchId,sequence])
+ @@index([batchId,kind,sequence])
+}
+model FinanceOpeningPosting {
+ id String @id @db.Uuid
+ batchId String @db.Uuid
+ batch FinanceOpeningBatch @relation(fields:[batchId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ lineId String? @unique @db.Uuid
+ line FinanceOpeningLine? @relation(fields:[lineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ journalId String @unique @db.Uuid
+ journal FinanceJournalEntry @relation(fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+}
+
+model FinanceRecurringSchedule {
+ id String @id @db.Uuid
+ name String
+ kind String
+ template Json
+ startMonth String
+ endMonth String?
+ day Int
+ evidence String
+ active Boolean @default(true)
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ grantId String @db.Uuid
+ grant FinanceGrant @relation(fields:[grantId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ runs FinanceRecurringRun[]
+}
+model FinanceRecurringRun {
+ id String @id @db.Uuid
+ scheduleId String @db.Uuid
+ schedule FinanceRecurringSchedule @relation(fields:[scheduleId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ month String
+ postingDate DateTime @db.Date
+ requesterId String @db.Uuid
+ requester Person @relation(fields:[requesterId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ grantId String @db.Uuid
+ grant FinanceGrant @relation(fields:[grantId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ state String @default("QUEUED")
+ version Int @default(1)
+ attempts Int @default(0)
+ budget Int @default(3)
+ leaseId String? @db.Uuid
+ leaseUntil DateTime? @db.Timestamptz
+ sourceId String? @db.Uuid
+ sourceType String?
+ errorCode String?
+ createdAt DateTime @default(now()) @db.Timestamptz
+ updatedAt DateTime @default(now()) @db.Timestamptz
+ history FinanceRecurringAttempt[]
+ @@unique([scheduleId,month])
+ @@index([state,postingDate,id],map:"FinanceRecurringRun_due")
+}
+model FinanceRecurringAttempt {
+ id String @id @db.Uuid
+ runId String @db.Uuid
+ run FinanceRecurringRun @relation(fields:[runId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ attempt Int
+ leaseId String @unique @db.Uuid
+ startedAt DateTime @default(now()) @db.Timestamptz
+ finishedAt DateTime? @db.Timestamptz
+ outcome String @default("RUNNING")
+ errorCode String?
+ @@unique([runId,attempt])
+}
+model FinanceRecognition {
+ id String @id @db.Uuid
+ invoiceLineId String @db.Uuid
+ invoiceLine FinanceInvoiceLine @relation(fields:[invoiceLineId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ postingDate DateTime @db.Date
+ amount Decimal @db.Decimal(20,2)
+ description String
+ evidence String
+ state String @default("DRAFT")
+ version Int @default(1)
+ createdById String @db.Uuid
+ createdBy Person @relation("RecognitionCreator",fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ postedById String? @db.Uuid
+ postedBy Person? @relation("RecognitionPoster",fields:[postedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ postedAt DateTime? @db.Timestamptz
+ journalId String? @unique @db.Uuid
+ journal FinanceJournalEntry? @relation("RecognitionJournal",fields:[journalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reversalJournalId String? @unique @db.Uuid
+ reversalJournal FinanceJournalEntry? @relation("RecognitionReversalJournal",fields:[reversalJournalId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reversalDate DateTime? @db.Date
+ reversedById String? @db.Uuid
+ reversedBy Person? @relation("RecognitionReverser",fields:[reversedById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@index([postingDate,id],map:"FinanceRecognition_register")
+}
+model FinanceOpeningCreditReview {
+ id String @id @db.Uuid
+ customerDocumentId String? @db.Uuid
+ customerDocument FinanceCustomerDocument? @relation(fields:[customerDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ supplierDocumentId String? @db.Uuid
+ supplierDocument FinanceSupplierDocument? @relation(fields:[supplierDocumentId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ offsetAccountId String @db.Uuid
+ offsetAccount FinanceAccount @relation(fields:[offsetAccountId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ basisHash String
+ evidence String
+ createdById String @db.Uuid
+ createdBy Person @relation(fields:[createdById],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @db.Timestamptz
+ @@unique([customerDocumentId,basisHash])
+ @@unique([supplierDocumentId,basisHash])
 }

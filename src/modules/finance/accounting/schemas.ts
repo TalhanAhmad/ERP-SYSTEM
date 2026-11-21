@@ -78,7 +78,7 @@ export const accountSchema = z
       "DEFERRED_REVENUE",
     ];
     if (
-      (["CAPITAL", "DISTRIBUTION"].includes(a.controlType) &&
+      (["OPENING_CLEARING", "CAPITAL", "DISTRIBUTION"].includes(a.controlType) &&
         a.type !== "EQUITY") ||
       (assetControls.includes(a.controlType) && a.type !== "ASSET") ||
       (liabilityControls.includes(a.controlType) && a.type !== "LIABILITY")

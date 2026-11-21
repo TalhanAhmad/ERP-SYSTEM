@@ -7,7 +7,13 @@ import type { Actor } from "@/server/context";
 import { invariant } from "@/server/errors";
 export function invoicePdf(actor: Pick<Actor, "id">, id: string) {
   return withFinanceAccess(actor, async () => {
-    const { item: i } = await invoiceDetail(actor, id);
+    const { item: i, opening } = await invoiceDetail(actor, id);
+    invariant(
+      !opening && i.entry?.sourceType !== "OPENING",
+      "FINANCE_OPENING_DOCUMENT",
+      "This is a retained opening balance. Use its cutover source; it is not a newly issued invoice.",
+      409,
+    );
     invariant(
       i.state === "POSTED",
       "FINANCE_INVOICE_UNPOSTED",

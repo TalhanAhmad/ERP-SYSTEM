@@ -1,3 +1,4 @@
+import { OpeningCreditReview } from "./opening-credit-review";
 import {EvidenceSection} from "./evidence-section";
 import Link from "next/link";
 import { env } from "@/server/env";
@@ -285,6 +286,7 @@ export async function PaymentDetail({
           ))}
         </section>
       )}
+      {resource === "SUPPLIER_CREDIT" && <OpeningCreditReview side="SUPPLIER" id={i.id} />}
       {i.state === "DRAFT" && resource !== "UNALLOCATION" && (
         <>
           <section

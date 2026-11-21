@@ -477,6 +477,7 @@ export async function projectFinancialResult(
         directCosts: string;
         assignedOverhead: string;
         contribution: string;
+        cashMovement: string;
         fullyAllocatedResult: string;
         companyUnallocatedOverhead: string;
         companyUnassignedDirectCosts: string;
@@ -488,9 +489,10 @@ export async function projectFinancialResult(
  coalesce(sum(l.debit-l.credit) FILTER(WHERE l."projectId"=${id}::uuid AND a.type='DIRECT_COST'),0) AS direct,
  coalesce(sum(l.debit-l.credit) FILTER(WHERE l."projectId"=${id}::uuid AND a.type IN('OPERATING_EXPENSE','OTHER_EXPENSE')),0) AS overhead,
  coalesce(sum(l.debit-l.credit) FILTER(WHERE l."projectId" IS NULL AND a.type IN('OPERATING_EXPENSE','OTHER_EXPENSE')),0) AS shared,
- coalesce(sum(l.debit-l.credit) FILTER(WHERE l."projectId" IS NULL AND a.type='DIRECT_COST'),0) AS unassigned
+ coalesce(sum(l.debit-l.credit) FILTER(WHERE l."projectId" IS NULL AND a.type='DIRECT_COST'),0) AS unassigned,
+ coalesce(sum(l.debit-l.credit) FILTER(WHERE l."projectId"=${id}::uuid AND a."controlType"='CASH'),0) AS cash
  FROM "FinanceJournalLine" l JOIN "FinanceJournalEntry" e ON e.id=l."journalId" JOIN "FinanceAccount" a ON a.id=l."accountId" LEFT JOIN "FinanceCustomerDocument" c ON c.id=e."customerDocumentId" LEFT JOIN "FinanceCustomerDocument" original ON original.id=c."reversalOfId" WHERE e."postingDate" BETWEEN ${q.from}::date AND ${q.to}::date AND e."sourceType"<>'YEAR_CLOSE')
- SELECT round(billed,2)::text AS "netInvoiced",round(income,2)::text AS "recognizedIncome",round(direct,2)::text AS "directCosts",round(overhead,2)::text AS "assignedOverhead",round(income-direct,2)::text AS contribution,round(income-direct-overhead,2)::text AS "fullyAllocatedResult",round(shared,2)::text AS "companyUnallocatedOverhead",round(unassigned,2)::text AS "companyUnassignedDirectCosts" FROM totals`;
+ SELECT round(billed,2)::text AS "netInvoiced",round(income,2)::text AS "recognizedIncome",round(direct,2)::text AS "directCosts",round(overhead,2)::text AS "assignedOverhead",round(income-direct,2)::text AS contribution,round(income-direct-overhead,2)::text AS "fullyAllocatedResult",round(shared,2)::text AS "companyUnallocatedOverhead",round(unassigned,2)::text AS "companyUnassignedDirectCosts",round(cash,2)::text AS "cashMovement" FROM totals`;
     return { project, filters: q, values: rows[0] };
   });
 }

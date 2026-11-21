@@ -49,6 +49,10 @@ export function FinanceNavigation() {
       <Link href="/finance/accounts">Accounts</Link>
       <Link href="/finance/periods">Periods</Link>
       <Link href="/finance/fiscal-years">Fiscal years</Link>
+      <Link href="/finance/openings">Opening balances</Link>
+      <Link href="/finance/automation">Recurring drafts</Link>
+      <Link href="/finance/recognitions">Revenue recognition</Link>
+      <Link href="/finance/opening-credit-reviews">Opening credit reviews</Link>
       <Link href="/finance/access">Access</Link>
     </nav>
   );

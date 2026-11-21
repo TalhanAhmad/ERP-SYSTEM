@@ -14,6 +14,7 @@ import {
   type CustomerResource,
 } from "./schemas";
 const errors: Record<string, string> = {
+  FINANCE_OPENING_CREDIT_REVIEW: "The Finance Owner must approve the opening-equity classification for this exact credit draft before posting.",
   ...costErrors,
   ...bankMatchErrors,
   FINANCE_TAX_POLICY:

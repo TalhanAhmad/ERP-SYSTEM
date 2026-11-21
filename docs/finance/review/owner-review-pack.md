@@ -1,10 +1,14 @@
-# Finance owner review pack — preparation in progress
+# Finance owner review pack — prepared for Talha
 
 Prepared for Talha Ahmad, as requested on 14 November 2026. Intended Finance Owner: zablerkhanahmad@gmail.com. This identifies the intended owner only; no live finance grant or configuration is implied.
 
+## Current review instructions
+
+Read the [F47 workbook](reviewer-workbook.md), [observed statements](acceptance-fixture.md), [populated recovery evidence](recovery-evidence.md), and [deployment procedure](../operations/deployment.md). The workbook provides exact accounting equations, retained-source/correction examples, a policy decision table and unfilled reviewer/date/acceptance fields. Engineering through F46 is locally verified and published separately in draft PR8. Actual human review remains pending; no company/accountant acceptance or launch is inferred. Historical entries below preserve the evidence available at each earlier milestone; use [progress](../progress.md) for the current source/CI status.
+
 ## Current evidence and scope
 
-F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29 is now locally accepted with838 checks; F30 is now locally accepted with865 checks; F31 is locally accepted with882 checks; F32 is locally accepted with902 checks; F33 is locally accepted with921 checks; F34 is locally accepted with940 checks; F35 is locally accepted with962 checks; F36 is locally accepted with985 checks; F37 is locally accepted with1,006 tests; F38 is locally accepted with1,045 tests; F39 is locally accepted with1,080 tests; F40 fiscal-year close/reversal is locally accepted with1,113 tests; F41–F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
+F01–F25 are implemented and merged through PR3, merge b83951d280361b44a57d93b8c8f01e9109096e65. Exact-head CI43584464377 passed before merge. F26 source4b0e4a6 passed fresh CI43599585247. F27 source9e23dfc passed CI43604433797. F28 reviewed cost/project result engineering is locally verified with818 checks; publication is recorded in the continuation tracker. F29 is now locally accepted with838 checks; F30 is now locally accepted with865 checks; F31 is locally accepted with882 checks; F32 is locally accepted with902 checks; F33 is locally accepted with921 checks; F34 is locally accepted with940 checks; F35 is locally accepted with962 checks; F36 is locally accepted with985 checks; F37 is locally accepted with1,006 tests; F38 is locally accepted with1,045 tests; F39 is locally accepted with1,080 tests; F40 fiscal-year close/reversal is locally accepted with1,113 tests; F41 opening imports passed fresh CI44736998016; F42 reviewed automation/recognition is locally accepted with1,178 tests. F43 combined-fixture acceptance is verified with15 new database cases and captured synthetic statements; F44 full access/file/ERP acceptance is verified with1,209 local tests; F45/F46 remain pending. This preparation does not mark F47 human review or F48 acceptance/release complete.
 
 The final pack will include tested representative statements, source-to-ledger links, dated balances, exception cases, migration/recovery evidence and outstanding decisions. No company figures, legal compliance or accountant approval are inferred from synthetic fixtures.
 
@@ -23,7 +27,7 @@ The final pack will include tested representative statements, source-to-ledger l
 | Funding classification | Capital, founder-payable and distributions are distinct source types | Pending |
 | Finance selection and owner security | Current ACTIVE Super Admin plus explicit grant; fresh verification for writes | Pending |
 | Private evidence/scanner | Separate private bucket and signed clean attestation; live scanner not configured | Pending |
-| Cutover import/reconciliation/closing | Later milestone acceptance still required | Pending |
+| Cutover import/reconciliation/closing | Engineering through reviewed opening imports is tested; actual company source file/cutover/control review remains required | Pending |
 
 ## Verified F26 synthetic example
 
@@ -180,3 +184,52 @@ Source publication and fresh GitHub verification follow separately. Earlier appl
 ## F40 publication and fresh verification — 20 November 2026
 
 F40 source **5ab1e8a5b3ccf6466c28160bca1db91a4a19bd72** is committed and pushed to **finance/f40-year-close**. [Draft PR #7](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/7) targets main and remains unmerged. [Fresh CI44593966836](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44593966836) passed for that exact source: all80 fresh migrations,1,113 tests, typing/lint,both builds and228-path API verification. The subsequent documentation-only recording preserves application/schema/tests/scripts/config source exactly. The annual browser journey passed12.3s focused and12.1s in full local regression. F41 opening imports and clearing proof is next; F41–F46 engineering, F47 human review and F48 live release remain. Hosted finance stays disabled; no actual fiscal policy/mapping/books, hosted grant or human acceptance occurred.
+
+
+## F41 reviewed cutover example
+
+A synthetic trial balance has equal debits/credits554.00. Sixteen typed positions enter normal registers once: unpaid AR100/AP60, bank200, loan principal/interest, investment carrying80 versus cost70 with2.500000 units, income receivable3, asset cost100/accumulated20, capital50/distribution10/founder15, customer advance25/supplier advance12 and settled deferred obligation16. Ordinary retained equity323 reconciles the books. Opening clearing is exactly0.00; current income/expenses are zero. Opening cash flow is opening200/closing200 with no fabricated period receipt. Follow-on ordinary collections, supplier payments, advance applications, loan repayment, half-lot disposal and first remaining-life depreciation are tested. The original UTF-8 file/hash/approval remains unchanged. These figures are acceptance data only; the owner must supply and review actual cutover books before any real import.
+
+
+## F42 reviewed automation example
+
+Two due monthly supplier obligations10.01 each create normal draft bills, not payments or posted costs. An explicit monthly prepaid recognition2.01 creates a balanced draft journal. A reviewed asset/month charge is unique even across two schedules. Expired worker leases resume with retained attempts; an old finisher cannot create another source. A revoked original grant is denied at release. Manual recovery is fresh-owner-reviewed and capped at9 total attempts.
+
+From the synthetic imported deferred obligation16.00, an evidenced delivered portion5.01 moves deferred liability to earned revenue, with no new AR/cash. A future10.99 recognition reserves the remaining capacity; an earlier competing0.01 is rejected. A later exact5.01 reversal restores that deferred portion without changing earlier reports. Imported unpaid customer/supplier credits3.01/2.01 offset explicitly reviewed opening equity, leaving original clearing0.00 and current sales/costs unchanged. Source changes require another retained owner review. These are test examples only; real obligations, delivery evidence and accounting policy remain owner decisions.
+
+
+## F43 complete representative statement set
+
+[Observed synthetic statements and assumptions](acceptance-fixture.md) include the actual captured [report JSON](acceptance-fixture.json), source/code hashes, original entry/source references, complete fixture equations and independent follow-up results. All known expected values match actual application output. The test DB was discarded after verification; these IDs are test evidence, not live books. Project cash is separately recorded from real assigned cash entries rather than inferred from contribution or forecasts. This pack still has no actual company/accountant acceptance or launch decision.
+
+
+## F44 access and source assurance
+
+[Verified permission/source matrix](../accounting/access-acceptance.md) records role, owner, feature, original-grant, lease, source, SQL and private-file boundaries. Full1,209-test local regression passes, including existing ERP workflows. Fresh F43 source608ab0a independently passed CI44769070851. Invalid operator metadata is rejected without relaxing runtime permissions or ownership protection. No actual live finance grant or human review has been performed.
+
+
+## F45 combined workflow and recoverable submission — 20 November2026
+
+F45 engineering acceptance is complete locally. The exact nine-source scenario passed the owned combined Chromium journey in19.7s: project contribution180000.00 versus recorded cash110000.00, seven bank matches, final reconciliation, reviewed period close and real frozen PDF, blocked closed-period credit with unchanged nine journals, owner reopening/superseded download, dated0.01 original-service correction, live profit179999.99, new ready private PDF and current selected-access revocation denying that existing artifact. A separate real lost-response journey passed9.3s: first POST committed201 but transport failed; unchanged retry reused its exact original key, retained one schedule and zero journals, cleared password and passed mobile/WCAG/keyboard checks. Source preparation uses actual checked services; the nine original sources were API-assisted, not all typed in the browser.
+
+57 affected owned PostgreSQL tests passed13.71s, including actual opening/recognition workflow backlinks and private wrapper ACLs. Additive84 passed true rollback rehearsal before dedicated test application; no earlier applied SQL was changed. Full351 units and both production configurations/type/lint/API/Word/private-value checks accompany publication. F44 previously passed1,209 full regression tests; the complete post-F46 suite is still pending and is not inferred from focused F45 results.
+
+F46 populated financial restore/rollback and deployment documentation, followed by the prepared F47/F48 review/release packs. Actual company policy, human acceptance, hosted financial migration/grants and activation remain unconfigured.
+
+
+## F46 populated financial recovery — 20 November2026
+
+F46 engineering is locally verified: actual custom-format backup/restore of both populated nine-source accounting books and opening/recognition/recurring history into new owned databases; every public table and security/catalog definition compared, balanced totals and original source/report bytes preserved, external signed evidence object copied separately and hash-verified. Default ACL and associative CHECK serialization differences normalize without dropping semantics. Runtime/browser raw-write/core execution remains denied after restore. Hosted targets, unowned source clusters and empty books are refused. Actual additive and faulted migration rehearsals roll back without source changes; escaping transaction aliases are rejected. Updated CI ensures PostgreSQL17 recovery clients. Deployment and rollback runbooks record exact boundaries and outstanding hosted operations.
+
+78 focused checks passed25.35s:76 owned PostgreSQL scenarios plus2 recovery unit cases. All353 units passed5.64s. Normal build/type/lint passed; prior F45 Supabase-shaped build passed.84 source migration hashes match; no applied SQL was rewritten. The complete final backend/browser regression and refreshed hosted-shaped build are still running/pending and are recorded separately, rather than inferred from focused tests.
+
+See [observed recovery evidence](recovery-evidence.md). F47 review workbook and F48 engineering release evidence/final verification remain to publish. Actual human policy acceptance, hosted staging/restore verification, real books, live grants and launch remain separate decisions.
+
+
+## F48 final local engineering acceptance and release pack — 20 November2026
+
+Final local engineering acceptance passed1,218 distinct tests:353 unit5.64s,802 actual PostgreSQL454.42s,63 Chromium4.7m. The complete browser run includes the new combined nine-source journey19.1s and lost committed-response recovery9.0s, ERP roles/HR/attendance/leave/assignments/announcements/invitations, private files/scanning/exports, mobile/keyboard/WCAG and retained correction/access boundaries. Both normal and Supabase-shaped production builds, strict TypeScript/lint,250 concrete API contracts and all84 applied source checksums pass.78 recovery-focused checks additionally passed25.35s after strengthening column/trigger/owner/grantor/index/RLS comparisons; they are included in the distinct full-suite count, not added again.
+
+PR7 is merged at a2a1814d0c9629f8840a8bf13367b27007085077. F41 e758baa, F42 f62a4fa, F43 608ab0a, F44 bb14c49, F45 c097849, F46 85072d4 and F47 review pack703cc14 were separately committed/pushed in draft PR8. CI client preparation correctionb8b2a1f reuses the existing PostgreSQL17 image. F44 exact-head CI44774304395 and F45 exact-head CI44775856017 passed. F46/F47 initial CI preparation failed on missing Ubuntu client17; failed runs remain recorded and no tests were skipped. Fresh corrected/final source CI is an independent gate, linked from PR8 checks; no success is inferred before it actually completes.
+
+Authorized engineering and review/release-pack preparation are complete. F47 actual company review/policy acceptance and F48 separate staging/live launch decision remain pending. Actual hosted finance migration/runtime-private permissions/scanner/Storage/provider restore verification, real fiscal/chart/tax/measurement/cutover choices, original opening reconciliation, live owner/grants/MFA and activation are not configured by these synthetic tests. Finance stays disabled. No real books or paid upgrade occurred.

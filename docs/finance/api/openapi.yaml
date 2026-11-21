@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Encova private finance through F30",
-    "version": "0.25.0",
+    "title": "Encova private finance API",
+    "version": "0.45.0",
     "description": "Implemented F01\u2013F18: private selected-admin accounting with owner-reviewed tax policy, net/tax invoice and purchase posting, capped original-tax credits and evidenced customer/supplier withholding in gross settlements. Default disabled, no hosted financial launch, real tax rates or legal compliance claims. See source-bound accounting and progress evidence. F19 adds private typed evidence, direct upload, quarantine, signed malware attestation, current-access bounded proxy downloads and auditable draft cleanup. Scanner configuration is operator-only; no clean fallback or live signing secrets seeded."
   },
   "security": [
@@ -24185,6 +24185,2085 @@
           }
         }
       }
+    },
+    "/api/v1/finance/openings": {
+      "get": {
+        "operationId": "opening_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningRegister"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "opening_post",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpeningCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}": {
+      "get": {
+        "operationId": "opening_id_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningDetail"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/preview": {
+      "get": {
+        "operationId": "opening_id_preview_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningPreview"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/lines": {
+      "get": {
+        "operationId": "opening_id_lines_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "TB",
+                "ITEMS"
+              ],
+              "default": "ALL"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningLines"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/source": {
+      "get": {
+        "operationId": "opening_id_source_get",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. Download exact reviewed JSON bytes with safe attachment name and x-content-sha256; current grant rechecked.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private retained JSON attachment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/post": {
+      "post": {
+        "operationId": "opening_id_post_post",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpeningPost"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/openings/{id}/void": {
+      "post": {
+        "operationId": "opening_id_void_post",
+        "description": "Private/no-store, current selected ACTIVE Super Admin reads; current Finance Owner writes with fresh provider password/MFA proof, Origin/CSRF and permanent request key. Immutable source bytes/approval retained; posted opening cannot be overwritten or voided. Typed controls populate existing subledgers without double posting; no current income or fake cash on import. Pre-cutover posting and final earlier report coverage unavailable. ",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpeningVoid"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/automation": {
+      "get": {
+        "operationId": "automation_automation_get",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RecurringRegister"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "automation_automation_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringScheduleCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/automation/{id}": {
+      "get": {
+        "operationId": "automation_automation_id_get",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RecurringSchedule"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/automation/{id}/pause": {
+      "post": {
+        "operationId": "automation_automation_id_pause_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/automation/{id}/resume": {
+      "post": {
+        "operationId": "automation_automation_id_resume_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/automation/prepare": {
+      "post": {
+        "operationId": "automation_automation_prepare_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringPrepare"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/automation/runs": {
+      "get": {
+        "operationId": "automation_automation_runs_get",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RecurringRuns"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/automation/runs/{runId}": {
+      "get": {
+        "operationId": "automation_automation_runs_runId_get",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RecurringRunDetail"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/automation/runs/{runId}/retry": {
+      "post": {
+        "operationId": "automation_automation_runs_runId_retry_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/automation/options": {
+      "get": {
+        "operationId": "automation_automation_options_get",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ASSET",
+                "DEFERRED",
+                "EQUITY"
+              ]
+            }
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Required for DEFERRED choices."
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PreparationOptions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/recognitions": {
+      "get": {
+        "operationId": "automation_recognitions_get",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RecognitionRegister"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "automation_recognitions_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecognitionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/recognitions/{id}": {
+      "get": {
+        "operationId": "automation_recognitions_id_get",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RecognitionDetail"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/recognitions/{id}/post": {
+      "post": {
+        "operationId": "automation_recognitions_id_post_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/recognitions/{id}/void": {
+      "post": {
+        "operationId": "automation_recognitions_id_void_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/recognitions/{id}/reverse": {
+      "post": {
+        "operationId": "automation_recognitions_id_reverse_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecognitionReverse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/finance/opening-credit-reviews": {
+      "get": {
+        "operationId": "automation_opening-credit-reviews_get",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "200": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OpeningCreditReviews"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "automation_opening-credit-reviews_post",
+        "description": "Private/no-store; current ACTIVE selected Super Admin reads, current Finance Owner writes. Fresh provider verification/MFA, Origin/CSRF, exact mutable version, permanent key and explicit reason required. Finance defaults disabled. Recurring work creates reviewable drafts only, with unique schedule/month, leases, bounded retries, safe private failure codes and immutable attempts. Current original grant/ownership/schedule are rechecked before issuing a draft. Recognition posts only an evidenced source with exact deferred control/revenue/event agreement and traceable dated reversal. No cash/receivable is created. Raw preparation cores are ungranted; public normal source commands retain fresh-session guards.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Configured application Origin."
+          },
+          {
+            "name": "X-Encova-CSRF",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "const": "1"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpeningCreditReviewCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "No current session"
+          },
+          "403": {
+            "description": "No current capability, Origin or fresh verification"
+          },
+          "404": {
+            "description": "Disabled feature or unavailable source"
+          },
+          "409": {
+            "description": "Version/state/capacity/relationship conflict"
+          },
+          "422": {
+            "description": "Invalid fields"
+          },
+          "429": {
+            "description": "Shared limit reached"
+          },
+          "413": {
+            "description": "Bounded request/file too large"
+          },
+          "503": {
+            "description": "Safe temporary processing error; raw CSV/SQL/provider parameters excluded"
+          },
+          "201": {
+            "description": "Private {data}.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AutomationResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -24270,6 +26349,17 @@
           "controlType": {
             "type": "string",
             "enum": [
+              "OPENING_CLEARING",
+              "INVESTMENT_INCOME_RECEIVABLE",
+              "INTEREST_RECEIVABLE",
+              "INTEREST_PAYABLE",
+              "CAPITAL",
+              "DISTRIBUTION",
+              "FOUNDER_PAYABLE",
+              "TAX_INPUT",
+              "TAX_OUTPUT",
+              "WITHHOLDING_RECEIVABLE",
+              "WITHHOLDING_PAYABLE",
               "NONE",
               "CASH",
               "RECEIVABLES",
@@ -24281,11 +26371,7 @@
               "INVESTMENT",
               "LOAN_RECEIVABLE",
               "LOAN_PAYABLE",
-              "DEFERRED_REVENUE",
-              "TAX_INPUT",
-              "TAX_OUTPUT",
-              "WITHHOLDING_RECEIVABLE",
-              "WITHHOLDING_PAYABLE"
+              "DEFERRED_REVENUE"
             ]
           },
           "currency": {
@@ -24385,6 +26471,17 @@
           "controlType": {
             "type": "string",
             "enum": [
+              "OPENING_CLEARING",
+              "INVESTMENT_INCOME_RECEIVABLE",
+              "INTEREST_RECEIVABLE",
+              "INTEREST_PAYABLE",
+              "CAPITAL",
+              "DISTRIBUTION",
+              "FOUNDER_PAYABLE",
+              "TAX_INPUT",
+              "TAX_OUTPUT",
+              "WITHHOLDING_RECEIVABLE",
+              "WITHHOLDING_PAYABLE",
               "NONE",
               "CASH",
               "RECEIVABLES",
@@ -24396,11 +26493,7 @@
               "INVESTMENT",
               "LOAN_RECEIVABLE",
               "LOAN_PAYABLE",
-              "DEFERRED_REVENUE",
-              "TAX_INPUT",
-              "TAX_OUTPUT",
-              "WITHHOLDING_RECEIVABLE",
-              "WITHHOLDING_PAYABLE"
+              "DEFERRED_REVENUE"
             ]
           },
           "currency": {
@@ -30628,6 +32721,11 @@
           "companyUnassignedDirectCosts": {
             "type": "string",
             "pattern": "^-?[0-9]+\\.[0-9]{2}$"
+          },
+          "cashMovement": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$",
+            "description": "Actual dated bank/cash journal debit minus credit explicitly tagged to this project. Includes only recorded project cash, without inferring shared or unassigned movements; distinct from contribution/forecast."
           }
         },
         "required": [
@@ -30638,7 +32736,8 @@
           "contribution",
           "fullyAllocatedResult",
           "companyUnallocatedOverhead",
-          "companyUnassignedDirectCosts"
+          "companyUnassignedDirectCosts",
+          "cashMovement"
         ]
       },
       "BudgetLineInput": {
@@ -33216,6 +35315,615 @@
       "FiscalYearResult": {
         "type": "object",
         "description": "Private {id:yearId,version,state,closeId,closeVersion,sequence,journalId,reversalJournalId}; nullable journal for zero remaining balances. No fake zero-value posting."
+      },
+      "OpeningCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "maxLength": 160,
+            "pattern": "\\.json$"
+          },
+          "sourceText": {
+            "type": "string",
+            "maxLength": 180000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "fileName",
+          "sourceText",
+          "reason",
+          "reauth"
+        ],
+        "description": "Exact reviewed UTF-8 JSON, at most180KB; formatVersion1, PKR, explicit cutover/clearing/evidence; 2–200 single-sided TB rows, 0–200 typed items. See opening-balances.md for kind-specific mappings. Strict fields and numeric strings. Staging never posts."
+      },
+      "OpeningPost": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "basisHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "reviewEvidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "basisHash",
+          "reviewEvidence",
+          "reason",
+          "reauth"
+        ],
+        "description": "Current owner fresh proof and exact preview basis; first OPEN date, empty ledger, one cutover, balanced TB and exact typed controls. Atomically posts source/GL once, reconciles zero clearing and retains approval/source/journal digest."
+      },
+      "OpeningVoid": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "OpeningRegister": {
+        "type": "object",
+        "description": "Private items,total,page,pages,canManage; 25 batches per page. Immutable source hash, cutover, state, version and approver."
+      },
+      "OpeningDetail": {
+        "type": "object",
+        "description": "Private retained batch configuration/evidence/state/proof, lineCount,journalCount,canManage. Posted proof includes exact expected/posted/difference per account, clearingBalance,journalDigest and original sourceHash."
+      },
+      "OpeningPreview": {
+        "type": "object",
+        "description": "Private ready,balanced,debits,credits,mappingIssueCount,issues,controls,ledgerEmpty,cutoverIsFirstOpenDate,basisHash,version,canManage. Exact money strings."
+      },
+      "OpeningLines": {
+        "type": "object",
+        "description": "Private 25-item source row page; total,page,pages,canManage. Original dates/reference/kind, exact amounts, cash side and posted journal links."
+      },
+      "OpeningResult": {
+        "type": "object",
+        "description": "Private id,version,state,sourceHash. Permanent idempotency; exact-file replay returns retained source."
+      },
+      "RecurringScheduleCreate": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "startMonth": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+              },
+              "endMonth": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "day": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 28
+              },
+              "evidence": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 1000
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              },
+              "kind": {
+                "const": "BILL"
+              },
+              "template": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  },
+                  "partyId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "payableAccountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "costAccountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,13})(\\.[0-9]{1,2})?$"
+                  },
+                  "dueDays": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 90
+                  },
+                  "projectId": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "description",
+                  "partyId",
+                  "payableAccountId",
+                  "costAccountId",
+                  "amount",
+                  "dueDays"
+                ],
+                "description": "Positive fixed one-unit supplier rate, no assumed tax. Original bill needs independent document review before post."
+              }
+            },
+            "required": [
+              "name",
+              "startMonth",
+              "day",
+              "evidence",
+              "reason",
+              "reauth",
+              "kind",
+              "template"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "startMonth": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+              },
+              "endMonth": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "day": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 28
+              },
+              "evidence": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 1000
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              },
+              "kind": {
+                "const": "JOURNAL"
+              },
+              "template": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  },
+                  "debitAccountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "creditAccountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$"
+                  },
+                  "projectId": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "description",
+                  "debitAccountId",
+                  "creditAccountId",
+                  "amount"
+                ],
+                "description": "Positive explicit amount; two distinct active ordinary accounts, no cash or protected controls/mapped annual retained account. Independent reviewed posting required."
+              }
+            },
+            "required": [
+              "name",
+              "startMonth",
+              "day",
+              "evidence",
+              "reason",
+              "reauth",
+              "kind",
+              "template"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "startMonth": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+              },
+              "endMonth": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "day": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 28
+              },
+              "evidence": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 1000
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 500
+              },
+              "reauth": {
+                "$ref": "#/components/schemas/Reauthentication"
+              },
+              "kind": {
+                "const": "DEPRECIATION"
+              },
+              "template": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  },
+                  "assetId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "expenseAccountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "accumulatedAccountId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "description",
+                  "assetId",
+                  "expenseAccountId",
+                  "accumulatedAccountId"
+                ],
+                "description": "Reviewed registered asset policy; reuses existing unique asset/month generation. Never automatically posts a charge."
+              }
+            },
+            "required": [
+              "name",
+              "startMonth",
+              "day",
+              "evidence",
+              "reason",
+              "reauth",
+              "kind",
+              "template"
+            ]
+          }
+        ]
+      },
+      "RecurringChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "reason",
+          "reauth"
+        ]
+      },
+      "RecurringPrepare": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "reason",
+          "reauth"
+        ],
+        "description": "Current owner fresh verification. Bounded due draft queue; worker may prepare at most three per pass. Durable job remains visible on interruption."
+      },
+      "RecognitionCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "invoiceLineId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,2})?$"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "invoiceLineId",
+          "postingDate",
+          "amount",
+          "description",
+          "evidence",
+          "reason",
+          "reauth"
+        ],
+        "description": "Positive evidenced delivered portion of a posted DEFERRED invoice line. Draft creates no GL/AR/cash. Posting independently checks current and future remaining deferred capacity."
+      },
+      "RecognitionReverse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "postingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "expectedVersion",
+          "postingDate",
+          "reason",
+          "reauth"
+        ],
+        "description": "Exact dated opposite; on/after original and within open posting boundaries; original history retained."
+      },
+      "OpeningCreditReviewCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "CUSTOMER",
+              "SUPPLIER"
+            ]
+          },
+          "documentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "offsetAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "reauth": {
+            "$ref": "#/components/schemas/Reauthentication"
+          }
+        },
+        "required": [
+          "side",
+          "documentId",
+          "expectedVersion",
+          "offsetAccountId",
+          "evidence",
+          "reason",
+          "reauth"
+        ],
+        "description": "Owner reviews exact DRAFT credit against imported unpaid AR/AP and an active ordinary EQUITY offset. Immutable input basis; changing draft requires another review. Posting-created tax/settlement splits are independently validated, not part of the reviewed input hash. No current revenue/cost or opening clearing offset."
+      },
+      "RecurringRegister": {
+        "type": "object",
+        "description": "Private items,total,page,pages,canManage;25 records/page. Schedule immutable original template/policy/month range; owner pause/resume retains history and original grant epoch."
+      },
+      "RecurringSchedule": {
+        "type": "object",
+        "description": "Private schedule and25 monthly preparation records,total/page/pages/canManage. No raw grant or lease tokens."
+      },
+      "RecurringRuns": {
+        "type": "object",
+        "description": "Private25-run page: schedule/month/date,state/version,attempts/budget,output source id/type,errorCode,createdAt. No raw grant or lease tokens."
+      },
+      "RecurringRunDetail": {
+        "type": "object",
+        "description": "Private run,at most9 immutable attempts,canManage. Outcomes RUNNING/READY/FAILED/EXPIRED/CANCELLED. Stale finishers cannot issue drafts; requester, original grant and current ownership are checked at claim and release."
+      },
+      "RecognitionRegister": {
+        "type": "object",
+        "description": "Private25-source page,total/page/pages,canManage. Exact string amounts, original/effective dates/evidence/state/version/journal/reversal links."
+      },
+      "RecognitionDetail": {
+        "type": "object",
+        "description": "Private item,remainingDeferred exact string across this and future dates,canManage; retained creator/poster/reverser and original/opposite journals."
+      },
+      "PreparationOptions": {
+        "type": "object",
+        "description": "Private25 ASSET/DEFERRED/EQUITY choices,total/page/pages/canManage. Deferred choices need explicit asOf date and remaining eligible balance; original source references retained."
+      },
+      "OpeningCreditReviews": {
+        "type": "object",
+        "description": "Private25 retained review records,total/page/pages,canManage. Exact document/offset/basis/evidence/actor/time. No mutation of earlier reviews."
+      },
+      "AutomationResult": {
+        "type": "object",
+        "description": "Private id,version,state/queued or journalId/reviewId as applicable. Permanent command receipt; repeated passes retain one source per schedule/month and never automatically post."
       }
     }
   }
