@@ -33,7 +33,10 @@
     "verify:hosted-recovery": "tsx scripts/verify-hosted-recovery.ts",
     "finance:scanner": "tsx --conditions=react-server scripts/finance/configure-scanner.ts",
     "finance:evidence:cleanup": "tsx --conditions=react-server scripts/finance/cleanup-evidence.ts",
-    "finance:exports": "tsx --conditions=react-server scripts/finance/process-exports.ts"
+    "finance:exports": "tsx --conditions=react-server scripts/finance/process-exports.ts",
+    "finance:demo": "tsx --conditions=react-server scripts/finance/demo.ts",
+    "finance:demo:verify": "tsx scripts/finance/verify-demo.ts",
+    "finance:demo:stop": "tsx scripts/finance/stop-demo.ts"
   },
   "keywords": [],
   "author": "",

@@ -843,3 +843,7 @@ fieldset {
 .money-cell { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .account-picker { min-width: 0; }
 .finance-drawer button[aria-pressed="true"] { background: #225d49; color: #fff; }
+
+.finance-demo-banner { padding: 12px 24px; background: #fff4ce; color: #503d00; border-bottom: 1px solid #d8bf64; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+.finance-demo-banner nav { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.finance-demo-banner a { text-decoration: underline; font-weight: 600; }

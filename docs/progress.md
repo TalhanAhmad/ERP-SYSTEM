@@ -1,8 +1,8 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-21 (Asia/Karachi)
+Last updated: 2026-11-22 (Asia/Karachi)
 
-Finance extension: F01–F46 engineering and F47/F48 review/release packs are merged through PR8, merge 62128ee. Final PR and merged-main CI passed; [main CI 44882423627](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44882423627) verified the full suite and both builds. Prior local acceptance: 1,218 tests, 250 API contracts and 84 checksums. [Concise report](finance/Encova_Final_Engineering_Report.docx) and [finance progress](finance/progress.md) record publication and next-phase choices. The live Vercel URL still serves its earlier READY deployment; no finance activation or hosted changes were performed. Human policy acceptance and isolated demo/real company setup remain.
+Finance extension: F01–F46 engineering and F47/F48 review/release packs are merged through PR8, merge 62128ee. Final PR and merged-main CI passed; [main CI 44882423627](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44882423627) verified the full suite and both builds. Prior local acceptance: 1,218 tests, 250 API contracts and 84 checksums. [Concise report](finance/Encova_Final_Engineering_Report.docx) and [finance progress](finance/progress.md) record publication and next-phase choices. The live Vercel URL still serves its earlier READY deployment; no finance activation or hosted changes were performed. The owner-selected isolated finance demo is delivered locally; see [demo guide](finance/review/isolated-demo.md) and [Word report](finance/Encova_Isolated_Demo_Report.docx). Human policy acceptance and hosted finance setup remain.
 
 - Total proposed learning days: 60
 - Completed learning days: 0 — no learner demonstration has been recorded

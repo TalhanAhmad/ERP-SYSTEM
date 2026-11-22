@@ -53,3 +53,8 @@ PR #8 merged into main on 21 November 2026 at 12:54:56 Asia/Karachi, merge 62128
 Read-only Vercel inspection found the canonical workspace still points to READY production deployment dpl_2SSKGD2xS2jojkBuHhoqN6xjLCa4, created before this merge. Vercel returned no source commit metadata, so this is not proof of a deployment of merged main. Public checks: /login 200 with the sign-in form; anonymous /dashboard 307 to /login; anonymous /api/v1/finance/status 401 UNAUTHENTICATED. The 401 proves authentication is required, not the finance feature flag, schema, grants or readiness. No hosted migrations, deployment, environment changes, grants or financial activation were performed during this post-merge pass.
 
 F01–F46 engineering and the F47/F48 review/release packs are complete and merged. Actual company policy/reviewer acceptance and a separate finance staging/live setup remain. The next phase needs the user choice between an isolated synthetic finance demo and real company setup; this choice is pending. No company accounting decisions or test data are silently adopted for live books.
+
+
+## Local review demo — 22 November 2026
+
+Talha selected the isolated synthetic finance demo and then chose to keep it local after Supabase rejected a separate free project for account capacity. The persistent six-role local demo is delivered; [guide and actual verification](isolated-demo.md) record the link, private credential location, sample statements, start/stop commands and limits. No hosted finance activation, real books/policy acceptance or paid upgrade occurred. Human company review and any future hosted finance setup remain pending.

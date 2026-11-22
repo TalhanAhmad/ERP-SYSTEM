@@ -20,6 +20,10 @@ export const runtimeSchema = z
     APP_URL: z.url().optional(),
     FINANCE_SCANNER_URL: z.url().optional(),
     FINANCE_SCANNER_SECRET: z.string().min(32).optional(),
+    FINANCE_DEMO: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((v) => v === "true"),
     FINANCE_ENABLED: z
       .enum(["true", "false"])
       .default("false")

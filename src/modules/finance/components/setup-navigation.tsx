@@ -1,7 +1,22 @@
 import Link from "next/link";
+import { env } from "@/server/env";
 export function FinanceNavigation() {
   return (
     <nav aria-label="Finance navigation" className="form-actions">
+      {env.FINANCE_DEMO && (
+        <>
+          <Link href="/finance/reports/trial-balance?from=2020-01-01&to=2020-01-31">
+            Demo January 2020 trial balance
+          </Link>
+          <Link href="/finance/reports/profit-loss?from=2020-01-01&to=2020-01-31">
+            Demo January 2020 profit and loss
+          </Link>
+          <Link href="/finance/reports/balance-sheet?asOf=2020-01-31">
+            Demo January 2020 balance sheet
+          </Link>
+        </>
+      )}
+
       <Link href="/finance">Finance</Link>
       <Link href="/finance/reports/general-ledger">General ledger</Link>
       <Link href="/finance/reports/trial-balance">Trial balance</Link>

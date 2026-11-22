@@ -233,3 +233,8 @@ Final local engineering acceptance passed 1,218 distinct tests:353 unit5.64s,802
 PR7 is merged at a2a1814d0c9629f8840a8bf13367b27007085077. F41 e758baa, F42 f62a4fa, F43 608ab0a, F44 bb14c49, F45 c097849, F46 85072d4 and F47 review pack703cc14 were separately committed/pushed in draft PR8. CI client preparation correctionb8b2a1f reuses the existing PostgreSQL17 image. F44 exact-head CI44774304395 and F45 exact-head CI44775856017 passed. F46/F47 initial CI preparation failed on missing Ubuntu client17; failed runs remain recorded and no tests were skipped. Fresh corrected/final source CI is an independent gate, linked from PR8 checks; no success is inferred before it actually completes.
 
 Authorized engineering and review/release-pack preparation are complete. F47 actual company review/policy acceptance and F48 separate staging/live launch decision remain pending. Actual hosted finance migration/runtime-private permissions/scanner/Storage/provider restore verification, real fiscal/chart/tax/measurement/cutover choices, original opening reconciliation, live owner/grants/MFA and activation are not configured by these synthetic tests. Finance stays disabled. No real books or paid upgrade occurred.
+
+
+## Local review demo — 22 November 2026
+
+Talha selected the isolated synthetic finance demo and then chose to keep it local after Supabase rejected a separate free project for account capacity. The persistent six-role local demo is delivered; [guide and actual verification](isolated-demo.md) record the link, private credential location, sample statements, start/stop commands and limits. No hosted finance activation, real books/policy acceptance or paid upgrade occurred. Human company review and any future hosted finance setup remain pending.
