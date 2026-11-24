@@ -1,6 +1,6 @@
 {
   "kind": "ISOLATED_SYNTHETIC_DEMO",
-  "at": "2026-11-22T16:05:41.821Z",
+  "at": "2026-11-24T12:45:27.250Z",
   "url": "http://localhost:49278",
   "scenarios": [
     "Owner: isolated cookies, exact actual statements, normal draft/void, private CSV/PDF hashes, mobile/WCAG/keyboard",

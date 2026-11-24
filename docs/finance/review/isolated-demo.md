@@ -1,6 +1,6 @@
 # Encova isolated finance demo
 
-Delivered 22 November 2026, Asia/Karachi. Talha chose the isolated synthetic demo and then explicitly chose to keep it local after hosted capacity was unavailable. This is a separate review environment; the existing Vercel ERP and intended real Finance Owner are unchanged.
+Delivered 22 November 2026; reverified 24 November 2026, Asia/Karachi. Talha chose the isolated synthetic demo and then explicitly chose to keep it local after hosted capacity was unavailable. This is a separate review environment; the existing Vercel ERP and intended real Finance Owner are unchanged.
 
 ## Open and sign in
 
@@ -65,7 +65,9 @@ A separate free Encova Finance Demo organization was created, but Supabase rejec
 
 Corrected and reran actual failures: required NODE_ENV typing; an already-seeded CompanySettings singleton (changed to upsert before financial seeding); six invalid Next page re-exports with an extra resource prop (proper page wrappers now pass the resource); and local legacy auth permissions scoped to the verified owned database. A verifier was initially run before readiness. A later export verifier incorrectly assumed HTTP 201; the existing contract is HTTP 202 Accepted. It now asserts that contract and verifies the real resulting ready page and file bytes. No product financial assertion, migration checksum, hosted permission or final-export readiness control was bypassed.
 
-These are observed targeted results, not a claim that the entire previous 1,218-test suite was rerun for this change. Fresh branch CI is tracked separately after publication. F47 actual company review and F48 live setup remain pending; this demo does not create company policy acceptance.
+The full fresh Linux [CI run 45042106142](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/45042106142) passed on exact source 9ec43c74cbea94c80c4b4b38b41057be64db0204: all 1,227 distinct tests (358 unit in 10.25 seconds, 806 actual PostgreSQL integration in 729.55 seconds, and 63 Chromium in 7.5 minutes), 84 fresh migrations, strict types/lint, both production builds and 250 API/documentation contracts. This full-suite evidence is separate from the targeted local results above; overlapping checks are not added twice.
+
+On 24 November, all seven actual running-demo browser/security scenarios passed again and the login page returned HTTP 200. Nine posted sources and exact baseline statements remain unchanged. [PR #9](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/9) is open as a draft and has not been merged. F47 actual company review and F48 live setup remain pending; this demo does not create company policy acceptance.
 
 ## Mobile review evidence
 
