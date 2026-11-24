@@ -1,2 +1,5 @@
+import { NewReceipt } from "@/modules/finance/components/customer-pages";
 export const dynamic = "force-dynamic";
-export { NewReceipt as default } from "@/modules/finance/components/customer-pages";
+export default function Page() {
+  return NewReceipt({ resource: "RECEIPT" });
+}

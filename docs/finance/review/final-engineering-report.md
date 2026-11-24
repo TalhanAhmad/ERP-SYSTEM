@@ -45,3 +45,13 @@ Authorized engineering and review/release-pack preparation are complete. F47 act
 Read [review workbook](reviewer-workbook.md) and fill reviewer/date/company policies/gaps. Read [release decision](release-decision.md), [recovery evidence](recovery-evidence.md) and [deployment/rollback runbook](../operations/deployment.md). The current source/CI status is available in [progress](../progress.md) and PR8 checks. Only actual reviewed decisions and staging evidence can close the remaining human gates.
 
 The full step-by-step history remains in [work log](../../work-log.md), [full Word report](../../Encova_Progress_Report.docx), [F26–F48 Word report](../Encova_F26-F48_Report.docx) and the individual milestone records. No effort hours or learner demonstrations were fabricated.
+
+
+## Local review demo — 22 November 2026
+
+Talha selected the isolated synthetic finance demo and then chose to keep it local after Supabase rejected a separate free project for account capacity. The persistent six-role local demo is delivered; [guide and actual verification](isolated-demo.md) record the link, private credential location, sample statements, start/stop commands and limits. No hosted finance activation, real books/policy acceptance or paid upgrade occurred. Human company review and any future hosted finance setup remain pending.
+
+
+## Demo publication verified — 24 November 2026
+
+[Draft PR #9](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/9) contains pushed source 9ec43c74cbea94c80c4b4b38b41057be64db0204. [Fresh Linux CI45042106142](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/45042106142) passed all 1,227 distinct tests (358 unit, 806 PostgreSQL, 63 Chromium),84 fresh migrations,types/lint,both production builds and250 API/documentation contracts. All seven actual persistent-demo browser/security scenarios passed again on 24 November; its login returned200 and nine posted sample sources remain unchanged. No application/schema change was needed in this follow-up. PR9 remains unmerged; local-only scope and actual company-review/hosted-setup gates remain unchanged.

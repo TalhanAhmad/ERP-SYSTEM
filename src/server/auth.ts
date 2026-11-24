@@ -33,7 +33,10 @@ function createLegacyAuth() {
       window: 60,
       max: 30,
     },
-    advanced: { database: { generateId: () => crypto.randomUUID() } },
+    advanced: {
+      ...(env.FINANCE_DEMO ? { cookiePrefix: "encova-finance-demo" } : {}),
+      database: { generateId: () => crypto.randomUUID() },
+    },
   });
 }
 let instance: ReturnType<typeof createLegacyAuth> | undefined;

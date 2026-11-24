@@ -49,3 +49,8 @@ F01–F05 implementation acceptance is complete: 5/48 finance milestones, 43 rem
 ## Finance through F10 — 12 November 2026
 
 F01–F10 engineering acceptance is complete: 10/48 finance groups,38 remaining. Ordinary journal posting/reversal/idempotency, database balancing/immutability, dated core subset, shared accessible registers/drawer editing, parties/cash mappings and complete parent search are implemented. 488 distinct local tests: 185 unit, 275 real PostgreSQL integration and 28 Chromium browser. Strict typing/lint and both local/Supabase-mode production builds passed. Test schema has27 migrations; hosted ERP keeps17 with finance disabled. No company books, credential change, hosted migration/grant, merge or deployment occurs. Publication/clean CI follows in the focused finance results. Original ERP/learning progress is unchanged. Next F11: earned/deferred invoices.
+
+
+## Local review demo — 22 November 2026
+
+Talha selected the isolated synthetic finance demo and then chose to keep it local after Supabase rejected a separate free project for account capacity. The persistent six-role local demo is delivered; [guide and actual verification](../finance/review/isolated-demo.md) record the link, private credential location, sample statements, start/stop commands and limits. No hosted finance activation, real books/policy acceptance or paid upgrade occurred. Human company review and any future hosted finance setup remain pending.

@@ -1,2 +1,5 @@
+import { NewPayment } from "@/modules/finance/components/supplier-pages";
 export const dynamic = "force-dynamic";
-export { NewPayment as default } from "@/modules/finance/components/supplier-pages";
+export default function Page() {
+  return NewPayment({ resource: "PAYMENT" });
+}
