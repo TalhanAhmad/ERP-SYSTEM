@@ -55,3 +55,10 @@ Talha selected the isolated synthetic finance demo and then chose to keep it loc
 ## Demo publication verified — 24 November 2026
 
 [Draft PR #9](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/9) contains pushed source 9ec43c74cbea94c80c4b4b38b41057be64db0204. [Fresh Linux CI45042106142](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/45042106142) passed all 1,227 distinct tests (358 unit, 806 PostgreSQL, 63 Chromium),84 fresh migrations,types/lint,both production builds and250 API/documentation contracts. All seven actual persistent-demo browser/security scenarios passed again on 24 November; its login returned200 and nine posted sample sources remain unchanged. No application/schema change was needed in this follow-up. PR9 remains unmerged; local-only scope and actual company-review/hosted-setup gates remain unchanged.
+
+
+## Merged demo handoff — 25 November 2026
+
+PR #9 merged into main on 24 November 2026 at 22:13:15 Asia/Karachi, commit 9b96866a9142edc0f8f52061c7a7deb34f8bc2c2. Its final PR source b667d2d passed CI45397129257 before merge. [Post-merge CI45446116853](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/45446116853) passed all required steps: 84 fresh migrations, TypeScript/lint, the complete unit/PostgreSQL/Chromium suites, both production builds and 250 API/documentation contracts. The merged file tree exactly matches the tested final PR source. No application/schema changes were needed in this handoff.
+
+The retained local login returned HTTP 200 on 25 November; the last full seven-scenario local browser/security run passed on 24 November. [The review workbook](reviewer-workbook.md) now provides a short local statement/export/role walkthrough. Actual human review/company policy fields and future hosted finance setup remain pending. Hosting stays local; this handoff changes no production service, grant, provider setting or financial record.

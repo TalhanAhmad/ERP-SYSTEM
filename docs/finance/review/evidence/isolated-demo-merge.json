@@ -1,0 +1,16 @@
+{
+  "observedOn": "2026-11-25",
+  "timezone": "Asia/Karachi",
+  "pr": 9,
+  "state": "MERGED",
+  "mergeCommit": "9b96866a9142edc0f8f52061c7a7deb34f8bc2c2",
+  "mergedAt": "2026-11-24T17:13:15Z",
+  "finalPrSource": "b667d2d02ce659a35b341d3e1b7e532a98dc3de7",
+  "postMergeCI": "https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/45446116853",
+  "postMergeConclusion": "success",
+  "sameTestedPrTree": true,
+  "localLoginStatus": 200,
+  "latestSevenScenarioLocalRun": "2026-11-24",
+  "hosting": "LOCAL_ONLY",
+  "companyReview": "PENDING"
+}

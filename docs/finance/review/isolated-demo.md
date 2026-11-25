@@ -1,6 +1,6 @@
 # Encova isolated finance demo
 
-Delivered 22 November 2026; reverified 24 November 2026, Asia/Karachi. Talha chose the isolated synthetic demo and then explicitly chose to keep it local after hosted capacity was unavailable. This is a separate review environment; the existing Vercel ERP and intended real Finance Owner are unchanged.
+Delivered 22 November 2026; browser/security verification 24 November and merged-main verification 25 November 2026, Asia/Karachi. Talha chose the isolated synthetic demo and then explicitly chose to keep it local after hosted capacity was unavailable. This is a separate review environment; the existing Vercel ERP and intended real Finance Owner are unchanged.
 
 ## Open and sign in
 
@@ -67,7 +67,13 @@ Corrected and reran actual failures: required NODE_ENV typing; an already-seeded
 
 The full fresh Linux [CI run 45042106142](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/45042106142) passed on exact source 9ec43c74cbea94c80c4b4b38b41057be64db0204: all 1,227 distinct tests (358 unit in 10.25 seconds, 806 actual PostgreSQL integration in 729.55 seconds, and 63 Chromium in 7.5 minutes), 84 fresh migrations, strict types/lint, both production builds and 250 API/documentation contracts. This full-suite evidence is separate from the targeted local results above; overlapping checks are not added twice.
 
-On 24 November, all seven actual running-demo browser/security scenarios passed again and the login page returned HTTP 200. Nine posted sources and exact baseline statements remain unchanged. [PR #9](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/9) is open as a draft and has not been merged. F47 actual company review and F48 live setup remain pending; this demo does not create company policy acceptance.
+On 24 November, all seven actual running-demo browser/security scenarios passed again and the login page returned HTTP 200. Nine posted sources and exact baseline statements remain unchanged. [PR #9](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/9) is now merged; see the merged-main verification below. F47 actual company review and F48 live setup remain pending; this demo does not create company policy acceptance.
+
+## Merged-main handoff — 25 November 2026
+
+PR #9 merged into main on 24 November 2026 at 22:13:15 Asia/Karachi, commit 9b96866a9142edc0f8f52061c7a7deb34f8bc2c2. Its final PR source b667d2d passed CI45397129257 before merge. [Post-merge CI45446116853](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/45446116853) passed all required steps: 84 fresh migrations, TypeScript/lint, the complete unit/PostgreSQL/Chromium suites, both production builds and 250 API/documentation contracts. The merged file tree exactly matches the tested final PR source. No application/schema changes were needed in this handoff.
+
+On 25 November the retained local login returned HTTP 200. The most recent seven-scenario browser/security verification remains the passing 24 November run; it was not repeated for these documentation-only changes. Use the walkthrough in [the review workbook](reviewer-workbook.md) to inspect the demo. Actual reviewer decisions remain unfilled.
 
 ## Mobile review evidence
 

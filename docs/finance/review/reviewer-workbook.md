@@ -2,6 +2,18 @@
 
 Prepared at the user's request for their review, rather than claiming accountant acceptance. Intended Finance Owner: zablerkhanahmad@gmail.com. Actual company figures, policy choices, reviewer/date/signature and live grants remain pending.
 
+## Review the local demo
+
+The isolated demo is available at http://localhost:49278/login on this Mac. Sign in as finance.owner@example.test using the private initial credential in `.local/finance-demo/logins.json`. This walkthrough uses January 2020 synthetic records and does not approve company policies.
+
+1. Open [January profit and loss](http://localhost:49278/finance/reports/profit-loss?from=2020-01-01&to=2020-01-31). Compare earned revenue 300000.00, contractor cost 120000.00 and profit 180000.00 with the original invoice and bill from their source registers.
+2. Open [the balance sheet](http://localhost:49278/finance/reports/balance-sheet?asOf=2020-01-31). Check assets 785000.00 equal liabilities 105000.00 plus equity 680000.00. Bank 575000.00 differs from earned profit because receipt/payment timing and asset/financing movements are separate.
+3. Open [the trial balance](http://localhost:49278/finance/reports/trial-balance?from=2020-01-01&to=2020-01-31). Compare debit and credit turnover of 1445000.00 each. Use the existing source/journal links to inspect the nine posted sample sources.
+4. Open [report exports](http://localhost:49278/finance/exports) to inspect an existing REVIEW copy and its private CSV/PDF. FINAL issuance remains blocked while readiness is incomplete. Viewing/downloading an existing copy does not post a transaction.
+5. Sign out and compare the selected administrator with the unselected administrator, HR, Team Lead and Member accounts from the private login file. Selected admin can read finance; the four unselected/lower-role accounts have no finance navigation or authorized finance page/artifact access.
+
+Record any desired interface/workflow changes with the page, role, steps and expected result. Fill the review record below only after your own review. The example chart, fiscal dates and tax-free sample transactions do not establish real company choices. Email/external file storage remain unconnected; hosted finance setup stays deferred at the owner's request. See [the complete local guide](isolated-demo.md) for start/stop, persistence and safe verification boundaries.
+
 ## Read these representative statements
 
 [Observed acceptance statements](acceptance-fixture.md) and [machine-readable evidence](acceptance-fixture.json) come from nine actual posted synthetic sources with zero opening, PKR currency, no tax, no January depreciation and explicit cash classifications. They are examples to review, not company books.
