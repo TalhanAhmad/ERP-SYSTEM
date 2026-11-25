@@ -2,6 +2,10 @@
 
 Delivered 22 November 2026; browser/security verification 24 November and merged-main verification 25 November 2026, Asia/Karachi. Talha chose the isolated synthetic demo and then explicitly chose to keep it local after hosted capacity was unavailable. This is a separate review environment; the existing Vercel ERP and intended real Finance Owner are unchanged.
 
+## Usability update — 26 November 2026
+
+The running local demo now includes Finance overview, grouped searchable navigation and date-preserving statement links. See [the usability review](usability-review.md) and [Word report](../Encova_Finance_Usability_Report.docx) for the measured desktop/mobile changes, actual checks and publication status. Accounts, passwords and books are retained; this UI source is on finance/usability-review and is not yet merged.
+
 ## Open and sign in
 
 Open http://localhost:49278/login on this Mac. Use finance.owner@example.test for the Finance Owner. Initial passwords for all six accounts are in the private local file `.local/finance-demo/logins.json`; they are excluded from Git and this report. Do not use the live ERP credentials here.

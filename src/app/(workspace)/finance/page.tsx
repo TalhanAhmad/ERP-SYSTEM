@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { FinanceNavigation } from "@/modules/finance/components/setup-navigation";
+import { financeSections } from "@/modules/finance/components/navigation-links";
 import { notFound } from "next/navigation";
 import { context } from "@/server/context";
 import { AppError } from "@/server/errors";
@@ -20,33 +22,35 @@ export default async function FinancePage() {
   }
   return (
     <section>
+      <FinanceNavigation />
       <p className="eyebrow">FINANCE · PKR</p>
-      <h1>Finance setup</h1>
-      <div className="panel">
-        <h2>Ledger and accounting setup</h2>
-        <p>
-          <Link href="/finance/journals">Journal register</Link> ·{" "}
-          <Link href="/finance/accounts">Chart of accounts</Link> ·{" "}
-          <Link href="/finance/periods">Accounting periods</Link>
-        </p>
-        <p>
-          Review invoices, record client receipts, apply held funds and manage
-          credit notes or refunds.
-        </p>
-        <p>
-          <Link href="/finance/invoices">Invoices</Link> ·{" "}
-          <Link href="/finance/receipts">Client receipts</Link> ·{" "}
-          <Link href="/finance/advance-applications">Apply client funds</Link> ·{" "}
-          <Link href="/finance/customer-credits">Credit notes</Link> ·{" "}
-          <Link href="/finance/customer-refunds">Client refunds</Link>
-        </p>
-        <Link href="/dashboard" className="button secondary">
-          Back to workspace
-        </Link>
-        <p>
-          <Link href="/finance/access">Finance access and ownership</Link>
-        </p>
+      <h1>Finance overview</h1>
+      <p>Find daily transactions, financial reports and accounting settings.</p>
+      <div className="finance-section-grid">
+        {financeSections.map((section) => (
+          <section
+            className="panel finance-section-card"
+            key={section.label}
+            aria-label={section.label}
+          >
+            <h2>{section.label}</h2>
+            <p>{section.description}</p>
+            <ul>
+              {section.links.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} prefetch={false}>
+                    {link.label}
+                    <span aria-hidden="true"> →</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
       </div>
+      <Link href="/dashboard" className="button secondary">
+        Back to workspace
+      </Link>
     </section>
   );
 }

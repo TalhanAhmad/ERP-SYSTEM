@@ -1,76 +1,7 @@
-import Link from "next/link";
 import { env } from "@/server/env";
+import { FinanceNavigationMenu } from "./navigation-menu";
 export function FinanceNavigation() {
-  return (
-    <nav aria-label="Finance navigation" className="form-actions">
-      {env.FINANCE_DEMO && (
-        <>
-          <Link href="/finance/reports/trial-balance?from=2020-01-01&to=2020-01-31">
-            Demo January 2020 trial balance
-          </Link>
-          <Link href="/finance/reports/profit-loss?from=2020-01-01&to=2020-01-31">
-            Demo January 2020 profit and loss
-          </Link>
-          <Link href="/finance/reports/balance-sheet?asOf=2020-01-31">
-            Demo January 2020 balance sheet
-          </Link>
-        </>
-      )}
-
-      <Link href="/finance">Finance</Link>
-      <Link href="/finance/reports/general-ledger">General ledger</Link>
-      <Link href="/finance/reports/trial-balance">Trial balance</Link>
-      <Link href="/finance/reports/roll-forwards/PROJECTS">
-        Roll-forward reports
-      </Link>
-      <Link href="/finance/reports/receivables-ageing">Receivables ageing</Link>
-      <Link href="/finance/reports/payables-ageing">Payables ageing</Link>
-      <Link href="/finance/reports/cash-flow">Direct cash flow</Link>
-      <Link href="/finance/reports/profit-loss">Profit and loss</Link>
-      <Link href="/finance/reports/balance-sheet">Balance sheet</Link>
-      <Link href="/finance/exports">Report exports</Link>
-      <Link href="/finance/report-settings">Statement presentation</Link>
-      <Link href="/finance/projects">Commercial projects</Link>
-      <Link href="/finance/cost-allocations">Cost allocations</Link>
-      <Link href="/finance/budgets">Budgets</Link>
-      <Link href="/finance/forecasts">Cash forecasts</Link>
-      <Link href="/finance/statements">Bank statements</Link>
-      <Link href="/finance/bank-matches">Bank matching</Link>
-      <Link href="/finance/reconciliations">Bank reconciliations</Link>
-      <Link href="/finance/customer-credits">Credits</Link>
-      <Link href="/finance/customer-refunds">Refunds</Link>
-      <Link href="/finance/receipt-unallocations">Settlement releases</Link>
-      <Link href="/finance/advance-applications">Apply advances</Link>
-      <Link href="/finance/receipts">Receipts</Link>
-      <Link href="/finance/supplier-payments">Supplier payments</Link>
-      <Link href="/finance/supplier-applications">Supplier advances</Link>
-      <Link href="/finance/supplier-credits">Supplier credits</Link>
-      <Link href="/finance/supplier-refunds">Supplier refunds</Link>
-      <Link href="/finance/supplier-releases">Payment releases</Link>
-      <Link href="/finance/assets">Fixed assets</Link>
-      <Link href="/finance/asset-movements">Asset movements</Link>
-      <Link href="/finance/investments">Investments</Link>
-      <Link href="/finance/loans">Loans</Link>
-      <Link href="/finance/funding">Founder funding</Link>
-      <Link href="/finance/cash-register">Cash register</Link>
-      <Link href="/finance/transfers">Transfers</Link>
-      <Link href="/finance/attachments">Evidence</Link>
-      <Link href="/finance/tax-codes">Tax policies</Link>
-      <Link href="/finance/bills">Bills &amp; expenses</Link>
-      <Link href="/finance/invoices">Invoices</Link>
-      <Link href="/finance/journals">Journals</Link>
-      <Link href="/finance/parties">Parties</Link>
-      <Link href="/finance/cash-accounts">Cash accounts</Link>
-      <Link href="/finance/accounts">Accounts</Link>
-      <Link href="/finance/periods">Periods</Link>
-      <Link href="/finance/fiscal-years">Fiscal years</Link>
-      <Link href="/finance/openings">Opening balances</Link>
-      <Link href="/finance/automation">Recurring drafts</Link>
-      <Link href="/finance/recognitions">Revenue recognition</Link>
-      <Link href="/finance/opening-credit-reviews">Opening credit reviews</Link>
-      <Link href="/finance/access">Access</Link>
-    </nav>
-  );
+  return <FinanceNavigationMenu demo={env.FINANCE_DEMO} />;
 }
 export function SetupHistory({
   events,
