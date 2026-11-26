@@ -63,7 +63,7 @@ test("a selected admin sees accessible setup and loses access after revocation",
       .getByRole("link", { name: "Finance", exact: true })
       .click();
     await expect(
-      page.getByRole("heading", { name: "Finance setup", exact: true }),
+      page.getByRole("heading", { name: "Finance overview", exact: true }),
     ).toBeVisible();
     expect((await page.request.get("/api/v1/finance/status")).status()).toBe(
       200,

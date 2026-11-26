@@ -1,0 +1,19 @@
+{
+  "kind": "ISOLATED_SYNTHETIC_DEMO",
+  "at": "2026-11-25T20:22:26.616Z",
+  "url": "http://localhost:49278",
+  "scenarios": [
+    "Owner: isolated cookies, exact actual statements, normal draft/void, private CSV/PDF hashes, mobile/WCAG/keyboard",
+    "Selected administrator: actual private financial statements",
+    "Unselected Demo Admin: financial navigation, pages and artifact access denied",
+    "Demo HR: financial navigation, pages and artifact access denied",
+    "Demo Team Lead: financial navigation, pages and artifact access denied",
+    "Demo Member: financial navigation, pages and artifact access denied",
+    "Restricted runtime SQL grants; nine posted sources unchanged"
+  ],
+  "postedSources": 9,
+  "bank": "575000.00",
+  "profit": "180000.00",
+  "assets": "785000.00",
+  "productionTouched": false
+}

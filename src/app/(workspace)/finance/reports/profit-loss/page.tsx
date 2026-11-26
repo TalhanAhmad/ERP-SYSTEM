@@ -49,7 +49,16 @@ export default async function ProfitLoss({
     <section>
       <FinanceNavigation />
       <h1>Profit and loss</h1>
-      <Link href="/finance/reports/balance-sheet">Balance sheet</Link>
+      <Link
+        href={
+          p.success
+            ? "/finance/reports/balance-sheet?" +
+              new URLSearchParams({ asOf: p.data.to })
+            : "/finance/reports/balance-sheet"
+        }
+      >
+        Balance sheet at period end
+      </Link>
       <section className="panel">
         <form method="get" className="form-grid">
           <label>

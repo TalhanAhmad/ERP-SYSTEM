@@ -1,0 +1,692 @@
+{
+  "checkedOn": "2026-11-26",
+  "kind": "READ_ONLY_LOCAL_SYNTHETIC_DIRECTORY_AUDIT",
+  "pages": [
+    {
+      "width": 1440,
+      "route": "/finance/invoices",
+      "status": 200,
+      "heading": "Invoices",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/receipts",
+      "status": 200,
+      "heading": "Receipts",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/bills",
+      "status": 200,
+      "heading": "Bills",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/supplier-payments",
+      "status": 200,
+      "heading": "Payments",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/cash-register",
+      "status": 200,
+      "heading": "Cash register",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/journals",
+      "status": 200,
+      "heading": "Journals",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/advance-applications",
+      "status": 200,
+      "heading": "Advance applications",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/customer-credits",
+      "status": 200,
+      "heading": "Customer credits",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/customer-refunds",
+      "status": 200,
+      "heading": "Customer refunds",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/receipt-unallocations",
+      "status": 200,
+      "heading": "Settlement releases",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/supplier-applications",
+      "status": 200,
+      "heading": "Advance applications",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/supplier-credits",
+      "status": 200,
+      "heading": "Supplier credits",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/supplier-refunds",
+      "status": 200,
+      "heading": "Supplier refunds",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/supplier-releases",
+      "status": 200,
+      "heading": "Settlement releases",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reports/general-ledger",
+      "status": 200,
+      "heading": "General ledger",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reports/trial-balance",
+      "status": 200,
+      "heading": "Trial balance",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reports/roll-forwards/PROJECTS",
+      "status": 200,
+      "heading": "Project results roll-forward",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reports/receivables-ageing",
+      "status": 200,
+      "heading": "Receivables ageing",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reports/payables-ageing",
+      "status": 200,
+      "heading": "Payables ageing",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reports/cash-flow",
+      "status": 200,
+      "heading": "Direct cash flow",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reports/profit-loss",
+      "status": 200,
+      "heading": "Profit and loss",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reports/balance-sheet",
+      "status": 200,
+      "heading": "Balance sheet",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/exports",
+      "status": 200,
+      "heading": "Report exports",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/report-settings",
+      "status": 200,
+      "heading": "Statement presentation",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/projects",
+      "status": 200,
+      "heading": "Commercial projects",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/cost-allocations",
+      "status": 200,
+      "heading": "Cost allocations",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/budgets",
+      "status": 200,
+      "heading": "Monthly cost budgets",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/forecasts",
+      "status": 200,
+      "heading": "Cash forecasts",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/assets",
+      "status": 200,
+      "heading": "Fixed asset register",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/asset-movements",
+      "status": 200,
+      "heading": "Asset movements",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/investments",
+      "status": 200,
+      "heading": "Investment holdings",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/loans",
+      "status": 200,
+      "heading": "Loan register",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/funding",
+      "status": 200,
+      "heading": "Founder funding",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/transfers",
+      "status": 200,
+      "heading": "Cash transfers",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/statements",
+      "status": 200,
+      "heading": "Bank statement evidence",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/bank-matches",
+      "status": 200,
+      "heading": "Bank matching",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reconciliations",
+      "status": 200,
+      "heading": "Bank reconciliations",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/attachments",
+      "status": 200,
+      "heading": "Private evidence",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/parties",
+      "status": 200,
+      "heading": "Parties",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/cash-accounts",
+      "status": 200,
+      "heading": "Cash accounts",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/accounts",
+      "status": 200,
+      "heading": "Chart of accounts",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/periods",
+      "status": 200,
+      "heading": "Accounting periods",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/fiscal-years",
+      "status": 200,
+      "heading": "Fiscal years",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/openings",
+      "status": 200,
+      "heading": "Opening balances",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/automation",
+      "status": 200,
+      "heading": "Recurring drafts",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/recognitions",
+      "status": 200,
+      "heading": "Deferred revenue recognition",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/opening-credit-reviews",
+      "status": 200,
+      "heading": "Opening credit classification reviews",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/tax-codes",
+      "status": 200,
+      "heading": "Tax policies",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/access",
+      "status": 200,
+      "heading": "Finance access",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/invoices",
+      "status": 200,
+      "heading": "Invoices",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/receipts",
+      "status": 200,
+      "heading": "Receipts",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/bills",
+      "status": 200,
+      "heading": "Bills",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/supplier-payments",
+      "status": 200,
+      "heading": "Payments",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/cash-register",
+      "status": 200,
+      "heading": "Cash register",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/journals",
+      "status": 200,
+      "heading": "Journals",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/advance-applications",
+      "status": 200,
+      "heading": "Advance applications",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/customer-credits",
+      "status": 200,
+      "heading": "Customer credits",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/customer-refunds",
+      "status": 200,
+      "heading": "Customer refunds",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/receipt-unallocations",
+      "status": 200,
+      "heading": "Settlement releases",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/supplier-applications",
+      "status": 200,
+      "heading": "Advance applications",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/supplier-credits",
+      "status": 200,
+      "heading": "Supplier credits",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/supplier-refunds",
+      "status": 200,
+      "heading": "Supplier refunds",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/supplier-releases",
+      "status": 200,
+      "heading": "Settlement releases",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reports/general-ledger",
+      "status": 200,
+      "heading": "General ledger",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reports/trial-balance",
+      "status": 200,
+      "heading": "Trial balance",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reports/roll-forwards/PROJECTS",
+      "status": 200,
+      "heading": "Project results roll-forward",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reports/receivables-ageing",
+      "status": 200,
+      "heading": "Receivables ageing",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reports/payables-ageing",
+      "status": 200,
+      "heading": "Payables ageing",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reports/cash-flow",
+      "status": 200,
+      "heading": "Direct cash flow",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reports/profit-loss",
+      "status": 200,
+      "heading": "Profit and loss",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reports/balance-sheet",
+      "status": 200,
+      "heading": "Balance sheet",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/exports",
+      "status": 200,
+      "heading": "Report exports",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/report-settings",
+      "status": 200,
+      "heading": "Statement presentation",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/projects",
+      "status": 200,
+      "heading": "Commercial projects",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/cost-allocations",
+      "status": 200,
+      "heading": "Cost allocations",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/budgets",
+      "status": 200,
+      "heading": "Monthly cost budgets",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/forecasts",
+      "status": 200,
+      "heading": "Cash forecasts",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/assets",
+      "status": 200,
+      "heading": "Fixed asset register",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/asset-movements",
+      "status": 200,
+      "heading": "Asset movements",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/investments",
+      "status": 200,
+      "heading": "Investment holdings",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/loans",
+      "status": 200,
+      "heading": "Loan register",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/funding",
+      "status": 200,
+      "heading": "Founder funding",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/transfers",
+      "status": 200,
+      "heading": "Cash transfers",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/statements",
+      "status": 200,
+      "heading": "Bank statement evidence",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/bank-matches",
+      "status": 200,
+      "heading": "Bank matching",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reconciliations",
+      "status": 200,
+      "heading": "Bank reconciliations",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/attachments",
+      "status": 200,
+      "heading": "Private evidence",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/parties",
+      "status": 200,
+      "heading": "Parties",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/cash-accounts",
+      "status": 200,
+      "heading": "Cash accounts",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/accounts",
+      "status": 200,
+      "heading": "Chart of accounts",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/periods",
+      "status": 200,
+      "heading": "Accounting periods",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/fiscal-years",
+      "status": 200,
+      "heading": "Fiscal years",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/openings",
+      "status": 200,
+      "heading": "Opening balances",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/automation",
+      "status": 200,
+      "heading": "Recurring drafts",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/recognitions",
+      "status": 200,
+      "heading": "Deferred revenue recognition",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/opening-credit-reviews",
+      "status": 200,
+      "heading": "Opening credit classification reviews",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/tax-codes",
+      "status": 200,
+      "heading": "Tax policies",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/access",
+      "status": 200,
+      "heading": "Finance access",
+      "overflow": false
+    }
+  ]
+}

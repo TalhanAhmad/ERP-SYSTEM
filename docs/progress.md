@@ -1,6 +1,8 @@
 # Encova Workspace progress
 
-Last updated: 2026-11-25 (Asia/Karachi)
+Last updated: 2026-11-27 (Asia/Karachi)
+Usability follow-up: the owner-selected local finance screen review is implemented and locally verified on finance/usability-review. Compact grouped/searchable navigation retains all 50 destinations, Finance overview exposes every module, and statement links preserve the selected cutoff. [Review and evidence](finance/review/usability-review.md) record 358 passing units, 8 focused browser tests, 7 retained-demo scenarios, 14 representative layouts and 98 module-directory layout checks. [PR #10](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/10) passed full CI on aca83b2 (1,229 tests and both builds). A final current-page menu dismissal/focus fix is locally verified and awaits its own fresh CI; merge remains pending.
+
 
 Finance extension: F01–F46 engineering and F47/F48 review/release packs are merged through PR8, merge 62128ee. Final PR and merged-main CI passed; [main CI 44882423627](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/44882423627) verified the full suite and both builds. Prior local acceptance: 1,218 tests, 250 API contracts and 84 checksums. [Concise report](finance/Encova_Final_Engineering_Report.docx) and [finance progress](finance/progress.md) record publication and next-phase choices. The live Vercel URL still serves its earlier READY deployment; no finance activation or hosted changes were performed. The owner-selected isolated finance demo is delivered locally and merged through [PR #9](https://github.com/TalhanAhmad/ERP-SYSTEM/pull/9), commit 9b96866. [Post-merge CI](https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/45446116853) passed all 1,227 tests and both builds, and all seven actual demo scenarios passed again on 24 November; see [demo guide](finance/review/isolated-demo.md) and [Word report](finance/Encova_Isolated_Demo_Report.docx). Human policy acceptance and hosted finance setup remain.
 

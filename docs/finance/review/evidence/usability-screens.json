@@ -1,0 +1,133 @@
+{
+  "kind": "LOCAL_SYNTHETIC_FINANCE_USABILITY_REVIEW",
+  "checkedOn": "2026-11-26",
+  "timezone": "Asia/Karachi",
+  "screens": [
+    {
+      "width": 1440,
+      "route": "/finance",
+      "status": 200,
+      "heading": "Finance overview",
+      "headingTop": 331,
+      "navigationHeight": 159,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/reports/profit-loss?from=2020-01-01&to=2020-01-31",
+      "status": 200,
+      "heading": "Profit and loss",
+      "headingTop": 309,
+      "navigationHeight": 159,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/invoices",
+      "status": 200,
+      "heading": "Invoices",
+      "headingTop": 309,
+      "navigationHeight": 159,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/invoices/new",
+      "status": 200,
+      "heading": "New invoice draft",
+      "headingTop": 309,
+      "navigationHeight": 159,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/bills/new",
+      "status": 200,
+      "heading": "New bill draft",
+      "headingTop": 309,
+      "navigationHeight": 159,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/journals/new",
+      "status": 200,
+      "heading": "New journal draft",
+      "headingTop": 309,
+      "navigationHeight": 159,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/finance/exports/new",
+      "status": 200,
+      "heading": "Prepare report export",
+      "headingTop": 309,
+      "navigationHeight": 159,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance",
+      "status": 200,
+      "heading": "Finance overview",
+      "headingTop": 578,
+      "navigationHeight": 231,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/reports/profit-loss?from=2020-01-01&to=2020-01-31",
+      "status": 200,
+      "heading": "Profit and loss",
+      "headingTop": 556,
+      "navigationHeight": 231,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/invoices",
+      "status": 200,
+      "heading": "Invoices",
+      "headingTop": 556,
+      "navigationHeight": 231,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/invoices/new",
+      "status": 200,
+      "heading": "New invoice draft",
+      "headingTop": 556,
+      "navigationHeight": 231,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/bills/new",
+      "status": 200,
+      "heading": "New bill draft",
+      "headingTop": 556,
+      "navigationHeight": 231,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/journals/new",
+      "status": 200,
+      "heading": "New journal draft",
+      "headingTop": 556,
+      "navigationHeight": 231,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "/finance/exports/new",
+      "status": 200,
+      "heading": "Prepare report export",
+      "headingTop": 556,
+      "navigationHeight": 231,
+      "overflow": false
+    }
+  ]
+}

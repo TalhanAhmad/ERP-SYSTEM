@@ -1,0 +1,15 @@
+{
+  "checkedOn": "2026-11-26",
+  "viewportWidth": 390,
+  "route": "/finance/invoices",
+  "before": {
+    "navigationHeight": 503,
+    "headingTop": 831
+  },
+  "after": {
+    "navigationHeight": 231,
+    "headingTop": 556
+  },
+  "originalDestinationsRetained": 50,
+  "testedScreenLayouts": 14
+}

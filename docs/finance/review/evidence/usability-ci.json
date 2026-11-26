@@ -1,0 +1,21 @@
+{
+  "observedOn": "2026-11-27",
+  "timezone": "Asia/Karachi",
+  "source": "aca83b2f8ce58f9a865a9c9a330f3731392237d5",
+  "run": "https://github.com/TalhanAhmad/ERP-SYSTEM/actions/runs/45700584090",
+  "conclusion": "success",
+  "tests": {
+    "unit": 358,
+    "postgresql": 806,
+    "chromium": 65,
+    "total": 1229
+  },
+  "freshMigrations": 84,
+  "typecheck": "passed",
+  "lint": "passed",
+  "normalBuild": "passed",
+  "supabaseShapedBuild": "passed",
+  "apiPaths": 250,
+  "followUpMenuDismissal": "new source; fresh CI pending",
+  "merge": "pending"
+}
