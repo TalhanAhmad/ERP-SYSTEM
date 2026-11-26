@@ -1,0 +1,18 @@
+{
+  "checkedOn": "2026-11-27",
+  "scope": "ACTUAL_LOCAL_SYNTHETIC_DEMO",
+  "before": {
+    "source": "aca83b2",
+    "route": "/finance/loans",
+    "menuOpenAfterCurrentPageSelection": true,
+    "retainedSearch": "loans"
+  },
+  "after": {
+    "currentPageCloses": true,
+    "queryOnlyNavigationCloses": true,
+    "searchCleared": true,
+    "focusRestored": true,
+    "newWindowPreservesOriginalMenu": true
+  },
+  "moneyOrPermissionChange": false
+}

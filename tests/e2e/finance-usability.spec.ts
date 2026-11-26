@@ -51,6 +51,12 @@ test("finance directory and searchable navigation work on mobile with keyboard a
   await expect(
     nav.getByRole("link", { name: "Loans", exact: true }),
   ).toHaveAttribute("aria-current", "page");
+  await nav.getByRole("searchbox").fill("loans");
+  await nav.getByRole("link", { name: "Loans", exact: true }).click();
+  await expect(nav.locator("details")).toHaveJSProperty("open", false);
+  await expect(nav.locator("summary")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(nav.getByRole("searchbox")).toHaveValue("");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

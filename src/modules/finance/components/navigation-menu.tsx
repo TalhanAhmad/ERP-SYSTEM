@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { financeSections } from "./navigation-links";
 
 export function FinanceNavigationMenu({ demo }: { demo: boolean }) {
@@ -10,6 +10,14 @@ export function FinanceNavigationMenu({ demo }: { demo: boolean }) {
 }
 function FinanceMenu({ pathname, demo }: { pathname: string; demo: boolean }) {
   const [query, setQuery] = useState("");
+  const disclosure = useRef<HTMLDetailsElement>(null);
+  const dismiss = () => {
+    if (disclosure.current?.open) {
+      disclosure.current.open = false;
+      disclosure.current.querySelector("summary")?.focus();
+    }
+    setQuery("");
+  };
   const search = query.trim().toLowerCase();
   const sections = financeSections
     .map((section) => ({
@@ -36,13 +44,14 @@ function FinanceMenu({ pathname, demo }: { pathname: string; demo: boolean }) {
             key={href}
             href={href}
             prefetch={false}
+            onNavigate={dismiss}
             aria-current={current(href) ? "page" : undefined}
           >
             {label}
           </Link>
         ))}
       </div>
-      <details className="finance-menu">
+      <details ref={disclosure} className="finance-menu">
         <summary>Browse finance pages</summary>
         <div className="finance-menu-content">
           <label>
@@ -64,6 +73,7 @@ function FinanceMenu({ pathname, demo }: { pathname: string; demo: boolean }) {
                       <Link
                         href={link.href}
                         prefetch={false}
+                        onNavigate={dismiss}
                         aria-current={current(link.href) ? "page" : undefined}
                       >
                         {link.label}
@@ -90,18 +100,21 @@ function FinanceMenu({ pathname, demo }: { pathname: string; demo: boolean }) {
           <Link
             href="/finance/reports/trial-balance?from=2020-01-01&to=2020-01-31"
             prefetch={false}
+            onNavigate={dismiss}
           >
             Demo January 2020 trial balance
           </Link>
           <Link
             href="/finance/reports/profit-loss?from=2020-01-01&to=2020-01-31"
             prefetch={false}
+            onNavigate={dismiss}
           >
             Demo January 2020 profit and loss
           </Link>
           <Link
             href="/finance/reports/balance-sheet?asOf=2020-01-31"
             prefetch={false}
+            onNavigate={dismiss}
           >
             Demo January 2020 balance sheet
           </Link>
